@@ -1,0 +1,385 @@
+/* Base Styles */
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f5f5f5;
+}
+
+h1 {
+    color: #4b0673;
+    text-align: center;
+    margin-bottom: 2px;
+}
+
+.parallax {
+    background-image: url("../notes3.jpg");
+    min-height: 100vh;
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+/* Week Display */
+.week-display {
+    font-weight: bold;
+    font-size: 1.5em;
+    text-align: center;
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Controls */
+.controls {
+    margin-bottom: 20px;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.controls-container {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 1em;
+}
+
+.toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#dedicated-toggle {
+    width: 40px;
+    height: 20px;
+    appearance: none;
+    background-color: #ccc;
+    border-radius: 10px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#dedicated-toggle:checked {
+    background-color: #2f40d3;
+}
+
+#dedicated-toggle::after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: white;
+    top: 2px;
+    left: 1px;
+    transition: transform 0.2s;
+}
+
+#dedicated-toggle:checked::after {
+    transform: translateX(20px);
+}
+
+/* Buttons */
+button {
+    background-color: #2f40d3;
+    color: white;
+    border: none;
+    padding: 8px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #f72a2a;
+}
+
+.details-btn {
+    background-color: #190dab;
+    color: white;
+    border: none;
+    padding: 8px 8px;
+    border-radius: 2px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-size: 0.8em;
+    transition: background-color 0.2s;
+}
+
+.details-btn:hover {
+    background-color: #0d38ad;
+}
+
+/* Day Cards */
+.day-card {
+    background-color: white;
+    opacity: 94%;
+    margin-bottom: 15px;
+
+}
+
+.day-header {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    background-color: #4c4be7;
+    color: white;
+    padding: 18px 15px;
+    font-weight: bold;
+    font-size:1.5em;
+    display: flex;
+    justify-content: space-between;
+    position: -webkit-sticky;
+    position: sticky;
+    top:-8px;
+    z-index:1;
+    box-shadow: 0px 7px rgba(0, 0, 0, 0.1);
+}
+
+.day-header.today {
+    background-color: #ff0000;
+}
+
+.day-header.today::after {
+    content: "TODAY";
+    font-size: 1.2rem;
+}
+
+.schedule-container{
+    margin-bottom: 50px
+    
+}
+.date-number {
+    font-size: 1em;
+}
+
+/* Venue Items */
+.venue-list {
+    padding: 6px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.venue-item {
+    margin-bottom: 4px;
+    padding: 15px;
+    background-color: white;
+    border-bottom: 1px solid #bebebe;
+    
+}
+
+.venue-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 14px;
+    border-bottom: none;
+    
+}
+
+.venue-name {
+    text-transform: uppercase;
+    font-family: Tahoma, sans-serif;
+    font-size: 17px;
+    font-weight: bold;
+    color: #b50027;
+    margin-bottom: 2px;
+}
+
+.venue-kj {
+    font-weight: bold;
+    font-style: italic;
+    font-size: 0.9em;
+    color: #49306c;
+    margin-bottom: 5px;
+}
+
+.venue-address {
+    font-size: 1em;
+    color: #666;
+}
+
+.venue-address a {
+    font-size: 1em;
+    color: #666;
+    text-decoration: none;
+    border-bottom: 1px solid black;
+}
+
+.venue-time {
+    font-weight: bold;
+    color: #333;
+    margin: 5px 0;
+}
+
+.time-description {
+    font-weight: normal;
+    font-style: italic;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.social-links {
+    display: flex;
+    gap: 16px;
+    margin-top: 8px;
+}
+
+.social-links a {
+    color: #555;
+    font-size: 1.2em;
+    transition: color 0.2s;
+}
+
+.social-links a:hover {
+    color: #d32f2f;
+}
+
+.no-events {
+    color: #999;
+    font-style: italic;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    padding: 18px;
+    border-radius: 19px;
+    margin: 4% auto;
+    width: 75%;
+    max-height: 95vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.close-modal {
+    color: #aaa;
+    float: right;
+    font-size: 44px;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute;
+    right: 20px;
+    top: 0;
+}
+
+.close-modal:hover {
+    color: black;
+}
+
+.modal-venue-name {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #b50027;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    margin-right: 32px;
+    border-bottom: 1px solid #eee;
+
+}
+
+.modal-address,
+.modal-kj {
+    margin-bottom: 15px;
+}
+
+.modal-schedule h3 {
+    margin:0;
+    padding: 0;
+    
+    color: #4b0673;
+}
+
+.modal-schedule h4 {
+        margin:0;
+    padding: 0;
+    color: blue;
+}
+
+.modal-schedule ul {
+            margin:0;
+    padding-top: 0;
+    list-style-type: none;
+    padding-left: 0;
+    padding-bottom: 20px;
+}
+
+.modal-schedule-item {
+    margin-bottom: 5px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.modal .social-links {
+    margin: 9px 0;
+}
+
+.modal .social-links a {
+    font-size: 2.3em;
+}
+
+/* Back to Top Button */
+#backToTop {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    display: none;
+    width: 82px;
+    height: 50px;
+    border-radius: 8%;
+    background: #700000;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    z-index: 101;
+    transition: opacity 0.3s;
+}
+
+#backToTop:hover {
+    background: #555;
+}
+
+#backToTop.visible {
+    display: block;
+}
+
+/* Responsive Adjustments */
+@media (min-width: 768px) {
+    .week-display {
+        font-size: 2em;
+    }
+}
+
+@media (max-width: 600px) {
+    .controls-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    
+    .social-links {
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    
+    .modal-content {
+        margin: 4% auto;
+        width: 80%;
+    }
+}
