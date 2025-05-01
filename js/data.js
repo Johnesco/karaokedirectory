@@ -130,6 +130,29 @@ const karaokeData = {
                         }
                     },
                     {
+                        VenueName: "Blindside Lounge",
+                        Address: {
+                            Street: "211 6th St",
+                            City: "Austin",
+                            State: "TX",
+                            Zip: "78701"
+                        },
+                        KJ: {
+                            Host: "Xpider",
+                            Company: ""
+                        },
+                        socials: {
+                            Website:"https://blindsidelounge.com/",
+                            Instagram: "https://www.instagram.com/blindsidelounge"
+                        },
+                        schedule: {
+                            weekly: {
+                                Wednesday: "9:00 PM - 2:00 AM"
+                            },
+                            ordinal: []
+                        }
+                    },
+                    {
                         VenueName: "Buddy's Place",
                         Address: {
                             Street: "8619 Burnet Road",
