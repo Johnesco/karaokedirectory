@@ -80,7 +80,7 @@ function formatWeekRange(startDate) {
     const startStr = startDate.toLocaleDateString("en-US", options);
     const endStr = endDate.toLocaleDateString("en-US", { ...options, year: "numeric" });
 
-    return `Viewing ${startStr} - ${endStr}`;
+    return `Viewing: ${startStr} - ${endStr}`;
 }
 
 function isOrdinalDate(date, ordinal, dayName) {
@@ -210,7 +210,7 @@ function renderWeek() {
                                     <div class="venue-item">
                                         <div class="venue-name">${venue.VenueName}</div>
                                         <div class="venue-kj">${venue.KJ.Company ? `${venue.KJ.Company}<br>` : ""}${venue.KJ.Host ? ` with ${venue.KJ.Host}` : ""}</div>
-                                        <div class="venue-time">${venue.timeInfo.time}${venue.timeInfo.description ? ` <span class="time-description">(${venue.timeInfo.description})</span>` : ""}</div>
+                                        <div class="venue-time">${venue.timeInfo.time}${venue.timeInfo.description ? ` <span class="time-description"><br>(${venue.timeInfo.description})</span>` : ""}</div>
                                         <div class="venue-address"><a href="${createMapLink(venue)}" target="_blank" title="View on Google Maps">${formatAddress(venue)}</a></div>
                                         <button class="details-btn" onclick="showVenueDetails(${JSON.stringify(venue).replace(/"/g, '&quot;')})">
                                             See Details

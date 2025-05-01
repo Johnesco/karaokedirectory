@@ -556,7 +556,7 @@ const karaokeData = {
                     {
                         VenueName: "Rabbit Hole (Cedar Park)",
                         Address: {
-                            Street: "13920 Ronald Reagan Boulevard STE 202",
+                            Street: "13920 Ronald Reagan Blvd STE 202",
                             City: "Cedar Park",
                             State: "TX",
                             Zip: "78641"

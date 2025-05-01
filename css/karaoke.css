@@ -11,6 +11,7 @@ h1 {
     color: #4b0673;
     text-align: center;
     margin-bottom: 2px;
+    font-size:5vw;
 }
 
 .parallax {
@@ -371,6 +372,10 @@ button:hover {
         flex-direction: column;
         gap: 10px;
     }
+    h1 {
+        font-size: 2em;
+    }
+
     
     
     .social-links {
