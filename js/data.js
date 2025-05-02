@@ -153,6 +153,30 @@ const karaokeData = {
                         }
                     },
                     {
+                        VenueName: "Pflutto's Tavern (Round Rock/Hutto)",
+                        Address: {
+                            Street: "101 Limmer Loop",
+                            City: "Hutto/Round Rock",
+                            State: "TX",
+                            Zip: "78665"
+                        },
+                        KJ: {
+                            Host: "Xpider",
+                            Company: ""
+                        },
+                        socials: {
+                            Website:"https://blindsidelounge.com/",
+                            
+                            Facebook: "https://www.facebook.com/profile.php?id=61563834987547"
+                        },
+                        schedule: {
+                            weekly: {
+                                Wednesday: "7:00 PM - 11:00 PM"
+                            },
+                            ordinal: []
+                        }
+                    },
+                    {
                         VenueName: "Buddy's Place",
                         Address: {
                             Street: "8619 Burnet Road",
