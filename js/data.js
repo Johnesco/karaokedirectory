@@ -211,7 +211,7 @@ const karaokeData = {
                         },
                         socials: {
                             Facebook:"https://www.facebook.com/thehudsontavern/",
-                            Instagram: "https://www.instagram.com/buddysplaceatx/"
+                            Instagram: "https://www.instagram.com/explore/locations/1655266901454617/hudson-tavern/"
                         },
                         schedule: {
                             weekly: {

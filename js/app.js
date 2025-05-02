@@ -16,16 +16,17 @@ function showVenueDetails(venue) {
   venueName.textContent = venue.VenueName;
   
   let infoHTML = `
+  <div class="modal-kj">
+      ${venue.KJ.Company ? `<strong><div class="venue-kj">${venue.KJ.Company}</strong><br>` : ""}${venue.KJ.Host ? `<strong>KJ:</strong> ${venue.KJ.Host}` : ""}</div>
+    </div>
     <div class="modal-address">
       <strong>Address:</strong><br>
       <div class="venue-address"><a href="${createMapLink(venue)}" target="_blank" title="View on Google Maps">${formatAddress(venue)}</a></div>
     </div>
-    <div class="modal-kj">
-      ${venue.KJ.Company ? `<strong>KJ:</strong> <div class="venue-kj">${venue.KJ.Company}<br>` : ""}${venue.KJ.Host ? ` with ${venue.KJ.Host}` : ""}</div>
-    </div>
+    
     
     <div class="modal-schedule">
-      <h3>Schedule:</h3>`;
+      <strong>Schedule:</strong>`;
   
   const weeklyDays = Object.entries(venue.schedule.weekly);
   if (weeklyDays.length > 0) {
@@ -44,7 +45,7 @@ function showVenueDetails(venue) {
     infoHTML += `</ul>`;
   }
   
-  venueInfo.innerHTML = infoHTML + `<strong>Social Media:</strong>${createSocialLinks(venue)}</div>`;
+  venueInfo.innerHTML = infoHTML + `<strong>Social Media:</strong><br>${createSocialLinks(venue)}</div></div>`;
   modal.style.display = 'block';
   
   document.querySelector('.close-modal').onclick = () => {
@@ -173,60 +174,118 @@ function createSocialLinks(venue) {
 // DOM RENDERING
 // ======================
 function renderWeek() {
+    updateWeekDisplay();
+    clearContainer();
+    renderAllDays();
+}
+
+function updateWeekDisplay() {
     const weekDisplay = document.getElementById("week-display");
-    const container = document.getElementById("schedule-container");
-
     weekDisplay.textContent = formatWeekRange(currentWeekStart);
+}
+
+function clearContainer() {
+    const container = document.getElementById("schedule-container");
     container.innerHTML = "";
+}
 
+function renderAllDays() {
     for (let i = 0; i < 7; i++) {
-        const currentDate = new Date(currentWeekStart);
-        currentDate.setDate(currentDate.getDate() + i);
-        const isCurrentDay = isToday(currentDate);
-
-        const venuesToday = karaokeData.listings
-            .map((venue) => {
-                const { hasEvent, timeInfo } = hasKaraokeOnDate(venue, currentDate);
-                return hasEvent ? { ...venue, timeInfo } : null;
-            })
-            .filter((venue) => venue && (showDedicated || !venue.Dedicated))
-            .sort((a, b) => a.VenueName.localeCompare(b.VenueName));
-
-        const dayHTML = `
-            
-                <div class="day-header ${isCurrentDay ? "today" : ""}">
-                    <span>${currentDate.toLocaleDateString("en-US", { weekday: "long" })}</span>
-                    <span class="date-number ${isCurrentDay ? "today" : ""}">
-                        ${currentDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                    </span>
-                </div>
-                <div class="day-card">
-                <div class="venue-list">
-                    ${
-                        venuesToday.length > 0
-                            ? venuesToday
-                                .map(
-                                    (venue) => `
-                                    <div class="venue-item">
-                                        <div class="venue-name">${venue.VenueName}</div>
-                                        <div class="venue-kj">${venue.KJ.Company ? `${venue.KJ.Company}<br>` : ""}${venue.KJ.Host ? ` with ${venue.KJ.Host}` : ""}</div>
-                                        <div class="venue-time">${venue.timeInfo.time}${venue.timeInfo.description ? ` <span class="time-description"><br>(${venue.timeInfo.description})</span>` : ""}</div>
-                                        <div class="venue-address"><a href="${createMapLink(venue)}" target="_blank" title="View on Google Maps">${formatAddress(venue)}</a></div>
-                                        <button class="details-btn" onclick="showVenueDetails(${JSON.stringify(venue).replace(/"/g, '&quot;')})">
-                                            See Details
-                                        </button>
-                                    </div>
-                                `
-                                )
-                                .join("")
-                            : '<div class="no-events">No karaoke venues scheduled</div>'
-                    }
-                </div>
-            </div>
-        `;
-
-        container.insertAdjacentHTML("beforeend", dayHTML);
+        const currentDate = getCurrentDate(i);
+        const venuesToday = getVenuesForDate(currentDate);
+        const dayHTML = createDayHTML(currentDate, venuesToday);
+        appendDayToContainer(dayHTML);
     }
+}
+
+function getCurrentDate(dayOffset) {
+    const currentDate = new Date(currentWeekStart);
+    currentDate.setDate(currentDate.getDate() + dayOffset);
+    return currentDate;
+}
+
+function getVenuesForDate(date) {
+    return karaokeData.listings
+        .map(venue => getVenueWithEventInfo(venue, date))
+        .filter(venue => venue && (showDedicated || !venue.Dedicated))
+        .sort((a, b) => a.VenueName.localeCompare(b.VenueName));
+}
+
+function getVenueWithEventInfo(venue, date) {
+    const { hasEvent, timeInfo } = hasKaraokeOnDate(venue, date);
+    return hasEvent ? { ...venue, timeInfo } : null;
+}
+
+function createDayHTML(date, venues) {
+    const isCurrentDay = isToday(date);
+    return `
+        <div class="day-header ${isCurrentDay ? "today" : ""}">
+            ${createDayHeaderContent(date, isCurrentDay)}
+        </div>
+        <div class="day-card">
+            <div class="venue-list">
+                ${venues.length > 0 ? createVenuesList(venues) : createNoEventsMessage()}
+            </div>
+        </div>
+    `;
+}
+
+function createDayHeaderContent(date, isCurrentDay) {
+    return `
+        <span>${date.toLocaleDateString("en-US", { weekday: "long" })}</span>
+        <span class="date-number ${isCurrentDay ? "today" : ""}">
+            ${date.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+        </span>
+    `;
+}
+
+function createVenuesList(venues) {
+    return venues.map(venue => createVenueItem(venue)).join("");
+}
+
+function createNoEventsMessage() {
+    return '<div class="no-events">No karaoke venues scheduled</div>';
+}
+
+function createVenueItem(venue) {
+    return `
+        <div class="venue-item">
+            <div class="venue-name">${venue.VenueName}</div>
+            <div class="venue-kj">${createKJInfo(venue.KJ)}</div>
+            <div class="venue-time">${createTimeInfo(venue.timeInfo)}</div>
+            <div class="venue-address">${createAddressLink(venue)}</div>
+            ${createDetailsButton(venue)}
+        </div>
+    `;
+}
+
+function createKJInfo(kj) {
+    return `${kj.Company ? `${kj.Company}<br>` : ""}${kj.Host ? ` with ${kj.Host}` : ""}`;
+}
+
+function createTimeInfo(timeInfo) {
+    return `${timeInfo.time}${
+        timeInfo.description 
+            ? ` <span class="time-description"><br>(${timeInfo.description})</span>` 
+            : ""
+    }`;
+}
+
+function createAddressLink(venue) {
+    return `<a href="${createMapLink(venue)}" target="_blank" title="View on Google Maps">${formatAddress(venue)}</a>`;
+}
+
+function createDetailsButton(venue) {
+    return `
+        <button class="details-btn" onclick="showVenueDetails(${JSON.stringify(venue).replace(/"/g, '&quot;')})">
+            See Details
+        </button>
+    `;
+}
+
+function appendDayToContainer(html) {
+    const container = document.getElementById("schedule-container");
+    container.insertAdjacentHTML("beforeend", html);
 }
 
 // ======================
