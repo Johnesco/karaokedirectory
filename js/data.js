@@ -161,12 +161,10 @@ const karaokeData = {
                             Zip: "78665"
                         },
                         KJ: {
-                            Host: "Xpider",
-                            Company: ""
+                            Host: "",
+                            Company: "Diamond Karaoke Austin"
                         },
                         socials: {
-                            Website:"https://blindsidelounge.com/",
-                            
                             Facebook: "https://www.facebook.com/profile.php?id=61563834987547"
                         },
                         schedule: {
