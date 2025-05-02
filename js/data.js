@@ -153,7 +153,7 @@ const karaokeData = {
                         }
                     },
                     {
-                        VenueName: "Pflutto's Tavern (Round Rock/Hutto)",
+                        VenueName: "Pflutto's Tavern #2",
                         Address: {
                             Street: "101 Limmer Loop",
                             City: "Hutto/Round Rock",
@@ -487,6 +487,30 @@ const karaokeData = {
                         schedule: {
                             weekly: {
                                 Wednesday: "6:00 PM - 9:00 PM"
+                            },
+                            ordinal: []
+                        }
+                    },
+                     {
+                        VenueName: "Hard Count Kitchen & Cocktails",
+                        Address: {
+                            Street: "1500 Rivery Blvd Suite 2105",
+                            City: "Georgetown",
+                            State: "TX",
+                            Zip: "78628"
+                        },
+                        KJ: {
+                            Host: "",
+                            Company: "Diamond Karaoke Austin"
+                        },
+                        socials: {
+                            Facebook: "https://www.facebook.com/hardcountgtown/?ref=page_internal",
+                            Instagram: "https://www.instagram.com/hardcountgtown/",
+                            Website: "https://hardcountgtown.com/"
+                        },
+                        schedule: {
+                            weekly: {
+                                Saturday: "9:00 PM - MIDNIGHT"
                             },
                             ordinal: []
                         }
