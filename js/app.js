@@ -265,9 +265,7 @@ function createKJInfo(kj) {
 
 function createTimeInfo(timeInfo) {
     return `${timeInfo.time}${
-        timeInfo.description 
-            ? ` <span class="time-description"><br>(${timeInfo.description})</span>` 
-            : ""
+        timeInfo.description ? ` <span class="time-description"><br>(${timeInfo.description})</span>` : ""
     }`;
 }
 
