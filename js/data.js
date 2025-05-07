@@ -21,13 +21,13 @@ const karaokeData = {
                         },
                         schedule: {
                             weekly: {
-                                Sunday: "4:00 PM - 2:00 AM",
-                                Monday: "2:00 PM - 1:00 AM",
-                                Tuesday: "2:00 PM - 1:00 AM",
-                                Wednesday: "2:00 PM - 1:00 AM",
-                                Thursday: "2:00 PM - 1:00 AM",
-                                Friday: "2:00 PM - 1:00 AM",
-                                Saturday: "4:00 PM - 2:00 AM"
+                                Sunday: "8:00 PM - 2:00 AM",
+                                Monday: "8:00 PM - 1:00 AM",
+                                Tuesday: "8:00 PM - 1:00 AM",
+                                Wednesday: "8:00 PM - 1:00 AM",
+                                Thursday: "8:00 PM - 1:00 AM",
+                                Friday: "7:00 PM - 1:00 AM",
+                                Saturday: "8:00 PM - 2:00 AM"
                             },
                             ordinal: []
                         }
