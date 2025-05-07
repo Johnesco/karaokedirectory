@@ -794,12 +794,12 @@ const karaokeData = {
                             ordinal: [
                                 {
                                     day: ["second", "Thursday"],
-                                    time: "6:00 PM - ??? PM",
+                                    time: "6:30 PM - ??? PM",
                                     description: "Second and Fourth Fridays"
                                 },
                                 {
                                     day: ["fourth", "Thrusday"],
-                                    time: "6:00 PM - ??? PM",
+                                    time: "6:30 PM - ??? PM",
                                     description: "Second and Fourth Fridays"
                                 }
                             ]
