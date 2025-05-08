@@ -17,7 +17,11 @@ function showVenueDetails(venue) {
   
   let infoHTML = `
   <div class="modal-kj">
-      ${venue.KJ.Company ? `<strong><div class="venue-kj">${venue.KJ.Company}</strong><br>` : ""}${venue.KJ.Host ? `<strong>KJ:</strong> ${venue.KJ.Host}` : ""}</div>
+      ${venue.KJ.Company ? `<strong><div class="venue-kj">${venue.KJ.Company}</strong><br>` : ""}
+      ${venue.KJ.Host ? `<strong>KJ:</strong> ${venue.KJ.Host}` : ""}
+      ${venue.KJ.Website ? `<br><a href="${venue.KJ.Website}">${venue.KJ.Website}</a>` : ""}
+      </div>
+      
     </div>
     <div class="modal-address">
       <strong>Address:</strong><br>
@@ -45,7 +49,7 @@ function showVenueDetails(venue) {
     infoHTML += `</ul>`;
   }
   
-  venueInfo.innerHTML = infoHTML + `<strong>Social Media:</strong><br>${createSocialLinks(venue)}</div></div>`;
+  venueInfo.innerHTML = infoHTML + `<strong>Venue Social Media:</strong><br>${createSocialLinks(venue)}</div></div>`;
   modal.style.display = 'block';
   
   document.querySelector('.close-modal').onclick = () => {

@@ -230,6 +230,10 @@
                             <label for="kjCompany">Company</label>
                             <input type="text" id="kjCompany">
                         </div>
+                        <div class="form-group">
+                            <label for="kjWebsite">Website</label>
+                            <input type="text" id="kjWebsite">
+                        </div>
                     </div>
                     
                     <div class="section">
@@ -370,6 +374,7 @@
         // KJ fields
         const kjHost = document.getElementById('kjHost');
         const kjCompany = document.getElementById('kjCompany');
+        const kjWebsite = document.getElementById('kjWebsite');
         
         // Social fields
         const facebook = document.getElementById('facebook');
@@ -471,6 +476,7 @@
                     if (kjText) kjText += ' | ';
                     kjText += `Company: ${venue.KJ.Company}`;
                 }
+                // no website on preview
                 kjDiv.textContent = kjText || 'No KJ info';
                 
                 venueDetailsDiv.appendChild(addressDiv);
@@ -509,6 +515,7 @@
             // Set KJ info
             kjHost.value = venue.KJ.Host || '';
             kjCompany.value = venue.KJ.Company || '';
+            kjWebsite.value = venue.KJ.Website || '';
             
             // Set socials
             facebook.value = venue.socials.Facebook || '';
@@ -602,7 +609,8 @@
                 },
                 "KJ": {
                     "Host": "",
-                    "Company": ""
+                    "Company": "",
+                    "Website":""
                 },
                 "socials": {
                     "Facebook": null,
@@ -647,7 +655,8 @@
             // Update KJ info
             venue.KJ = {
                 Host: kjHost.value,
-                Company: kjCompany.value
+                Company: kjCompany.value,
+                Website: kjWebsite.value
             };
             
             // Update socials

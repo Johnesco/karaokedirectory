@@ -488,6 +488,36 @@ const karaokeData = {
       "Dedicated": false
     },
     {
+      "VenueName": "Hudson Tavern",
+      "Dedicated": false,
+      "Address": {
+        "Street": "5000 Hudson Bend Rd Suite D",
+        "City": "Lake Travis",
+        "State": "TX",
+        "Zip": "78734"
+      },
+      "KJ": {
+        "Host": "Jason Lynum",
+        "Company": "CPR Mobile DJs",
+        "Website": "https://cprmobiledjs.com/"
+      },
+      "socials": {
+        "Facebook": null,
+        "Instagram": null,
+        "Twitter": null,
+        "Website": null,
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": {
+        "weekly": {
+          "Wednesday": "7:00 PM - 11:00 PM"
+        },
+        "ordinal": []
+      }
+    },
+    {
       "VenueName": "Lone Star Bar",
       "Address": {
         "Street": "403 FM 685",
@@ -700,7 +730,8 @@ const karaokeData = {
       },
       "KJ": {
         "Host": "Jason Lynum",
-        "Company": "CPR Mobile DJs"
+        "Company": "CPR Mobile DJs",
+        "Website": "https://cprmobiledjs.com/"
       },
       "socials": {
         "Facebook": "https://www.facebook.com/tayloricehouse",
@@ -787,7 +818,8 @@ const karaokeData = {
       },
       "KJ": {
         "Host": "TJ",
-        "Company": ""
+        "Company": "",
+        "Website": ""
       },
       "socials": {},
       "schedule": {
