@@ -798,7 +798,7 @@ const karaokeData = {
                         "description": "Second and Fourth Fridays"
                     },
                     {
-                        "day": ["fourth", "Thrusday"],
+                        "day": ["fourth", "Thursday"],
                         "time": "6:30 PM - ??? PM",
                         "description": "Second and Fourth Fridays"
                     }

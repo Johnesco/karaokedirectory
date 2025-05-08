@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karaoke Venue Editor</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .venue-list {
+            flex: 1;
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .editor {
+            flex: 2;
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .json-output {
+            margin-top: 20px;
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        .venue-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .venue-item:hover {
+            background-color: #f0f8ff;
+        }
+        .venue-item.selected {
+            background-color: #e1f0ff;
+            font-weight: bold;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+            margin-top: 5px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        button.danger {
+            background-color: #e74c3c;
+        }
+        button.danger:hover {
+            background-color: #c0392b;
+        }
+        button.success {
+            background-color: #2ecc71;
+        }
+        button.success:hover {
+            background-color: #27ae60;
+        }
+        .days-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .day-item {
+            background: #f0f0f0;
+            padding: 5px 10px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+        }
+        .ordinal-item {
+            background: #e8f4f8;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            border-left: 3px solid #3498db;
+        }
+        .section {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .section-title {
+            margin-top: 0;
+            color: #3498db;
+        }
+        .add-venue-btn {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <script src="js/data.js"></script>
+    <div class="container">
+        <div class="venue-list">
+            <h1>Venues</h1>
+            <button id="addVenue" class="add-venue-btn success">+ Add New Venue</button>
+            <div id="venueList"></div>
+        </div>
+        <div class="editor">
+            <div id="venueEditor" style="display: none;">
+                <h2 id="venueTitle">Edit Venue</h2>
+                
+                <div class="section">
+                    <h3 class="section-title">Basic Information</h3>
+                    <div class="form-group">
+                        <label for="venueName">Venue Name</label>
+                        <input type="text" id="venueName">
+                    </div>
+                    <div class="form-group">
+                        <label for="dedicated">
+                            <input type="checkbox" id="dedicated"> Dedicated Venue
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3 class="section-title">Address</h3>
+                    <div class="form-group">
+                        <label for="street">Street</label>
+                        <input type="text" id="street">
+                    </div>
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <input type="text" id="city">
+                    </div>
+                    <div class="form-group">
+                        <label for="state">State</label>
+                        <input type="text" id="state">
+                    </div>
+                    <div class="form-group">
+                        <label for="zip">Zip</label>
+                        <input type="text" id="zip">
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3 class="section-title">KJ Information</h3>
+                    <div class="form-group">
+                        <label for="kjHost">Host</label>
+                        <input type="text" id="kjHost">
+                    </div>
+                    <div class="form-group">
+                        <label for="kjCompany">Company</label>
+                        <input type="text" id="kjCompany">
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3 class="section-title">Social Media</h3>
+                    <div class="form-group">
+                        <label for="facebook">Facebook</label>
+                        <input type="text" id="facebook">
+                    </div>
+                    <div class="form-group">
+                        <label for="instagram">Instagram</label>
+                        <input type="text" id="instagram">
+                    </div>
+                    <div class="form-group">
+                        <label for="twitter">Twitter</label>
+                        <input type="text" id="twitter">
+                    </div>
+                    <div class="form-group">
+                        <label for="website">Website</label>
+                        <input type="text" id="website">
+                    </div>
+                    <div class="form-group">
+                        <label for="bluesky">Bluesky</label>
+                        <input type="text" id="bluesky">
+                    </div>
+                    <div class="form-group">
+                        <label for="tiktok">TikTok</label>
+                        <input type="text" id="tiktok">
+                    </div>
+                    <div class="form-group">
+                        <label for="youtube">YouTube</label>
+                        <input type="text" id="youtube">
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3 class="section-title">Weekly Schedule</h3>
+                    <div class="days-container" id="weeklyDays">
+                        <!-- Days will be added here -->
+                    </div>
+                    <div class="form-group">
+                        <label>Add Weekly Day</label>
+                        <div style="display: flex; gap: 10px;">
+                            <select id="newWeeklyDay">
+                                <option value="Sunday">Sunday</option>
+                                <option value="Monday">Monday</option>
+                                <option value="Tuesday">Tuesday</option>
+                                <option value="Wednesday">Wednesday</option>
+                                <option value="Thursday">Thursday</option>
+                                <option value="Friday">Friday</option>
+                                <option value="Saturday">Saturday</option>
+                            </select>
+                            <input type="text" id="newWeeklyTime" placeholder="9:00 PM - 2:00 AM">
+                            <button id="addWeeklyDay" class="success">Add</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3 class="section-title">Ordinal Schedule</h3>
+                    <div id="ordinalItems">
+                        <!-- Ordinal items will be added here -->
+                    </div>
+                    <div class="form-group">
+                        <label>Add Ordinal Day</label>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+                            <select id="newOrdinalNumber">
+                                <option value="first">First</option>
+                                <option value="second">Second</option>
+                                <option value="third">Third</option>
+                                <option value="fourth">Fourth</option>
+                                <option value="fifth">Fifth</option>
+                            </select>
+                            <select id="newOrdinalDay">
+                                <option value="Sunday">Sunday</option>
+                                <option value="Monday">Monday</option>
+                                <option value="Tuesday">Tuesday</option>
+                                <option value="Wednesday">Wednesday</option>
+                                <option value="Thursday">Thursday</option>
+                                <option value="Friday">Friday</option>
+                                <option value="Saturday">Saturday</option>
+                            </select>
+                            <input type="text" id="newOrdinalTime" placeholder="7:00 PM - 10:00 PM">
+                            <input type="text" id="newOrdinalDesc" placeholder="Description">
+                            <button id="addOrdinalDay" class="success">Add</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between;">
+                    <button id="deleteVenue" class="danger">Delete Venue</button>
+                    <button id="saveVenue" class="success">Save Changes</button>
+                </div>
+            </div>
+            
+            <div id="noSelection" style="text-align: center; padding: 40px 0;">
+                <h2>Select a venue to edit</h2>
+                <p>or add a new venue using the button on the left</p>
+            </div>
+            
+            <div class="json-output">
+                <h3>JSON Output</h3>
+                <textarea id="jsonOutput" style="width: 100%; height: 200px;"></textarea>
+                <button id="copyJson">Copy JSON</button>
+                <button id="loadJson">Load JSON</button>
+                <input type="file" id="jsonFileInput" accept=".json" style="display: none;">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variable to hold our data
+        let venueData = {
+            listings: []
+        };
+        
+        // Current selected venue index
+        let selectedVenueIndex = -1;
+        
+        // DOM elements
+        const venueList = document.getElementById('venueList');
+        const venueEditor = document.getElementById('venueEditor');
+        const noSelection = document.getElementById('noSelection');
+        const jsonOutput = document.getElementById('jsonOutput');
+        
+        // Basic info fields
+        const venueName = document.getElementById('venueName');
+        const dedicated = document.getElementById('dedicated');
+        
+        // Address fields
+        const street = document.getElementById('street');
+        const city = document.getElementById('city');
+        const state = document.getElementById('state');
+        const zip = document.getElementById('zip');
+        
+        // KJ fields
+        const kjHost = document.getElementById('kjHost');
+        const kjCompany = document.getElementById('kjCompany');
+        
+        // Social fields
+        const facebook = document.getElementById('facebook');
+        const instagram = document.getElementById('instagram');
+        const twitter = document.getElementById('twitter');
+        const website = document.getElementById('website');
+        const bluesky = document.getElementById('bluesky');
+        const tiktok = document.getElementById('tiktok');
+        const youtube = document.getElementById('youtube');
+        
+        // Weekly schedule elements
+        const weeklyDays = document.getElementById('weeklyDays');
+        const newWeeklyDay = document.getElementById('newWeeklyDay');
+        const newWeeklyTime = document.getElementById('newWeeklyTime');
+        
+        // Ordinal schedule elements
+        const ordinalItems = document.getElementById('ordinalItems');
+        const newOrdinalNumber = document.getElementById('newOrdinalNumber');
+        const newOrdinalDay = document.getElementById('newOrdinalDay');
+        const newOrdinalTime = document.getElementById('newOrdinalTime');
+        const newOrdinalDesc = document.getElementById('newOrdinalDesc');
+        
+        // Buttons
+        const addVenueBtn = document.getElementById('addVenue');
+        const saveVenueBtn = document.getElementById('saveVenue');
+        const deleteVenueBtn = document.getElementById('deleteVenue');
+        const addWeeklyDayBtn = document.getElementById('addWeeklyDay');
+        const addOrdinalDayBtn = document.getElementById('addOrdinalDay');
+        const copyJsonBtn = document.getElementById('copyJson');
+        const loadJsonBtn = document.getElementById('loadJson');
+        const jsonFileInput = document.getElementById('jsonFileInput');
+        
+        // Initialize the app
+        function init() {
+            // Load sample data (you can replace this with loading from a file)
+            loadSampleData();
+            
+            // Set up event listeners
+            addVenueBtn.addEventListener('click', addNewVenue);
+            saveVenueBtn.addEventListener('click', saveVenue);
+            deleteVenueBtn.addEventListener('click', deleteVenue);
+            addWeeklyDayBtn.addEventListener('click', addWeeklyDay);
+            addOrdinalDayBtn.addEventListener('click', addOrdinalDay);
+            copyJsonBtn.addEventListener('click', copyJsonToClipboard);
+            loadJsonBtn.addEventListener('click', () => jsonFileInput.click());
+            jsonFileInput.addEventListener('change', handleFileUpload);
+            
+            // Render the initial view
+            renderVenueList();
+            updateJsonOutput();
+        }
+        
+        // Load sample data (you can replace this with your actual data loading logic)
+        function loadSampleData() {
+            // This would normally be loaded from a file
+            venueData = karaokeData;
+        }
+        
+        // Render the venue list
+        function renderVenueList() {
+            venueList.innerHTML = '';
+            
+            venueData.listings.forEach((venue, index) => {
+                const venueItem = document.createElement('div');
+                venueItem.className = 'venue-item';
+                if (index === selectedVenueIndex) {
+                    venueItem.classList.add('selected');
+                }
+                
+                venueItem.textContent = venue.VenueName;
+                venueItem.addEventListener('click', () => selectVenue(index));
+                
+                venueList.appendChild(venueItem);
+            });
+        }
+        
+        // Select a venue to edit
+        function selectVenue(index) {
+            selectedVenueIndex = index;
+            renderVenueList();
+            
+            const venue = venueData.listings[index];
+            
+            // Show editor and hide no selection message
+            venueEditor.style.display = 'block';
+            noSelection.style.display = 'none';
+            
+            // Set basic info
+            venueName.value = venue.VenueName;
+            dedicated.checked = venue.Dedicated || false;
+            
+            // Set address
+            street.value = venue.Address.Street || '';
+            city.value = venue.Address.City || '';
+            state.value = venue.Address.State || '';
+            zip.value = venue.Address.Zip || '';
+            
+            // Set KJ info
+            kjHost.value = venue.KJ.Host || '';
+            kjCompany.value = venue.KJ.Company || '';
+            
+            // Set socials
+            facebook.value = venue.socials.Facebook || '';
+            instagram.value = venue.socials.Instagram || '';
+            twitter.value = venue.socials.Twitter || '';
+            website.value = venue.socials.Website || '';
+            bluesky.value = venue.socials.Bluesky || '';
+            tiktok.value = venue.socials.Tiktok || '';
+            youtube.value = venue.socials.Youtube || '';
+            
+            // Render weekly schedule
+            renderWeeklySchedule(venue.schedule.weekly);
+            
+            // Render ordinal schedule
+            renderOrdinalSchedule(venue.schedule.ordinal);
+            
+            // Update JSON output
+            updateJsonOutput();
+        }
+        
+        // Render weekly schedule
+        function renderWeeklySchedule(weekly) {
+            weeklyDays.innerHTML = '';
+            
+            for (const day in weekly) {
+                const dayItem = document.createElement('div');
+                dayItem.className = 'day-item';
+                
+                const dayText = document.createElement('span');
+                dayText.textContent = `${day}: ${weekly[day]}`;
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = '×';
+                deleteBtn.className = 'danger';
+                deleteBtn.style.marginLeft = '5px';
+                deleteBtn.style.padding = '2px 5px';
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteWeeklyDay(day);
+                });
+                
+                dayItem.appendChild(dayText);
+                dayItem.appendChild(deleteBtn);
+                weeklyDays.appendChild(dayItem);
+            }
+        }
+        
+        // Render ordinal schedule
+        function renderOrdinalSchedule(ordinal) {
+            ordinalItems.innerHTML = '';
+            
+            ordinal.forEach((item, index) => {
+                const ordinalItem = document.createElement('div');
+                ordinalItem.className = 'ordinal-item';
+                
+                const ordinalText = document.createElement('div');
+                ordinalText.textContent = `${capitalizeFirstLetter(item.day[0])} ${item.day[1]}: ${item.time}`;
+                
+                if (item.description) {
+                    const descText = document.createElement('div');
+                    descText.textContent = item.description;
+                    descText.style.fontSize = '0.9em';
+                    descText.style.color = '#666';
+                    ordinalText.appendChild(descText);
+                }
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.className = 'danger';
+                deleteBtn.style.marginTop = '5px';
+                deleteBtn.addEventListener('click', () => {
+                    deleteOrdinalItem(index);
+                });
+                
+                ordinalItem.appendChild(ordinalText);
+                ordinalItem.appendChild(deleteBtn);
+                ordinalItems.appendChild(ordinalItem);
+            });
+        }
+        
+        // Add a new venue
+        function addNewVenue() {
+            const newVenue = {
+                "VenueName": "New Venue",
+                "Dedicated": false,
+                "Address": {
+                    "Street": "",
+                    "City": "",
+                    "State": "",
+                    "Zip": ""
+                },
+                "KJ": {
+                    "Host": "",
+                    "Company": ""
+                },
+                "socials": {
+                    "Facebook": null,
+                    "Instagram": null,
+                    "Twitter": null,
+                    "Website": null,
+                    "Bluesky": null,
+                    "Tiktok": null,
+                    "Youtube": null
+                },
+                "schedule": {
+                    "weekly": {},
+                    "ordinal": []
+                }
+            };
+            
+            venueData.listings.push(newVenue);
+            selectedVenueIndex = venueData.listings.length - 1;
+            renderVenueList();
+            selectVenue(selectedVenueIndex);
+            updateJsonOutput();
+        }
+        
+        // Save venue changes
+        function saveVenue() {
+            if (selectedVenueIndex === -1) return;
+            
+            const venue = venueData.listings[selectedVenueIndex];
+            
+            // Update basic info
+            venue.VenueName = venueName.value;
+            venue.Dedicated = dedicated.checked;
+            
+            // Update address
+            venue.Address = {
+                Street: street.value,
+                City: city.value,
+                State: state.value,
+                Zip: zip.value
+            };
+            
+            // Update KJ info
+            venue.KJ = {
+                Host: kjHost.value,
+                Company: kjCompany.value
+            };
+            
+            // Update socials
+            venue.socials = {
+                Facebook: facebook.value || null,
+                Instagram: instagram.value || null,
+                Twitter: twitter.value || null,
+                Website: website.value || null,
+                Bluesky: bluesky.value || null,
+                Tiktok: tiktok.value || null,
+                Youtube: youtube.value || null
+            };
+            
+            // Weekly schedule is updated in place
+            
+            // Ordinal schedule is updated in place
+            
+            // Update the venue list
+            renderVenueList();
+            updateJsonOutput();
+        }
+        
+        // Delete a venue
+        function deleteVenue() {
+            if (selectedVenueIndex === -1) return;
+            
+            if (confirm('Are you sure you want to delete this venue?')) {
+                venueData.listings.splice(selectedVenueIndex, 1);
+                selectedVenueIndex = -1;
+                renderVenueList();
+                
+                // Hide editor and show no selection message
+                venueEditor.style.display = 'none';
+                noSelection.style.display = 'block';
+                
+                updateJsonOutput();
+            }
+        }
+        
+        // Add a weekly day
+        function addWeeklyDay() {
+            if (selectedVenueIndex === -1) return;
+            
+            const day = newWeeklyDay.value;
+            const time = newWeeklyTime.value.trim();
+            
+            if (!time) {
+                alert('Please enter a time range');
+                return;
+            }
+            
+            venueData.listings[selectedVenueIndex].schedule.weekly[day] = time;
+            renderWeeklySchedule(venueData.listings[selectedVenueIndex].schedule.weekly);
+            
+            // Clear inputs
+            newWeeklyTime.value = '';
+            
+            updateJsonOutput();
+        }
+        
+        // Delete a weekly day
+        function deleteWeeklyDay(day) {
+            if (selectedVenueIndex === -1) return;
+            
+            delete venueData.listings[selectedVenueIndex].schedule.weekly[day];
+            renderWeeklySchedule(venueData.listings[selectedVenueIndex].schedule.weekly);
+            updateJsonOutput();
+        }
+        
+        // Add an ordinal day
+        function addOrdinalDay() {
+            if (selectedVenueIndex === -1) return;
+            
+            const number = newOrdinalNumber.value;
+            const day = newOrdinalDay.value;
+            const time = newOrdinalTime.value.trim();
+            const description = newOrdinalDesc.value.trim();
+            
+            if (!time) {
+                alert('Please enter a time range');
+                return;
+            }
+            
+            const newOrdinal = {
+                day: [number, day],
+                time: time,
+                description: description || undefined
+            };
+            
+            venueData.listings[selectedVenueIndex].schedule.ordinal.push(newOrdinal);
+            renderOrdinalSchedule(venueData.listings[selectedVenueIndex].schedule.ordinal);
+            
+            // Clear inputs
+            newOrdinalTime.value = '';
+            newOrdinalDesc.value = '';
+            
+            updateJsonOutput();
+        }
+        
+        // Delete an ordinal item
+        function deleteOrdinalItem(index) {
+            if (selectedVenueIndex === -1) return;
+            
+            venueData.listings[selectedVenueIndex].schedule.ordinal.splice(index, 1);
+            renderOrdinalSchedule(venueData.listings[selectedVenueIndex].schedule.ordinal);
+            updateJsonOutput();
+        }
+        
+        // Update the JSON output
+        function updateJsonOutput() {
+            // Fix the Thursday typo before displaying
+            const fixedData = JSON.parse(JSON.stringify(venueData));
+            fixedData.listings.forEach(venue => {
+                if (venue.schedule.ordinal) {
+                    venue.schedule.ordinal.forEach(item => {
+                        if (item.day && item.day[1] === "Thrusday") {
+                            item.day[1] = "Thursday";
+                        }
+                    });
+                }
+            });
+            
+            jsonOutput.value = JSON.stringify(fixedData, null, 2);
+        }
+        
+        // Copy JSON to clipboard
+        function copyJsonToClipboard() {
+            jsonOutput.select();
+            document.execCommand('copy');
+            alert('JSON copied to clipboard!');
+        }
+        
+        // Handle file upload
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data && data.listings) {
+                        venueData = data;
+                        selectedVenueIndex = -1;
+                        renderVenueList();
+                        
+                        // Hide editor and show no selection message
+                        venueEditor.style.display = 'none';
+                        noSelection.style.display = 'block';
+                        
+                        updateJsonOutput();
+                        alert('File loaded successfully!');
+                    } else {
+                        alert('Invalid JSON format. Expected a "listings" array.');
+                    }
+                } catch (error) {
+                    alert('Error parsing JSON: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        // Helper function to capitalize first letter
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+        
+        // Initialize the app when the page loads
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
