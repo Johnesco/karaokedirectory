@@ -573,6 +573,36 @@ const karaokeData = {
       }
     },
     {
+      "VenueName": "Manchaca Springs Saloon",
+      "Dedicated": false,
+      "Address": {
+        "Street": "737 Farm to Market 1626",
+        "City": "Manchaca",
+        "State": "TX",
+        "Zip": "78652"
+      },
+      "KJ": {
+        "Host": "John Roberts",
+        "Company": "",
+        "Website": ""
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/ManchacaSpringsSaloon",
+        "Instagram": "https://www.instagram.com/manchaca_springs_saloon/",
+        "Twitter": null,
+        "Website": null,
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": {
+        "weekly": {
+          "Sunday": "7:00 PM - 11:00 PM"
+        },
+        "ordinal": []
+      }
+    },
+    {
       "VenueName": "Mario's Seafood",
       "Address": {
         "Street": "522 N Interstate 35 Frontage Rd<br>Building C",
