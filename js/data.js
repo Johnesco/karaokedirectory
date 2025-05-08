@@ -467,19 +467,25 @@ const karaokeData = {
         "Zip": "78734"
       },
       "KJ": {
-        "Host": "",
-        "Company": "Xpider"
+        "Host": "Xpider",
+        "Company": ""
       },
       "socials": {
         "Facebook": "https://www.facebook.com/thehudsontavern/",
-        "Instagram": "https://www.instagram.com/explore/locations/1655266901454617/hudson-tavern/"
+        "Instagram": "https://www.instagram.com/explore/locations/1655266901454617/hudson-tavern/",
+        "Twitter": null,
+        "Website": null,
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": {
         "weekly": {
           "Friday": "9:00 PM - 1:00 AM"
         },
         "ordinal": []
-      }
+      },
+      "Dedicated": false
     },
     {
       "VenueName": "Lone Star Bar",
@@ -490,19 +496,25 @@ const karaokeData = {
         "Zip": "78660"
       },
       "KJ": {
-        "Host": "XPIDER",
+        "Host": "Xpider",
         "Company": ""
       },
       "socials": {
         "Facebook": "https://www.facebook.com/LoneStarBarPflugerville/",
-        "Website": "https://lonestarbartexas.com/"
+        "Instagram": null,
+        "Twitter": null,
+        "Website": "https://lonestarbartexas.com/",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": {
         "weekly": {
           "Saturday": "9:00 PM - 1:00 AM"
         },
         "ordinal": []
-      }
+      },
+      "Dedicated": false
     },
     {
       "VenueName": "Lucky Rabbit",
@@ -673,6 +685,36 @@ const karaokeData = {
       "schedule": {
         "weekly": {
           "Thursday": "9:00 PM - 11:00 PM"
+        },
+        "ordinal": []
+      }
+    },
+    {
+      "VenueName": "Randy's Ice House",
+      "Dedicated": false,
+      "Address": {
+        "Street": "1321 W 2nd St",
+        "City": "Taylor",
+        "State": "TX",
+        "Zip": "76574"
+      },
+      "KJ": {
+        "Host": "Jason Lynum",
+        "Company": "CPR Mobile DJs"
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/tayloricehouse",
+        "Instagram": null,
+        "Twitter": null,
+        "Website": "http://www.tayloricehouse.com/",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": {
+        "weekly": {
+          "Thursday": "8:00 PM - 11:00 PM",
+          "Saturday": "8:00 PM - 11:00 PM"
         },
         "ordinal": []
       }
@@ -860,4 +902,4 @@ const karaokeData = {
       }
     }
   ]
-}
+};
