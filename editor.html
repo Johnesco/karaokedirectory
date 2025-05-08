@@ -8,7 +8,7 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             background-color: #f5f5f5;
             color: #333;
         }
@@ -17,6 +17,7 @@
             gap: 20px;
             max-width: 1200px;
             margin: 0 auto;
+            padding: 20px;
         }
         .venue-list {
             flex: 1;
@@ -34,14 +35,21 @@
             padding: 15px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        .json-output {
+        .json-tab {
+            display: none;
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             margin-top: 20px;
+        }
+        .json-output {
             background: #f0f0f0;
             padding: 15px;
             border-radius: 8px;
             font-family: monospace;
             white-space: pre-wrap;
-            max-height: 300px;
+            max-height: 70vh;
             overflow-y: auto;
         }
         h1, h2 {
@@ -59,6 +67,17 @@
         .venue-item.selected {
             background-color: #e1f0ff;
             font-weight: bold;
+        }
+        .venue-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .venue-details {
+            font-size: 0.9em;
+            color: #666;
+        }
+        .venue-address, .venue-kj {
+            margin-bottom: 3px;
         }
         .form-group {
             margin-bottom: 15px;
@@ -132,6 +151,21 @@
         .add-venue-btn {
             margin-bottom: 15px;
         }
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        .tab-button {
+            padding: 8px 15px;
+            background: #ddd;
+            border: none;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        .tab-button.active {
+            background: #3498db;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -140,157 +174,165 @@
         <div class="venue-list">
             <h1>Venues</h1>
             <button id="addVenue" class="add-venue-btn success">+ Add New Venue</button>
+            <button id="sortVenues" class="add-venue-btn">Sort Alphabetically</button>
             <div id="venueList"></div>
         </div>
         <div class="editor">
-            <div id="venueEditor" style="display: none;">
-                <h2 id="venueTitle">Edit Venue</h2>
-                
-                <div class="section">
-                    <h3 class="section-title">Basic Information</h3>
-                    <div class="form-group">
-                        <label for="venueName">Venue Name</label>
-                        <input type="text" id="venueName">
-                    </div>
-                    <div class="form-group">
-                        <label for="dedicated">
-                            <input type="checkbox" id="dedicated"> Dedicated Venue
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="section">
-                    <h3 class="section-title">Address</h3>
-                    <div class="form-group">
-                        <label for="street">Street</label>
-                        <input type="text" id="street">
-                    </div>
-                    <div class="form-group">
-                        <label for="city">City</label>
-                        <input type="text" id="city">
-                    </div>
-                    <div class="form-group">
-                        <label for="state">State</label>
-                        <input type="text" id="state">
-                    </div>
-                    <div class="form-group">
-                        <label for="zip">Zip</label>
-                        <input type="text" id="zip">
-                    </div>
-                </div>
-                
-                <div class="section">
-                    <h3 class="section-title">KJ Information</h3>
-                    <div class="form-group">
-                        <label for="kjHost">Host</label>
-                        <input type="text" id="kjHost">
-                    </div>
-                    <div class="form-group">
-                        <label for="kjCompany">Company</label>
-                        <input type="text" id="kjCompany">
-                    </div>
-                </div>
-                
-                <div class="section">
-                    <h3 class="section-title">Social Media</h3>
-                    <div class="form-group">
-                        <label for="facebook">Facebook</label>
-                        <input type="text" id="facebook">
-                    </div>
-                    <div class="form-group">
-                        <label for="instagram">Instagram</label>
-                        <input type="text" id="instagram">
-                    </div>
-                    <div class="form-group">
-                        <label for="twitter">Twitter</label>
-                        <input type="text" id="twitter">
-                    </div>
-                    <div class="form-group">
-                        <label for="website">Website</label>
-                        <input type="text" id="website">
-                    </div>
-                    <div class="form-group">
-                        <label for="bluesky">Bluesky</label>
-                        <input type="text" id="bluesky">
-                    </div>
-                    <div class="form-group">
-                        <label for="tiktok">TikTok</label>
-                        <input type="text" id="tiktok">
-                    </div>
-                    <div class="form-group">
-                        <label for="youtube">YouTube</label>
-                        <input type="text" id="youtube">
-                    </div>
-                </div>
-                
-                <div class="section">
-                    <h3 class="section-title">Weekly Schedule</h3>
-                    <div class="days-container" id="weeklyDays">
-                        <!-- Days will be added here -->
-                    </div>
-                    <div class="form-group">
-                        <label>Add Weekly Day</label>
-                        <div style="display: flex; gap: 10px;">
-                            <select id="newWeeklyDay">
-                                <option value="Sunday">Sunday</option>
-                                <option value="Monday">Monday</option>
-                                <option value="Tuesday">Tuesday</option>
-                                <option value="Wednesday">Wednesday</option>
-                                <option value="Thursday">Thursday</option>
-                                <option value="Friday">Friday</option>
-                                <option value="Saturday">Saturday</option>
-                            </select>
-                            <input type="text" id="newWeeklyTime" placeholder="9:00 PM - 2:00 AM">
-                            <button id="addWeeklyDay" class="success">Add</button>
+            <div class="tab-buttons">
+                <button class="tab-button active" data-tab="editor">Editor</button>
+                <button class="tab-button" data-tab="json">JSON</button>
+            </div>
+            
+            <div id="editorTab" class="editor-tab">
+                <div id="venueEditor" style="display: none;">
+                    <h2 id="venueTitle">Edit Venue</h2>
+                    
+                    <div class="section">
+                        <h3 class="section-title">Basic Information</h3>
+                        <div class="form-group">
+                            <label for="venueName">Venue Name</label>
+                            <input type="text" id="venueName">
+                        </div>
+                        <div class="form-group">
+                            <label for="dedicated">
+                                <input type="checkbox" id="dedicated"> Dedicated Venue
+                            </label>
                         </div>
                     </div>
-                </div>
-                
-                <div class="section">
-                    <h3 class="section-title">Ordinal Schedule</h3>
-                    <div id="ordinalItems">
-                        <!-- Ordinal items will be added here -->
-                    </div>
-                    <div class="form-group">
-                        <label>Add Ordinal Day</label>
-                        <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
-                            <select id="newOrdinalNumber">
-                                <option value="first">First</option>
-                                <option value="second">Second</option>
-                                <option value="third">Third</option>
-                                <option value="fourth">Fourth</option>
-                                <option value="fifth">Fifth</option>
-                            </select>
-                            <select id="newOrdinalDay">
-                                <option value="Sunday">Sunday</option>
-                                <option value="Monday">Monday</option>
-                                <option value="Tuesday">Tuesday</option>
-                                <option value="Wednesday">Wednesday</option>
-                                <option value="Thursday">Thursday</option>
-                                <option value="Friday">Friday</option>
-                                <option value="Saturday">Saturday</option>
-                            </select>
-                            <input type="text" id="newOrdinalTime" placeholder="7:00 PM - 10:00 PM">
-                            <input type="text" id="newOrdinalDesc" placeholder="Description">
-                            <button id="addOrdinalDay" class="success">Add</button>
+                    
+                    <div class="section">
+                        <h3 class="section-title">Address</h3>
+                        <div class="form-group">
+                            <label for="street">Street</label>
+                            <input type="text" id="street">
+                        </div>
+                        <div class="form-group">
+                            <label for="city">City</label>
+                            <input type="text" id="city">
+                        </div>
+                        <div class="form-group">
+                            <label for="state">State</label>
+                            <input type="text" id="state">
+                        </div>
+                        <div class="form-group">
+                            <label for="zip">Zip</label>
+                            <input type="text" id="zip">
                         </div>
                     </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">KJ Information</h3>
+                        <div class="form-group">
+                            <label for="kjHost">Host</label>
+                            <input type="text" id="kjHost">
+                        </div>
+                        <div class="form-group">
+                            <label for="kjCompany">Company</label>
+                            <input type="text" id="kjCompany">
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">Social Media</h3>
+                        <div class="form-group">
+                            <label for="facebook">Facebook</label>
+                            <input type="text" id="facebook">
+                        </div>
+                        <div class="form-group">
+                            <label for="instagram">Instagram</label>
+                            <input type="text" id="instagram">
+                        </div>
+                        <div class="form-group">
+                            <label for="twitter">Twitter</label>
+                            <input type="text" id="twitter">
+                        </div>
+                        <div class="form-group">
+                            <label for="website">Website</label>
+                            <input type="text" id="website">
+                        </div>
+                        <div class="form-group">
+                            <label for="bluesky">Bluesky</label>
+                            <input type="text" id="bluesky">
+                        </div>
+                        <div class="form-group">
+                            <label for="tiktok">TikTok</label>
+                            <input type="text" id="tiktok">
+                        </div>
+                        <div class="form-group">
+                            <label for="youtube">YouTube</label>
+                            <input type="text" id="youtube">
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">Weekly Schedule</h3>
+                        <div class="days-container" id="weeklyDays">
+                            <!-- Days will be added here -->
+                        </div>
+                        <div class="form-group">
+                            <label>Add Weekly Day</label>
+                            <div style="display: flex; gap: 10px;">
+                                <select id="newWeeklyDay">
+                                    <option value="Sunday">Sunday</option>
+                                    <option value="Monday">Monday</option>
+                                    <option value="Tuesday">Tuesday</option>
+                                    <option value="Wednesday">Wednesday</option>
+                                    <option value="Thursday">Thursday</option>
+                                    <option value="Friday">Friday</option>
+                                    <option value="Saturday">Saturday</option>
+                                </select>
+                                <input type="text" id="newWeeklyTime" placeholder="9:00 PM - 2:00 AM">
+                                <button id="addWeeklyDay" class="success">Add</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">Ordinal Schedule</h3>
+                        <div id="ordinalItems">
+                            <!-- Ordinal items will be added here -->
+                        </div>
+                        <div class="form-group">
+                            <label>Add Ordinal Day</label>
+                            <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+                                <select id="newOrdinalNumber">
+                                    <option value="first">First</option>
+                                    <option value="second">Second</option>
+                                    <option value="third">Third</option>
+                                    <option value="fourth">Fourth</option>
+                                    <option value="fifth">Fifth</option>
+                                </select>
+                                <select id="newOrdinalDay">
+                                    <option value="Sunday">Sunday</option>
+                                    <option value="Monday">Monday</option>
+                                    <option value="Tuesday">Tuesday</option>
+                                    <option value="Wednesday">Wednesday</option>
+                                    <option value="Thursday">Thursday</option>
+                                    <option value="Friday">Friday</option>
+                                    <option value="Saturday">Saturday</option>
+                                </select>
+                                <input type="text" id="newOrdinalTime" placeholder="7:00 PM - 10:00 PM">
+                                <input type="text" id="newOrdinalDesc" placeholder="Description">
+                                <button id="addOrdinalDay" class="success">Add</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between;">
+                        <button id="deleteVenue" class="danger">Delete Venue</button>
+                        <button id="saveVenue" class="success">Save Changes</button>
+                    </div>
                 </div>
                 
-                <div style="display: flex; justify-content: space-between;">
-                    <button id="deleteVenue" class="danger">Delete Venue</button>
-                    <button id="saveVenue" class="success">Save Changes</button>
+                <div id="noSelection" style="text-align: center; padding: 40px 0;">
+                    <h2>Select a venue to edit</h2>
+                    <p>or add a new venue using the button on the left</p>
                 </div>
             </div>
             
-            <div id="noSelection" style="text-align: center; padding: 40px 0;">
-                <h2>Select a venue to edit</h2>
-                <p>or add a new venue using the button on the left</p>
-            </div>
-            
-            <div class="json-output">
+            <div id="jsonTab" class="json-tab">
                 <h3>JSON Output</h3>
-                <textarea id="jsonOutput" style="width: 100%; height: 200px;"></textarea>
+                <textarea id="jsonOutput" style="width: 100%; height: 70vh;"></textarea>
                 <button id="copyJson">Copy JSON</button>
                 <button id="loadJson">Load JSON</button>
                 <input type="file" id="jsonFileInput" accept=".json" style="display: none;">
@@ -312,6 +354,8 @@
         const venueEditor = document.getElementById('venueEditor');
         const noSelection = document.getElementById('noSelection');
         const jsonOutput = document.getElementById('jsonOutput');
+        const editorTab = document.getElementById('editorTab');
+        const jsonTab = document.getElementById('jsonTab');
         
         // Basic info fields
         const venueName = document.getElementById('venueName');
@@ -357,6 +401,10 @@
         const copyJsonBtn = document.getElementById('copyJson');
         const loadJsonBtn = document.getElementById('loadJson');
         const jsonFileInput = document.getElementById('jsonFileInput');
+        const sortVenuesBtn = document.getElementById('sortVenues');
+        
+        // Tab buttons
+        const tabButtons = document.querySelectorAll('.tab-button');
         
         // Initialize the app
         function init() {
@@ -372,6 +420,15 @@
             copyJsonBtn.addEventListener('click', copyJsonToClipboard);
             loadJsonBtn.addEventListener('click', () => jsonFileInput.click());
             jsonFileInput.addEventListener('change', handleFileUpload);
+            sortVenuesBtn.addEventListener('click', sortVenuesAlphabetically);
+            
+            // Tab switching
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabName = button.getAttribute('data-tab');
+                    switchTab(tabName);
+                });
+            });
             
             // Render the initial view
             renderVenueList();
@@ -395,7 +452,33 @@
                     venueItem.classList.add('selected');
                 }
                 
-                venueItem.textContent = venue.VenueName;
+                const venueNameDiv = document.createElement('div');
+                venueNameDiv.className = 'venue-name';
+                venueNameDiv.textContent = venue.VenueName;
+                
+                const venueDetailsDiv = document.createElement('div');
+                venueDetailsDiv.className = 'venue-details';
+                
+                const addressDiv = document.createElement('div');
+                addressDiv.className = 'venue-address';
+                addressDiv.textContent = `${venue.Address.Street}, ${venue.Address.City}, ${venue.Address.State} ${venue.Address.Zip}`;
+                
+                const kjDiv = document.createElement('div');
+                kjDiv.className = 'venue-kj';
+                let kjText = '';
+                if (venue.KJ.Host) kjText += `Host: ${venue.KJ.Host}`;
+                if (venue.KJ.Company) {
+                    if (kjText) kjText += ' | ';
+                    kjText += `Company: ${venue.KJ.Company}`;
+                }
+                kjDiv.textContent = kjText || 'No KJ info';
+                
+                venueDetailsDiv.appendChild(addressDiv);
+                venueDetailsDiv.appendChild(kjDiv);
+                
+                venueItem.appendChild(venueNameDiv);
+                venueItem.appendChild(venueDetailsDiv);
+                
                 venueItem.addEventListener('click', () => selectVenue(index));
                 
                 venueList.appendChild(venueItem);
@@ -671,6 +754,41 @@
             venueData.listings[selectedVenueIndex].schedule.ordinal.splice(index, 1);
             renderOrdinalSchedule(venueData.listings[selectedVenueIndex].schedule.ordinal);
             updateJsonOutput();
+        }
+        
+        // Sort venues alphabetically
+        function sortVenuesAlphabetically() {
+            venueData.listings.sort((a, b) => {
+                const nameA = a.VenueName.toUpperCase();
+                const nameB = b.VenueName.toUpperCase();
+                if (nameA < nameB) return -1;
+                if (nameA > nameB) return 1;
+                return 0;
+            });
+            
+            renderVenueList();
+            updateJsonOutput();
+        }
+        
+        // Switch between tabs
+        function switchTab(tabName) {
+            // Update tab buttons
+            tabButtons.forEach(button => {
+                if (button.getAttribute('data-tab') === tabName) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
+            
+            // Show/hide tabs
+            if (tabName === 'editor') {
+                editorTab.style.display = 'block';
+                jsonTab.style.display = 'none';
+            } else if (tabName === 'json') {
+                editorTab.style.display = 'none';
+                jsonTab.style.display = 'block';
+            }
         }
         
         // Update the JSON output
