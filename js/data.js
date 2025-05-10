@@ -77,6 +77,36 @@ const karaokeData = {
       }
     },
     {
+      "VenueName": "Big Easy Saloon",
+      "Dedicated": false,
+      "Address": {
+        "Street": "15601 Vision Dr.",
+        "City": "Pflugerville",
+        "State": "TX",
+        "Zip": "78660"
+      },
+      "KJ": {
+        "Host": "DJ Cysum & Mo",
+        "Company": "",
+        "Website": ""
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/bigeasysaloonpflugerville/",
+        "Instagram": "https://www.instagram.com/bigeasysaloonpflugerville/",
+        "Twitter": null,
+        "Website": "https://www.bigeasysaloonpflugerville.com/",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": {
+        "weekly": {
+          "Sunday": "8:30 PM - 12:30 AM"
+        },
+        "ordinal": []
+      }
+    },
+    {
       "VenueName": "Blindside Lounge",
       "Address": {
         "Street": "211 6th St",
