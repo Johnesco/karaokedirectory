@@ -26,6 +26,29 @@ const karaokeData = {
         "ordinal": []
       }
     },
+{
+      "VenueName": "Marea, La",
+      "Address": {
+        "Street": "116 E Parsons St",
+        "City": "Manor",
+        "State": "TX",
+        "Zip": "78653"
+      },
+      "KJ": {
+        "Host": "",
+        "Company": ""
+      },
+      "socials": {
+       
+      },
+      "schedule": {
+        "weekly": {
+          "Friday": "8:00 PM - MIDNIGHT",
+"Saturday": "8:00 PM - MIDNIGHT"
+        },
+        "ordinal": []
+      }
+    },
     {
       "VenueName": "Baker St. Pub & Grill",
       "Address": {
