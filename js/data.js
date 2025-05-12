@@ -26,31 +26,6 @@ const karaokeData = {
         "ordinal": []
       }
     },
-{
-      "VenueName": "La Marea",
-      "Address": {
-        "Street": "116 E Parsons St",
-        "City": "Manor",
-        "State": "TX",
-        "Zip": "78653"
-      },
-      "KJ": {
-        "Host": "",
-        "Company": ""
-      },
-      "socials": {
-       "Facebook":"https://www.facebook.com/lamareaaustin/",
-        "Instagram":"https://www.instagram.com/pluisrodriguez/",
-        "Website": "https://www.lamarearestaurantseafoodtx.com/"
-      },
-      "schedule": {
-        "weekly": {
-          "Friday": "8:00 PM - MIDNIGHT",
-"Saturday": "8:00 PM - MIDNIGHT"
-        },
-        "ordinal": []
-      }
-    },
     {
       "VenueName": "Baker St. Pub & Grill",
       "Address": {
@@ -653,6 +628,31 @@ const karaokeData = {
       "schedule": {
         "weekly": {
           "Sunday": "7:00 PM - 11:00 PM"
+        },
+        "ordinal": []
+      }
+    },
+    {
+      "VenueName": "La Marea",
+      "Address": {
+        "Street": "116 E Parsons St",
+        "City": "Manor",
+        "State": "TX",
+        "Zip": "78653"
+      },
+      "KJ": {
+        "Host": "",
+        "Company": ""
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/lamareaaustin/",
+        "Instagram": "https://www.instagram.com/pluisrodriguez/",
+        "Website": "https://www.lamarearestaurantseafoodtx.com/"
+      },
+      "schedule": {
+        "weekly": {
+          "Friday": "8:00 PM - MIDNIGHT",
+          "Saturday": "8:00 PM - MIDNIGHT"
         },
         "ordinal": []
       }
