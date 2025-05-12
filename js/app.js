@@ -209,10 +209,27 @@ function getCurrentDate(dayOffset) {
 }
 
 function getVenuesForDate(date) {
+    // Helper function to ignore articles for sorting
+    function getSortableName(venueName) {
+        const articles = ['the ', 'a ', 'an ','la ', 'el ', 'le '];
+        const lowerName = venueName.toLowerCase();
+        
+        for (const article of articles) {
+            if (lowerName.startsWith(article)) {
+                return venueName.slice(article.length);
+            }
+        }
+        return venueName;
+    }
+
     return karaokeData.listings
         .map(venue => getVenueWithEventInfo(venue, date))
         .filter(venue => venue && (showDedicated || !venue.Dedicated))
-        .sort((a, b) => a.VenueName.localeCompare(b.VenueName));
+        .sort((a, b) => {
+            const nameA = getSortableName(a.VenueName);
+            const nameB = getSortableName(b.VenueName);
+            return nameA.localeCompare(nameB);
+        });
 }
 
 function getVenueWithEventInfo(venue, date) {

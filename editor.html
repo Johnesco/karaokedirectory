@@ -767,17 +767,30 @@
         
         // Sort venues alphabetically
         function sortVenuesAlphabetically() {
-            venueData.listings.sort((a, b) => {
-                const nameA = a.VenueName.toUpperCase();
-                const nameB = b.VenueName.toUpperCase();
-                if (nameA < nameB) return -1;
-                if (nameA > nameB) return 1;
-                return 0;
-            });
-            
-            renderVenueList();
-            updateJsonOutput();
+    // Helper function to ignore articles for sorting
+    function getSortableName(venueName) {
+        const articles = ['the ', 'a ', 'an ','la ', 'el ', 'le '];
+        const lowerName = venueName.toLowerCase();
+        
+        for (const article of articles) {
+            if (lowerName.startsWith(article)) {
+                return venueName.slice(article.length).toUpperCase();
+            }
         }
+        return venueName.toUpperCase();
+    }
+
+    venueData.listings.sort((a, b) => {
+        const nameA = getSortableName(a.VenueName);
+        const nameB = getSortableName(b.VenueName);
+        if (nameA < nameB) return -1;
+        if (nameA > nameB) return 1;
+        return 0;
+    });
+    
+    renderVenueList();
+    updateJsonOutput();
+}
         
         // Switch between tabs
         function switchTab(tabName) {

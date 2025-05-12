@@ -1,7 +1,7 @@
 const karaokeData = {
   "listings": [
     {
-      "VenueName": "Alcove Cantina, The",
+      "VenueName": "The Alcove Cantina",
       "Address": {
         "Street": "119 E Main Street",
         "City": "Round Rock",
@@ -296,7 +296,7 @@ const karaokeData = {
       }
     },
     {
-      "VenueName": "Common Interest, The",
+      "VenueName": "The Common Interest",
       "Dedicated": true,
       "Address": {
         "Street": "8440 Burnet Rd",
@@ -472,7 +472,7 @@ const karaokeData = {
       }
     },
     {
-      "VenueName": "Hive, The",
+      "VenueName": "The Hive",
       "Address": {
         "Street": "10542 Menchaca Road",
         "City": "Austin",
@@ -913,7 +913,7 @@ const karaokeData = {
       }
     },
     {
-      "VenueName": "Water Tank Bar & Grill, The",
+      "VenueName": "The Water Tank Bar & Grill",
       "Address": {
         "Street": "7309 Mcneil Dr",
         "City": "Austin",
@@ -942,7 +942,7 @@ const karaokeData = {
       }
     },
     {
-      "VenueName": "Whiskey Girls Saloon, The",
+      "VenueName": "The Whiskey Girls Saloon",
       "Address": {
         "Street": "13700 FM 973, Bldg A",
         "City": "Manor",
