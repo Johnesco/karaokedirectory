@@ -27,7 +27,7 @@ const karaokeData = {
       }
     },
 {
-      "VenueName": "Marea, La",
+      "VenueName": "La Marea",
       "Address": {
         "Street": "116 E Parsons St",
         "City": "Manor",
@@ -39,7 +39,8 @@ const karaokeData = {
         "Company": ""
       },
       "socials": {
-       
+       "Facebook":"https://www.facebook.com/lamareaaustin/",
+        "Website": "https://www.lamarearestaurantseafoodtx.com/"
       },
       "schedule": {
         "weekly": {
