@@ -40,6 +40,7 @@ const karaokeData = {
       },
       "socials": {
        "Facebook":"https://www.facebook.com/lamareaaustin/",
+        "Instagram":"https://www.instagram.com/pluisrodriguez/",
         "Website": "https://www.lamarearestaurantseafoodtx.com/"
       },
       "schedule": {
