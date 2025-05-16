@@ -305,6 +305,36 @@ const karaokeData = {
       }
     },
     {
+      "VenueName": "Dog 'n' Bone Pub",
+      "Dedicated": false,
+      "Address": {
+        "Street": "310 Old Fitzhugh Rd.",
+        "City": "Dripping Springs",
+        "State": "TX",
+        "Zip": "78620"
+      },
+      "KJ": {
+        "Host": "Armando",
+        "Company": "",
+        "Website": ""
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/groups/871341856699010/user/100057382302405/",
+        "Instagram": "https://www.instagram.com/dognbone2023/",
+        "Twitter": null,
+        "Website": "https://www.dognboneds.com/",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": {
+        "weekly": {
+          "Wednesday": "7:00 PM - 10:00 PM"
+        },
+        "ordinal": []
+      }
+    },
+    {
       "VenueName": "Ego's",
       "Dedicated": true,
       "Address": {
@@ -1021,29 +1051,6 @@ const karaokeData = {
           "Sunday": "10:00 PM - 2:00 AM",
           "Tuesday": "10:00 PM - 2:00 AM",
           "Friday": "9:00 PM - 2:00 AM"
-        },
-        "ordinal": []
-      }
-    },
-    {
-      "VenueName": "Wildflower Corks & Brews",
-      "Address": {
-        "Street": "108 E. 2nd Street",
-        "City": "Taylor",
-        "State": "TX",
-        "Zip": "76574"
-      },
-      "KJ": {
-        "Host": "",
-        "Company": "Diamond Karaoke Austin"
-      },
-      "socials": {
-        "Facebook": "https://www.facebook.com/profile.php?id=61573452677081",
-        "Instagram": "https://www.instagram.com/wildflowertaylortx/"
-      },
-      "schedule": {
-        "weekly": {
-          "Thursday": "7:00 PM - 11:00 PM"
         },
         "ordinal": []
       }
