@@ -894,6 +894,36 @@ const karaokeData = {
       }
     },
     {
+      "VenueName": "Shooters (Cedar Park)",
+      "Dedicated": false,
+      "Address": {
+        "Street": "601 E Whitestone Blvd",
+        "City": "Cedar Park",
+        "State": "TX",
+        "Zip": "78613"
+      },
+      "KJ": {
+        "Host": "",
+        "Company": "Party Pipes Karaoke",
+        "Website": ""
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/shooterscp",
+        "Instagram": "https://www.instagram.com/shooterscp/",
+        "Twitter": "https://twitter.com/shootersatx",
+        "Website": "https://shootersbilliards.net/locations/cedar-park",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": {
+        "weekly": {
+          "Wednesday": "10:00 PM - CLOSE"
+        },
+        "ordinal": []
+      }
+    },
+    {
       "VenueName": "Water Hole 71",
       "Address": {
         "Street": "5244 E Hwy 71",
