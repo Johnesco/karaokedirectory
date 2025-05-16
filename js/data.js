@@ -692,7 +692,7 @@ const karaokeData = {
       },
       "KJ": {
         "Host": "Mandy",
-        "Company": ""
+        "Company": "Party Pipes Karaoke"
       },
       "socials": {
         "Facebook": "https://www.facebook.com/milliesonmainetx",
