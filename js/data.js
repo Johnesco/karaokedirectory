@@ -19,12 +19,16 @@ const karaokeData = {
         "Twitter": "https://twitter.com/AlcoveCantina",
         "Bluesky": null
       },
-      "schedule": {
-        "weekly": {
-          "Wednesday": "7:30 PM - MIDNIGHT"
-        },
-        "ordinal": []
-      }
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "7:30 PM - MIDNIGHT",
+          "description": "Every Wednesday"
+        }
+      ]
     },
     {
       "VenueName": "Baker St. Pub & Grill",
@@ -44,12 +48,15 @@ const karaokeData = {
         "Website": "https://www.texaslivebandkaraoke.com/",
         "Bluesky": null
       },
-      "schedule": {
-        "weekly": {
-          "Thursday": "9:00 PM - 1:00 AM"
-        },
-        "ordinal": []
-      }
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Thursday"
+          ],
+          "time": "9:00 PM - 1:00 AM"
+        }
+      ]
     },
     {
       "VenueName": "Bar Louie",
@@ -69,12 +76,15 @@ const karaokeData = {
         "Website": "https://www.barlouie.com/locations/us/tx/round-rock/round-rock",
         "Bluesky": null
       },
-      "schedule": {
-        "weekly": {
-          "Wednesday": "7:00 PM - 10:00 PM"
-        },
-        "ordinal": []
-      }
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "7:00 PM - 10:00 PM"
+        }
+      ]
     },
     {
       "VenueName": "Big Easy Saloon",
@@ -99,12 +109,15 @@ const karaokeData = {
         "Tiktok": null,
         "Youtube": null
       },
-      "schedule": {
-        "weekly": {
-          "Sunday": "8:30 PM - 12:30 AM"
-        },
-        "ordinal": []
-      }
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Sunday"
+          ],
+          "time": "8:30 PM - 12:30 AM"
+        }
+      ]
     },
     {
       "VenueName": "Blindside Lounge",
@@ -122,12 +135,15 @@ const karaokeData = {
         "Website": "https://blindsidelounge.com/",
         "Instagram": "https://www.instagram.com/blindsidelounge"
       },
-      "schedule": {
-        "weekly": {
-          "Wednesday": "9:00 PM - 2:00 AM"
-        },
-        "ordinal": []
-      }
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "9:00 PM - 2:00 AM"
+        }
+      ]
     },
     {
       "VenueName": "Boomerz",
@@ -147,12 +163,15 @@ const karaokeData = {
         "Website": "https://boomerzaustin.com/",
         "Bluesky": null
       },
-      "schedule": {
-        "weekly": {
-          "Thursday": "9:00 PM - 1:30 AM"
-        },
-        "ordinal": []
-      }
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Thursday"
+          ],
+          "time": "9:00 PM - 1:30 AM"
+        }
+      ]
     },
     {
       "VenueName": "Buddy's Place",
@@ -170,12 +189,15 @@ const karaokeData = {
         "Website": "https://buddysplaceatx.com/",
         "Instagram": "https://www.instagram.com/buddysplaceatx/"
       },
-      "schedule": {
-        "weekly": {
-          "Sunday": "7:30 PM - 11:30 PM"
-        },
-        "ordinal": []
-      }
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Sunday"
+          ],
+          "time": "7:30 PM - 11:30 PM"
+        }
+      ]
     },
     {
       "VenueName": "Canary Roost",
@@ -196,18 +218,57 @@ const karaokeData = {
         "Website": null,
         "Bluesky": null
       },
-      "schedule": {
-        "weekly": {
-          "Sunday": "8:00 PM - 2:00 AM",
-          "Monday": "8:00 PM - 2:00 AM",
-          "Tuesday": "8:00 PM - 2:00 AM",
-          "Wednesday": "8:00 PM - 2:00 AM",
-          "Thursday": "8:00 PM - 2:00 AM",
-          "Friday": "8:00 PM - 2:00 AM",
-          "Saturday": "8:00 PM - 2:00 AM"
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Sunday"
+          ],
+          "time": "8:00 PM - 2:00 AM"
         },
-        "ordinal": []
-      }
+        {
+          "day": [
+            "every",
+            "Monday"
+          ],
+          "time": "8:00 PM - 2:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Tuesday"
+          ],
+          "time": "8:00 PM - 2:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "8:00 PM - 2:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Thursday"
+          ],
+          "time": "8:00 PM - 2:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Friday"
+          ],
+          "time": "8:00 PM - 2:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Saturday"
+          ],
+          "time": "8:00 PM - 2:00 AM"
+        }
+      ]
     },
     {
       "VenueName": "Cheerz",
@@ -222,13 +283,22 @@ const karaokeData = {
         "Company": ""
       },
       "socials": {},
-      "schedule": {
-        "weekly": {
-          "Friday": "9:00 PM - 1:00 AM",
-          "Saturday": "9:00 PM - 1:00 AM"
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Friday"
+          ],
+          "time": "9:00 PM - 1:00 AM"
         },
-        "ordinal": []
-      }
+        {
+          "day": [
+            "every",
+            "Saturday"
+          ],
+          "time": "9:00 PM - 1:00 AM"
+        }
+      ]
     },
     {
       "VenueName": "CJ's Sports Bar",
@@ -248,29 +318,31 @@ const karaokeData = {
         "Website": null,
         "Bluesky": null
       },
-      "schedule": {
-        "weekly": {
-          "Wednesday": "6:00 PM - 10:30 PM"
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "6:00 PM - 10:30 PM"
         },
-        "ordinal": [
-          {
-            "day": [
-              "second",
-              "Friday"
-            ],
-            "time": "6:00 PM - 10:00 PM",
-            "description": "Second Fridays"
-          },
-          {
-            "day": [
-              "fourth",
-              "Friday"
-            ],
-            "time": "6:00 PM - 10:00 PM",
-            "description": "Fourth Fridays"
-          }
-        ]
-      }
+        {
+          "day": [
+            "second",
+            "Friday"
+          ],
+          "time": "6:00 PM - 10:00 PM",
+          "description": "Second Fridays"
+        },
+        {
+          "day": [
+            "fourth",
+            "Friday"
+          ],
+          "time": "6:00 PM - 10:00 PM",
+          "description": "Fourth Fridays"
+        }
+      ]
     },
     {
       "VenueName": "The Common Interest",
@@ -291,18 +363,57 @@ const karaokeData = {
         "Website": "https://ciaustin.com",
         "Bluesky": null
       },
-      "schedule": {
-        "weekly": {
-          "Sunday": "8:00 PM - 2:00 AM",
-          "Monday": "8:00 PM - 1:00 AM",
-          "Tuesday": "8:00 PM - 1:00 AM",
-          "Wednesday": "8:00 PM - 1:00 AM",
-          "Thursday": "8:00 PM - 1:00 AM",
-          "Friday": "7:00 PM - 1:00 AM",
-          "Saturday": "8:00 PM - 2:00 AM"
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Sunday"
+          ],
+          "time": "8:00 PM - 2:00 AM"
         },
-        "ordinal": []
-      }
+        {
+          "day": [
+            "every",
+            "Monday"
+          ],
+          "time": "8:00 PM - 1:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Tuesday"
+          ],
+          "time": "8:00 PM - 1:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "8:00 PM - 1:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Thursday"
+          ],
+          "time": "8:00 PM - 1:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Friday"
+          ],
+          "time": "7:00 PM - 1:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Saturday"
+          ],
+          "time": "8:00 PM - 2:00 AM"
+        }
+      ]
     },
     {
       "VenueName": "Dog 'n' Bone Pub",
@@ -327,12 +438,15 @@ const karaokeData = {
         "Tiktok": null,
         "Youtube": null
       },
-      "schedule": {
-        "weekly": {
-          "Wednesday": "7:00 PM - 10:00 PM"
-        },
-        "ordinal": []
-      }
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "7:00 PM - 10:00 PM"
+        }
+      ]
     },
     {
       "VenueName": "Ego's",
@@ -354,18 +468,57 @@ const karaokeData = {
         "Website": null,
         "Bluesky": null
       },
-      "schedule": {
-        "weekly": {
-          "Sunday": "8:00 PM - 2:00 AM",
-          "Monday": "8:00 PM - 2:00 AM",
-          "Tuesday": "8:00 PM - 2:00 AM",
-          "Wednesday": "8:00 PM - 2:00 AM",
-          "Thursday": "8:00 PM - 2:00 AM",
-          "Friday": "8:00 PM - 2:00 AM",
-          "Saturday": "8:00 PM - 2:00 AM"
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Sunday"
+          ],
+          "time": "8:00 PM - 2:00 AM"
         },
-        "ordinal": []
-      }
+        {
+          "day": [
+            "every",
+            "Monday"
+          ],
+          "time": "8:00 PM - 2:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Tuesday"
+          ],
+          "time": "8:00 PM - 2:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "8:00 PM - 2:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Thursday"
+          ],
+          "time": "8:00 PM - 2:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Friday"
+          ],
+          "time": "8:00 PM - 2:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Saturday"
+          ],
+          "time": "8:00 PM - 2:00 AM"
+        }
+      ]
     },
     {
       "VenueName": "Film Alley",
@@ -385,27 +538,24 @@ const karaokeData = {
         "Website": "https://georgetown.filmalley.net/",
         "Bluesky": null
       },
-      "schedule": {
-        "weekly": {},
-        "ordinal": [
-          {
-            "day": [
-              "second",
-              "Thursday"
-            ],
-            "time": "6:30 PM - ??? PM",
-            "description": "Second and Fourth Fridays"
-          },
-          {
-            "day": [
-              "fourth",
-              "Thursday"
-            ],
-            "time": "6:30 PM - ??? PM",
-            "description": "Second and Fourth Fridays"
-          }
-        ]
-      }
+      "schedule": [
+        {
+          "day": [
+            "second",
+            "Thursday"
+          ],
+          "time": "6:30 PM - ??? PM",
+          "description": "Second and Fourth Fridays"
+        },
+        {
+          "day": [
+            "fourth",
+            "Thursday"
+          ],
+          "time": "6:30 PM - ??? PM",
+          "description": "Second and Fourth Fridays"
+        }
+      ]
     },
     {
       "VenueName": "Firewater Sports Bar",
@@ -423,12 +573,15 @@ const karaokeData = {
         "Instagram": "https://www.instagram.com/firewaterbarcafe",
         "Website": "https://firewatersportsbar.com/"
       },
-      "schedule": {
-        "weekly": {
-          "Tuesday": "8:00 PM - 11:00 PM"
-        },
-        "ordinal": []
-      }
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Tuesday"
+          ],
+          "time": "8:00 PM - 11:00 PM"
+        }
+      ]
     },
     {
       "VenueName": "Gnar Bar",
@@ -447,12 +600,15 @@ const karaokeData = {
         "Facebook": "https://www.facebook.com/gnarbaratx/",
         "Instagram": "https://www.instagram.com/gnarbaratx/"
       },
-      "schedule": {
-        "weekly": {
-          "Sunday": "9:00 PM - Close"
-        },
-        "ordinal": []
-      }
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Sunday"
+          ],
+          "time": "9:00 PM - Close"
+        }
+      ]
     },
     {
       "VenueName": "Hard Count Kitchen & Cocktails",
@@ -471,12 +627,15 @@ const karaokeData = {
         "Instagram": "https://www.instagram.com/hardcountgtown/",
         "Website": "https://hardcountgtown.com/"
       },
-      "schedule": {
-        "weekly": {
-          "Saturday": "9:00 PM - MIDNIGHT"
-        },
-        "ordinal": []
-      }
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Saturday"
+          ],
+          "time": "9:00 PM - MIDNIGHT"
+        }
+      ]
     },
     {
       "VenueName": "The Hive",
@@ -496,27 +655,24 @@ const karaokeData = {
         "Website": "https://www.hiveaustin.com/",
         "Twitter": "https://x.com/hiveaustin"
       },
-      "schedule": {
-        "weekly": {},
-        "ordinal": [
-          {
-            "day": [
-              "second",
-              "Saturday"
-            ],
-            "time": "7:00 PM - 10:00 PM",
-            "description": "Second and Fourth Saturdays"
-          },
-          {
-            "day": [
-              "fourth",
-              "Saturday"
-            ],
-            "time": "7:00 PM - 10:00 PM",
-            "description": "Second and Fourth Saturdays"
-          }
-        ]
-      }
+      "schedule": [
+        {
+          "day": [
+            "second",
+            "Saturday"
+          ],
+          "time": "7:00 PM - 10:00 PM",
+          "description": "Second and Fourth Saturdays"
+        },
+        {
+          "day": [
+            "fourth",
+            "Saturday"
+          ],
+          "time": "7:00 PM - 10:00 PM",
+          "description": "Second and Fourth Saturdays"
+        }
+      ]
     },
     {
       "VenueName": "Hudson Tavern",
@@ -539,12 +695,15 @@ const karaokeData = {
         "Tiktok": null,
         "Youtube": null
       },
-      "schedule": {
-        "weekly": {
-          "Friday": "9:00 PM - 1:00 AM"
-        },
-        "ordinal": []
-      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Friday"
+          ],
+          "time": "9:00 PM - 1:00 AM"
+        }
+      ],
       "Dedicated": false
     },
     {
@@ -570,12 +729,15 @@ const karaokeData = {
         "Tiktok": null,
         "Youtube": null
       },
-      "schedule": {
-        "weekly": {
-          "Wednesday": "7:00 PM - 11:00 PM"
-        },
-        "ordinal": []
-      }
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "7:00 PM - 11:00 PM"
+        }
+      ]
     },
     {
       "VenueName": "Lone Star Bar",
@@ -598,12 +760,15 @@ const karaokeData = {
         "Tiktok": null,
         "Youtube": null
       },
-      "schedule": {
-        "weekly": {
-          "Saturday": "9:00 PM - 1:00 AM"
-        },
-        "ordinal": []
-      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Saturday"
+          ],
+          "time": "9:00 PM - 1:00 AM"
+        }
+      ],
       "Dedicated": false
     },
     {
@@ -625,12 +790,15 @@ const karaokeData = {
         "Bluesky": null,
         "Youtube": "https://www.youtube.com/@LuckyRabbitBar"
       },
-      "schedule": {
-        "weekly": {
-          "Wednesday": "7:00 PM - 11:00 PM"
-        },
-        "ordinal": []
-      }
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "7:00 PM - 11:00 PM"
+        }
+      ]
     },
     {
       "VenueName": "Manchaca Springs Saloon",
@@ -655,12 +823,15 @@ const karaokeData = {
         "Tiktok": null,
         "Youtube": null
       },
-      "schedule": {
-        "weekly": {
-          "Sunday": "7:00 PM - 11:00 PM"
-        },
-        "ordinal": []
-      }
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Sunday"
+          ],
+          "time": "7:00 PM - 11:00 PM"
+        }
+      ]
     },
     {
       "VenueName": "La Marea",
@@ -679,13 +850,22 @@ const karaokeData = {
         "Instagram": "https://www.instagram.com/pluisrodriguez/",
         "Website": "https://www.lamarearestaurantseafoodtx.com/"
       },
-      "schedule": {
-        "weekly": {
-          "Friday": "8:00 PM - MIDNIGHT",
-          "Saturday": "8:00 PM - MIDNIGHT"
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Friday"
+          ],
+          "time": "8:00 PM - MIDNIGHT"
         },
-        "ordinal": []
-      }
+        {
+          "day": [
+            "every",
+            "Saturday"
+          ],
+          "time": "8:00 PM - MIDNIGHT"
+        }
+      ]
     },
     {
       "VenueName": "Mario's Seafood",
@@ -705,12 +885,15 @@ const karaokeData = {
         "Website": "https://marioseafood.com/",
         "Bluesky": null
       },
-      "schedule": {
-        "weekly": {
-          "Thursday": "7ish PM - MIDNIGHT"
-        },
-        "ordinal": []
-      }
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Thursday"
+          ],
+          "time": "7ish PM - MIDNIGHT"
+        }
+      ]
     },
     {
       "VenueName": "Millie's on Main",
@@ -731,12 +914,15 @@ const karaokeData = {
         "Bluesky": null,
         "Tiktok": "https://www.tiktok.com/@millies.on.main.e"
       },
-      "schedule": {
-        "weekly": {
-          "Thursday": "6:00 PM - 9:00 PM"
-        },
-        "ordinal": []
-      }
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Thursday"
+          ],
+          "time": "6:00 PM - 9:00 PM"
+        }
+      ]
     },
     {
       "VenueName": "Oak Hill Social",
@@ -755,12 +941,15 @@ const karaokeData = {
         "Instagram": "https://www.instagram.com/oakhillsocial",
         "Website": "https://www.oakhillsocial.com/"
       },
-      "schedule": {
-        "weekly": {
-          "Wednesday": "6:00 PM - 9:00 PM"
-        },
-        "ordinal": []
-      }
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "6:00 PM - 9:00 PM"
+        }
+      ]
     },
     {
       "VenueName": "Pflutto's Tavern #2",
@@ -777,12 +966,15 @@ const karaokeData = {
       "socials": {
         "Facebook": "https://www.facebook.com/profile.php?id=61563834987547"
       },
-      "schedule": {
-        "weekly": {
-          "Wednesday": "7:00 PM - 11:00 PM"
-        },
-        "ordinal": []
-      }
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "7:00 PM - 11:00 PM"
+        }
+      ]
     },
     {
       "VenueName": "Rabbit Hole (Cedar Park)",
@@ -802,12 +994,15 @@ const karaokeData = {
         "Website": "https://www.rabbitholetx.com/",
         "Bluesky": null
       },
-      "schedule": {
-        "weekly": {
-          "Wednesday": "9:00 PM - 11:00 PM"
-        },
-        "ordinal": []
-      }
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "9:00 PM - 11:00 PM"
+        }
+      ]
     },
     {
       "VenueName": "Rabbit Hole (Leander)",
@@ -827,12 +1022,15 @@ const karaokeData = {
         "Website": "https://www.rabbitholetx.com/",
         "Bluesky": null
       },
-      "schedule": {
-        "weekly": {
-          "Thursday": "9:00 PM - 11:00 PM"
-        },
-        "ordinal": []
-      }
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Thursday"
+          ],
+          "time": "9:00 PM - 11:00 PM"
+        }
+      ]
     },
     {
       "VenueName": "Randy's Ice House",
@@ -857,13 +1055,22 @@ const karaokeData = {
         "Tiktok": null,
         "Youtube": null
       },
-      "schedule": {
-        "weekly": {
-          "Thursday": "8:00 PM - 11:00 PM",
-          "Saturday": "8:00 PM - 11:00 PM"
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Thursday"
+          ],
+          "time": "8:00 PM - 11:00 PM"
         },
-        "ordinal": []
-      }
+        {
+          "day": [
+            "every",
+            "Saturday"
+          ],
+          "time": "8:00 PM - 11:00 PM"
+        }
+      ]
     },
     {
       "VenueName": "Red Rooster's Pub and Grub",
@@ -884,18 +1091,57 @@ const karaokeData = {
         "Website": "https://www.roosteraustin.com/",
         "Bluesky": null
       },
-      "schedule": {
-        "weekly": {
-          "Sunday": "9:00 PM - 2:00 AM",
-          "Monday": "9:00 PM - 2:00 AM",
-          "Tuesday": "9:00 PM - 2:00 AM",
-          "Wednesday": "9:00 PM - 2:00 AM",
-          "Thursday": "9:00 PM - 2:00 AM",
-          "Friday": "9:00 PM - 2:00 AM",
-          "Saturday": "9:00 PM - 2:00 AM"
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Sunday"
+          ],
+          "time": "9:00 PM - 2:00 AM"
         },
-        "ordinal": []
-      }
+        {
+          "day": [
+            "every",
+            "Monday"
+          ],
+          "time": "9:00 PM - 2:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Tuesday"
+          ],
+          "time": "9:00 PM - 2:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "9:00 PM - 2:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Thursday"
+          ],
+          "time": "9:00 PM - 2:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Friday"
+          ],
+          "time": "9:00 PM - 2:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Saturday"
+          ],
+          "time": "9:00 PM - 2:00 AM"
+        }
+      ]
     },
     {
       "VenueName": "Round Rock Tavern",
@@ -915,13 +1161,22 @@ const karaokeData = {
         "Website": "https://www.roundrocktavern.com/",
         "Bluesky": null
       },
-      "schedule": {
-        "weekly": {
-          "Monday": "9:00 PM - 1:00 AM",
-          "Tuesday": "9:00 PM - 1:00 AM"
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Monday"
+          ],
+          "time": "9:00 PM - 1:00 AM"
         },
-        "ordinal": []
-      }
+        {
+          "day": [
+            "every",
+            "Tuesday"
+          ],
+          "time": "9:00 PM - 1:00 AM"
+        }
+      ]
     },
     {
       "VenueName": "Shooters (Cedar Park)",
@@ -946,12 +1201,15 @@ const karaokeData = {
         "Tiktok": null,
         "Youtube": null
       },
-      "schedule": {
-        "weekly": {
-          "Wednesday": "10:00 PM - CLOSE"
-        },
-        "ordinal": []
-      }
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "10:00 PM - CLOSE"
+        }
+      ]
     },
     {
       "VenueName": "Water Hole 71",
@@ -967,12 +1225,15 @@ const karaokeData = {
         "Website": ""
       },
       "socials": {},
-      "schedule": {
-        "weekly": {
-          "Friday": "9:30 PM - 1:30 AM"
-        },
-        "ordinal": []
-      }
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Friday"
+          ],
+          "time": "9:30 PM - 1:30 AM"
+        }
+      ]
     },
     {
       "VenueName": "The Water Tank Bar & Grill",
@@ -992,16 +1253,43 @@ const karaokeData = {
         "Website": "https://www.austinwatertank.com/",
         "Bluesky": null
       },
-      "schedule": {
-        "weekly": {
-          "Sunday": "5:30 PM - 9:00 PM",
-          "Wednesday": "8:30 PM - MIDNIGHT",
-          "Thursday": "8:00 PM - MIDNIGHT",
-          "Friday": "8:00 PM - 1:30 AM",
-          "Saturday": "9:00 PM - 2:00 AM"
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Sunday"
+          ],
+          "time": "5:30 PM - 9:00 PM"
         },
-        "ordinal": []
-      }
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "8:30 PM - MIDNIGHT"
+        },
+        {
+          "day": [
+            "every",
+            "Thursday"
+          ],
+          "time": "8:00 PM - MIDNIGHT"
+        },
+        {
+          "day": [
+            "every",
+            "Friday"
+          ],
+          "time": "8:00 PM - 1:30 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Saturday"
+          ],
+          "time": "9:00 PM - 2:00 AM"
+        }
+      ]
     },
     {
       "VenueName": "The Whiskey Girls Saloon",
@@ -1021,12 +1309,15 @@ const karaokeData = {
         "Website": "https://whiskeygirlssaloon.com/",
         "Bluesky": null
       },
-      "schedule": {
-        "weekly": {
-          "Tuesday": "8:00 PM - MIDNIGHT"
-        },
-        "ordinal": []
-      }
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Tuesday"
+          ],
+          "time": "8:00 PM - MIDNIGHT"
+        }
+      ]
     },
     {
       "VenueName": "Wicked Wings South Austin",
@@ -1046,14 +1337,29 @@ const karaokeData = {
         "Website": null,
         "Bluesky": null
       },
-      "schedule": {
-        "weekly": {
-          "Sunday": "10:00 PM - 2:00 AM",
-          "Tuesday": "10:00 PM - 2:00 AM",
-          "Friday": "9:00 PM - 2:00 AM"
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Sunday"
+          ],
+          "time": "10:00 PM - 2:00 AM"
         },
-        "ordinal": []
-      }
+        {
+          "day": [
+            "every",
+            "Tuesday"
+          ],
+          "time": "10:00 PM - 2:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Friday"
+          ],
+          "time": "9:00 PM - 2:00 AM"
+        }
+      ]
     }
   ]
 };

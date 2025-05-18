@@ -267,29 +267,7 @@
                             <input type="text" id="youtube">
                         </div>
                     </div>
-                    
-                    <div class="section">
-                        <h3 class="section-title">Weekly Schedule</h3>
-                        <div class="days-container" id="weeklyDays">
-                            <!-- Days will be added here -->
-                        </div>
-                        <div class="form-group">
-                            <label>Add Weekly Day</label>
-                            <div style="display: flex; gap: 10px;">
-                                <select id="newWeeklyDay">
-                                    <option value="Sunday">Sunday</option>
-                                    <option value="Monday">Monday</option>
-                                    <option value="Tuesday">Tuesday</option>
-                                    <option value="Wednesday">Wednesday</option>
-                                    <option value="Thursday">Thursday</option>
-                                    <option value="Friday">Friday</option>
-                                    <option value="Saturday">Saturday</option>
-                                </select>
-                                <input type="text" id="newWeeklyTime" placeholder="9:00 PM - 2:00 AM">
-                                <button id="addWeeklyDay" class="success">Add</button>
-                            </div>
-                        </div>
-                    </div>
+                
                     
                     <div class="section">
                         <h3 class="section-title">Ordinal Schedule</h3>
@@ -300,7 +278,7 @@
                             <label>Add Ordinal Day</label>
                             <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
                                 <select id="newOrdinalNumber">
-                                    <option value="first">First</option>
+                                    <option value="every">Every</option><option value="first">First</option>
                                     <option value="second">Second</option>
                                     <option value="third">Third</option>
                                     <option value="fourth">Fourth</option>
@@ -385,11 +363,6 @@
         const tiktok = document.getElementById('tiktok');
         const youtube = document.getElementById('youtube');
         
-        // Weekly schedule elements
-        const weeklyDays = document.getElementById('weeklyDays');
-        const newWeeklyDay = document.getElementById('newWeeklyDay');
-        const newWeeklyTime = document.getElementById('newWeeklyTime');
-        
         // Ordinal schedule elements
         const ordinalItems = document.getElementById('ordinalItems');
         const newOrdinalNumber = document.getElementById('newOrdinalNumber');
@@ -420,7 +393,6 @@
             addVenueBtn.addEventListener('click', addNewVenue);
             saveVenueBtn.addEventListener('click', saveVenue);
             deleteVenueBtn.addEventListener('click', deleteVenue);
-            addWeeklyDayBtn.addEventListener('click', addWeeklyDay);
             addOrdinalDayBtn.addEventListener('click', addOrdinalDay);
             copyJsonBtn.addEventListener('click', copyJsonToClipboard);
             loadJsonBtn.addEventListener('click', () => jsonFileInput.click());
@@ -526,11 +498,10 @@
             tiktok.value = venue.socials.Tiktok || '';
             youtube.value = venue.socials.Youtube || '';
             
-            // Render weekly schedule
-            renderWeeklySchedule(venue.schedule.weekly);
+
             
             // Render ordinal schedule
-            renderOrdinalSchedule(venue.schedule.ordinal);
+            renderOrdinalSchedule(venue.schedule);
             
             // Update JSON output
             updateJsonOutput();
@@ -621,10 +592,7 @@
                     "Tiktok": null,
                     "Youtube": null
                 },
-                "schedule": {
-                    "weekly": {},
-                    "ordinal": []
-                }
+                "schedule": []
             };
             
             venueData.listings.push(newVenue);
@@ -696,35 +664,7 @@
             }
         }
         
-        // Add a weekly day
-        function addWeeklyDay() {
-            if (selectedVenueIndex === -1) return;
-            
-            const day = newWeeklyDay.value;
-            const time = newWeeklyTime.value.trim();
-            
-            if (!time) {
-                alert('Please enter a time range');
-                return;
-            }
-            
-            venueData.listings[selectedVenueIndex].schedule.weekly[day] = time;
-            renderWeeklySchedule(venueData.listings[selectedVenueIndex].schedule.weekly);
-            
-            // Clear inputs
-            newWeeklyTime.value = '';
-            
-            updateJsonOutput();
-        }
         
-        // Delete a weekly day
-        function deleteWeeklyDay(day) {
-            if (selectedVenueIndex === -1) return;
-            
-            delete venueData.listings[selectedVenueIndex].schedule.weekly[day];
-            renderWeeklySchedule(venueData.listings[selectedVenueIndex].schedule.weekly);
-            updateJsonOutput();
-        }
         
         // Add an ordinal day
         function addOrdinalDay() {
@@ -746,8 +686,8 @@
                 description: description || undefined
             };
             
-            venueData.listings[selectedVenueIndex].schedule.ordinal.push(newOrdinal);
-            renderOrdinalSchedule(venueData.listings[selectedVenueIndex].schedule.ordinal);
+            venueData.listings[selectedVenueIndex].schedule.push(newOrdinal);
+            renderOrdinalSchedule(venueData.listings[selectedVenueIndex].schedule);
             
             // Clear inputs
             newOrdinalTime.value = '';
@@ -760,8 +700,8 @@
         function deleteOrdinalItem(index) {
             if (selectedVenueIndex === -1) return;
             
-            venueData.listings[selectedVenueIndex].schedule.ordinal.splice(index, 1);
-            renderOrdinalSchedule(venueData.listings[selectedVenueIndex].schedule.ordinal);
+            venueData.listings[selectedVenueIndex].schedule.splice(index, 1);
+            renderOrdinalSchedule(venueData.listings[selectedVenueIndex].schedule);
             updateJsonOutput();
         }
         
@@ -818,8 +758,8 @@
             // Fix the Thursday typo before displaying
             const fixedData = JSON.parse(JSON.stringify(venueData));
             fixedData.listings.forEach(venue => {
-                if (venue.schedule.ordinal) {
-                    venue.schedule.ordinal.forEach(item => {
+                if (venue.schedule) {
+                    venue.schedule.forEach(item => {
                         if (item.day && item.day[1] === "Thrusday") {
                             item.day[1] = "Thursday";
                         }

@@ -93,6 +93,10 @@ function isOrdinalDate(date, ordinal, dayName) {
     const month = date.getMonth();
     const year = date.getFullYear();
     const lastDay = new Date(year, month + 1, 0).getDate();
+    
+    if (ordinal === "every"){
+        return true;
+    }
 
     const occurrences = [];
     for (let d = 1; d <= lastDay; d++) {
@@ -112,17 +116,7 @@ function isOrdinalDate(date, ordinal, dayName) {
 function hasKaraokeOnDate(venue, date) {
     const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
 
-    if (venue.schedule.weekly[dayName]) {
-        return {
-            hasEvent: true,
-            timeInfo: {
-                time: venue.schedule.weekly[dayName],
-                description: "Weekly karaoke"
-            }
-        };
-    }
-
-    for (const ordinalEvent of venue.schedule.ordinal) {
+    for (const ordinalEvent of venue.schedule) {
         const [ordinal, ordinalDay] = ordinalEvent.day;
         if (ordinalDay === dayName && isOrdinalDate(date, ordinal, ordinalDay)) {
             return {
