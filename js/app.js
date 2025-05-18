@@ -209,7 +209,6 @@ function renderAllDays() {
         const currentDate = getCurrentDate(i);
         const venuesToday = getVenuesForDate(currentDate);
         const dayHTML = createDayHTML(currentDate, venuesToday);
-        console.log(getCurrentDate(i));
         appendDayToContainer(dayHTML);
     }
 }

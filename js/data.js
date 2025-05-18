@@ -324,7 +324,8 @@ const karaokeData = {
             "every",
             "Wednesday"
           ],
-          "time": "6:00 PM - 10:30 PM"
+          "time": "6:00 PM - 10:30 PM",
+          "description": "Every Wednesday and Second and Fourth Fridays"
         },
         {
           "day": [
@@ -332,7 +333,7 @@ const karaokeData = {
             "Friday"
           ],
           "time": "6:00 PM - 10:00 PM",
-          "description": "Second Fridays"
+          "description": "Every Wednesday and Second and Fourth Fridays"
         },
         {
           "day": [
@@ -340,7 +341,7 @@ const karaokeData = {
             "Friday"
           ],
           "time": "6:00 PM - 10:00 PM",
-          "description": "Fourth Fridays"
+          "description": "Every Wednesday and Second and Fourth Fridays"
         }
       ]
     },
