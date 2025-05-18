@@ -146,6 +146,39 @@ const karaokeData = {
       ]
     },
     {
+      "VenueName": "Bodhi's Bodacious Hideaway",
+      "Dedicated": false,
+      "Address": {
+        "Street": "10402 Menchaca Rd, Unit D  Austin, TX 78748",
+        "City": "Austin",
+        "State": "TX ",
+        "Zip": "78748"
+      },
+      "KJ": {
+        "Host": "",
+        "Company": "Karaoke Soup",
+        "Website": "https://www.instagram.com/karaokesoup/"
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/bodhishideaway/",
+        "Instagram": "https://www.instagram.com/bodhis_hideaway/",
+        "Twitter": null,
+        "Website": "https://www.bodhishideaway.com/",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Tuesday"
+          ],
+          "time": "9:00 PM - CLOSE"
+        }
+      ]
+    },
+    {
       "VenueName": "Boomerz",
       "Address": {
         "Street": "6148 West US Highway 290",
@@ -798,6 +831,39 @@ const karaokeData = {
             "Wednesday"
           ],
           "time": "7:00 PM - 11:00 PM"
+        }
+      ]
+    },
+    {
+      "VenueName": "Lustre Pearl South",
+      "Dedicated": false,
+      "Address": {
+        "Street": "10400 Menchaca Rd",
+        "City": "Austin",
+        "State": "TX ",
+        "Zip": "78748"
+      },
+      "KJ": {
+        "Host": "",
+        "Company": "Karaoke Soup",
+        "Website": "https://www.instagram.com/karaokesoup/"
+      },
+      "socials": {
+        "Facebook": null,
+        "Instagram": "https://www.instagram.com/lustre_pearl_south/",
+        "Twitter": null,
+        "Website": "https://dunlapatx.com/lustre-pearl-south/",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Thursday"
+          ],
+          "time": "9:00 PM - Close"
         }
       ]
     },
