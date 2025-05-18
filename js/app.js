@@ -32,7 +32,7 @@ function showVenueDetails(venue) {
     <div class="modal-schedule">
       <strong>Schedule:</strong>`;
   
-  const weeklyDays = Object.entries(venue.schedule.weekly);
+  /* const weeklyDays = Object.entries(venue.schedule.weekly);
   if (weeklyDays.length > 0) {
     infoHTML += `<h4>Weekly:</h4><ul>`;
     weeklyDays.forEach(([day, time]) => {
@@ -40,11 +40,19 @@ function showVenueDetails(venue) {
     });
     infoHTML += `</ul>`;
   }
-  
-  if (venue.schedule.ordinal.length > 0) {
-    infoHTML += `<h4>Special Events:</h4><ul>`;
-    venue.schedule.ordinal.forEach(event => {
-      infoHTML += `<li class="modal-schedule-item">${event.description}: ${event.time}</li>`;
+  */
+  if (venue.schedule.length > 0) {
+    infoHTML += `<ul>`;
+    
+    venue.schedule.forEach(event => {
+    let cadence = capitalizeFirstLetter(event.day[0]);
+    let weekday = event.day[1];
+     
+    //Pluarize day if it's every weekday
+    if (event.day[0] != "every")
+        {weekday = weekday + "s";}
+
+    infoHTML += `<li class="modal-schedule-item">${cadence} ${weekday}: ${event.time}</li>`;
     });
     infoHTML += `</ul>`;
   }
@@ -116,8 +124,13 @@ function isOrdinalDate(date, ordinal, dayName) {
 function hasKaraokeOnDate(venue, date) {
     const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
 
+
     for (const ordinalEvent of venue.schedule) {
         const [ordinal, ordinalDay] = ordinalEvent.day;
+        if (ordinalEvent.description === undefined)
+        {
+            ordinalEvent.description = capitalizeFirstLetter(ordinalEvent.day[0]) + " " + ordinalEvent.day[1];
+        }
         if (ordinalDay === dayName && isOrdinalDate(date, ordinal, ordinalDay)) {
             return {
                 hasEvent: true,
@@ -140,6 +153,10 @@ function createMapLink(venue) {
 function formatAddress(venue) {
     return `${venue.Address.Street}<br>${venue.Address.City}, ${venue.Address.State}, ${venue.Address.Zip}`;
 }
+
+function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
 
 function createSocialLinks(venue) {
     const socials = [];
@@ -192,6 +209,7 @@ function renderAllDays() {
         const currentDate = getCurrentDate(i);
         const venuesToday = getVenuesForDate(currentDate);
         const dayHTML = createDayHTML(currentDate, venuesToday);
+        console.log(getCurrentDate(i));
         appendDayToContainer(dayHTML);
     }
 }
