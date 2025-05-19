@@ -3,7 +3,7 @@ const karaokeData = {
     {
       "VenueName": "The Alcove Cantina",
       "Address": {
-        "Street": "119 E Main Street",
+        "Street": "119 E Maiun Street",
         "City": "Round Rock",
         "State": "TX",
         "Zip": "78664"
@@ -774,6 +774,48 @@ const karaokeData = {
       ]
     },
     {
+      "VenueName": "The Iron Bear",
+      "Dedicated": false,
+      "Address": {
+        "Street": "301 West. 6th St.",
+        "City": "Austin",
+        "State": "TX",
+        "Zip": "78701"
+      },
+      "KJ": {
+        "Host": "Murrah",
+        "Company": "Planet Karaoke",
+        "Website": ""
+      },
+      "socials": {
+        "Facebook": null,
+        "Instagram": "https://www.instagram.com/theironbearaustin/",
+        "Twitter": null,
+        "Website": "http://www.theironbear.com/",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Sunday"
+          ],
+          "time": "9:00 PM - 1:00 AM",
+          "description": "Sundays and Wednesdays"
+        },
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "9:00 PM - 1:00 AM",
+          "description": "Sundays and Wednesdays"
+        }
+      ]
+    },
+    {
       "VenueName": "Lone Star Bar",
       "Address": {
         "Street": "403 FM 685",
@@ -1387,22 +1429,26 @@ const karaokeData = {
       ]
     },
     {
-      "VenueName": "Wicked Wings South Austin",
+      "VenueName": "The Iron Bear",
       "Address": {
-        "Street": "615 W Slaughter Ln #108",
+        "Street": "301 West. 6th St.",
         "City": "Austin",
         "State": "TX",
-        "Zip": "78748"
+        "Zip": "78701"
       },
       "KJ": {
-        "Host": "Deb O Rah",
-        "Company": "Ugotta Sing Karaoke"
+        "Host": "Murrah",
+        "Company": "Planet Karaoke",
+        "Website": ""
       },
       "socials": {
-        "Facebook": "https://www.facebook.com/p/Wicked-Wings-Slaughter-100063625898136/",
-        "Instagram": null,
-        "Website": null,
-        "Bluesky": null
+        "Facebook": null,
+        "Instagram": "https://www.instagram.com/theironbearaustin/",
+        "Twitter": null,
+        "Website": "http://www.theironbear.com/",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -1426,7 +1472,8 @@ const karaokeData = {
           ],
           "time": "9:00 PM - 2:00 AM"
         }
-      ]
+      ],
+      "Dedicated": false
     }
   ]
 };
