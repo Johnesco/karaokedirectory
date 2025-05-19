@@ -3,7 +3,7 @@ const karaokeData = {
     {
       "VenueName": "The Alcove Cantina",
       "Address": {
-        "Street": "119 E Maiun Street",
+        "Street": "119 E Main Street",
         "City": "Round Rock",
         "State": "TX",
         "Zip": "78664"
