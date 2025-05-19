@@ -1427,53 +1427,6 @@ const karaokeData = {
           "time": "8:00 PM - MIDNIGHT"
         }
       ]
-    },
-    {
-      "VenueName": "The Iron Bear",
-      "Address": {
-        "Street": "301 West. 6th St.",
-        "City": "Austin",
-        "State": "TX",
-        "Zip": "78701"
-      },
-      "KJ": {
-        "Host": "Murrah",
-        "Company": "Planet Karaoke",
-        "Website": ""
-      },
-      "socials": {
-        "Facebook": null,
-        "Instagram": "https://www.instagram.com/theironbearaustin/",
-        "Twitter": null,
-        "Website": "http://www.theironbear.com/",
-        "Bluesky": null,
-        "Tiktok": null,
-        "Youtube": null
-      },
-      "schedule": [
-        {
-          "day": [
-            "every",
-            "Sunday"
-          ],
-          "time": "10:00 PM - 2:00 AM"
-        },
-        {
-          "day": [
-            "every",
-            "Tuesday"
-          ],
-          "time": "10:00 PM - 2:00 AM"
-        },
-        {
-          "day": [
-            "every",
-            "Friday"
-          ],
-          "time": "9:00 PM - 2:00 AM"
-        }
-      ],
-      "Dedicated": false
     }
-  ]
+]
 };
