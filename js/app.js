@@ -74,12 +74,12 @@ function showVenueDetails(venue) {
 // ======================
 // DATE UTILITIES
 // ======================
-function getStartOfWeek(date) {
+/* function getStartOfWeek(date) {
     const d = new Date(date);
     const day = d.getDay();
     const diff = d.getDate() - day;
     return new Date(d.setDate(diff));
-}
+} */
 
 function isToday(date) {
     return date.toDateString() === today;
@@ -97,25 +97,69 @@ function formatWeekRange(startDate) {
 }
 
 function isOrdinalDate(date, ordinal, dayName) {
-    const day = date.getDate();
-    const month = date.getMonth();
-    const year = date.getFullYear();
-    const lastDay = new Date(year, month + 1, 0).getDate();
-    
-    if (ordinal === "every"){
+    // Early return if date is invalid
+    if (!(date instanceof Date) || isNaN(date.getTime())) {
+        console.warn("Invalid date provided to isOrdinalDate");
+        return false;
+    }
+
+    const validOrdinals = new Set(["first", "second", "third", "fourth", "last", "every"]);
+    if (!validOrdinals.has(ordinal)) {
+        console.warn(`Invalid ordinal (${ordinal}). Expected: first, second, third, fourth, last, or every.`);
+        return false;
+    }
+
+    if (ordinal === "every") {
         return true;
     }
 
-    const occurrences = [];
-    for (let d = 1; d <= lastDay; d++) {
-        const testDate = new Date(year, month, d);
-        if (testDate.toLocaleDateString("en-US", { weekday: "long" }) === dayName) {
-            occurrences.push(d);
-        }
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const day = date.getDate();
+
+    // Find the first occurrence of `dayName` in the month
+    const firstDay = new Date(year, month, 1);
+    const firstDayOfWeek = firstDay.getDay(); // 0 (Sun) to 6 (Sat)
+    
+    const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const targetDayIndex = weekdays.indexOf(dayName);
+    if (targetDayIndex === -1) {
+        console.warn(`Invalid dayName (${dayName}). Must be a weekday (e.g., "Monday").`);
+        return false;
     }
 
-    const ordinalIndex = { first: 0, second: 1, third: 2, fourth: 3, last: occurrences.length - 1 }[ordinal];
-    return occurrences[ordinalIndex] === day;
+    // Calculate the first occurrence
+    let firstOccurrence = 1 + ((targetDayIndex - firstDayOfWeek + 7) % 7);
+    if (firstOccurrence > 31) {
+        console.warn("Unexpected date calculation error.");
+        return false;
+    }
+
+    // Get all occurrences (adding 7 days each time)
+    const occurrences = [];
+    for (let d = firstOccurrence; d <= 31; d += 7) {
+        const testDate = new Date(year, month, d);
+        if (testDate.getMonth() !== month) break;
+        occurrences.push(d);
+    }
+
+    // Handle "last" separately (since months may have 4 or 5 occurrences)
+    if (ordinal === "last") {
+        return occurrences.length > 0 && day === occurrences[occurrences.length - 1];
+    }
+
+    // Map ordinal to index
+    const ordinalIndexMap = {
+        first: 0,
+        second: 1,
+        third: 2,
+        fourth: 3,
+        fifth: 4,
+    };
+    const index = ordinalIndexMap[ordinal];
+
+    // Check if the index is valid (e.g., no "fifth" in a 4-occurrence month)
+    return index < occurrences.length && day === occurrences[index];
 }
 
 // ======================
@@ -170,6 +214,7 @@ function createSocialLinks(venue) {
         Website: { icon: "fa-solid fa-globe", title: "Website" },
     };
 
+    // Do maps first as slightly different than other socials
     socials.push(
         `<a href="${createMapLink(venue)}" target="_blank" title="View on Google Maps"><i class="fas fa-map-marker-alt"></i></a>`
     );
@@ -266,7 +311,7 @@ function createDayHeaderContent(date, isCurrentDay) {
     return `
         <span>${date.toLocaleDateString("en-US", { weekday: "long" })}</span>
         <span class="date-number ${isCurrentDay ? "today" : ""}">
-            ${date.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+            ${date.toLocaleDateString("en-US", { month: "short", day: "numeric" })} ${isCurrentDay ? "(today)" : ""}
         </span>
     `;
 }

@@ -757,15 +757,6 @@
         function updateJsonOutput() {
             // Fix the Thursday typo before displaying
             const fixedData = JSON.parse(JSON.stringify(venueData));
-            fixedData.listings.forEach(venue => {
-                if (venue.schedule) {
-                    venue.schedule.forEach(item => {
-                        if (item.day && item.day[1] === "Thrusday") {
-                            item.day[1] = "Thursday";
-                        }
-                    });
-                }
-            });
             
             jsonOutput.value = JSON.stringify(fixedData, null, 2);
         }

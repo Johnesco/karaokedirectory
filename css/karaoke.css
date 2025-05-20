@@ -160,11 +160,6 @@ button:hover {
     background-color: #ff0000;
 }
 
-.day-header.today::after {
-    content: "TODAY";
-    font-size: 1.2rem;
-}
-
 .schedule-container{
     margin-bottom: 50px
     
