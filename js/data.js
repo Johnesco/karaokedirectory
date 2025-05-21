@@ -1321,6 +1321,81 @@ const karaokeData = {
       ]
     },
     {
+      "VenueName": "TopSpin Austin",
+      "Dedicated": true,
+      "Address": {
+        "Street": "1851 S Lakeline Blvd #106",
+        "City": "Cedar Park",
+        "State": "TX",
+        "Zip": "78613"
+      },
+      "KJ": {
+        "Host": "",
+        "Company": "",
+        "Website": ""
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/TopSpinAustin/",
+        "Instagram": "https://www.instagram.com/topspinkaraoke",
+        "Twitter": null,
+        "Website": "https://www.topspinaustin.com/",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Sunday"
+          ],
+          "time": "9:00 PM - 2:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Monday"
+          ],
+          "time": "9:00 PM - 2:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Tuesday"
+          ],
+          "time": "9:00 PM - 2:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "9:00 PM - 2:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Thursday"
+          ],
+          "time": "9:00 PM - 2:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Friday"
+          ],
+          "time": "9:00 PM - 2:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Saturday"
+          ],
+          "time": "9:00 PM - 2:00 AM"
+        },
+      ]
+    },
+    {
       "VenueName": "Water Hole 71",
       "Address": {
         "Street": "5244 E Hwy 71",
