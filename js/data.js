@@ -149,7 +149,7 @@ const karaokeData = {
       "VenueName": "Bodhi's Bodacious Hideaway",
       "Dedicated": false,
       "Address": {
-        "Street": "10402 Menchaca Rd, Unit D  Austin, TX 78748",
+        "Street": "10402 Menchaca Rd, Unit D",
         "City": "Austin",
         "State": "TX ",
         "Zip": "78748"
