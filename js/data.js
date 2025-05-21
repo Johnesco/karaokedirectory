@@ -1392,7 +1392,7 @@ const karaokeData = {
             "Saturday"
           ],
           "time": "9:00 PM - 2:00 AM"
-        },
+        }
       ]
     },
     {
