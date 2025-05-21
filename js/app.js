@@ -1,9 +1,20 @@
 // ======================
 // CONSTANTS & CONFIG
 // ======================
-const today = new Date().toDateString();
+const TODAY = new Date().toDateString();
 let currentWeekStart = new Date();
 let showDedicated = true;
+
+// ======================
+// HELPER FUNCTIONS
+// ======================
+const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
+
+const getDayName = (date) => date.toLocaleDateString("en-US", { weekday: "long" });
+
+const formatDateShort = (date) => date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
+const isCurrentDay = (date) => date.toDateString() === TODAY;
 
 // ======================
 // MODAL FUNCTIONS
@@ -14,405 +25,274 @@ function showVenueDetails(venue) {
   const venueInfo = document.getElementById('modal-venue-info');
   
   venueName.textContent = venue.VenueName;
-  
-  let infoHTML = `
-  <div class="modal-kj">
+  venueInfo.innerHTML = createModalContent(venue);
+  modal.style.display = 'block';
+
+  setupModalEventListeners(modal);
+}
+
+function createModalContent(venue) {
+  return `
+    <div class="modal-kj">
       ${venue.KJ.Company ? `<strong>Hosted By: </strong>${venue.KJ.Company}<br>` : ""}
       ${venue.KJ.Host ? `<strong>KJ:</strong> ${venue.KJ.Host}<br>` : ""}
       ${venue.KJ.Website ? `<a href="${venue.KJ.Website}">${venue.KJ.Website}</a>` : ""}
-      
     </div>
     <div class="modal-address">
       <strong>Address:</strong><br>
       <div class="venue-address"><a href="${createMapLink(venue)}" target="_blank" title="View on Google Maps">${formatAddress(venue)}</a></div>
     </div>
-    
-    
     <div class="modal-schedule">
-      <strong>Schedule:</strong>`;
-  
-  /* const weeklyDays = Object.entries(venue.schedule.weekly);
-  if (weeklyDays.length > 0) {
-    infoHTML += `<h4>Weekly:</h4><ul>`;
-    weeklyDays.forEach(([day, time]) => {
-      infoHTML += `<li class="modal-schedule-item">Every ${day}: ${time}</li>`;
-    });
-    infoHTML += `</ul>`;
-  }
-  */
-  if (venue.schedule.length > 0) {
-    infoHTML += `<ul>`;
-    
-    venue.schedule.forEach(event => {
-    let cadence = capitalizeFirstLetter(event.day[0]);
-    let weekday = event.day[1];
-     
-    //Pluarize day if it's every weekday
-    if (event.day[0] != "every")
-        {weekday = weekday + "s";}
+      <strong>Schedule:</strong>
+      ${createScheduleList(venue.schedule)}
+      <strong>Venue Social Media:</strong><br>
+      ${createSocialLinks(venue)}
+    </div>
+  `;
+}
 
-    infoHTML += `<li class="modal-schedule-item">${cadence} ${weekday}: ${event.time}</li>`;
-    });
-    infoHTML += `</ul>`;
-  }
+function createScheduleList(schedule) {
+  if (schedule.length === 0) return '';
   
-  venueInfo.innerHTML = infoHTML + `<strong>Venue Social Media:</strong><br>${createSocialLinks(venue)}</div></div>`;
-  modal.style.display = 'block';
+  const items = schedule.map(event => {
+    const [cadence, day] = event.day;
+    const pluralDay = cadence === "every" ? day : `${day}s`;
+    return `<li class="modal-schedule-item">${capitalizeFirstLetter(cadence)} ${pluralDay}: ${event.time}</li>`;
+  });
   
-  document.querySelector('.close-modal').onclick = () => {
-    modal.style.display = 'none';
-  };
-  
-  modal.onclick = (e) => {
-    if (e.target === modal) {
-      modal.style.display = 'none';
-    }
-  };
+  return `<ul>${items.join('')}</ul>`;
+}
+
+function setupModalEventListeners(modal) {
+  document.querySelector('.close-modal').onclick = () => modal.style.display = 'none';
+  modal.onclick = (e) => e.target === modal && (modal.style.display = 'none');
 }
 
 // ======================
 // DATE UTILITIES
 // ======================
-/* function getStartOfWeek(date) {
-    const d = new Date(date);
-    const day = d.getDay();
-    const diff = d.getDate() - day;
-    return new Date(d.setDate(diff));
-} */
-
-function isToday(date) {
-    return date.toDateString() === today;
-}
-
 function formatWeekRange(startDate) {
-    const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + 6);
-
-    const options = { month: "short", day: "numeric" };
-    const startStr = startDate.toLocaleDateString("en-US", options);
-    const endStr = endDate.toLocaleDateString("en-US", { ...options, year: "numeric" });
-
-    return `Viewing: ${startStr} - ${endStr}`;
+  const endDate = new Date(startDate);
+  endDate.setDate(endDate.getDate() + 6);
+  return `Viewing: ${formatDateShort(startDate)} - ${formatDateShort(endDate)} ${endDate.getFullYear()}`;
 }
 
 function isOrdinalDate(date, ordinal, dayName) {
-    // Early return if date is invalid
-    if (!(date instanceof Date) || isNaN(date.getTime())) {
-        console.warn("Invalid date provided to isOrdinalDate");
-        return false;
-    }
+  if (!(date instanceof Date) || isNaN(date.getTime())) return false;
 
-    const validOrdinals = new Set(["first", "second", "third", "fourth", "last", "every"]);
-    if (!validOrdinals.has(ordinal)) {
-        console.warn(`Invalid ordinal (${ordinal}). Expected: first, second, third, fourth, last, or every.`);
-        return false;
-    }
+  const validOrdinals = ["first", "second", "third", "fourth", "fifth", "last", "every"];
+  if (!validOrdinals.includes(ordinal)) return false;
+  if (ordinal === "every") return true;
 
-    if (ordinal === "every") {
-        return true;
-    }
+  const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const targetDayIndex = weekdays.indexOf(dayName);
+  if (targetDayIndex === -1) return false;
 
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const day = date.getDate();
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const day = date.getDate();
 
-    // Find the first occurrence of `dayName` in the month
-    const firstDay = new Date(year, month, 1);
-    const firstDayOfWeek = firstDay.getDay(); // 0 (Sun) to 6 (Sat)
-    
-    const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    const targetDayIndex = weekdays.indexOf(dayName);
-    if (targetDayIndex === -1) {
-        console.warn(`Invalid dayName (${dayName}). Must be a weekday (e.g., "Monday").`);
-        return false;
-    }
+  const occurrences = [];
+  const firstDay = new Date(year, month, 1);
+  const firstDayOfWeek = firstDay.getDay();
+  
+  let firstOccurrence = 1 + ((targetDayIndex - firstDayOfWeek + 7) % 7);
+  for (let d = firstOccurrence; d <= 31; d += 7) {
+    const testDate = new Date(year, month, d);
+    if (testDate.getMonth() !== month) break;
+    occurrences.push(d);
+  }
 
-    // Calculate the first occurrence
-    let firstOccurrence = 1 + ((targetDayIndex - firstDayOfWeek + 7) % 7);
-    if (firstOccurrence > 31) {
-        console.warn("Unexpected date calculation error.");
-        return false;
-    }
-
-    // Get all occurrences (adding 7 days each time)
-    const occurrences = [];
-    for (let d = firstOccurrence; d <= 31; d += 7) {
-        const testDate = new Date(year, month, d);
-        if (testDate.getMonth() !== month) break;
-        occurrences.push(d);
-    }
-
-    // Handle "last" separately (since months may have 4 or 5 occurrences)
-    if (ordinal === "last") {
-        return occurrences.length > 0 && day === occurrences[occurrences.length - 1];
-    }
-
-    // Map ordinal to index
-    const ordinalIndexMap = {
-        first: 0,
-        second: 1,
-        third: 2,
-        fourth: 3,
-        fifth: 4,
-    };
-    const index = ordinalIndexMap[ordinal];
-
-    // Check if the index is valid (e.g., no "fifth" in a 4-occurrence month)
-    return index < occurrences.length && day === occurrences[index];
+  if (ordinal === "last") return day === occurrences[occurrences.length - 1];
+  
+  const ordinalIndex = ["first", "second", "third", "fourth", "fifth"].indexOf(ordinal);
+  return ordinalIndex < occurrences.length && day === occurrences[ordinalIndex];
 }
 
 // ======================
 // VENUE UTILITIES
 // ======================
 function hasKaraokeOnDate(venue, date) {
-    const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
+  const dayName = getDayName(date);
 
-
-    for (const ordinalEvent of venue.schedule) {
-        const [ordinal, ordinalDay] = ordinalEvent.day;
-        if (ordinalEvent.description === undefined)
-        {
-            ordinalEvent.description = capitalizeFirstLetter(ordinalEvent.day[0]) + " " + ordinalEvent.day[1];
+  for (const event of venue.schedule) {
+    const [ordinal, ordinalDay] = event.day;
+    event.description = event.description || `${capitalizeFirstLetter(ordinal)} ${ordinalDay}`;
+    
+    if (ordinalDay === dayName && isOrdinalDate(date, ordinal, ordinalDay)) {
+      return {
+        hasEvent: true,
+        timeInfo: {
+          time: event.time,
+          description: event.description
         }
-        if (ordinalDay === dayName && isOrdinalDate(date, ordinal, ordinalDay)) {
-            return {
-                hasEvent: true,
-                timeInfo: {
-                    time: ordinalEvent.time,
-                    description: ordinalEvent.description
-                }
-            };
-        }
+      };
     }
-
-    return { hasEvent: false };
+  }
+  return { hasEvent: false };
 }
 
 function createMapLink(venue) {
-    const address = `${venue.VenueName} ${venue.Address.Street}, ${venue.Address.City} ${venue.Address.State} ${venue.Address.Zip}`;
-    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+  const address = `${venue.VenueName} ${venue.Address.Street}, ${venue.Address.City} ${venue.Address.State} ${venue.Address.Zip}`;
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
 }
 
 function formatAddress(venue) {
-    return `${venue.Address.Street}<br>${venue.Address.City}, ${venue.Address.State}, ${venue.Address.Zip}`;
+  return `${venue.Address.Street}<br>${venue.Address.City}, ${venue.Address.State}, ${venue.Address.Zip}`;
 }
 
-function capitalizeFirstLetter(string) {
-            return string.charAt(0).toUpperCase() + string.slice(1);
-        }
-
 function createSocialLinks(venue) {
-    const socials = [];
-    const socialPlatforms = {
-        Facebook: { icon: "fa-brands fa-facebook", title: "Facebook" },
-        Instagram: { icon: "fa-brands fa-instagram", title: "Instagram" },
-        Bluesky: { icon: "fa-brands fa-bluesky", title: "Bluesky" },
-        Tiktok: { icon: "fa-brands fa-tiktok", title: "TikTok" },
-        Twitter: { icon: "fa-brands fa-twitter", title: "Twitter" },
-        Youtube: { icon: "fa-brands fa-youtube", title: "YouTube" },
-        Website: { icon: "fa-solid fa-globe", title: "Website" },
-    };
+  const socialPlatforms = {
+    Facebook: { icon: "fa-brands fa-facebook", title: "Facebook" },
+    Instagram: { icon: "fa-brands fa-instagram", title: "Instagram" },
+    Bluesky: { icon: "fa-brands fa-bluesky", title: "Bluesky" },
+    Tiktok: { icon: "fa-brands fa-tiktok", title: "TikTok" },
+    Twitter: { icon: "fa-brands fa-twitter", title: "Twitter" },
+    Youtube: { icon: "fa-brands fa-youtube", title: "YouTube" },
+    Website: { icon: "fa-solid fa-globe", title: "Website" },
+  };
 
-    // Do maps first as slightly different than other socials
-    socials.push(
-        `<a href="${createMapLink(venue)}" target="_blank" title="View on Google Maps"><i class="fas fa-map-marker-alt"></i></a>`
-    );
+  const socials = [
+    `<a href="${createMapLink(venue)}" target="_blank" title="View on Google Maps"><i class="fas fa-map-marker-alt"></i></a>`
+  ];
 
-    for (const [platform, info] of Object.entries(socialPlatforms)) {
-        if (venue.socials[platform]) {
-            socials.push(
-                `<a href="${venue.socials[platform]}" target="_blank" title="${info.title}"><i class="${info.icon}"></i></a>`
-            );
-        }
+  for (const [platform, info] of Object.entries(socialPlatforms)) {
+    if (venue.socials[platform]) {
+      socials.push(
+        `<a href="${venue.socials[platform]}" target="_blank" title="${info.title}"><i class="${info.icon}"></i></a>`
+      );
     }
+  }
 
-    return `<div class="social-links">${socials.join("")}</div>`;
+  return `<div class="social-links">${socials.join("")}</div>`;
 }
 
 // ======================
 // DOM RENDERING
 // ======================
 function renderWeek() {
-    updateWeekDisplay();
-    clearContainer();
-    renderAllDays();
+  updateWeekDisplay();
+  clearContainer();
+  renderAllDays();
 }
 
 function updateWeekDisplay() {
-    const weekDisplay = document.getElementById("week-display");
-    weekDisplay.textContent = formatWeekRange(currentWeekStart);
+  document.getElementById("week-display").textContent = formatWeekRange(currentWeekStart);
 }
 
 function clearContainer() {
-    const container = document.getElementById("schedule-container");
-    container.innerHTML = "";
+  document.getElementById("schedule-container").innerHTML = "";
 }
 
 function renderAllDays() {
-    for (let i = 0; i < 7; i++) {
-        const currentDate = getCurrentDate(i);
-        const venuesToday = getVenuesForDate(currentDate);
-        const dayHTML = createDayHTML(currentDate, venuesToday);
-        appendDayToContainer(dayHTML);
-    }
-}
-
-function getCurrentDate(dayOffset) {
-    const currentDate = new Date(currentWeekStart);
-    currentDate.setDate(currentDate.getDate() + dayOffset);
-    return currentDate;
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(currentWeekStart);
+    date.setDate(date.getDate() + i);
+    const venues = getVenuesForDate(date);
+    appendDayToContainer(createDayHTML(date, venues));
+  }
 }
 
 function getVenuesForDate(date) {
-    // Helper function to ignore articles for sorting
-    function getSortableName(venueName) {
-        const articles = ['the ', 'a ', 'an ','la ', 'el ', 'le '];
-        const lowerName = venueName.toLowerCase();
-        
-        for (const article of articles) {
-            if (lowerName.startsWith(article)) {
-                return venueName.slice(article.length);
-            }
-        }
-        return venueName;
-    }
+  const getSortableName = (name) => {
+    const articles = ['the ', 'a ', 'an ', 'la ', 'el ', 'le '];
+    const lowerName = name.toLowerCase();
+    const article = articles.find(a => lowerName.startsWith(a));
+    return article ? name.slice(article.length) : name;
+  };
 
-    return karaokeData.listings
-        .map(venue => getVenueWithEventInfo(venue, date))
-        .filter(venue => venue && (showDedicated || !venue.Dedicated))
-        .sort((a, b) => {
-            const nameA = getSortableName(a.VenueName);
-            const nameB = getSortableName(b.VenueName);
-            return nameA.localeCompare(nameB);
-        });
-}
-
-function getVenueWithEventInfo(venue, date) {
-    const { hasEvent, timeInfo } = hasKaraokeOnDate(venue, date);
-    return hasEvent ? { ...venue, timeInfo } : null;
+  return karaokeData.listings
+    .map(venue => {
+      const { hasEvent, timeInfo } = hasKaraokeOnDate(venue, date);
+      return hasEvent ? { ...venue, timeInfo } : null;
+    })
+    .filter(venue => venue && (showDedicated || !venue.Dedicated))
+    .sort((a, b) => getSortableName(a.VenueName).localeCompare(getSortableName(b.VenueName)));
 }
 
 function createDayHTML(date, venues) {
-    const isCurrentDay = isToday(date);
-    return `
-        <div class="day-header ${isCurrentDay ? "today" : ""}">
-            ${createDayHeaderContent(date, isCurrentDay)}
-        </div>
-        <div class="day-card">
-            <div class="venue-list">
-                ${venues.length > 0 ? createVenuesList(venues) : createNoEventsMessage()}
-            </div>
-        </div>
-    `;
-}
-
-function createDayHeaderContent(date, isCurrentDay) {
-    return `
-        <span>${date.toLocaleDateString("en-US", { weekday: "long" })}</span>
-        <span class="date-number ${isCurrentDay ? "today" : ""}">
-            ${date.toLocaleDateString("en-US", { month: "short", day: "numeric" })} ${isCurrentDay ? "(today)" : ""}
-        </span>
-    `;
+  return `
+    <div class="day-header ${isCurrentDay(date) ? "today" : ""}">
+      <span>${getDayName(date)}</span>
+      <span class="date-number ${isCurrentDay(date) ? "today" : ""}">
+        ${formatDateShort(date)} ${isCurrentDay(date) ? "(today)" : ""}
+      </span>
+    </div>
+    <div class="day-card">
+      <div class="venue-list">
+        ${venues.length > 0 ? createVenuesList(venues) : '<div class="no-events">No karaoke venues scheduled</div>'}
+      </div>
+    </div>
+  `;
 }
 
 function createVenuesList(venues) {
-    return venues.map(venue => createVenueItem(venue)).join("");
-}
-
-function createNoEventsMessage() {
-    return '<div class="no-events">No karaoke venues scheduled</div>';
-}
-
-function createVenueItem(venue) {
-    return `
-        <div class="venue-item">
-            <div class="venue-name">${venue.VenueName}</div>
-            <div class="venue-kj">${createKJInfo(venue.KJ)}</div>
-            <div class="venue-time">${createTimeInfo(venue.timeInfo)}</div>
-            <div class="venue-address">${createAddressLink(venue)}</div>
-            ${createDetailsButton(venue)}
-        </div>
-    `;
-}
-
-function createKJInfo(kj) {
-    return `${kj.Company ? `${kj.Company}<br>` : ""}${kj.Host ? ` with ${kj.Host}` : ""}`;
-}
-
-function createTimeInfo(timeInfo) {
-    return `${timeInfo.time}${
-        timeInfo.description ? ` <span class="time-description"><br>(${timeInfo.description})</span>` : ""
-    }`;
-}
-
-function createAddressLink(venue) {
-    return `<a href="${createMapLink(venue)}" target="_blank" title="View on Google Maps">${formatAddress(venue)}</a>`;
-}
-
-function createDetailsButton(venue) {
-    return `
-        <button class="details-btn" onclick="showVenueDetails(${JSON.stringify(venue).replace(/"/g, '&quot;')})">
-            See Details
-        </button>
-    `;
+  return venues.map(venue => `
+    <div class="venue-item">
+      <div class="venue-name">${venue.VenueName}</div>
+      <div class="venue-kj">${venue.KJ.Company ? `${venue.KJ.Company}<br>` : ""}${venue.KJ.Host ? ` with ${venue.KJ.Host}` : ""}</div>
+      <div class="venue-time">${venue.timeInfo.time}${
+        venue.timeInfo.description ? ` <span class="time-description"><br>(${venue.timeInfo.description})</span>` : ""
+      }</div>
+      <div class="venue-address"><a href="${createMapLink(venue)}" target="_blank" title="View on Google Maps">${formatAddress(venue)}</a></div>
+      <button class="details-btn" onclick="showVenueDetails(${JSON.stringify(venue).replace(/"/g, '&quot;')})">
+        See Details
+      </button>
+    </div>
+  `).join("");
 }
 
 function appendDayToContainer(html) {
-    const container = document.getElementById("schedule-container");
-    container.insertAdjacentHTML("beforeend", html);
+  document.getElementById("schedule-container").insertAdjacentHTML("beforeend", html);
 }
 
 // ======================
 // EVENT LISTENERS
 // ======================
 function setupEventListeners() {
-    const backToTopButton = document.getElementById("backToTop");
-    
-    window.addEventListener("scroll", function() {
-        backToTopButton.classList.toggle("visible", window.pageYOffset > 300);
-    });
+  const backToTopButton = document.getElementById("backToTop");
+  
+  window.addEventListener("scroll", () => {
+    backToTopButton.classList.toggle("visible", window.pageYOffset > 300);
+  });
 
-    backToTopButton.addEventListener("click", function() {
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
-    });
+  backToTopButton.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
 
-    document.getElementById("prev-week").addEventListener("click", () => {
-        currentWeekStart.setDate(currentWeekStart.getDate() - 7);
-        renderWeek();
-    });
+  document.getElementById("prev-week").addEventListener("click", () => {
+    currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+    renderWeek();
+  });
 
-    document.getElementById("next-week").addEventListener("click", () => {
-        currentWeekStart.setDate(currentWeekStart.getDate() + 7);
-        renderWeek();
-    });
+  document.getElementById("next-week").addEventListener("click", () => {
+    currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+    renderWeek();
+  });
 
-    document.getElementById("this-week").addEventListener("click", () => {
-        currentWeekStart = new Date();
-        renderWeek();
-    });
+  document.getElementById("this-week").addEventListener("click", () => {
+    currentWeekStart = new Date();
+    renderWeek();
+  });
 
-    document.getElementById("dedicated-toggle").addEventListener("change", function() {
-        showDedicated = this.checked;
-        renderWeek();
-    });
+  document.getElementById("dedicated-toggle").addEventListener("change", (e) => {
+    showDedicated = e.target.checked;
+    renderWeek();
+  });
 
-    document.addEventListener('keydown', function(e) {
-        const modal = document.getElementById('venue-modal');
-        if (e.key === 'Escape' && modal.style.display === 'block') {
-            modal.style.display = 'none';
-        }
-    });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.getElementById('venue-modal').style.display === 'block') {
+      document.getElementById('venue-modal').style.display = 'none';
+    }
+  });
 }
 
 // ======================
 // INITIALIZATION
 // ======================
 function init() {
-    setupEventListeners();
-    renderWeek();
+  setupEventListeners();
+  renderWeek();
 }
 
 // Start the application
