@@ -758,7 +758,9 @@
             // Fix the Thursday typo before displaying
             const fixedData = JSON.parse(JSON.stringify(venueData));
             
-            jsonOutput.value = JSON.stringify(fixedData, null, 2);
+            
+            
+            jsonOutput.value = "const karaokeData = " +  JSON.stringify(fixedData, null, 2) +";";
         }
         
         // Copy JSON to clipboard

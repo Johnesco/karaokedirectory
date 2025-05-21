@@ -1428,5 +1428,5 @@ const karaokeData = {
         }
       ]
     }
-]
+  ]
 };
