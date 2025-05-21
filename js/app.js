@@ -17,10 +17,9 @@ function showVenueDetails(venue) {
   
   let infoHTML = `
   <div class="modal-kj">
-      ${venue.KJ.Company ? `<strong><div class="venue-kj">${venue.KJ.Company}</strong><br>` : ""}
-      ${venue.KJ.Host ? `<strong>KJ:</strong> ${venue.KJ.Host}` : ""}
-      ${venue.KJ.Website ? `<br><a href="${venue.KJ.Website}">${venue.KJ.Website}</a>` : ""}
-      </div>
+      ${venue.KJ.Company ? `<strong>Hosted By: </strong>${venue.KJ.Company}<br>` : ""}
+      ${venue.KJ.Host ? `<strong>KJ:</strong> ${venue.KJ.Host}<br>` : ""}
+      ${venue.KJ.Website ? `<a href="${venue.KJ.Website}">${venue.KJ.Website}</a>` : ""}
       
     </div>
     <div class="modal-address">

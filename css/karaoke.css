@@ -188,9 +188,8 @@ button:hover, .details-btn:hover {
 
 .venue-kj {
     font-weight: bold;
-    font-style: italic;
     font-size: 0.9em;
-    color: #49306c;
+    color: #695252;
     margin-bottom: 5px;
 }
 
@@ -288,25 +287,11 @@ button:hover, .details-btn:hover {
     padding-bottom: 10px;
     margin-right: 32px;
     border-bottom: 1px solid #eee;
-
 }
 
 .modal-address,
 .modal-kj {
-    margin-bottom: 15px;
-}
-
-.modal-schedule h3 {
-    margin:0;
-    padding: 0;
-    
-    color: #4b0673;
-}
-
-.modal-schedule h4 {
-    margin:0;
-    padding: 0;
-    color: blue;
+    margin-bottom: 18px;
 }
 
 .modal-schedule ul {
