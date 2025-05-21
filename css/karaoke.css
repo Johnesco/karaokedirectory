@@ -101,7 +101,7 @@ color:white;}
 }
 
 /* Buttons */
-button {
+button, .details-btn{
     background-color: #2f40d3;
     color: white;
     border: none;
@@ -111,24 +111,12 @@ button {
     font-weight: bold;
 }
 
-button:hover {
+button:hover, .details-btn:hover {
     background-color: #f72a2a;
 }
 
 .details-btn {
-    background-color: #190dab;
-    color: white;
-    border: none;
-    padding: 8px 8px;
-    border-radius: 15px;
-    cursor: pointer;
-    margin-top: 10px;
-    font-size: 0.8em;
-    transition: background-color 0.2s;
-}
-
-.details-btn:hover {
-    background-color: #0d38ad;
+    margin-top: 12px;
 }
 
 /* Day Cards */
@@ -136,6 +124,7 @@ button:hover {
     background-color: white;
     opacity: 94%;
     margin-bottom: 15px;
+    box-shadow: 0 7px rgba(0, 0, 0, 0.1);
 
 }
 
@@ -151,9 +140,9 @@ button:hover {
     justify-content: space-between;
     position: -webkit-sticky;
     position: sticky;
-    top:-8px;
+    top:-11px;
     z-index:1;
-    box-shadow: 0px 7px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 7px rgba(0, 0, 0, 0.1);
 }
 
 .day-header.today {
@@ -171,7 +160,6 @@ button:hover {
 /* Venue Items */
 .venue-list {
     padding: 6px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .venue-item {
