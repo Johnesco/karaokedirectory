@@ -1349,49 +1349,56 @@ const karaokeData = {
             "every",
             "Sunday"
           ],
-          "time": "9:00 PM - 2:00 AM"
+          "time": "9:00 PM - 2:00 AM",
+          "description": "Everday, 9pm to 2am"
         },
         {
           "day": [
             "every",
             "Monday"
           ],
-          "time": "9:00 PM - 2:00 AM"
+          "time": "9:00 PM - 2:00 AM",
+          "description": "Everday, 9pm to 2am"
         },
         {
           "day": [
             "every",
             "Tuesday"
           ],
-          "time": "9:00 PM - 2:00 AM"
+          "time": "9:00 PM - 2:00 AM",
+          "description": "Everday, 9pm to 2am"
         },
         {
           "day": [
             "every",
             "Wednesday"
           ],
-          "time": "9:00 PM - 2:00 AM"
+          "time": "9:00 PM - 2:00 AM",
+          "description": "Everday, 9pm to 2am"
         },
         {
           "day": [
             "every",
             "Thursday"
           ],
-          "time": "9:00 PM - 2:00 AM"
+          "time": "9:00 PM - 2:00 AM",
+          "description": "Everday, 9pm to 2am"
         },
         {
           "day": [
             "every",
             "Friday"
           ],
-          "time": "9:00 PM - 2:00 AM"
+          "time": "9:00 PM - 2:00 AM",
+          "description": "Everday, 9pm to 2am"
         },
         {
           "day": [
             "every",
             "Saturday"
           ],
-          "time": "9:00 PM - 2:00 AM"
+          "time": "9:00 PM - 2:00 AM",
+          "description": "Everday, 9pm to 2am"
         }
       ]
     },
