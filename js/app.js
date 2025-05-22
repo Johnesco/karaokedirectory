@@ -64,8 +64,29 @@ function createScheduleList(schedule) {
 }
 
 function setupModalEventListeners(modal) {
+  // Close button handler
   document.querySelector('.close-modal').onclick = () => modal.style.display = 'none';
-  modal.onclick = (e) => e.target === modal && (modal.style.display = 'none');
+  
+  // Revised modal click handler
+  modal.onclick = (e) => {
+    // Only close if clicking directly on the modal backdrop (not its children)
+    if (e.target === modal) {
+      modal.style.display = 'none';
+    }
+    
+    // If clicking a link, let it behave normally
+    if (e.target.tagName === 'A') {
+      return true; // Allow default link behavior
+    }
+  };
+  
+  // Add this to ensure all links work properly
+  modal.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent event from bubbling to modal
+      // Default behavior will proceed naturally
+    });
+  });
 }
 
 // ======================
