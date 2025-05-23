@@ -37,6 +37,7 @@ function createModalContent(venue) {
       ${venue.KJ.Company ? `<strong>Hosted By: </strong>${venue.KJ.Company}<br>` : ""}
       ${venue.KJ.Host ? `<strong>KJ:</strong> ${venue.KJ.Host}<br>` : ""}
       ${venue.KJ.Website ? `<a href="${venue.KJ.Website}">${venue.KJ.Website}</a>` : ""}
+      ${venue.KJ.socials ? `<strong>KJ Social Media:</strong><br>${createSocialLinks({ socials: venue.KJ.socials })}` : ""}
     </div>
     <div class="modal-address">
       <strong>Address:</strong><br>
@@ -149,25 +150,32 @@ function formatAddress(venue) {
   return `${venue.Address.Street}<br>${venue.Address.City}, ${venue.Address.State}, ${venue.Address.Zip}`;
 }
 
-function createSocialLinks(venue) {
+function createSocialLinks(item) {
+  // Handle case where we pass just socials object (for KJ)
+  const socialsObj = item.socials || item;
+  
+
   const socialPlatforms = {
     Facebook: { icon: "fa-brands fa-facebook", title: "Facebook" },
     Instagram: { icon: "fa-brands fa-instagram", title: "Instagram" },
-    Bluesky: { icon: "fa-brands fa-bluesky", title: "Bluesky" },
+    Bluesky: { icon: "fa-solid fa-b", title: "Bluesky" },
     Tiktok: { icon: "fa-brands fa-tiktok", title: "TikTok" },
     Twitter: { icon: "fa-brands fa-twitter", title: "Twitter" },
     Youtube: { icon: "fa-brands fa-youtube", title: "YouTube" },
     Website: { icon: "fa-solid fa-globe", title: "Website" },
   };
 
-  const socials = [
-    `<a href="${createMapLink(venue)}" target="_blank" title="View on Google Maps"><i class="fas fa-map-marker-alt"></i></a>`
-  ];
+  const socials = [];
+  
+  // Only add map link if this is a venue (not KJ)
+  if (item.Address) {
+    socials.push(`<a href="${createMapLink(item)}" target="_blank" title="View on Google Maps"><i class="fas fa-map-marker-alt"></i></a>`);
+  }
 
   for (const [platform, info] of Object.entries(socialPlatforms)) {
-    if (venue.socials[platform]) {
+    if (socialsObj[platform]) {
       socials.push(
-        `<a href="${venue.socials[platform]}" target="_blank" title="${info.title}"><i class="${info.icon}"></i></a>`
+        `<a href="${socialsObj[platform]}" target="_blank" title="${info.title}"><i class="${info.icon}"></i></a>`
       );
     }
   }
