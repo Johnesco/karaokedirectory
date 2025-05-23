@@ -166,6 +166,18 @@
             background: #3498db;
             color: white;
         }
+        .social-section {
+            background: #f8f8f8;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .social-section h4 {
+            margin-top: 0;
+            color: #3498db;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
     </style>
 </head>
 <body>
@@ -234,10 +246,34 @@
                             <label for="kjWebsite">Website</label>
                             <input type="text" id="kjWebsite">
                         </div>
+                        
+                        <div class="social-section">
+                            <h4>KJ Social Media</h4>
+                            <div class="form-group">
+                                <label for="kjFacebook">Facebook</label>
+                                <input type="text" id="kjFacebook">
+                            </div>
+                            <div class="form-group">
+                                <label for="kjInstagram">Instagram</label>
+                                <input type="text" id="kjInstagram">
+                            </div>
+                            <div class="form-group">
+                                <label for="kjTwitter">Twitter</label>
+                                <input type="text" id="kjTwitter">
+                            </div>
+                            <div class="form-group">
+                                <label for="kjTiktok">TikTok</label>
+                                <input type="text" id="kjTiktok">
+                            </div>
+                            <div class="form-group">
+                                <label for="kjYoutube">YouTube</label>
+                                <input type="text" id="kjYoutube">
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="section">
-                        <h3 class="section-title">Social Media</h3>
+                        <h3 class="section-title">Venue Social Media</h3>
                         <div class="form-group">
                             <label for="facebook">Facebook</label>
                             <input type="text" id="facebook">
@@ -268,7 +304,6 @@
                         </div>
                     </div>
                 
-                    
                     <div class="section">
                         <h3 class="section-title">Ordinal Schedule</h3>
                         <div id="ordinalItems">
@@ -354,7 +389,14 @@
         const kjCompany = document.getElementById('kjCompany');
         const kjWebsite = document.getElementById('kjWebsite');
         
-        // Social fields
+        // KJ Social fields
+        const kjFacebook = document.getElementById('kjFacebook');
+        const kjInstagram = document.getElementById('kjInstagram');
+        const kjTwitter = document.getElementById('kjTwitter');
+        const kjTiktok = document.getElementById('kjTiktok');
+        const kjYoutube = document.getElementById('kjYoutube');
+        
+        // Venue Social fields
         const facebook = document.getElementById('facebook');
         const instagram = document.getElementById('instagram');
         const twitter = document.getElementById('twitter');
@@ -374,7 +416,6 @@
         const addVenueBtn = document.getElementById('addVenue');
         const saveVenueBtn = document.getElementById('saveVenue');
         const deleteVenueBtn = document.getElementById('deleteVenue');
-        const addWeeklyDayBtn = document.getElementById('addWeeklyDay');
         const addOrdinalDayBtn = document.getElementById('addOrdinalDay');
         const copyJsonBtn = document.getElementById('copyJson');
         const loadJsonBtn = document.getElementById('loadJson');
@@ -448,7 +489,6 @@
                     if (kjText) kjText += ' | ';
                     kjText += `Company: ${venue.KJ.Company}`;
                 }
-                // no website on preview
                 kjDiv.textContent = kjText || 'No KJ info';
                 
                 venueDetailsDiv.appendChild(addressDiv);
@@ -489,7 +529,14 @@
             kjCompany.value = venue.KJ.Company || '';
             kjWebsite.value = venue.KJ.Website || '';
             
-            // Set socials
+            // Set KJ socials
+            kjFacebook.value = venue.KJ.socials?.Facebook || '';
+            kjInstagram.value = venue.KJ.socials?.Instagram || '';
+            kjTwitter.value = venue.KJ.socials?.Twitter || '';
+            kjTiktok.value = venue.KJ.socials?.Tiktok || '';
+            kjYoutube.value = venue.KJ.socials?.Youtube || '';
+            
+            // Set venue socials
             facebook.value = venue.socials.Facebook || '';
             instagram.value = venue.socials.Instagram || '';
             twitter.value = venue.socials.Twitter || '';
@@ -498,40 +545,11 @@
             tiktok.value = venue.socials.Tiktok || '';
             youtube.value = venue.socials.Youtube || '';
             
-
-            
             // Render ordinal schedule
             renderOrdinalSchedule(venue.schedule);
             
             // Update JSON output
             updateJsonOutput();
-        }
-        
-        // Render weekly schedule
-        function renderWeeklySchedule(weekly) {
-            weeklyDays.innerHTML = '';
-            
-            for (const day in weekly) {
-                const dayItem = document.createElement('div');
-                dayItem.className = 'day-item';
-                
-                const dayText = document.createElement('span');
-                dayText.textContent = `${day}: ${weekly[day]}`;
-                
-                const deleteBtn = document.createElement('button');
-                deleteBtn.textContent = '×';
-                deleteBtn.className = 'danger';
-                deleteBtn.style.marginLeft = '5px';
-                deleteBtn.style.padding = '2px 5px';
-                deleteBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    deleteWeeklyDay(day);
-                });
-                
-                dayItem.appendChild(dayText);
-                dayItem.appendChild(deleteBtn);
-                weeklyDays.appendChild(dayItem);
-            }
         }
         
         // Render ordinal schedule
@@ -581,7 +599,14 @@
                 "KJ": {
                     "Host": "",
                     "Company": "",
-                    "Website":""
+                    "Website": "",
+                    "socials": {
+                        "Facebook": null,
+                        "Instagram": null,
+                        "Twitter": null,
+                        "Tiktok": null,
+                        "Youtube": null
+                    }
                 },
                 "socials": {
                     "Facebook": null,
@@ -624,10 +649,17 @@
             venue.KJ = {
                 Host: kjHost.value,
                 Company: kjCompany.value,
-                Website: kjWebsite.value
+                Website: kjWebsite.value,
+                socials: {
+                    Facebook: kjFacebook.value || null,
+                    Instagram: kjInstagram.value || null,
+                    Twitter: kjTwitter.value || null,
+                    Tiktok: kjTiktok.value || null,
+                    Youtube: kjYoutube.value || null
+                }
             };
             
-            // Update socials
+            // Update venue socials
             venue.socials = {
                 Facebook: facebook.value || null,
                 Instagram: instagram.value || null,
@@ -637,10 +669,6 @@
                 Tiktok: tiktok.value || null,
                 Youtube: youtube.value || null
             };
-            
-            // Weekly schedule is updated in place
-            
-            // Ordinal schedule is updated in place
             
             // Update the venue list
             renderVenueList();
@@ -663,8 +691,6 @@
                 updateJsonOutput();
             }
         }
-        
-        
         
         // Add an ordinal day
         function addOrdinalDay() {
@@ -707,30 +733,30 @@
         
         // Sort venues alphabetically
         function sortVenuesAlphabetically() {
-    // Helper function to ignore articles for sorting
-    function getSortableName(venueName) {
-        const articles = ['the ', 'a ', 'an ','la ', 'el ', 'le '];
-        const lowerName = venueName.toLowerCase();
-        
-        for (const article of articles) {
-            if (lowerName.startsWith(article)) {
-                return venueName.slice(article.length).toUpperCase();
+            // Helper function to ignore articles for sorting
+            function getSortableName(venueName) {
+                const articles = ['the ', 'a ', 'an ','la ', 'el ', 'le '];
+                const lowerName = venueName.toLowerCase();
+                
+                for (const article of articles) {
+                    if (lowerName.startsWith(article)) {
+                        return venueName.slice(article.length).toUpperCase();
+                    }
+                }
+                return venueName.toUpperCase();
             }
-        }
-        return venueName.toUpperCase();
-    }
 
-    venueData.listings.sort((a, b) => {
-        const nameA = getSortableName(a.VenueName);
-        const nameB = getSortableName(b.VenueName);
-        if (nameA < nameB) return -1;
-        if (nameA > nameB) return 1;
-        return 0;
-    });
-    
-    renderVenueList();
-    updateJsonOutput();
-}
+            venueData.listings.sort((a, b) => {
+                const nameA = getSortableName(a.VenueName);
+                const nameB = getSortableName(b.VenueName);
+                if (nameA < nameB) return -1;
+                if (nameA > nameB) return 1;
+                return 0;
+            });
+            
+            renderVenueList();
+            updateJsonOutput();
+        }
         
         // Switch between tabs
         function switchTab(tabName) {
@@ -757,8 +783,6 @@
         function updateJsonOutput() {
             // Fix the Thursday typo before displaying
             const fixedData = JSON.parse(JSON.stringify(venueData));
-            
-            
             
             jsonOutput.value = "const karaokeData = " +  JSON.stringify(fixedData, null, 2) +";";
         }
