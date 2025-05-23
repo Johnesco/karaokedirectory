@@ -31,34 +31,6 @@ const karaokeData = {
       ]
     },
     {
-      "VenueName": "Baker St. Pub & Grill",
-      "Address": {
-        "Street": "3003 S Lamar Blvd",
-        "City": "Austin",
-        "State": "TX",
-        "Zip": "78704"
-      },
-      "KJ": {
-        "Host": "",
-        "Company": "Texas Live Band Karaoke"
-      },
-      "socials": {
-        "Facebook": null,
-        "Instagram": null,
-        "Website": "https://www.texaslivebandkaraoke.com/",
-        "Bluesky": null
-      },
-      "schedule": [
-        {
-          "day": [
-            "every",
-            "Thursday"
-          ],
-          "time": "9:00 PM - 1:00 AM"
-        }
-      ]
-    },
-    {
       "VenueName": "Bar Louie",
       "Address": {
         "Street": "270 Bass Pro Dr",
@@ -812,6 +784,42 @@ const karaokeData = {
           ],
           "time": "9:00 PM - 1:00 AM",
           "description": "Sundays and Wednesdays"
+        }
+      ]
+    },
+    {
+      "VenueName": "Knomad Bar",
+      "Address": {
+        "Street": "1213 Corona Dr.",
+        "City": "Austin",
+        "State": "TX",
+        "Zip": "78723"
+      },
+      "KJ": {
+        "Host": "",
+        "Company": "The Karaoke Underground",
+        "socials": {
+          "Facebook": "https://www.facebook.com/profile.php?id=100031017777100",
+          "Instagram": "https://www.instagram.com/karaokeunderground/",
+          "Website": "https://karaokeunderground.com/",
+          "Twitter": "https://twitter.com/KUAustin",
+          "Bluesky": "https://bsky.app/profile/karaokeunderground.bsky.social"
+        }
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/NomadBarATX",
+        "Instagram": "https://www.instagram.com/alcovecantinarr/",
+        "Website": "http://knomadbar.com/",
+        "Twitter": null,
+        "Bluesky": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "first",
+            "Saturday"
+          ],
+          "time": "8:00 PM - Close"
         }
       ]
     },
