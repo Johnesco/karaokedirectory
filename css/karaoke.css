@@ -290,8 +290,8 @@ button:hover, .details-btn:hover {
 }
 
 .modal-address,
-.modal-kj {
-    margin-bottom: 18px;
+.modal-kj, modal-schedule {
+    margin-bottom: 19px;
 }
 
 .modal-schedule ul {

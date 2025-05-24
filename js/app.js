@@ -20,59 +20,63 @@ const isCurrentDay = (date) => date.toDateString() === TODAY;
 // MODAL FUNCTIONS
 // ======================
 function showVenueDetails(venue) {
-  const modal = document.getElementById('venue-modal');
-  const venueName = document.getElementById('modal-venue-name');
-  const venueInfo = document.getElementById('modal-venue-info');
-  
+  const modal = document.getElementById("venue-modal");
+  const venueName = document.getElementById("modal-venue-name");
+  const venueInfo = document.getElementById("modal-venue-info");
+
   venueName.textContent = venue.VenueName;
   venueInfo.innerHTML = createModalContent(venue);
-  modal.style.display = 'block';
+  modal.style.display = "block";
 
   setupModalEventListeners(modal);
 }
 
 function createModalContent(venue) {
   return `
-    <div class="modal-kj">
-      ${venue.KJ.Company ? `<strong>Hosted By: </strong>${venue.KJ.Company}<br>` : ""}
-      ${venue.KJ.Host ? `<strong>KJ:</strong> ${venue.KJ.Host}<br>` : ""}
-      ${venue.KJ.Website ? `<a href="${venue.KJ.Website}">${venue.KJ.Website}</a>` : ""}
-      ${venue.KJ.socials ? `<strong>KJ Social Media:</strong><br>${createSocialLinks({ socials: venue.KJ.socials })}` : ""}
-    </div>
+    
     <div class="modal-address">
-      <strong>Address:</strong><br>
+    <strong>Address:</strong><br>
       <div class="venue-address"><a href="${createMapLink(venue)}" target="_blank" title="View on Google Maps">${formatAddress(venue)}</a></div>
     </div>
     <div class="modal-schedule">
       <strong>Schedule:</strong>
       ${createScheduleList(venue.schedule)}
-      <strong>Venue Social Media:</strong><br>
-      ${createSocialLinks(venue)}
+    </div>
+    <div><strong>Venue Social Media:</strong><br>
+      ${createSocialLinks(venue)}</div>  
+    </div>
+    <div class="modal-kj">
+    <hr>
+    <strong>Karaoke Info:</strong><br>
+      ${venue.KJ.Company ? `<strong>Hosted By: </strong>${venue.KJ.Company}<br>` : ""}
+      ${venue.KJ.Host ? `<strong>KJ:</strong> ${venue.KJ.Host}<br>` : ""}
+      ${venue.KJ.Website ? `<a href="${venue.KJ.Website}">${venue.KJ.Website}</a>` : ""}
+      ${venue.KJ.socials ? `<strong>Karaoke Social Media:</strong><br>${createSocialLinks({ socials: venue.KJ.socials })}` : ""}
     </div>
   `;
 }
 
 function createScheduleList(schedule) {
-  if (schedule.length === 0) return '';
-  
-  const items = schedule.map(event => {
+  if (schedule.length === 0) return "";
+
+  const items = schedule.map((event) => {
     const [cadence, day] = event.day;
     const pluralDay = cadence === "every" ? day : `${day}s`;
     return `<li class="modal-schedule-item">${capitalizeFirstLetter(cadence)} ${pluralDay}: ${event.time}</li>`;
   });
-  
-  return `<ul>${items.join('')}</ul>`;
+
+  return `<ul>${items.join("")}</ul>`;
 }
 
 function setupModalEventListeners(modal) {
   // Handle close button
-  document.querySelector('.close-modal').onclick = () => modal.style.display = 'none';
+  document.querySelector(".close-modal").onclick = () => (modal.style.display = "none");
 
   // Handle backdrop clicks ONLY (ignores all content)
-  modal.addEventListener('click', function(e) {
+  modal.addEventListener("click", function (e) {
     // Check if clicked directly on the modal backdrop (not children)
     if (e.target === this) {
-      modal.style.display = 'none';
+      modal.style.display = "none";
     }
   });
 }
@@ -104,7 +108,7 @@ function isOrdinalDate(date, ordinal, dayName) {
   const occurrences = [];
   const firstDay = new Date(year, month, 1);
   const firstDayOfWeek = firstDay.getDay();
-  
+
   let firstOccurrence = 1 + ((targetDayIndex - firstDayOfWeek + 7) % 7);
   for (let d = firstOccurrence; d <= 31; d += 7) {
     const testDate = new Date(year, month, d);
@@ -113,7 +117,7 @@ function isOrdinalDate(date, ordinal, dayName) {
   }
 
   if (ordinal === "last") return day === occurrences[occurrences.length - 1];
-  
+
   const ordinalIndex = ["first", "second", "third", "fourth", "fifth"].indexOf(ordinal);
   return ordinalIndex < occurrences.length && day === occurrences[ordinalIndex];
 }
@@ -127,7 +131,7 @@ function hasKaraokeOnDate(venue, date) {
   for (const event of venue.schedule) {
     const [ordinal, ordinalDay] = event.day;
     event.description = event.description || `${capitalizeFirstLetter(ordinal)} ${ordinalDay}`;
-    
+
     if (ordinalDay === dayName && isOrdinalDate(date, ordinal, ordinalDay)) {
       return {
         hasEvent: true,
@@ -153,7 +157,6 @@ function formatAddress(venue) {
 function createSocialLinks(item) {
   // Handle case where we pass just socials object (for KJ)
   const socialsObj = item.socials || item;
-  
 
   const socialPlatforms = {
     Facebook: { icon: "fa-brands fa-facebook", title: "Facebook" },
@@ -162,14 +165,16 @@ function createSocialLinks(item) {
     Tiktok: { icon: "fa-brands fa-tiktok", title: "TikTok" },
     Twitter: { icon: "fa-brands fa-twitter", title: "Twitter" },
     Youtube: { icon: "fa-brands fa-youtube", title: "YouTube" },
-    Website: { icon: "fa-solid fa-globe", title: "Website" },
+    Website: { icon: "fa-solid fa-globe", title: "Website" }
   };
 
   const socials = [];
-  
+
   // Only add map link if this is a venue (not KJ)
   if (item.Address) {
-    socials.push(`<a href="${createMapLink(item)}" target="_blank" title="View on Google Maps"><i class="fas fa-map-marker-alt"></i></a>`);
+    socials.push(
+      `<a href="${createMapLink(item)}" target="_blank" title="View on Google Maps"><i class="fas fa-map-marker-alt"></i></a>`
+    );
   }
 
   for (const [platform, info] of Object.entries(socialPlatforms)) {
@@ -211,18 +216,18 @@ function renderAllDays() {
 
 function getVenuesForDate(date) {
   const getSortableName = (name) => {
-    const articles = ['the ', 'a ', 'an ', 'la ', 'el ', 'le '];
+    const articles = ["the ", "a ", "an ", "la ", "el ", "le "];
     const lowerName = name.toLowerCase();
-    const article = articles.find(a => lowerName.startsWith(a));
+    const article = articles.find((a) => lowerName.startsWith(a));
     return article ? name.slice(article.length) : name;
   };
 
   return karaokeData.listings
-    .map(venue => {
+    .map((venue) => {
       const { hasEvent, timeInfo } = hasKaraokeOnDate(venue, date);
       return hasEvent ? { ...venue, timeInfo } : null;
     })
-    .filter(venue => venue && (showDedicated || !venue.Dedicated))
+    .filter((venue) => venue && (showDedicated || !venue.Dedicated))
     .sort((a, b) => getSortableName(a.VenueName).localeCompare(getSortableName(b.VenueName)));
 }
 
@@ -243,7 +248,9 @@ function createDayHTML(date, venues) {
 }
 
 function createVenuesList(venues) {
-  return venues.map(venue => `
+  return venues
+    .map(
+      (venue) => `
     <div class="venue-item">
       <div class="venue-name">${venue.VenueName}</div>
       <div class="venue-kj">${venue.KJ.Company ? `${venue.KJ.Company}<br>` : ""}${venue.KJ.Host ? ` with ${venue.KJ.Host}` : ""}</div>
@@ -251,11 +258,13 @@ function createVenuesList(venues) {
         venue.timeInfo.description ? ` <span class="time-description"><br>(${venue.timeInfo.description})</span>` : ""
       }</div>
       <div class="venue-address"><a href="${createMapLink(venue)}" target="_blank" title="View on Google Maps">${formatAddress(venue)}</a></div>
-      <button class="details-btn" onclick="showVenueDetails(${JSON.stringify(venue).replace(/"/g, '&quot;')})">
+      <button class="details-btn" onclick="showVenueDetails(${JSON.stringify(venue).replace(/"/g, "&quot;")})">
         See Details
       </button>
     </div>
-  `).join("");
+  `
+    )
+    .join("");
 }
 
 function appendDayToContainer(html) {
@@ -267,7 +276,7 @@ function appendDayToContainer(html) {
 // ======================
 function setupEventListeners() {
   const backToTopButton = document.getElementById("backToTop");
-  
+
   window.addEventListener("scroll", () => {
     backToTopButton.classList.toggle("visible", window.pageYOffset > 300);
   });
@@ -296,9 +305,9 @@ function setupEventListeners() {
     renderWeek();
   });
 
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && document.getElementById('venue-modal').style.display === 'block') {
-      document.getElementById('venue-modal').style.display = 'none';
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && document.getElementById("venue-modal").style.display === "block") {
+      document.getElementById("venue-modal").style.display = "none";
     }
   });
 }
