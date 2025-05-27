@@ -121,6 +121,8 @@ button:hover, .details-btn:hover {
 
 /* Day Cards */
 .day-card {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
     background-color: white;
     opacity: 94%;
     margin-bottom: 15px;
@@ -135,8 +137,9 @@ button:hover, .details-btn:hover {
     color: white;
     padding: 18px 15px;
     font-weight: bold;
-    font-size:1.5em;
+    font-size:2em;
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     position: -webkit-sticky;
     position: sticky;
@@ -180,7 +183,7 @@ button:hover, .details-btn:hover {
 .venue-name {
     text-transform: uppercase;
     font-family: Tahoma, sans-serif;
-    font-size: 17px;
+    font-size: 1.3em;
     font-weight: bold;
     color: #b50027;
     margin-bottom: 2px;
@@ -349,6 +352,9 @@ button:hover, .details-btn:hover {
 }
 
 @media (max-width: 600px) {
+    body{
+        padding: 0;
+    }
     .controls-container {
         flex-direction: column;
         gap: 10px;
@@ -357,9 +363,6 @@ button:hover, .details-btn:hover {
         font-size: 2em;
     }
 
-    
-
-    
     .modal-content {
         margin: 4% auto;
         width: 80%;
