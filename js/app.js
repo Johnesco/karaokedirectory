@@ -233,13 +233,14 @@ function getVenuesForDate(date) {
 
 function createDayHTML(date, venues) {
   return `
+    
+    <div class="day-card">
     <div class="day-header ${isCurrentDay(date) ? "today" : ""}">
       <span>${getDayName(date)}</span>
       <span class="date-number ${isCurrentDay(date) ? "today" : ""}">
         ${formatDateShort(date)} ${isCurrentDay(date) ? "(today)" : ""}
       </span>
     </div>
-    <div class="day-card">
       <div class="venue-list">
         ${venues.length > 0 ? createVenuesList(venues) : '<div class="no-events">No karaoke venues scheduled</div>'}
       </div>
