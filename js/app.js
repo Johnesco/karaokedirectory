@@ -227,7 +227,39 @@ function getVenuesForDate(date) {
       const { hasEvent, timeInfo } = hasKaraokeOnDate(venue, date);
       return hasEvent ? { ...venue, timeInfo } : null;
     })
-    .filter((venue) => venue && (showDedicated || !venue.Dedicated))
+    .filter((venue) => {
+      if (!venue) return false;
+      
+      // Check if venue should be excluded based on showDedicated flag
+      if (!showDedicated && venue.Dedicated) return false;
+      
+      // Check timeframe validity
+      const timeframe = venue.Timeframe;
+      if (timeframe) {
+        // Ensure date is in YYYY-MM-DD format for comparison
+        const renderDate = date instanceof Date ? date.toISOString().split('T')[0] : date;
+        
+        // If no StartDate and no EndDate, show venue
+        if (!timeframe.StartDate && !timeframe.EndDate) {
+          // Show venue (no restrictions)
+        }
+        // If only EndDate exists, show if EndDate hasn't passed
+        else if (!timeframe.StartDate && timeframe.EndDate) {
+          if (renderDate > timeframe.EndDate) return false;
+        }
+        // If only StartDate exists, show if render date is that day or date has passed
+        else if (timeframe.StartDate && !timeframe.EndDate) {
+          if (renderDate < timeframe.StartDate) return false;
+        }
+        // If both StartDate and EndDate exist
+        else if (timeframe.StartDate && timeframe.EndDate) {
+          if (renderDate < timeframe.StartDate) return false;
+          if (renderDate > timeframe.EndDate) return false;
+        }
+      }
+      
+      return true;
+    })
     .sort((a, b) => getSortableName(a.VenueName).localeCompare(getSortableName(b.VenueName)));
 }
 

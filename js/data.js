@@ -8,6 +8,7 @@ const karaokeData = {
         "State": "TX",
         "Zip": "78664"
       },
+      "Timeframe":{"StartDate":null, "EndDate":null},
       "KJ": {
         "Host": "",
         "Company": "Diamond Karaoke Austin"
@@ -27,6 +28,35 @@ const karaokeData = {
           ],
           "time": "7:30 PM - MIDNIGHT",
           "description": "Every Wednesday"
+        }
+      ]
+    },
+    {
+      "VenueName": "Baker St. Pub & Grill",
+      "Address": {
+        "Street": "3003 S Lamar Blvd",
+        "City": "Austin",
+        "State": "TX",
+        "Zip": "78704"
+      },
+      "Timeframe":{"StartDate": null, "EndDate":"2025-05-30"},
+      "KJ": {
+        "Host": "",
+        "Company": "Texas Live Band Karaoke"
+      },
+      "socials": {
+        "Facebook": null,
+        "Instagram": null,
+        "Website": "https://www.texaslivebandkaraoke.com/",
+        "Bluesky": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Thursday"
+          ],
+          "time": "9:00 PM - 1:00 AM"
         }
       ]
     },
@@ -957,6 +987,48 @@ const karaokeData = {
           "day": [
             "every",
             "Thursday"
+          ],
+          "time": "9:00 PM - Close"
+        }
+      ]
+    },
+    {
+      "VenueName": "Lustre Pearl South",
+      "Dedicated": false,
+      "Address": {
+        "Street": "10400 Menchaca Rd",
+        "City": "Austin",
+        "State": "TX ",
+        "Zip": "78748"
+      },
+      "Timeframe":{"StartDate": "2025-05-28", "EndDate":null},
+      "KJ": {
+        "Host": "",
+        "Company": "Texas Live Band Karaoke",
+        "socials": {
+          "Facebook": "https://www.facebook.com/texaslbk",
+          "Instagram": "https://www.instagram.com/texaslivebandkaraoke/",
+          "Twitter": null,
+          "Website": "https://www.texaslivebandkaraoke.com/",
+          "Bluesky": null,
+          "Tiktok": null,
+          "Youtube": null
+      },
+      },
+      "socials": {
+        "Facebook": null,
+        "Instagram": "https://www.instagram.com/lustre_pearl_south/",
+        "Twitter": null,
+        "Website": "https://dunlapatx.com/lustre-pearl-south/",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Wednesday"
           ],
           "time": "9:00 PM - Close"
         }
