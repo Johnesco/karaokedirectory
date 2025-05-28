@@ -32,6 +32,36 @@ const karaokeData = {
       ]
     },
     {
+      "VenueName": "Meridian Buda (TONIGHT ONLY!)",
+      "Address": {
+        "Street": "200 N. Main St.",
+        "City": "Buda",
+        "State": "TX",
+        "Zip": "78610"
+      },
+      "Timeframe":{"StartDate": null, "EndDate":"2025-05-29"},
+      "KJ": {
+        "Host": "",
+        "Company": ""
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/meridianbuda",
+        "Instagram": "https://www.instagram.com/meridianbuda",
+        "Website": "https://www.meridianbuda.com/",
+        "Bluesky": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "6:00 PM - 9:00 PM",
+          "description": "TONIGHT ONLY!"
+        }
+      ]
+    },
+    {
       "VenueName": "Baker St. Pub & Grill",
       "Address": {
         "Street": "3003 S Lamar Blvd",
@@ -1104,7 +1134,7 @@ const karaokeData = {
     {
       "VenueName": "Mario's Seafood",
       "Address": {
-        "Street": "522 N Interstate 35 Frontage Rd<br>Building C",
+        "Street": "522 N I-35 Frontage Rd Bld. C",
         "City": "Austin",
         "State": "TX",
         "Zip": "78752"

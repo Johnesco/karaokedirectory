@@ -30,7 +30,7 @@ function sanitizeUrl(url) {
 // CONSTANTS & CONFIG
 // ======================
 const TODAY = new Date().toDateString();
-let currentWeekStart = new Date();
+let currentWeekStart = new Date(); //Start of week is always "today"
 let showDedicated = true;
 
 // ======================
