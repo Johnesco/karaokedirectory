@@ -37,7 +37,6 @@ function createModalContent(venue) {
     <div class="modal-address">
     <strong>Address:</strong><br>
       <div class="venue-address"><a href="${createMapLink(venue)}" target="_blank" title="View on Google Maps">${formatAddress(venue)}</a></div>
-    </div>
     <div class="modal-schedule">
       <strong>Schedule:</strong>
       ${createScheduleList(venue.schedule)}
