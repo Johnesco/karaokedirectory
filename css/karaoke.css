@@ -267,6 +267,11 @@ button:hover, .details-btn:hover {
     position: relative;
 }
 
+.modal-content div {
+    margin-bottom: 10px;
+
+}
+
 .close-modal {
     color: #aaa;
     float: right;
@@ -292,7 +297,7 @@ button:hover, .details-btn:hover {
     border-bottom: 1px solid #eee;
 }
 
-.modal-address,
+.modal-venue,
 .modal-kj, modal-schedule {
     margin-bottom: 19px;
 }
