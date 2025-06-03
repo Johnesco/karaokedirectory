@@ -83,7 +83,7 @@ function createModalContent(venue) {
       ${venue.KJ.Company ? `<strong>Hosted By: </strong>${escapeHtml(venue.KJ.Company)}<br>` : ""}
       ${venue.KJ.Host ? `<strong>KJ:</strong> ${escapeHtml(venue.KJ.Host)}<br>` : ""}
       ${venue.KJ.Website ? `<a href="${escapeHtml(sanitizeUrl(venue.KJ.Website))}" target="_blank" rel="noopener noreferrer">${escapeHtml(venue.KJ.Website)}</a>` : ""}
-      ${venue.KJ.socials ? `<strong>Karaoke Social Media:</strong><br>${createSocialLinks({ socials: venue.KJ.socials })}` : ""}
+      ${venue.KJ.KJsocials ? `<strong>Karaoke Social Media:</strong><br>${createSocialLinks({ socials: venue.KJ.KJsocials })}` : ""}
     </div>
   `;
 }
