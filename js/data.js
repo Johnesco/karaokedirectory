@@ -893,7 +893,7 @@ const karaokeData = {
       "KJ": {
         "Host": "",
         "Company": "The Karaoke Underground",
-        "socials": {
+        "KJsocials": {
           "Facebook": "https://www.facebook.com/profile.php?id=100031017777100",
           "Instagram": "https://www.instagram.com/karaokeunderground/",
           "Website": "https://karaokeunderground.com/",
