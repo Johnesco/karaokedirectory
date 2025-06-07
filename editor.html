@@ -3,834 +3,573 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Karaoke Venue Editor</title>
+    <title>Karaoke Venue Data Editor</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        * {
             margin: 0;
             padding: 0;
-            background-color: #f5f5f5;
-            color: #333;
-        }
-        .container {
-            display: flex;
-            gap: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .venue-list {
-            flex: 1;
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-        .editor {
-            flex: 2;
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .json-tab {
-            display: none;
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-top: 20px;
-        }
-        .json-output {
-            background: #f0f0f0;
-            padding: 15px;
-            border-radius: 8px;
-            font-family: monospace;
-            white-space: pre-wrap;
-            max-height: 70vh;
-            overflow-y: auto;
-        }
-        h1, h2 {
-            color: #2c3e50;
-        }
-        .venue-item {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .venue-item:hover {
-            background-color: #f0f8ff;
-        }
-        .venue-item.selected {
-            background-color: #e1f0ff;
-            font-weight: bold;
-        }
-        .venue-name {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .venue-details {
-            font-size: 0.9em;
-            color: #666;
-        }
-        .venue-address, .venue-kj {
-            margin-bottom: 3px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input, select, textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
             box-sizing: border-box;
         }
-        button {
-            background-color: #3498db;
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ffd93d, #6bcf7f, #4d9de0, #e15554);
+            padding: 30px;
+            text-align: center;
             color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-right: 5px;
-            margin-top: 5px;
         }
-        button:hover {
-            background-color: #2980b9;
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
-        button.danger {
-            background-color: #e74c3c;
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
         }
-        button.danger:hover {
-            background-color: #c0392b;
+
+        .content {
+            padding: 30px;
         }
-        button.success {
-            background-color: #2ecc71;
-        }
-        button.success:hover {
-            background-color: #27ae60;
-        }
-        .days-container {
+
+        .controls {
             display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
             flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 15px;
         }
-        .day-item {
-            background: #f0f0f0;
-            padding: 5px 10px;
-            border-radius: 4px;
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
+            gap: 8px;
         }
-        .ordinal-item {
-            background: #e8f4f8;
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 10px;
-            border-left: 3px solid #3498db;
-        }
-        .section {
-            margin-bottom: 20px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #eee;
-        }
-        .section-title {
-            margin-top: 0;
-            color: #3498db;
-        }
-        .add-venue-btn {
-            margin-bottom: 15px;
-        }
-        .tab-buttons {
-            display: flex;
-            margin-bottom: 15px;
-        }
-        .tab-button {
-            padding: 8px 15px;
-            background: #ddd;
-            border: none;
-            cursor: pointer;
-            margin-right: 5px;
-        }
-        .tab-button.active {
-            background: #3498db;
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
         }
-        .social-section {
-            background: #f8f8f8;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 15px;
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #ffecd2, #fcb69f);
+            color: #333;
         }
-        .social-section h4 {
-            margin-top: 0;
-            color: #3498db;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 5px;
+
+        .btn-success {
+            background: linear-gradient(135deg, #a8edea, #fed6e3);
+            color: #333;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .section-basic { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); }
+        .section-event { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
+        .section-venue-social { background: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%); }
+        .section-kj { background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%); }
+        .section-kj-social { background: linear-gradient(135deg, #fdbb2d 0%, #22c1c3 100%); }
+
+        .section h3 {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: #333;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .json-editor {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .json-editor.show {
+            display: block;
+        }
+
+        .json-textarea {
+            width: 100%;
+            height: 200px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .json-output {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .json-output pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #333;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <script src="js/data.js"></script>
+     <script src="js/data.js"></script>
     <div class="container">
-        <div class="venue-list">
-            <h1>Venues</h1>
-            <button id="addVenue" class="add-venue-btn success">+ Add New Venue</button>
-            <button id="sortVenues" class="add-venue-btn">Sort Alphabetically</button>
-            <div id="venueList"></div>
+        <div class="header">
+            <h1>🎤 Karaoke Venue Data Editor</h1>
+            <p>Create and edit karaoke venue information with ease</p>
         </div>
-        <div class="editor">
-            <div class="tab-buttons">
-                <button class="tab-button active" data-tab="editor">Editor</button>
-                <button class="tab-button" data-tab="json">JSON</button>
+        
+        <div class="content">
+            <div class="controls">
+                <button class="btn btn-primary" onclick="toggleJsonEditor()">
+                    📝 Import JSON
+                </button>
+                <button class="btn btn-secondary" onclick="exportJson()">
+                    💾 Download JSON
+                </button>
+                <button class="btn btn-success" onclick="copyToClipboard()">
+                    📋 Copy to Clipboard
+                </button>
             </div>
-            
-            <div id="editorTab" class="editor-tab">
-                <div id="venueEditor" style="display: none;">
-                    <h2 id="venueTitle">Edit Venue</h2>
-                    
-                    <div class="section">
-                        <h3 class="section-title">Basic Information</h3>
-                        <div class="form-group">
-                            <label for="venueName">Venue Name</label>
-                            <input type="text" id="venueName">
-                        </div>
-                        <div class="form-group">
-                            <label for="dedicated">
-                                <input type="checkbox" id="dedicated"> Dedicated Venue
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div class="section">
-                        <h3 class="section-title">Address</h3>
-                        <div class="form-group">
-                            <label for="street">Street</label>
-                            <input type="text" id="street">
-                        </div>
-                        <div class="form-group">
-                            <label for="city">City</label>
-                            <input type="text" id="city">
-                        </div>
-                        <div class="form-group">
-                            <label for="state">State</label>
-                            <input type="text" id="state">
-                        </div>
-                        <div class="form-group">
-                            <label for="zip">Zip</label>
-                            <input type="text" id="zip">
-                        </div>
-                    </div>
-                    
-                    <div class="section">
-                        <h3 class="section-title">KJ Information</h3>
-                        <div class="form-group">
-                            <label for="kjHost">Host</label>
-                            <input type="text" id="kjHost">
-                        </div>
-                        <div class="form-group">
-                            <label for="kjCompany">Company</label>
-                            <input type="text" id="kjCompany">
-                        </div>
-                        <div class="form-group">
-                            <label for="kjWebsite">Website</label>
-                            <input type="text" id="kjWebsite">
-                        </div>
-                        
-                        <div class="social-section">
-                            <h4>KJ Social Media</h4>
-                            <div class="form-group">
-                                <label for="kjFacebook">Facebook</label>
-                                <input type="text" id="kjFacebook">
-                            </div>
-                            <div class="form-group">
-                                <label for="kjInstagram">Instagram</label>
-                                <input type="text" id="kjInstagram">
-                            </div>
-                            <div class="form-group">
-                                <label for="kjTwitter">Twitter</label>
-                                <input type="text" id="kjTwitter">
-                            </div>
-                            <div class="form-group">
-                                <label for="kjTiktok">TikTok</label>
-                                <input type="text" id="kjTiktok">
-                            </div>
-                            <div class="form-group">
-                                <label for="kjYoutube">YouTube</label>
-                                <input type="text" id="kjYoutube">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="section">
-                        <h3 class="section-title">Venue Social Media</h3>
-                        <div class="form-group">
-                            <label for="facebook">Facebook</label>
-                            <input type="text" id="facebook">
-                        </div>
-                        <div class="form-group">
-                            <label for="instagram">Instagram</label>
-                            <input type="text" id="instagram">
-                        </div>
-                        <div class="form-group">
-                            <label for="twitter">Twitter</label>
-                            <input type="text" id="twitter">
-                        </div>
-                        <div class="form-group">
-                            <label for="website">Website</label>
-                            <input type="text" id="website">
-                        </div>
-                        <div class="form-group">
-                            <label for="bluesky">Bluesky</label>
-                            <input type="text" id="bluesky">
-                        </div>
-                        <div class="form-group">
-                            <label for="tiktok">TikTok</label>
-                            <input type="text" id="tiktok">
-                        </div>
-                        <div class="form-group">
-                            <label for="youtube">YouTube</label>
-                            <input type="text" id="youtube">
-                        </div>
-                    </div>
-                
-                    <div class="section">
-                        <h3 class="section-title">Ordinal Schedule</h3>
-                        <div id="ordinalItems">
-                            <!-- Ordinal items will be added here -->
-                        </div>
-                        <div class="form-group">
-                            <label>Add Ordinal Day</label>
-                            <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
-                                <select id="newOrdinalNumber">
-                                    <option value="every">Every</option><option value="first">First</option>
-                                    <option value="second">Second</option>
-                                    <option value="third">Third</option>
-                                    <option value="fourth">Fourth</option>
-                                    <option value="fifth">Fifth</option>
-                                </select>
-                                <select id="newOrdinalDay">
-                                    <option value="Sunday">Sunday</option>
-                                    <option value="Monday">Monday</option>
-                                    <option value="Tuesday">Tuesday</option>
-                                    <option value="Wednesday">Wednesday</option>
-                                    <option value="Thursday">Thursday</option>
-                                    <option value="Friday">Friday</option>
-                                    <option value="Saturday">Saturday</option>
-                                </select>
-                                <input type="text" id="newOrdinalTime" placeholder="7:00 PM - 10:00 PM">
-                                <input type="text" id="newOrdinalDesc" placeholder="Description">
-                                <button id="addOrdinalDay" class="success">Add</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div style="display: flex; justify-content: space-between;">
-                        <button id="deleteVenue" class="danger">Delete Venue</button>
-                        <button id="saveVenue" class="success">Save Changes</button>
-                    </div>
-                </div>
-                
-                <div id="noSelection" style="text-align: center; padding: 40px 0;">
-                    <h2>Select a venue to edit</h2>
-                    <p>or add a new venue using the button on the left</p>
+
+            <div class="json-editor" id="jsonEditor">
+                <textarea class="json-textarea" id="jsonInput" placeholder="Paste your JSON data here..."></textarea>
+                <div style="margin-top: 15px;">
+                    <button class="btn btn-primary" onclick="loadFromJson()">Load Data</button>
+                    <button class="btn btn-secondary" onclick="toggleJsonEditor()">Cancel</button>
                 </div>
             </div>
-            
-            <div id="jsonTab" class="json-tab">
-                <h3>JSON Output</h3>
-                <textarea id="jsonOutput" style="width: 100%; height: 70vh;"></textarea>
-                <button id="copyJson">Copy JSON</button>
-                <button id="loadJson">Load JSON</button>
-                <input type="file" id="jsonFileInput" accept=".json" style="display: none;">
+
+            <!-- Basic Information -->
+            <div class="section section-basic">
+                <h3>🏢 Basic Information</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Venue Name</label>
+                        <input type="text" id="venueName" placeholder="Enter venue name">
+                    </div>
+                    <div class="form-group">
+                        <label>Address</label>
+                        <input type="text" id="address" placeholder="Enter full address">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="tel" id="phone" placeholder="Enter phone number">
+                    </div>
+                    <div class="form-group">
+                        <label>Website</label>
+                        <input type="url" id="website" placeholder="Enter website URL">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Event Details -->
+            <div class="section section-event">
+                <h3>📅 Event Details</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Day of Week</label>
+                        <select id="dayOfWeek">
+                            <option value="">Select day</option>
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+                            <option value="Saturday">Saturday</option>
+                            <option value="Sunday">Sunday</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Start Time</label>
+                        <input type="time" id="startTime">
+                    </div>
+                    <div class="form-group">
+                        <label>End Time</label>
+                        <input type="time" id="endTime">
+                    </div>
+                    <div class="form-group">
+                        <label>Frequency</label>
+                        <select id="frequency">
+                            <option value="Weekly">Weekly</option>
+                            <option value="Bi-weekly">Bi-weekly</option>
+                            <option value="Monthly">Monthly</option>
+                            <option value="Special Event">Special Event</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Venue Social Media -->
+            <div class="section section-venue-social">
+                <h3>📱 Venue Social Media</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Facebook</label>
+                        <input type="text" id="socialFacebook" placeholder="Enter Facebook handle/URL">
+                    </div>
+                    <div class="form-group">
+                        <label>Instagram</label>
+                        <input type="text" id="socialInstagram" placeholder="Enter Instagram handle">
+                    </div>
+                    <div class="form-group">
+                        <label>Twitter</label>
+                        <input type="text" id="socialTwitter" placeholder="Enter Twitter handle">
+                    </div>
+                    <div class="form-group">
+                        <label>Website</label>
+                        <input type="url" id="socialWebsite" placeholder="Enter website URL">
+                    </div>
+                    <div class="form-group">
+                        <label>Bluesky</label>
+                        <input type="text" id="socialBluesky" placeholder="Enter Bluesky handle">
+                    </div>
+                    <div class="form-group">
+                        <label>TikTok</label>
+                        <input type="text" id="socialTiktok" placeholder="Enter TikTok handle">
+                    </div>
+                    <div class="form-group">
+                        <label>YouTube</label>
+                        <input type="text" id="socialYoutube" placeholder="Enter YouTube channel">
+                    </div>
+                </div>
+            </div>
+
+            <!-- KJ Information -->
+            <div class="section section-kj">
+                <h3>🎙️ KJ Information</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>KJ Host Name</label>
+                        <input type="text" id="kjHost" placeholder="Enter KJ host name">
+                    </div>
+                    <div class="form-group">
+                        <label>KJ Company</label>
+                        <input type="text" id="kjCompany" placeholder="Enter KJ company name">
+                    </div>
+                </div>
+            </div>
+
+            <!-- KJ Social Media -->
+            <div class="section section-kj-social">
+                <h3>📱 KJ Social Media</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Facebook</label>
+                        <input type="text" id="kjSocialFacebook" placeholder="Enter KJ Facebook handle/URL">
+                    </div>
+                    <div class="form-group">
+                        <label>Instagram</label>
+                        <input type="text" id="kjSocialInstagram" placeholder="Enter KJ Instagram handle">
+                    </div>
+                    <div class="form-group">
+                        <label>Twitter</label>
+                        <input type="text" id="kjSocialTwitter" placeholder="Enter KJ Twitter handle">
+                    </div>
+                    <div class="form-group">
+                        <label>Website</label>
+                        <input type="url" id="kjSocialWebsite" placeholder="Enter KJ website URL">
+                    </div>
+                    <div class="form-group">
+                        <label>Bluesky</label>
+                        <input type="text" id="kjSocialBluesky" placeholder="Enter KJ Bluesky handle">
+                    </div>
+                    <div class="form-group">
+                        <label>TikTok</label>
+                        <input type="text" id="kjSocialTiktok" placeholder="Enter KJ TikTok handle">
+                    </div>
+                    <div class="form-group">
+                        <label>YouTube</label>
+                        <input type="text" id="kjSocialYoutube" placeholder="Enter KJ YouTube channel">
+                    </div>
+                </div>
+            </div>
+
+            <!-- JSON Output -->
+            <div class="json-output">
+                <h3>📄 Generated JSON</h3>
+                <pre id="jsonOutput">{}</pre>
             </div>
         </div>
     </div>
 
     <script>
-        // Global variable to hold our data
-        let venueData = {
-            listings: []
-        };
-        
-        // Current selected venue index
-        let selectedVenueIndex = -1;
-        
-        // DOM elements
-        const venueList = document.getElementById('venueList');
-        const venueEditor = document.getElementById('venueEditor');
-        const noSelection = document.getElementById('noSelection');
-        const jsonOutput = document.getElementById('jsonOutput');
-        const editorTab = document.getElementById('editorTab');
-        const jsonTab = document.getElementById('jsonTab');
-        
-        // Basic info fields
-        const venueName = document.getElementById('venueName');
-        const dedicated = document.getElementById('dedicated');
-        
-        // Address fields
-        const street = document.getElementById('street');
-        const city = document.getElementById('city');
-        const state = document.getElementById('state');
-        const zip = document.getElementById('zip');
-        
-        // KJ fields
-        const kjHost = document.getElementById('kjHost');
-        const kjCompany = document.getElementById('kjCompany');
-        const kjWebsite = document.getElementById('kjWebsite');
-        
-        // KJ Social fields
-        const kjFacebook = document.getElementById('kjFacebook');
-        const kjInstagram = document.getElementById('kjInstagram');
-        const kjTwitter = document.getElementById('kjTwitter');
-        const kjTiktok = document.getElementById('kjTiktok');
-        const kjYoutube = document.getElementById('kjYoutube');
-        
-        // Venue Social fields
-        const facebook = document.getElementById('facebook');
-        const instagram = document.getElementById('instagram');
-        const twitter = document.getElementById('twitter');
-        const website = document.getElementById('website');
-        const bluesky = document.getElementById('bluesky');
-        const tiktok = document.getElementById('tiktok');
-        const youtube = document.getElementById('youtube');
-        
-        // Ordinal schedule elements
-        const ordinalItems = document.getElementById('ordinalItems');
-        const newOrdinalNumber = document.getElementById('newOrdinalNumber');
-        const newOrdinalDay = document.getElementById('newOrdinalDay');
-        const newOrdinalTime = document.getElementById('newOrdinalTime');
-        const newOrdinalDesc = document.getElementById('newOrdinalDesc');
-        
-        // Buttons
-        const addVenueBtn = document.getElementById('addVenue');
-        const saveVenueBtn = document.getElementById('saveVenue');
-        const deleteVenueBtn = document.getElementById('deleteVenue');
-        const addOrdinalDayBtn = document.getElementById('addOrdinalDay');
-        const copyJsonBtn = document.getElementById('copyJson');
-        const loadJsonBtn = document.getElementById('loadJson');
-        const jsonFileInput = document.getElementById('jsonFileInput');
-        const sortVenuesBtn = document.getElementById('sortVenues');
-        
-        // Tab buttons
-        const tabButtons = document.querySelectorAll('.tab-button');
-        
-        // Initialize the app
-        function init() {
-            // Load sample data (you can replace this with loading from a file)
-            loadSampleData();
-            
-            // Set up event listeners
-            addVenueBtn.addEventListener('click', addNewVenue);
-            saveVenueBtn.addEventListener('click', saveVenue);
-            deleteVenueBtn.addEventListener('click', deleteVenue);
-            addOrdinalDayBtn.addEventListener('click', addOrdinalDay);
-            copyJsonBtn.addEventListener('click', copyJsonToClipboard);
-            loadJsonBtn.addEventListener('click', () => jsonFileInput.click());
-            jsonFileInput.addEventListener('change', handleFileUpload);
-            sortVenuesBtn.addEventListener('click', sortVenuesAlphabetically);
-            
-            // Tab switching
-            tabButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const tabName = button.getAttribute('data-tab');
-                    switchTab(tabName);
-                });
-            });
-            
-            // Render the initial view
-            renderVenueList();
-            updateJsonOutput();
-        }
-        
-        // Load sample data (you can replace this with your actual data loading logic)
-        function loadSampleData() {
-            // This would normally be loaded from a file
-            venueData = karaokeData;
-        }
-        
-        // Render the venue list
-        function renderVenueList() {
-            venueList.innerHTML = '';
-            
-            venueData.listings.forEach((venue, index) => {
-                const venueItem = document.createElement('div');
-                venueItem.className = 'venue-item';
-                if (index === selectedVenueIndex) {
-                    venueItem.classList.add('selected');
-                }
-                
-                const venueNameDiv = document.createElement('div');
-                venueNameDiv.className = 'venue-name';
-                venueNameDiv.textContent = venue.VenueName;
-                
-                const venueDetailsDiv = document.createElement('div');
-                venueDetailsDiv.className = 'venue-details';
-                
-                const addressDiv = document.createElement('div');
-                addressDiv.className = 'venue-address';
-                addressDiv.textContent = `${venue.Address.Street}, ${venue.Address.City}, ${venue.Address.State} ${venue.Address.Zip}`;
-                
-                const kjDiv = document.createElement('div');
-                kjDiv.className = 'venue-kj';
-                let kjText = '';
-                if (venue.KJ.Host) kjText += `Host: ${venue.KJ.Host}`;
-                if (venue.KJ.Company) {
-                    if (kjText) kjText += ' | ';
-                    kjText += `Company: ${venue.KJ.Company}`;
-                }
-                kjDiv.textContent = kjText || 'No KJ info';
-                
-                venueDetailsDiv.appendChild(addressDiv);
-                venueDetailsDiv.appendChild(kjDiv);
-                
-                venueItem.appendChild(venueNameDiv);
-                venueItem.appendChild(venueDetailsDiv);
-                
-                venueItem.addEventListener('click', () => selectVenue(index));
-                
-                venueList.appendChild(venueItem);
-            });
-        }
-        
-        // Select a venue to edit
-        function selectVenue(index) {
-            selectedVenueIndex = index;
-            renderVenueList();
-            
-            const venue = venueData.listings[index];
-            
-            // Show editor and hide no selection message
-            venueEditor.style.display = 'block';
-            noSelection.style.display = 'none';
-            
-            // Set basic info
-            venueName.value = venue.VenueName;
-            dedicated.checked = venue.Dedicated || false;
-            
-            // Set address
-            street.value = venue.Address.Street || '';
-            city.value = venue.Address.City || '';
-            state.value = venue.Address.State || '';
-            zip.value = venue.Address.Zip || '';
-            
-            // Set KJ info
-            kjHost.value = venue.KJ.Host || '';
-            kjCompany.value = venue.KJ.Company || '';
-            kjWebsite.value = venue.KJ.Website || '';
-            
-            // Set KJ socials
-            kjFacebook.value = venue.KJ.socials?.Facebook || '';
-            kjInstagram.value = venue.KJ.socials?.Instagram || '';
-            kjTwitter.value = venue.KJ.socials?.Twitter || '';
-            kjTiktok.value = venue.KJ.socials?.Tiktok || '';
-            kjYoutube.value = venue.KJ.socials?.Youtube || '';
-            
-            // Set venue socials
-            facebook.value = venue.socials.Facebook || '';
-            instagram.value = venue.socials.Instagram || '';
-            twitter.value = venue.socials.Twitter || '';
-            website.value = venue.socials.Website || '';
-            bluesky.value = venue.socials.Bluesky || '';
-            tiktok.value = venue.socials.Tiktok || '';
-            youtube.value = venue.socials.Youtube || '';
-            
-            // Render ordinal schedule
-            renderOrdinalSchedule(venue.schedule);
-            
-            // Update JSON output
-            updateJsonOutput();
-        }
-        
-        // Render ordinal schedule
-        function renderOrdinalSchedule(ordinal) {
-            ordinalItems.innerHTML = '';
-            
-            ordinal.forEach((item, index) => {
-                const ordinalItem = document.createElement('div');
-                ordinalItem.className = 'ordinal-item';
-                
-                const ordinalText = document.createElement('div');
-                ordinalText.textContent = `${capitalizeFirstLetter(item.day[0])} ${item.day[1]}: ${item.time}`;
-                
-                if (item.description) {
-                    const descText = document.createElement('div');
-                    descText.textContent = item.description;
-                    descText.style.fontSize = '0.9em';
-                    descText.style.color = '#666';
-                    ordinalText.appendChild(descText);
-                }
-                
-                const deleteBtn = document.createElement('button');
-                deleteBtn.textContent = 'Delete';
-                deleteBtn.className = 'danger';
-                deleteBtn.style.marginTop = '5px';
-                deleteBtn.addEventListener('click', () => {
-                    deleteOrdinalItem(index);
-                });
-                
-                ordinalItem.appendChild(ordinalText);
-                ordinalItem.appendChild(deleteBtn);
-                ordinalItems.appendChild(ordinalItem);
-            });
-        }
-        
-        // Add a new venue
-        function addNewVenue() {
-            const newVenue = {
-                "VenueName": "New Venue",
-                "Dedicated": false,
-                "Address": {
-                    "Street": "",
-                    "City": "",
-                    "State": "",
-                    "Zip": ""
-                },
-                "KJ": {
-                    "Host": "",
-                    "Company": "",
-                    "Website": "",
-                    "socials": {
-                        "Facebook": null,
-                        "Instagram": null,
-                        "Twitter": null,
-                        "Tiktok": null,
-                        "Youtube": null
-                    }
-                },
-                "socials": {
-                    "Facebook": null,
-                    "Instagram": null,
-                    "Twitter": null,
-                    "Website": null,
-                    "Bluesky": null,
-                    "Tiktok": null,
-                    "Youtube": null
-                },
-                "schedule": []
-            };
-            
-            venueData.listings.push(newVenue);
-            selectedVenueIndex = venueData.listings.length - 1;
-            renderVenueList();
-            selectVenue(selectedVenueIndex);
-            updateJsonOutput();
-        }
-        
-        // Save venue changes
-        function saveVenue() {
-            if (selectedVenueIndex === -1) return;
-            
-            const venue = venueData.listings[selectedVenueIndex];
-            
-            // Update basic info
-            venue.VenueName = venueName.value;
-            venue.Dedicated = dedicated.checked;
-            
-            // Update address
-            venue.Address = {
-                Street: street.value,
-                City: city.value,
-                State: state.value,
-                Zip: zip.value
-            };
-            
-            // Update KJ info
-            venue.KJ = {
-                Host: kjHost.value,
-                Company: kjCompany.value,
-                Website: kjWebsite.value,
-                socials: {
-                    Facebook: kjFacebook.value || null,
-                    Instagram: kjInstagram.value || null,
-                    Twitter: kjTwitter.value || null,
-                    Tiktok: kjTiktok.value || null,
-                    Youtube: kjYoutube.value || null
-                }
-            };
-            
-            // Update venue socials
-            venue.socials = {
-                Facebook: facebook.value || null,
-                Instagram: instagram.value || null,
-                Twitter: twitter.value || null,
-                Website: website.value || null,
-                Bluesky: bluesky.value || null,
-                Tiktok: tiktok.value || null,
-                Youtube: youtube.value || null
-            };
-            
-            // Update the venue list
-            renderVenueList();
-            updateJsonOutput();
-        }
-        
-        // Delete a venue
-        function deleteVenue() {
-            if (selectedVenueIndex === -1) return;
-            
-            if (confirm('Are you sure you want to delete this venue?')) {
-                venueData.listings.splice(selectedVenueIndex, 1);
-                selectedVenueIndex = -1;
-                renderVenueList();
-                
-                // Hide editor and show no selection message
-                venueEditor.style.display = 'none';
-                noSelection.style.display = 'block';
-                
-                updateJsonOutput();
-            }
-        }
-        
-        // Add an ordinal day
-        function addOrdinalDay() {
-            if (selectedVenueIndex === -1) return;
-            
-            const number = newOrdinalNumber.value;
-            const day = newOrdinalDay.value;
-            const time = newOrdinalTime.value.trim();
-            const description = newOrdinalDesc.value.trim();
-            
-            if (!time) {
-                alert('Please enter a time range');
-                return;
-            }
-            
-            const newOrdinal = {
-                day: [number, day],
-                time: time,
-                description: description || undefined
-            };
-            
-            venueData.listings[selectedVenueIndex].schedule.push(newOrdinal);
-            renderOrdinalSchedule(venueData.listings[selectedVenueIndex].schedule);
-            
-            // Clear inputs
-            newOrdinalTime.value = '';
-            newOrdinalDesc.value = '';
-            
-            updateJsonOutput();
-        }
-        
-        // Delete an ordinal item
-        function deleteOrdinalItem(index) {
-            if (selectedVenueIndex === -1) return;
-            
-            venueData.listings[selectedVenueIndex].schedule.splice(index, 1);
-            renderOrdinalSchedule(venueData.listings[selectedVenueIndex].schedule);
-            updateJsonOutput();
-        }
-        
-        // Sort venues alphabetically
-        function sortVenuesAlphabetically() {
-            // Helper function to ignore articles for sorting
-            function getSortableName(venueName) {
-                const articles = ['the ', 'a ', 'an ','la ', 'el ', 'le '];
-                const lowerName = venueName.toLowerCase();
-                
-                for (const article of articles) {
-                    if (lowerName.startsWith(article)) {
-                        return venueName.slice(article.length).toUpperCase();
-                    }
-                }
-                return venueName.toUpperCase();
-            }
+        // Initialize data structure
+        let venueData = karaokeData;
 
-            venueData.listings.sort((a, b) => {
-                const nameA = getSortableName(a.VenueName);
-                const nameB = getSortableName(b.VenueName);
-                if (nameA < nameB) return -1;
-                if (nameA > nameB) return 1;
-                return 0;
-            });
-            
-            renderVenueList();
-            updateJsonOutput();
-        }
-        
-        // Switch between tabs
-        function switchTab(tabName) {
-            // Update tab buttons
-            tabButtons.forEach(button => {
-                if (button.getAttribute('data-tab') === tabName) {
-                    button.classList.add('active');
-                } else {
-                    button.classList.remove('active');
-                }
-            });
-            
-            // Show/hide tabs
-            if (tabName === 'editor') {
-                editorTab.style.display = 'block';
-                jsonTab.style.display = 'none';
-            } else if (tabName === 'json') {
-                editorTab.style.display = 'none';
-                jsonTab.style.display = 'block';
-            }
-        }
-        
-        // Update the JSON output
+        // Update JSON output
         function updateJsonOutput() {
-            // Fix the Thursday typo before displaying
-            const fixedData = JSON.parse(JSON.stringify(venueData));
+            const cleanedData = JSON.parse(JSON.stringify(venueData, (key, value) => {
+                if (value === '') return null;
+                return value;
+            }));
             
-            jsonOutput.value = "const karaokeData = " +  JSON.stringify(fixedData, null, 2) +";";
+            document.getElementById('jsonOutput').textContent = JSON.stringify(cleanedData, null, 2);
         }
-        
-        // Copy JSON to clipboard
-        function copyJsonToClipboard() {
-            jsonOutput.select();
-            document.execCommand('copy');
-            alert('JSON copied to clipboard!');
-        }
-        
-        // Handle file upload
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    if (data && data.listings) {
-                        venueData = data;
-                        selectedVenueIndex = -1;
-                        renderVenueList();
-                        
-                        // Hide editor and show no selection message
-                        venueEditor.style.display = 'none';
-                        noSelection.style.display = 'block';
-                        
-                        updateJsonOutput();
-                        alert('File loaded successfully!');
-                    } else {
-                        alert('Invalid JSON format. Expected a "listings" array.');
+
+        // Collect data from form
+        function collectFormData() {
+            venueData = {
+                venueName: document.getElementById('venueName').value,
+                address: document.getElementById('address').value,
+                phone: document.getElementById('phone').value,
+                website: document.getElementById('website').value,
+                eventDetails: {
+                    dayOfWeek: document.getElementById('dayOfWeek').value,
+                    startTime: document.getElementById('startTime').value,
+                    endTime: document.getElementById('endTime').value,
+                    frequency: document.getElementById('frequency').value
+                },
+                socials: {
+                    Facebook: document.getElementById('socialFacebook').value,
+                    Instagram: document.getElementById('socialInstagram').value,
+                    Twitter: document.getElementById('socialTwitter').value,
+                    Website: document.getElementById('socialWebsite').value,
+                    Bluesky: document.getElementById('socialBluesky').value,
+                    Tiktok: document.getElementById('socialTiktok').value,
+                    Youtube: document.getElementById('socialYoutube').value
+                },
+                KJ: {
+                    Host: document.getElementById('kjHost').value,
+                    Company: document.getElementById('kjCompany').value,
+                    KJsocials: {
+                        Facebook: document.getElementById('kjSocialFacebook').value,
+                        Instagram: document.getElementById('kjSocialInstagram').value,
+                        Twitter: document.getElementById('kjSocialTwitter').value,
+                        Website: document.getElementById('kjSocialWebsite').value,
+                        Bluesky: document.getElementById('kjSocialBluesky').value,
+                        Tiktok: document.getElementById('kjSocialTiktok').value,
+                        Youtube: document.getElementById('kjSocialYoutube').value
                     }
-                } catch (error) {
-                    alert('Error parsing JSON: ' + error.message);
                 }
             };
-            reader.readAsText(file);
+            updateJsonOutput();
         }
-        
-        // Helper function to capitalize first letter
-        function capitalizeFirstLetter(string) {
-            return string.charAt(0).toUpperCase() + string.slice(1);
+
+        // Populate form from data
+        function populateForm() {
+            document.getElementById('venueName').value = venueData.venueName || '';
+            document.getElementById('address').value = venueData.address || '';
+            document.getElementById('phone').value = venueData.phone || '';
+            document.getElementById('website').value = venueData.website || '';
+            
+            document.getElementById('dayOfWeek').value = venueData.eventDetails?.dayOfWeek || '';
+            document.getElementById('startTime').value = venueData.eventDetails?.startTime || '';
+            document.getElementById('endTime').value = venueData.eventDetails?.endTime || '';
+            document.getElementById('frequency').value = venueData.eventDetails?.frequency || 'Weekly';
+            
+            document.getElementById('socialFacebook').value = venueData.socials?.Facebook || '';
+            document.getElementById('socialInstagram').value = venueData.socials?.Instagram || '';
+            document.getElementById('socialTwitter').value = venueData.socials?.Twitter || '';
+            document.getElementById('socialWebsite').value = venueData.socials?.Website || '';
+            document.getElementById('socialBluesky').value = venueData.socials?.Bluesky || '';
+            document.getElementById('socialTiktok').value = venueData.socials?.Tiktok || '';
+            document.getElementById('socialYoutube').value = venueData.socials?.Youtube || '';
+            
+            document.getElementById('kjHost').value = venueData.KJ?.Host || '';
+            document.getElementById('kjCompany').value = venueData.KJ?.Company || '';
+            
+            document.getElementById('kjSocialFacebook').value = venueData.KJ?.KJsocials?.Facebook || '';
+            document.getElementById('kjSocialInstagram').value = venueData.KJ?.KJsocials?.Instagram || '';
+            document.getElementById('kjSocialTwitter').value = venueData.KJ?.KJsocials?.Twitter || '';
+            document.getElementById('kjSocialWebsite').value = venueData.KJ?.KJsocials?.Website || '';
+            document.getElementById('kjSocialBluesky').value = venueData.KJ?.KJsocials?.Bluesky || '';
+            document.getElementById('kjSocialTiktok').value = venueData.KJ?.KJsocials?.Tiktok || '';
+            document.getElementById('kjSocialYoutube').value = venueData.KJ?.KJsocials?.Youtube || '';
         }
-        
-        // Initialize the app when the page loads
-        window.addEventListener('DOMContentLoaded', init);
+
+        // Toggle JSON editor
+        function toggleJsonEditor() {
+            const editor = document.getElementById('jsonEditor');
+            editor.classList.toggle('show');
+        }
+
+        // Load data from JSON
+        function loadFromJson() {
+            try {
+                const jsonInput = document.getElementById('jsonInput').value;
+                const parsed = JSON.parse(jsonInput);
+                
+                venueData = {
+                    venueName: parsed.venueName || '',
+                    address: parsed.address || '',
+                    phone: parsed.phone || '',
+                    website: parsed.website || '',
+                    eventDetails: {
+                        dayOfWeek: parsed.eventDetails?.dayOfWeek || '',
+                        startTime: parsed.eventDetails?.startTime || '',
+                        endTime: parsed.eventDetails?.endTime || '',
+                        frequency: parsed.eventDetails?.frequency || 'Weekly'
+                    },
+                    socials: {
+                        Facebook: parsed.socials?.Facebook || '',
+                        Instagram: parsed.socials?.Instagram || '',
+                        Twitter: parsed.socials?.Twitter || '',
+                        Website: parsed.socials?.Website || '',
+                        Bluesky: parsed.socials?.Bluesky || '',
+                        Tiktok: parsed.socials?.Tiktok || '',
+                        Youtube: parsed.socials?.Youtube || ''
+                    },
+                    KJ: {
+                        Host: parsed.KJ?.Host || '',
+                        Company: parsed.KJ?.Company || '',
+                        KJsocials: {
+                            Facebook: parsed.KJ?.KJsocials?.Facebook || '',
+                            Instagram: parsed.KJ?.KJsocials?.Instagram || '',
+                            Twitter: parsed.KJ?.KJsocials?.Twitter || '',
+                            Website: parsed.KJ?.KJsocials?.Website || '',
+                            Bluesky: parsed.KJ?.KJsocials?.Bluesky || '',
+                            Tiktok: parsed.KJ?.KJsocials?.Tiktok || '',
+                            Youtube: parsed.KJ?.KJsocials?.Youtube || ''
+                        }
+                    }
+                };
+                
+                populateForm();
+                updateJsonOutput();
+                document.getElementById('jsonInput').value = '';
+                toggleJsonEditor();
+                alert('Data loaded successfully!');
+            } catch (error) {
+                alert('Invalid JSON format. Please check your input.');
+            }
+        }
+
+        // Export JSON
+        function exportJson() {
+            collectFormData();
+            const cleanedData = JSON.parse(JSON.stringify(venueData, (key, value) => {
+                if (value === '') return null;
+                return value;
+            }));
+            
+            const jsonString = JSON.stringify(cleanedData, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${venueData.venueName || 'karaoke-venue'}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Copy to clipboard
+        function copyToClipboard() {
+            collectFormData();
+            const cleanedData = JSON.parse(JSON.stringify(venueData, (key, value) => {
+                if (value === '') return null;
+                return value;
+            }));
+            
+            const jsonString = JSON.stringify(cleanedData, null, 2);
+            navigator.clipboard.writeText(jsonString).then(() => {
+                alert('JSON copied to clipboard!');
+            });
+        }
+
+        // Add event listeners to all form inputs
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                input.addEventListener('input', collectFormData);
+                input.addEventListener('change', collectFormData);
+            });
+            
+            // Initialize
+            updateJsonOutput();
+        });
     </script>
 </body>
 </html>
