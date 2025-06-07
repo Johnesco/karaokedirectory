@@ -153,6 +153,51 @@ const karaokeData = {
       ]
     },
     {
+      "VenueName": "The Boat",
+      "Dedicated": false,
+      "Address": {
+        "Street": "10931 Stonelake Blvd",
+        "City": "Austin",
+        "State": "TX",
+        "Zip": "78759"
+      },
+      "Timeframe": {
+        "StartDate": null,
+        "EndDate": null
+      },
+      "KJ": {
+        "Host": "Keith Ruckus",
+        "Company": "Ruckus ATX",
+        "KJsocials": {
+          "Facebook": "https://www.facebook.com/RuckusKaraoke/",
+          "Instagram": "https://www.instagram.com/ruckuskaraoke/",
+          "Twitter": null,
+          "Website": "http://ruckuskaraoke.com/",
+          "Bluesky": null,
+          "Tiktok": null,
+          "Youtube": null
+        }
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/theboatatx/#",
+        "Instagram": "https://www.instagram.com/theboatatx",
+        "Website": "https://theboatatx.com/",
+        "Twitter": null,
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Tuesday"
+          ],
+          "time": "9:00 PM - MIDNIGHT"
+        }
+      ]
+    },
+    {
       "VenueName": "Bodhi's Bodacious Hideaway",
       "Dedicated": false,
       "Address": {
@@ -1147,7 +1192,7 @@ const karaokeData = {
       ]
     },
     {
-      "VenueName": "Meridian Buda (TONIGHT ONLY!)",
+      "VenueName": "Meridian Buda",
       "Address": {
         "Street": "200 N. Main St.",
         "City": "Buda",
@@ -1155,18 +1200,30 @@ const karaokeData = {
         "Zip": "78610"
       },
       "Timeframe": {
-        "StartDate": null,
+        "StartDate": "2025-05-21",
         "EndDate": "2025-05-29"
       },
       "KJ": {
         "Host": "",
-        "Company": ""
+        "Company": "",
+        "KJsocials": {
+          "Facebook": null,
+          "Instagram": null,
+          "Twitter": null,
+          "Website": null,
+          "Bluesky": null,
+          "Tiktok": null,
+          "Youtube": null
+        }
       },
       "socials": {
         "Facebook": "https://www.facebook.com/meridianbuda",
         "Instagram": "https://www.instagram.com/meridianbuda",
         "Website": "https://www.meridianbuda.com/",
-        "Bluesky": null
+        "Twitter": null,
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -1177,7 +1234,8 @@ const karaokeData = {
           "time": "6:00 PM - 9:00 PM",
           "description": "TONIGHT ONLY!"
         }
-      ]
+      ],
+      "Dedicated": false
     },
     {
       "VenueName": "Millie's on Main",
