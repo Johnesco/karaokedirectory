@@ -914,7 +914,7 @@ const karaokeData = {
             "first",
             "Saturday"
           ],
-          "time": "8:00 PM - Close"
+          "time": "8:30 PM - Midnight"
         }
       ]
     },
