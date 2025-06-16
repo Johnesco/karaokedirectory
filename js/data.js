@@ -1238,6 +1238,51 @@ const karaokeData = {
       "Dedicated": false
     },
     {
+      "VenueName": "The Mill",
+      "Dedicated": false,
+      "Address": {
+        "Street": "9112 Anderson Mill Rd suite b 100",
+        "City": " Austin",
+        "State": "TX",
+        "Zip": "78729"
+      },
+      "Timeframe": {
+        "StartDate": "2025-06-16",
+        "EndDate": null
+      },
+      "KJ": {
+        "Host": "",
+        "Company": "",
+        "KJsocials": {
+          "Facebook": null,
+          "Instagram": null,
+          "Twitter": null,
+          "Website": null,
+          "Bluesky": null,
+          "Tiktok": null,
+          "Youtube": null
+        }
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/themillbarandgrillaustin",
+        "Instagram": null,
+        "Website": null,
+        "Twitter": null,
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Tuesday"
+          ],
+          "time": "8:00 PM - 11:00 PM"
+        }
+      ]
+    },
+    {
       "VenueName": "Millie's on Main",
       "Address": {
         "Street": "212 N Main St",
@@ -1675,22 +1720,34 @@ const karaokeData = {
       ]
     },
     {
-      "VenueName": "The Water Tank Bar & Grill",
+      "VenueName": "The Mill",
       "Address": {
-        "Street": "7309 Mcneil Dr",
-        "City": "Austin",
+        "Street": "9112 Anderson Mill Rd suite b 100",
+        "City": " Austin",
         "State": "TX",
-        "Zip": "78629"
+        "Zip": "78729"
       },
       "KJ": {
         "Host": "",
-        "Company": ""
+        "Company": "",
+        "KJsocials": {
+          "Facebook": null,
+          "Instagram": null,
+          "Twitter": null,
+          "Website": null,
+          "Bluesky": null,
+          "Tiktok": null,
+          "Youtube": null
+        }
       },
       "socials": {
-        "Facebook": "https://www.facebook.com/Thewatertankaustin",
-        "Instagram": "https://www.instagram.com/the_water_tank/",
-        "Website": "https://www.austinwatertank.com/",
-        "Bluesky": null
+        "Facebook": "https://www.facebook.com/themillbarandgrillaustin",
+        "Instagram": null,
+        "Website": null,
+        "Twitter": null,
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -1728,7 +1785,12 @@ const karaokeData = {
           ],
           "time": "9:00 PM - 2:00 AM"
         }
-      ]
+      ],
+      "Dedicated": false,
+      "Timeframe": {
+        "StartDate": "2025-06-16",
+        "EndDate": null
+      }
     }
   ]
 };
