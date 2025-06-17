@@ -1278,7 +1278,7 @@ const karaokeData = {
             "every",
             "Tuesday"
           ],
-          "time": "8:00 PM - 11:00 PM"
+          "time": "8:00 PM - 11:30 PM"
         }
       ]
     },
