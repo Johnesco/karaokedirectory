@@ -44,19 +44,6 @@ h1 {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.controls a
-{text-decoration: none;
-color:white;}
-
-.controls a:visited
-{color:white;}
-
-.controls a:link
-{color:white;}
-
-.controls a:hover
-{color:white;}
-
 .controls-container {
     display: flex;
     justify-content: space-between;
@@ -230,7 +217,7 @@ button:hover, .details-btn:hover {
 
 .social-links a {
     color: #555;
-    font-size: 1.2em;
+    font-size: 2.4em;
     transition: color 0.2s;
 }
 
