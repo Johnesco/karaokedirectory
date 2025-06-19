@@ -415,7 +415,7 @@ const karaokeData = {
             "every",
             "Wednesday"
           ],
-          "time": "6:00 PM - 10:30 PM",
+          "time": "6:30 PM - 10:30 PM",
           "description": "Every Wednesday and Second and Fourth Fridays"
         },
         {
@@ -423,7 +423,7 @@ const karaokeData = {
             "second",
             "Friday"
           ],
-          "time": "6:00 PM - 10:00 PM",
+          "time": "7:00 PM - 11:00 PM",
           "description": "Every Wednesday and Second and Fourth Fridays"
         },
         {
@@ -431,7 +431,7 @@ const karaokeData = {
             "fourth",
             "Friday"
           ],
-          "time": "6:00 PM - 10:00 PM",
+          "time": "7:00 PM - 11:00 PM",
           "description": "Every Wednesday and Second and Fourth Fridays"
         }
       ]
@@ -644,7 +644,7 @@ const karaokeData = {
             "fourth",
             "Thursday"
           ],
-          "time": "6:30 PM - ??? PM",
+          "time": "6:30 PM - 10:30 PM",
           "description": "Second and Fourth Fridays"
         }
       ]
@@ -1716,6 +1716,51 @@ const karaokeData = {
             "Friday"
           ],
           "time": "9:30 PM - 1:30 AM"
+        }
+      ]
+    },
+    {
+      "VenueName": "Wildflower Corks & Brew",
+      "Dedicated": false,
+      "Address": {
+        "Street": "108 E. 2nd Street Taylor, TX, United States, Texas 76574",
+        "City": "Taylor",
+        "State": "TX",
+        "Zip": "76574"
+      },
+      "Timeframe": {
+        "StartDate": null,
+        "EndDate": null
+      },
+      "KJ": {
+        "Host": "",
+        "Company": "Diamond Karaoke",
+        "KJsocials": {
+          "Facebook": null,
+          "Instagram": "https://www.instagram.com/diamondkaraokeatx/",
+          "Twitter": null,
+          "Website": "http://www.diamondkaraoke.com/",
+          "Bluesky": null,
+          "Tiktok": null,
+          "Youtube": null
+        }
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/profile.php?id=61573452677081",
+        "Instagram": "https://www.instagram.com/wildflowertaylortx/",
+        "Website": null,
+        "Twitter": null,
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Thursday"
+          ],
+          "time": "7:00 PM - 11:00PM"
         }
       ]
     }
