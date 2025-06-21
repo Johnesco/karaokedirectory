@@ -1723,7 +1723,7 @@ const karaokeData = {
       "VenueName": "Wildflower Corks & Brew",
       "Dedicated": false,
       "Address": {
-        "Street": "108 E. 2nd Street Taylor, TX, United States, Texas 76574",
+        "Street": "108 E. 2nd St.",
         "City": "Taylor",
         "State": "TX",
         "Zip": "76574"
