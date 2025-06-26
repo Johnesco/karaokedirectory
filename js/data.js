@@ -1027,6 +1027,10 @@ const karaokeData = {
         "State": "TX ",
         "Zip": "78748"
       },
+      "Timeframe": {
+        "StartDate": null,
+        "EndDate": "2025-06-27"
+      },
       "KJ": {
         "Host": "",
         "Company": "Karaoke Soup",
@@ -1062,12 +1066,12 @@ const karaokeData = {
       },
       "Timeframe": {
         "StartDate": "2025-05-28",
-        "EndDate": null
+        "EndDate": "2025-06-25"
       },
       "KJ": {
         "Host": "",
         "Company": "Texas Live Band Karaoke",
-        "socials": {
+        "KJsocials": {
           "Facebook": "https://www.facebook.com/texaslbk",
           "Instagram": "https://www.instagram.com/texaslivebandkaraoke/",
           "Twitter": null,
@@ -1092,7 +1096,54 @@ const karaokeData = {
             "every",
             "Wednesday"
           ],
-          "time": "8:00 PM - Close"
+          "time": "8:00 PM - Close",
+          "description" : "Trial Period, switching to Thursday"
+        }
+      ]
+    },
+    {
+      "VenueName": "Lustre Pearl South",
+      "Dedicated": false,
+      "Address": {
+        "Street": "10400 Menchaca Rd",
+        "City": "Austin",
+        "State": "TX ",
+        "Zip": "78748"
+      },
+      "Timeframe": {
+        "StartDate": "2025-07-03",
+        "EndDate": null
+      },
+      "KJ": {
+        "Host": "",
+        "Company": "Texas Live Band Karaoke",
+        "KJsocials": {
+          "Facebook": "https://www.facebook.com/texaslbk",
+          "Instagram": "https://www.instagram.com/texaslivebandkaraoke/",
+          "Twitter": null,
+          "Website": "https://www.texaslivebandkaraoke.com/",
+          "Bluesky": null,
+          "Tiktok": null,
+          "Youtube": null
+        }
+      },
+      "socials": {
+        "Facebook": null,
+        "Instagram": "https://www.instagram.com/lustre_pearl_south/",
+        "Twitter": null,
+        "Website": "https://dunlapatx.com/lustre-pearl-south/",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Thursday"
+          ],
+          "time": "8:00 PM - 11:30 PM",
+          "description" : "New night! Now on Thursdays."
         }
       ]
     },
