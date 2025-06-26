@@ -1066,7 +1066,7 @@ const karaokeData = {
       },
       "Timeframe": {
         "StartDate": "2025-05-28",
-        "EndDate": "2025-06-25"
+        "EndDate": "2025-06-28"
       },
       "KJ": {
         "Host": "",
