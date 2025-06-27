@@ -402,7 +402,7 @@ const karaokeData = {
             "first",
             "Saturday"
           ],
-          "time": "7:00 PM - 11:00PM"
+          "time": "8:00 PM - 11:00PM"
         }
       ]
     },
