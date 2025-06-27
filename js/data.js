@@ -399,8 +399,8 @@ const karaokeData = {
       "schedule": [
         {
           "day": [
-            "every",
-            "Thursday"
+            "first",
+            "Saturday"
           ],
           "time": "7:00 PM - 11:00PM"
         }
