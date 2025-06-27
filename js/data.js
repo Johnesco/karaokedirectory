@@ -362,6 +362,51 @@ const karaokeData = {
       ]
     },
     {
+      "VenueName": "Captain Quack's Soundspace",
+      "Dedicated": false,
+      "Address": {
+        "Street": "5326 Menchaca Road",
+        "City": "Austin",
+        "State": "Tx",
+        "Zip": "78745"
+      },
+      "Timeframe": {
+        "StartDate": "2025-06-27",
+        "EndDate": null
+      },
+      "KJ": {
+        "Host": "Joe Stutzman",
+        "Company": "",
+        "KJsocials": {
+          "Facebook": null,
+          "Instagram": null,
+          "Twitter": null,
+          "Website": null,
+          "Bluesky": null,
+          "Tiktok": null,
+          "Youtube": null
+        }
+      },
+      "socials": {
+        "Facebook": null,
+        "Instagram": "https://www.instagram.com/quackssoundspace/",
+        "Website": "https://soundspaceatx.com/",
+        "Twitter": null,
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Thursday"
+          ],
+          "time": "7:00 PM - 11:00PM"
+        }
+      ]
+    },
+    {
       "VenueName": "Cheerz",
       "Address": {
         "Street": "14001 Shadow Glen Blvd",
