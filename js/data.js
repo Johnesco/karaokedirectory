@@ -386,7 +386,7 @@ const karaokeData = {
       },
       "socials": {
         "Facebook": null,
-        "Instagram": "https://www.instagram.com/quackssoundspace/",
+        "Instagram": "https://www.instagram.com/coffeehouse/",
         "Website": "https://soundspaceatx.com/",
         "Twitter": null,
         "Bluesky": null,
