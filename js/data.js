@@ -375,16 +375,13 @@ const karaokeData = {
         "EndDate": null
       },
       "KJ": {
-        "Host": "Joe Stutzman",
-        "Company": "",
+        "Host": "Average Joe",
+        "Company": "Starling Karaoke",
         "KJsocials": {
-          "Facebook": null,
-          "Instagram": null,
-          "Twitter": null,
-          "Website": null,
-          "Bluesky": null,
-          "Tiktok": null,
-          "Youtube": null
+          "Facebook": "https://www.facebook.com/starlingkaraoke",
+          "Tiktok": "https://www.tiktok.com/@starlingkaraoke",
+          "Instagram": "https://www.instagram.com/starling_karaoke",
+          "Website": "https://www.starlingkaraoke.com/"
         }
       },
       "socials": {
