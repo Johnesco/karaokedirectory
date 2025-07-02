@@ -692,6 +692,50 @@ const karaokeData = {
       ]
     },
     {
+      "VenueName": "The Fieldhouse at the Crossover",
+      "Dedicated": false,
+      "Address": {
+        "Street": "1717 Scottsdale Dr Suite 160",
+        "City": "Leander",
+        "State": "TX ",
+        "Zip": "78641"
+      },
+      "Timeframe": {
+        "StartDate": "2025-05-28"
+      },
+      "KJ": {
+        "Host": "",
+        "Company": "Texas Live Band Karaoke",
+        "KJsocials": {
+          "Facebook": "https://www.facebook.com/texaslbk",
+          "Instagram": "https://www.instagram.com/texaslivebandkaraoke/",
+          "Twitter": null,
+          "Website": "https://www.texaslivebandkaraoke.com/",
+          "Bluesky": null,
+          "Tiktok": null,
+          "Youtube": null
+        }
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/thefieldhousetexas/",
+        "Instagram": "https://www.instagram.com/thefieldhousetexas",
+        "Twitter": null,
+        "Website": "https://www.thefieldhousetexas.com/",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "7:00 PM - 10:00 PM"
+        }
+      ]
+    },
+    {
       "VenueName": "Firewater Sports Bar",
       "Address": {
         "Street": "13010 W Parmer Ln STE 300",
