@@ -1473,7 +1473,7 @@ const karaokeData = {
       },
       "Timeframe": {
         "StartDate": "2025-06-10",
-        "EndDate": null
+        "EndDate": "2025-07-08"
       },
       "schedule": [
         {
@@ -1482,6 +1482,43 @@ const karaokeData = {
             "Wednesday"
           ],
           "time": "6:00 PM - 9:00 PM"
+        }
+      ]
+    },
+        {
+      "VenueName": "Oak Hill Social",
+      "Address": {
+        "Street": "8600 US-290",
+        "City": "Austin",
+        "State": "TX",
+        "Zip": "78736"
+      },
+      "KJ": {
+        "Host": "Average Joe",
+        "Company": "Starling Karaoke",
+        "KJsocials": {
+          "Facebook": "https://www.facebook.com/starlingkaraoke",
+          "Tiktok": "https://www.tiktok.com/@starlingkaraoke",
+          "Instagram": "https://www.instagram.com/starling_karaoke",
+          "Website": "https://www.starlingkaraoke.com/"
+        }
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/people/Oak-Hill-Social/61552863291533/",
+        "Instagram": "https://www.instagram.com/oakhillsocial",
+        "Website": "https://www.oakhillsocial.com/"
+      },
+      "Timeframe": {
+        "StartDate": "2025-07-08",
+        "EndDate": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "7:00 PM - 11:30 PM"
         }
       ]
     },
