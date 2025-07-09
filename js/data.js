@@ -207,11 +207,11 @@ const karaokeData = {
         "Zip": "78748"
       },
       "KJ": {
-        "Host": "",
-        "Company": "Karaoke Soup",
+        "Host": "Ill Will",
+        "Company": "Live Music In Austin",
         "KJsocials": {
           "Facebook": "",
-          "Instagram": "https://www.instagram.com/karaokesoup/",
+          "Instagram": "https://www.instagram.com/livemusicinaustin/",
           "Website": "",
           "Twitter": "",
           "Bluesky": ""
@@ -232,7 +232,7 @@ const karaokeData = {
             "every",
             "Tuesday"
           ],
-          "time": "9:00 PM - CLOSE"
+          "time": "9:00 PM - Midnight"
         }
       ]
     },
