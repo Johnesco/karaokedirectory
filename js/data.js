@@ -1428,8 +1428,8 @@ const karaokeData = {
         "Zip": "78621"
       },
       "KJ": {
-        "Host": "Mandy",
-        "Company": "Party Pipes Karaoke"
+        "Host": "KJ Mandy",
+        "Company": ""
       },
       "socials": {
         "Facebook": "https://www.facebook.com/milliesonmainetx",
