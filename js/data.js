@@ -1457,7 +1457,7 @@ const karaokeData = {
         "Zip": "78736"
       },
       "KJ": {
-        "Host": "Average Joe",
+        "Host": "KJ Average Joe",
         "Company": "Starling Karaoke",
         "KJsocials": {
           "Facebook": "https://www.facebook.com/starlingkaraoke",
@@ -1494,7 +1494,7 @@ const karaokeData = {
         "Zip": "78736"
       },
       "KJ": {
-        "Host": "Average Joe",
+        "Host": "KJ Average Joe",
         "Company": "Starling Karaoke",
         "KJsocials": {
           "Facebook": "https://www.facebook.com/starlingkaraoke",
@@ -1544,6 +1544,43 @@ const karaokeData = {
             "Wednesday"
           ],
           "time": "7:00 PM - 11:00 PM"
+        }
+      ]
+    },
+    {
+      "VenueName": "Pizzeria Sportiva",
+      "Address": {
+        "Street": "1500 S Lamar Blvd ste 120",
+        "City": "Austin",
+        "State": "TX",
+        "Zip": "78736"
+      },
+      "KJ": {
+        "Host": "KJ Average Joe",
+        "Company": "Starling Karaoke",
+        "KJsocials": {
+          "Facebook": "https://www.facebook.com/starlingkaraoke",
+          "Tiktok": "https://www.tiktok.com/@starlingkaraoke",
+          "Instagram": "https://www.instagram.com/starling_karaoke",
+          "Website": "https://www.starlingkaraoke.com/"
+        }
+      },
+      "socials": {
+          "Facebook": "https://www.facebook.com/people/Pizzeria-sportia/",
+          "Instagram": "https://www.instagram.com/pizzeria_sportiva/",
+        "Website": "https://www.pizzeriasportiva.com/"
+      },
+      "Timeframe": {
+        "StartDate": "2025-07-15",
+        "EndDate": null,
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Friday"
+          ],
+          "time": "9:30 PM - MIDNIGHT"
         }
       ]
     },
