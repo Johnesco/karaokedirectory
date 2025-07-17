@@ -1689,6 +1689,44 @@ const karaokeData = {
       ]
     },
     {
+      "VenueName": "Railhouse Bar",
+      "Dedicated": false,
+      "Address": {
+        "Street": "107 E Center St",
+        "City": "Kyle",
+        "State": "TX",
+        "Zip": "78640"
+      },
+      "KJ": {
+        "Host": "Jen",
+        "Company": "Smart Ass Entertainment",
+        "KJsocials": {
+          "Facebook": "https://www.facebook.com/smartassentertainments/",
+          "Instagram": "https://www.instagram.com/smartassentertainment",
+          "Twitter": null,
+          "Website": "https://smartassentertainment.com/",
+          "Bluesky": null,
+          "Tiktok": null,
+          "Youtube": "https://www.youtube.com/@SmartAssEntertainment"
+        }
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/therailhousebartx/",
+        "Instagram": "https://www.instagram.com/therailhousetx/",
+        "Website": "https://railhousebar.com/",
+        "Bluesky": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "8:00 PM - CLOSE"
+        }
+      ]
+    },
+    {
       "VenueName": "Red Rooster's Pub and Grub",
       "Dedicated": true,
       "Address": {
