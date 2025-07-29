@@ -1968,6 +1968,34 @@ const karaokeData = {
         }
       ]
     },
+{
+      "VenueName": "Whiskey Girls Saloon, The",
+      "Address": {
+        "Street": "13700 FM 973, Bldg A",
+        "City": "Manor",
+        "State": "TX",
+        "Zip": "78653"
+      },
+      "KJ": {
+        "Host": "",
+        "Company": "Party Pipes Karaoke"
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/thewhiskeygirlssaloon",
+        "Instagram": "https://www.instagram.com/the_whiskey_girls_saloon/",
+        "Website": "https://whiskeygirlssaloon.com/",
+        "Bluesky": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Tuesday"
+          ],
+          "time": "8:00 PM - MIDNIGHT"
+        }
+      ]
+    },
     {
       "VenueName": "Wildflower Corks & Brew",
       "Dedicated": false,
