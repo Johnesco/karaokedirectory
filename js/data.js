@@ -1,6 +1,7 @@
 const karaokeData = {
   "listings": [
     {
+      "id": "the-alcove-cantina",
       "VenueName": "The Alcove Cantina",
       "Address": {
         "Street": "119 E Main Street",
@@ -35,38 +36,7 @@ const karaokeData = {
       ]
     },
     {
-      "VenueName": "Baker St. Pub & Grill",
-      "Address": {
-        "Street": "3003 S Lamar Blvd",
-        "City": "Austin",
-        "State": "TX",
-        "Zip": "78704"
-      },
-      "KJ": {
-        "Host": "",
-        "Company": "Texas Live Band Karaoke"
-      },
-      "socials": {
-        "Facebook": null,
-        "Instagram": null,
-        "Website": "https://www.texaslivebandkaraoke.com/",
-        "Bluesky": null
-      },
-      "Timeframe": {
-        "StartDate": null,
-        "EndDate": "2025-05-30"
-      },
-      "schedule": [
-        {
-          "day": [
-            "every",
-            "Thursday"
-          ],
-          "time": "9:00 PM - 1:00 AM"
-        }
-      ]
-    },
-    {
+      "id": "bar-louie",
       "VenueName": "Bar Louie",
       "Address": {
         "Street": "270 Bass Pro Dr",
@@ -95,6 +65,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "big-easy-saloon",
       "VenueName": "Big Easy Saloon",
       "Dedicated": false,
       "Address": {
@@ -127,6 +98,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "blindside-lounge",
       "VenueName": "Blindside Lounge",
       "Address": {
         "Street": "211 6th St",
@@ -153,6 +125,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "the-boat",
       "VenueName": "The Boat",
       "Dedicated": false,
       "Address": {
@@ -198,6 +171,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "bodhis-bodacious-hideaway",
       "VenueName": "Bodhi's Bodacious Hideaway",
       "Dedicated": false,
       "Address": {
@@ -237,6 +211,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "boomerz",
       "VenueName": "Boomerz",
       "Address": {
         "Street": "6148 West US Highway 290",
@@ -265,6 +240,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "buddys-place",
       "VenueName": "Buddy's Place",
       "Address": {
         "Street": "8619 Burnet Road",
@@ -291,6 +267,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "canary-roost",
       "VenueName": "Canary Roost",
       "Dedicated": true,
       "Address": {
@@ -362,6 +339,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "captain-quacks-soundspace",
       "VenueName": "Captain Quack's Soundspace",
       "Dedicated": false,
       "Address": {
@@ -404,6 +382,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "cheerz",
       "VenueName": "Cheerz",
       "Address": {
         "Street": "14001 Shadow Glen Blvd",
@@ -434,6 +413,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "cjs-sports-bar",
       "VenueName": "CJ's Sports Bar",
       "Address": {
         "Street": "1010 N Austin Ave",
@@ -479,6 +459,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "the-common-interest",
       "VenueName": "The Common Interest",
       "Dedicated": true,
       "Address": {
@@ -550,6 +531,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "dog-n-bone-pub",
       "VenueName": "Dog 'n' Bone Pub",
       "Dedicated": false,
       "Address": {
@@ -583,6 +565,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "egos",
       "VenueName": "Ego's",
       "Dedicated": true,
       "Address": {
@@ -655,6 +638,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "film-alley",
       "VenueName": "Film Alley",
       "Address": {
         "Street": "420 Wolf Ranch Parkway",
@@ -688,6 +672,51 @@ const karaokeData = {
           ],
           "time": "6:30 PM - 10:30 PM",
           "description": "Second and Fourth Fridays"
+        }
+      ]
+    },
+    {
+      "id": "the-firehouse-at-the-crossover",
+      "VenueName": "The Firehouse at the Crossover",
+      "Dedicated": false,
+      "Address": {
+        "Street": "1717 Scottsdale Dr Suite 160",
+        "City": "Leander",
+        "State": "TX ",
+        "Zip": "78641"
+      },
+      "Timeframe": {
+        "StartDate": "2025-05-28"
+      },
+      "KJ": {
+        "Host": "",
+        "Company": "Texas Live Band Karaoke",
+        "KJsocials": {
+          "Facebook": "https://www.facebook.com/texaslbk",
+          "Instagram": "https://www.instagram.com/texaslivebandkaraoke/",
+          "Twitter": null,
+          "Website": "https://www.texaslivebandkaraoke.com/",
+          "Bluesky": null,
+          "Tiktok": null,
+          "Youtube": null
+        }
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/thefieldhousetexas/",
+        "Instagram": "https://www.instagram.com/thefieldhousetexas",
+        "Twitter": null,
+        "Website": "https://www.thefieldhousetexas.com/",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "7:00 PM - 10:00 PM"
         }
       ]
     },
@@ -736,6 +765,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "firewater-sports-bar",
       "VenueName": "Firewater Sports Bar",
       "Address": {
         "Street": "13010 W Parmer Ln STE 300",
@@ -762,6 +792,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "gnar-bar",
       "VenueName": "Gnar Bar",
       "Address": {
         "Street": "219 E 6th Street",
@@ -789,6 +820,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "hard-count-kitchen-and-cocktails",
       "VenueName": "Hard Count Kitchen & Cocktails",
       "Address": {
         "Street": "1500 Rivery Blvd Suite 2105",
@@ -816,6 +848,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "the-hive",
       "VenueName": "The Hive",
       "Address": {
         "Street": "10542 Menchaca Road",
@@ -853,6 +886,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "hudson-tavern-xpider",
       "VenueName": "Hudson Tavern",
       "Address": {
         "Street": "5000 Hudson Bend Rd Suite D",
@@ -894,6 +928,7 @@ const karaokeData = {
       "Dedicated": false
     },
     {
+      "id": "hudson-tavern-lynum",
       "VenueName": "Hudson Tavern",
       "Dedicated": false,
       "Address": {
@@ -927,6 +962,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "the-iron-bear",
       "VenueName": "The Iron Bear",
       "Dedicated": false,
       "Address": {
@@ -969,6 +1005,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "knomad-bar",
       "VenueName": "Knomad Bar",
       "Address": {
         "Street": "1213 Corona Dr.",
@@ -1005,6 +1042,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "lone-star-bar",
       "VenueName": "Lone Star Bar",
       "Address": {
         "Street": "403 FM 685",
@@ -1037,6 +1075,7 @@ const karaokeData = {
       "Dedicated": false
     },
     {
+      "id": "lt-corner-pub",
       "VenueName": "LT Corner Pub",
       "Address": {
         "Street": "1310 RR 620 S Ste B12",
@@ -1076,6 +1115,7 @@ const karaokeData = {
       "Dedicated": false
     },
     {
+      "id": "lucky-rabbit",
       "VenueName": "Lucky Rabbit",
       "Address": {
         "Street": "18626 RM 1431",
@@ -1105,135 +1145,7 @@ const karaokeData = {
       ]
     },
     {
-      "VenueName": "Lustre Pearl South",
-      "Dedicated": false,
-      "Address": {
-        "Street": "10400 Menchaca Rd",
-        "City": "Austin",
-        "State": "TX ",
-        "Zip": "78748"
-      },
-      "Timeframe": {
-        "StartDate": null,
-        "EndDate": "2025-06-27"
-      },
-      "KJ": {
-        "Host": "",
-        "Company": "Karaoke Soup",
-        "Website": "https://www.instagram.com/karaokesoup/"
-      },
-      "socials": {
-        "Facebook": null,
-        "Instagram": "https://www.instagram.com/lustre_pearl_south/",
-        "Twitter": null,
-        "Website": "https://dunlapatx.com/lustre-pearl-south/",
-        "Bluesky": null,
-        "Tiktok": null,
-        "Youtube": null
-      },
-      "schedule": [
-        {
-          "day": [
-            "every",
-            "Thursday"
-          ],
-          "time": "9:00 PM - Close"
-        }
-      ]
-    },
-    {
-      "VenueName": "Lustre Pearl South",
-      "Dedicated": false,
-      "Address": {
-        "Street": "10400 Menchaca Rd",
-        "City": "Austin",
-        "State": "TX ",
-        "Zip": "78748"
-      },
-      "Timeframe": {
-        "StartDate": "2025-05-28",
-        "EndDate": "2025-06-28"
-      },
-      "KJ": {
-        "Host": "",
-        "Company": "Texas Live Band Karaoke",
-        "KJsocials": {
-          "Facebook": "https://www.facebook.com/texaslbk",
-          "Instagram": "https://www.instagram.com/texaslivebandkaraoke/",
-          "Twitter": null,
-          "Website": "https://www.texaslivebandkaraoke.com/",
-          "Bluesky": null,
-          "Tiktok": null,
-          "Youtube": null
-        }
-      },
-      "socials": {
-        "Facebook": null,
-        "Instagram": "https://www.instagram.com/lustre_pearl_south/",
-        "Twitter": null,
-        "Website": "https://dunlapatx.com/lustre-pearl-south/",
-        "Bluesky": null,
-        "Tiktok": null,
-        "Youtube": null
-      },
-      "schedule": [
-        {
-          "day": [
-            "every",
-            "Wednesday"
-          ],
-          "time": "8:00 PM - Close",
-          "description" : "Trial Period, switching to Thursday"
-        }
-      ]
-    },
-    {
-      "VenueName": "Lustre Pearl South",
-      "Dedicated": false,
-      "Address": {
-        "Street": "10400 Menchaca Rd",
-        "City": "Austin",
-        "State": "TX ",
-        "Zip": "78748"
-      },
-      "Timeframe": {
-        "StartDate": "2025-07-03",
-        "EndDate": null
-      },
-      "KJ": {
-        "Host": "",
-        "Company": "Texas Live Band Karaoke",
-        "KJsocials": {
-          "Facebook": "https://www.facebook.com/texaslbk",
-          "Instagram": "https://www.instagram.com/texaslivebandkaraoke/",
-          "Twitter": null,
-          "Website": "https://www.texaslivebandkaraoke.com/",
-          "Bluesky": null,
-          "Tiktok": null,
-          "Youtube": null
-        }
-      },
-      "socials": {
-        "Facebook": null,
-        "Instagram": "https://www.instagram.com/lustre_pearl_south/",
-        "Twitter": null,
-        "Website": "https://dunlapatx.com/lustre-pearl-south/",
-        "Bluesky": null,
-        "Tiktok": null,
-        "Youtube": null
-      },
-      "schedule": [
-        {
-          "day": [
-            "every",
-            "Thursday"
-          ],
-          "time": "8:00 PM - 11:30 PM",
-          "description" : "New night! Now on Thursdays."
-        }
-      ]
-    },
-    {
+      "id": "manchaca-springs-saloon",
       "VenueName": "Manchaca Springs Saloon",
       "Dedicated": false,
       "Address": {
@@ -1267,6 +1179,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "la-marea",
       "VenueName": "La Marea",
       "Address": {
         "Street": "116 E Parsons St",
@@ -1301,6 +1214,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "marios-seafood",
       "VenueName": "Mario's Seafood",
       "Address": {
         "Street": "522 N I-35 Frontage Rd Bld. C",
@@ -1329,6 +1243,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "meridian-buda",
       "VenueName": "Meridian Buda",
       "Address": {
         "Street": "200 N. Main St.",
@@ -1375,6 +1290,7 @@ const karaokeData = {
       "Dedicated": false
     },
     {
+      "id": "the-mill",
       "VenueName": "The Mill",
       "Dedicated": false,
       "Address": {
@@ -1420,6 +1336,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "millies-on-main",
       "VenueName": "Millie's on Main",
       "Address": {
         "Street": "212 N Main St",
@@ -1449,44 +1366,8 @@ const karaokeData = {
       ]
     },
     {
-      "VenueName": "Oak Hill Social",
-      "Address": {
-        "Street": "8600 US-290",
-        "City": "Austin",
-        "State": "TX",
-        "Zip": "78736"
-      },
-      "KJ": {
-        "Host": "KJ Average Joe",
-        "Company": "Starling Karaoke",
-        "KJsocials": {
-          "Facebook": "https://www.facebook.com/starlingkaraoke",
-          "Tiktok": "https://www.tiktok.com/@starlingkaraoke",
-          "Instagram": "https://www.instagram.com/starling_karaoke",
-          "Website": "https://www.starlingkaraoke.com/"
-        }
-      },
-      "socials": {
-        "Facebook": "https://www.facebook.com/people/Oak-Hill-Social/61552863291533/",
-        "Instagram": "https://www.instagram.com/oakhillsocial",
-        "Website": "https://www.oakhillsocial.com/"
-      },
-      "Timeframe": {
-        "StartDate": "2025-06-10",
-        "EndDate": "2025-07-08"
-      },
-      "schedule": [
-        {
-          "day": [
-            "every",
-            "Wednesday"
-          ],
-          "time": "6:00 PM - 9:00 PM"
-        }
-      ]
-    },
-        {
-      "VenueName": "Oak Hill Social",
+      "id": "oak-hill-social",
+          "VenueName": "Oak Hill Social",
       "Address": {
         "Street": "8600 US-290",
         "City": "Austin",
@@ -1523,6 +1404,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "pfluttos-tavern-2",
       "VenueName": "Pflutto's Tavern #2",
       "Address": {
         "Street": "101 Limmer Loop",
@@ -1548,6 +1430,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "pizzaria-sportiva",
       "VenueName": "Pizzeria Sportiva",
       "Address": {
         "Street": "1500 S Lamar Blvd ste 120",
@@ -1585,6 +1468,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "rabbit-hole-cedarpark",
       "VenueName": "Rabbit Hole (Cedar Park)",
       "Address": {
         "Street": "13920 Ronald Reagan Blvd STE 202",
@@ -1613,6 +1497,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "rabbit-hole-leander",
       "VenueName": "Rabbit Hole (Leander)",
       "Address": {
         "Street": "2082 US HWY 183 SUITE 145",
@@ -1641,6 +1526,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "randys-ice-house",
       "VenueName": "Randy's Ice House",
       "Dedicated": false,
       "Address": {
@@ -1689,6 +1575,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "railhouse-bar",
       "VenueName": "Railhouse Bar",
       "Dedicated": false,
       "Address": {
@@ -1727,6 +1614,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "red-rooters-pub-and-grub",
       "VenueName": "Red Rooster's Pub and Grub",
       "Dedicated": true,
       "Address": {
@@ -1798,6 +1686,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "round-rock-tavern",
       "VenueName": "Round Rock Tavern",
       "Address": {
         "Street": "113 West Main Street",
@@ -1833,6 +1722,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "shooters-cedar-park",
       "VenueName": "Shooters (Cedar Park)",
       "Dedicated": false,
       "Address": {
@@ -1865,6 +1755,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "topspin-austin",
       "VenueName": "TopSpin Austin",
       "Dedicated": true,
       "Address": {
@@ -1946,6 +1837,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "water-hole-71",
       "VenueName": "Water Hole 71",
       "Address": {
         "Street": "5244 E Hwy 71",
@@ -1969,7 +1861,8 @@ const karaokeData = {
       ]
     },
 {
-      "VenueName": "Whiskey Girls Saloon, The",
+      "id": "the-whiskey-girls-saloon",
+  "VenueName": "The Whiskey Girls Saloon",
       "Address": {
         "Street": "13700 FM 973, Bldg A",
         "City": "Manor",
@@ -1997,6 +1890,7 @@ const karaokeData = {
       ]
     },
     {
+      "id": "wildflower-corks-and-brew",
       "VenueName": "Wildflower Corks & Brew",
       "Dedicated": false,
       "Address": {
