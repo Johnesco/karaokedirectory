@@ -1,7 +1,6 @@
 // ======================
 // SECURITY UTILITIES
 // ======================
-// Escape HTML special characters to prevent XSS
 function escapeHtml(unsafe) {
   if (typeof unsafe !== 'string') return unsafe;
   return unsafe
@@ -12,7 +11,6 @@ function escapeHtml(unsafe) {
     .replace(/'/g, "&#039;");
 }
 
-// Sanitize URLs to prevent javascript: and other dangerous protocols
 function sanitizeUrl(url) {
   if (!url) return '';
   try {
@@ -27,97 +25,19 @@ function sanitizeUrl(url) {
 }
 
 // ======================
-// CONSTANTS & CONFIG
+// CONSTANTS & STATE
 // ======================
 const TODAY = new Date().toDateString();
-let currentWeekStart = new Date(); //Start of week is always "today"
+let currentWeekStart = new Date();
 let showDedicated = true;
 
 // ======================
-// HELPER FUNCTIONS
+// HELPERS
 // ======================
-const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
-
+const capitalizeFirstLetter = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 const getDayName = (date) => date.toLocaleDateString("en-US", { weekday: "long" });
-
 const formatDateShort = (date) => date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-
 const isCurrentDay = (date) => date.toDateString() === TODAY;
-
-// ======================
-// MODAL FUNCTIONS
-// ======================
-function showVenueDetails(venue) {
-  const modal = document.getElementById("venue-modal");
-  const venueName = document.getElementById("modal-venue-name");
-  const venueInfo = document.getElementById("modal-venue-info");
-
-  venueName.textContent = venue.VenueName;
-  venueInfo.innerHTML = DOMPurify.sanitize(createModalContent(venue));
-  modal.style.display = "block";
-
-  setupModalEventListeners(modal);
-}
-
-function createModalContent(venue) {
-  return `
-    <div class="modal-venue">
-      <strong>Address:</strong><br>
-      <div class="venue-address">
-        <a href="${escapeHtml(createMapLink(venue))}" target="_blank" rel="noopener noreferrer" title="View on Google Maps">
-          ${escapeHtml(venue.Address.Street)}<br>
-          ${escapeHtml(venue.Address.City)} ${escapeHtml(venue.Address.State)}, ${escapeHtml(venue.Address.Zip)}  
-        </a>
-      </div>
-      <div class="modal-schedule">
-        <strong>Schedule:</strong>
-        ${createScheduleList(venue.schedule)}
-      </div>
-      <div><strong>Venue Social Media:</strong><br>
-        ${createSocialLinks(venue)}
-      </div>  
-    </div>
-    <div class="modal-kj">
-      <hr>
-      <strong>Karaoke Info:</strong><br>
-      ${venue.KJ.Company ? `<strong>Hosted By: </strong>${escapeHtml(venue.KJ.Company)}<br>` : ""}
-      ${venue.KJ.Host ? `<strong>KJ:</strong> ${escapeHtml(venue.KJ.Host)}<br>` : ""}
-      ${venue.KJ.Website ? `<a href="${escapeHtml(sanitizeUrl(venue.KJ.Website))}" target="_blank" rel="noopener noreferrer">${escapeHtml(venue.KJ.Website)}</a>` : ""}
-      ${venue.KJ.KJsocials ? `<strong>Karaoke Social Media:</strong><br>${createSocialLinks({ socials: venue.KJ.KJsocials })}` : ""}
-    </div>
-  `;
-}
-
-function createScheduleList(schedule) {
-  if (schedule.length === 0) return "";
-
-  const items = schedule.map((event) => {
-    const [cadence, day] = event.day;
-    const pluralDay = cadence === "every" ? day : `${day}s`;
-    return `<li class="modal-schedule-item">${escapeHtml(capitalizeFirstLetter(cadence))} ${escapeHtml(pluralDay)}: ${escapeHtml(event.time)}</li>`;
-  });
-
-  return `<ul>${items.join("")}</ul>`;
-}
-
-function setupModalEventListeners(modal) {
-  document.querySelector(".close-modal").addEventListener('click', () => {
-    modal.style.display = "none";
-  });
-
-  modal.addEventListener("click", function(e) {
-    if (e.target === this) {
-      modal.style.display = "none";
-    }
-  });
-}
-
-// ======================
-// DATE UTILITIES
-// ======================
-function updateWeekDisplay() {
-  document.getElementById("week-display").textContent = formatWeekRange(currentWeekStart);
-}
 
 function formatWeekRange(startDate) {
   const endDate = new Date(startDate);
@@ -125,6 +45,52 @@ function formatWeekRange(startDate) {
   return `Viewing: ${formatDateShort(startDate)} - ${formatDateShort(endDate)} ${endDate.getFullYear()}`;
 }
 
+function createMapLink(venue) {
+  const address = `${venue.VenueName} ${venue.Address.Street}, ${venue.Address.City} ${venue.Address.State} ${venue.Address.Zip}`;
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+}
+
+function createSocialLinks(item) {
+  const socialsObj = item.socials || item;
+  const socialPlatforms = {
+    Facebook: { icon: "fa-brands fa-facebook", title: "Facebook" },
+    Instagram: { icon: "fa-brands fa-instagram", title: "Instagram" },
+    Bluesky: { icon: "fa-solid fa-b", title: "Bluesky" },
+    Tiktok: { icon: "fa-brands fa-tiktok", title: "TikTok" },
+    Twitter: { icon: "fa-brands fa-twitter", title: "Twitter" },
+    Youtube: { icon: "fa-brands fa-youtube", title: "YouTube" },
+    Website: { icon: "fa-solid fa-globe", title: "Website" }
+  };
+
+  const links = [];
+
+  if (item.Address) {
+    links.push(`
+      <a href="${escapeHtml(createMapLink(item))}" target="_blank" rel="noopener noreferrer" title="View on Google Maps">
+        <i class="fas fa-map-marker-alt"></i>
+      </a>
+    `);
+  }
+
+  for (const [platform, info] of Object.entries(socialPlatforms)) {
+    if (socialsObj[platform]) {
+      const safeUrl = sanitizeUrl(socialsObj[platform]);
+      if (safeUrl) {
+        links.push(`
+          <a href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(info.title)}">
+            <i class="${escapeHtml(info.icon)}"></i>
+          </a>
+        `);
+      }
+    }
+  }
+
+  return `<div class="social-links">${links.join('')}</div>`;
+}
+
+// ======================
+// DATE & SCHEDULE LOGIC
+// ======================
 function isOrdinalDate(date, ordinal, dayName) {
   if (!(date instanceof Date) || isNaN(date.getTime())) return false;
 
@@ -140,6 +106,7 @@ function isOrdinalDate(date, ordinal, dayName) {
   const month = date.getMonth();
   const day = date.getDate();
 
+  // Get all occurrences of dayName in this month
   const occurrences = [];
   const firstDay = new Date(year, month, 1);
   const firstDayOfWeek = firstDay.getDay();
@@ -157,14 +124,12 @@ function isOrdinalDate(date, ordinal, dayName) {
   return ordinalIndex < occurrences.length && day === occurrences[ordinalIndex];
 }
 
-// ======================
-// VENUE UTILITIES
-// ======================
 function hasKaraokeOnDate(venue, date) {
   const dayName = getDayName(date);
 
   for (const event of venue.schedule) {
     const [ordinal, ordinalDay] = event.day;
+    // Add default description if missing
     event.description = event.description || `${capitalizeFirstLetter(ordinal)} ${ordinalDay}`;
 
     if (ordinalDay === dayName && isOrdinalDate(date, ordinal, ordinalDay)) {
@@ -180,70 +145,21 @@ function hasKaraokeOnDate(venue, date) {
   return { hasEvent: false };
 }
 
-function createMapLink(venue) {
-  const address = `${venue.VenueName} ${venue.Address.Street}, ${venue.Address.City} ${venue.Address.State} ${venue.Address.Zip}`;
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
-}
-
-function formatAddress(venue) {
-  return `${venue.Address.Street} ${venue.Address.City}, ${venue.Address.State}, ${venue.Address.Zip}`;
-}
-
-function createSocialLinks(item) {
-  const socialsObj = item.socials || item;
-  const socialPlatforms = {
-    Facebook: { icon: "fa-brands fa-facebook", title: "Facebook" },
-    Instagram: { icon: "fa-brands fa-instagram", title: "Instagram" },
-    Bluesky: { icon: "fa-solid fa-b", title: "Bluesky" },
-    Tiktok: { icon: "fa-brands fa-tiktok", title: "TikTok" },
-    Twitter: { icon: "fa-brands fa-twitter", title: "Twitter" },
-    Youtube: { icon: "fa-brands fa-youtube", title: "YouTube" },
-    Website: { icon: "fa-solid fa-globe", title: "Website" }
-  };
-
-  const socials = [];
-
-  if (item.Address) {
-    socials.push(
-      `<a href="${escapeHtml(createMapLink(item))}" target="_blank" rel="noopener noreferrer" title="View on Google Maps">
-        <i class="fas fa-map-marker-alt"></i>
-      </a>`
-    );
-  }
-
-  for (const [platform, info] of Object.entries(socialPlatforms)) {
-    if (socialsObj[platform]) {
-      const safeUrl = sanitizeUrl(socialsObj[platform]);
-      if (safeUrl) {
-        socials.push(
-          `<a href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(info.title)}">
-            <i class="${escapeHtml(info.icon)}"></i>
-          </a>`
-        );
-      }
-    }
-  }
-
-  return `<div class="social-links">${socials.join("")}</div>`;
-}
-
 // ======================
 // DOM RENDERING
 // ======================
+function updateWeekDisplay() {
+  document.getElementById("week-display").textContent = formatWeekRange(currentWeekStart);
+}
+
+function clearScheduleContainer() {
+  const container = document.getElementById("schedule-container");
+  container.innerHTML = '';
+}
+
 function renderWeek() {
   updateWeekDisplay();
-  clearContainer();
-  renderAllDays();
-}
-
-function clearContainer() {
-  const container = document.getElementById("schedule-container");
-  while (container.firstChild) {
-    container.removeChild(container.firstChild);
-  }
-}
-
-function renderAllDays() {
+  clearScheduleContainer();
   for (let i = 0; i < 7; i++) {
     const date = new Date(currentWeekStart);
     date.setDate(date.getDate() + i);
@@ -256,36 +172,27 @@ function getVenuesForDate(date) {
   const getSortableName = (name) => {
     const articles = ["the ", "a ", "an ", "la ", "el ", "le "];
     const lowerName = name.toLowerCase();
-    const article = articles.find((a) => lowerName.startsWith(a));
+    const article = articles.find(a => lowerName.startsWith(a));
     return article ? name.slice(article.length) : name;
   };
 
   return karaokeData.listings
-    .map((venue) => {
+    .map(venue => {
       const { hasEvent, timeInfo } = hasKaraokeOnDate(venue, date);
       return hasEvent ? { ...venue, timeInfo } : null;
     })
-    .filter((venue) => {
+    .filter(venue => {
       if (!venue) return false;
-      
+
       if (!showDedicated && venue.Dedicated) return false;
-      
+
       const timeframe = venue.Timeframe;
       if (timeframe) {
-        const renderDate = date instanceof Date ? date.toISOString().split('T')[0] : date;
-        
-        if (!timeframe.StartDate && timeframe.EndDate) {
-          if (renderDate > timeframe.EndDate) return false;
-        }
-        else if (timeframe.StartDate && !timeframe.EndDate) {
-          if (renderDate < timeframe.StartDate) return false;
-        }
-        else if (timeframe.StartDate && timeframe.EndDate) {
-          if (renderDate < timeframe.StartDate) return false;
-          if (renderDate > timeframe.EndDate) return false;
-        }
+        const renderDate = date.toISOString().split('T')[0];
+
+        if (timeframe.StartDate && renderDate < timeframe.StartDate) return false;
+        if (timeframe.EndDate && renderDate > timeframe.EndDate) return false;
       }
-      
       return true;
     })
     .sort((a, b) => getSortableName(a.VenueName).localeCompare(getSortableName(b.VenueName)));
@@ -294,123 +201,186 @@ function getVenuesForDate(date) {
 function createDayHTML(date, venues) {
   return `
     <div class="day-card">
-      <div class="day-header ${isCurrentDay(date) ? "today" : ""}">
+      <div class="day-header ${isCurrentDay(date) ? 'today' : ''}">
         <span>${escapeHtml(getDayName(date))}</span>
-        <span class="date-number ${isCurrentDay(date) ? "today" : ""}">
-          ${escapeHtml(formatDateShort(date))} ${isCurrentDay(date) ? "(today)" : ""}
+        <span class="date-number ${isCurrentDay(date) ? 'today' : ''}">
+          ${escapeHtml(formatDateShort(date))} ${isCurrentDay(date) ? '(today)' : ''}
         </span>
       </div>
       <div class="venue-list">
-        ${venues.length > 0 ? createVenuesList(venues) : '<div class="no-events">No karaoke venues scheduled</div>'}
+        ${venues.length ? createVenuesList(venues) : '<div class="no-events">No karaoke venues scheduled</div>'}
       </div>
     </div>
   `;
 }
 
 function createVenuesList(venues) {
-  return venues
-    .map(
-      (venue) => `
-      <div class="venue-item">
-        <div class="venue-name">${escapeHtml(venue.VenueName)}</div>
-        <div class="venue-kj">
-          ${venue.KJ.Company ? `${escapeHtml(venue.KJ.Company)}<br>` : ""}
-          ${venue.KJ.Host ? ` with ${escapeHtml(venue.KJ.Host)}` : ""}
-        </div>
-        <div class="venue-time">${escapeHtml(venue.timeInfo.time)}${
-          venue.timeInfo.description ? 
-          ` <span class="time-description"><br>(${escapeHtml(venue.timeInfo.description)})</span>` : 
-          ""
-        }</div>
-        <div class="venue-address">
-          <a href="${escapeHtml(createMapLink(venue))}" target="_blank" rel="noopener noreferrer" title="View on Google Maps">
-          ${escapeHtml(venue.Address.Street)}<br>
-          ${escapeHtml(venue.Address.City)} ${escapeHtml(venue.Address.State)}, ${escapeHtml(venue.Address.Zip)}  
-          </a>
-        </div>
-        <button class="details-btn" data-venue='${escapeHtml(JSON.stringify(venue))}'>
-          See Details
-        </button>
+  return venues.map(venue => `
+    <div class="venue-item">
+      <div class="venue-name">${escapeHtml(venue.VenueName)}</div>
+      <div class="venue-kj">
+        ${venue.KJ.Company ? escapeHtml(venue.KJ.Company) + '<br>' : ''}
+        ${venue.KJ.Host ? `with ${escapeHtml(venue.KJ.Host)}` : ''}
       </div>
-    `
-    )
-    .join("");
+      <div class="venue-time">${escapeHtml(venue.timeInfo.time)}
+        ${venue.timeInfo.description ? `<span class="time-description"><br>(${escapeHtml(venue.timeInfo.description)})</span>` : ''}
+      </div>
+      <div class="venue-address">
+        <a href="${escapeHtml(createMapLink(venue))}" target="_blank" rel="noopener noreferrer" title="View on Google Maps">
+          ${escapeHtml(venue.Address.Street)}<br>
+          ${escapeHtml(venue.Address.City)} ${escapeHtml(venue.Address.State)}, ${escapeHtml(venue.Address.Zip)}
+        </a>
+      </div>
+      <button class="details-btn" data-id="${escapeHtml(venue.id)}">See Details</button>
+    </div>
+  `).join('');
 }
 
 function appendDayToContainer(html) {
-  document.getElementById("schedule-container").insertAdjacentHTML("beforeend", DOMPurify.sanitize(html));
+  const container = document.getElementById("schedule-container");
+  container.insertAdjacentHTML("beforeend", DOMPurify.sanitize(html));
 }
 
 // ======================
-// EVENT LISTENERS
+// MODAL LOGIC
 // ======================
-function setupEventListeners() {
-  const backToTopButton = document.getElementById("backToTop");
+function showVenueDetails(venue) {
+  const modal = document.getElementById("venue-modal");
+  const venueNameElem = document.getElementById("modal-venue-name");
+  const venueInfoElem = document.getElementById("modal-venue-info");
 
-  window.addEventListener("scroll", () => {
-    backToTopButton.classList.toggle("visible", window.pageYOffset > 300);
+  venueNameElem.textContent = venue.VenueName;
+  venueInfoElem.innerHTML = createModalContent(venue);
+
+  modal.style.display = "block";
+}
+
+function createModalContent(venue) {
+  return `
+    <div class="modal-venue">
+      <strong>Address:</strong><br>
+      <div class="venue-address">
+        <a href="${escapeHtml(createMapLink(venue))}" target="_blank" rel="noopener noreferrer" title="View on Google Maps">
+          ${escapeHtml(venue.Address.Street)}<br>
+          ${escapeHtml(venue.Address.City)} ${escapeHtml(venue.Address.State)}, ${escapeHtml(venue.Address.Zip)}
+        </a>
+      </div>
+      <div class="modal-schedule">
+        <strong>Schedule:</strong>
+        ${createScheduleList(venue.schedule)}
+      </div>
+      <div>
+        <strong>Venue Social Media:</strong><br>
+        ${createSocialLinks(venue)}
+      </div>
+    </div>
+    <div class="modal-kj">
+      <hr>
+      <strong>Karaoke Info:</strong><br>
+      ${venue.KJ.Company ? `<strong>Hosted By: </strong>${escapeHtml(venue.KJ.Company)}<br>` : ''}
+      ${venue.KJ.Host ? `<strong>KJ:</strong> ${escapeHtml(venue.KJ.Host)}<br>` : ''}
+      ${venue.KJ.Website ? `<a href="${escapeHtml(sanitizeUrl(venue.KJ.Website))}" target="_blank" rel="noopener noreferrer">${escapeHtml(venue.KJ.Website)}</a><br>` : ''}
+      ${venue.KJ.KJsocials ? `<strong>Karaoke Social Media:</strong><br>${createSocialLinks({ socials: venue.KJ.KJsocials })}` : ''}
+    </div>
+  `;
+}
+
+function createScheduleList(schedule) {
+  if (!schedule.length) return '';
+
+  const items = schedule.map(event => {
+    const [cadence, day] = event.day;
+    const pluralDay = cadence === 'every' ? day : `${day}s`;
+    return `<li class="modal-schedule-item">${escapeHtml(capitalizeFirstLetter(cadence))} ${escapeHtml(pluralDay)}: ${escapeHtml(event.time)}</li>`;
   });
 
-  backToTopButton.addEventListener("click", () => {
+  return `<ul>${items.join('')}</ul>`;
+}
+
+function setupModalEventListeners() {
+  const modal = document.getElementById("venue-modal");
+  const closeBtn = modal.querySelector(".close-modal");
+
+  // Close on click close button
+  closeBtn.addEventListener("click", () => {
+    modal.style.display = "none";
+  });
+
+  // Close on clicking outside modal content
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      modal.style.display = "none";
+    }
+  });
+
+  // Close on ESC key
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal.style.display === "block") {
+      modal.style.display = "none";
+    }
+  });
+}
+
+// ======================
+// EVENT LISTENERS & INIT
+// ======================
+function setupEventListeners() {
+  // Back to top button
+  const backToTop = document.getElementById("backToTop");
+  window.addEventListener("scroll", () => {
+    backToTop.classList.toggle("visible", window.pageYOffset > 300);
+  });
+  backToTop.addEventListener("click", () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
 
+  // Week navigation buttons
   document.getElementById("prev-week").addEventListener("click", () => {
     currentWeekStart.setDate(currentWeekStart.getDate() - 7);
     renderWeek();
   });
-
   document.getElementById("next-week").addEventListener("click", () => {
     currentWeekStart.setDate(currentWeekStart.getDate() + 7);
     renderWeek();
   });
-
   document.getElementById("this-week").addEventListener("click", () => {
     currentWeekStart = new Date();
     renderWeek();
   });
 
+  // Dedicated toggle
   document.getElementById("dedicated-toggle").addEventListener("change", (e) => {
     showDedicated = e.target.checked;
     renderWeek();
   });
 
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && document.getElementById("venue-modal").style.display === "block") {
-      document.getElementById("venue-modal").style.display = "none";
-    }
-  });
-
-  // Handle venue detail clicks
-  document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('details-btn')) {
-      try {
-        const venue = JSON.parse(e.target.dataset.venue);
+  // Venue details buttons (event delegation)
+  document.getElementById("schedule-container").addEventListener("click", (e) => {
+    if (e.target.classList.contains("details-btn")) {
+      const venueId = e.target.dataset.id;
+      const venue = karaokeData.listings.find(v => v.id === venueId);
+      if (venue) {
         showVenueDetails(venue);
-      } catch (error) {
-        console.error('Error parsing venue data:', error);
       }
     }
   });
 }
 
-// ======================
-// INITIALIZATION
-// ======================
 function init() {
   if (typeof DOMPurify !== 'object') {
     const script = document.createElement('script');
     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.5/purify.min.js';
     script.onload = () => {
+      setupModalEventListeners();
       setupEventListeners();
       renderWeek();
     };
     document.head.appendChild(script);
   } else {
+    setupModalEventListeners();
     setupEventListeners();
     renderWeek();
   }
 }
 
-// Start the application
 init();
