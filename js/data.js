@@ -380,7 +380,8 @@ const karaokeData = {
           "time": "8:00 PM - 11:00PM"
         }
       ]
-    }, {
+    },
+    {
       "id": "cheerz",
       "VenueName": "Cheerz",
       "Address": {
@@ -671,51 +672,6 @@ const karaokeData = {
           ],
           "time": "6:30 PM - 10:30 PM",
           "description": "Second and Fourth Fridays"
-        }
-      ]
-    },
-    {
-      "id": "the-firehouse-at-the-crossover",
-      "VenueName": "The Firehouse at the Crossover",
-      "Dedicated": false,
-      "Address": {
-        "Street": "1717 Scottsdale Dr Suite 160",
-        "City": "Leander",
-        "State": "TX ",
-        "Zip": "78641"
-      },
-      "Timeframe": {
-        "StartDate": "2025-05-28"
-      },
-      "KJ": {
-        "Host": "",
-        "Company": "Texas Live Band Karaoke",
-        "KJsocials": {
-          "Facebook": "https://www.facebook.com/texaslbk",
-          "Instagram": "https://www.instagram.com/texaslivebandkaraoke/",
-          "Twitter": null,
-          "Website": "https://www.texaslivebandkaraoke.com/",
-          "Bluesky": null,
-          "Tiktok": null,
-          "Youtube": null
-        }
-      },
-      "socials": {
-        "Facebook": "https://www.facebook.com/thefieldhousetexas/",
-        "Instagram": "https://www.instagram.com/thefieldhousetexas",
-        "Twitter": null,
-        "Website": "https://www.thefieldhousetexas.com/",
-        "Bluesky": null,
-        "Tiktok": null,
-        "Youtube": null
-      },
-      "schedule": [
-        {
-          "day": [
-            "every",
-            "Wednesday"
-          ],
-          "time": "7:00 PM - 10:00 PM"
         }
       ]
     },
@@ -1113,7 +1069,7 @@ const karaokeData = {
       ],
       "Dedicated": false
     },
-      {
+    {
       "id": "lucky-rabbit",
       "VenueName": "Lucky Rabbit",
       "Address": {
@@ -1366,7 +1322,7 @@ const karaokeData = {
     },
     {
       "id": "oak-hill-social",
-          "VenueName": "Oak Hill Social",
+      "VenueName": "Oak Hill Social",
       "Address": {
         "Street": "8600 US-290",
         "City": "Austin",
@@ -1448,13 +1404,13 @@ const karaokeData = {
         }
       },
       "socials": {
-          "Facebook": "https://www.facebook.com/people/Pizzeria-sportia/",
-          "Instagram": "https://www.instagram.com/pizzeria_sportiva/",
+        "Facebook": "https://www.facebook.com/people/Pizzeria-sportia/",
+        "Instagram": "https://www.instagram.com/pizzeria_sportiva/",
         "Website": "https://www.pizzeriasportiva.com/"
       },
       "Timeframe": {
         "StartDate": "2025-07-15",
-        "EndDate": null,
+        "EndDate": null
       },
       "schedule": [
         {
@@ -1861,7 +1817,7 @@ const karaokeData = {
     },
     {
       "id": "the-whiskey-girls-saloon",
-  "VenueName": "The Whiskey Girls Saloon",
+      "VenueName": "The Whiskey Girls Saloon",
       "Address": {
         "Street": "13700 FM 973, Bldg A",
         "City": "Manor",
@@ -1935,4 +1891,4 @@ const karaokeData = {
       ]
     }
   ]
-};;
+};
