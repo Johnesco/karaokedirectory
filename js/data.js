@@ -635,7 +635,7 @@ const karaokeData = {
         Zip: "78701"
       },
       KJ: {
-        Host: "Xpider",
+        Host: "",
         Company: ""
       },
       socials: {
@@ -646,7 +646,7 @@ const karaokeData = {
       schedule: [
         {
           day: ["every", "Sunday"],
-          time: "9:00 PM - Close"
+          time: "9:00 PM - 2:00 AM"
         }
       ]
     },
