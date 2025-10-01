@@ -38,6 +38,7 @@ const sanitizeUrl = (url) => {
 const TODAY = new Date().toDateString();
 let currentWeekStart = new Date();
 let showDedicated = true;
+let currentView = 'weekly'; // 'weekly' or 'alphabetical'
 
 // ======================
 // DATE & STRING HELPERS
@@ -224,15 +225,8 @@ const hasKaraokeOnDate = (venue, date) => {
 };
 
 // ======================
-// DOM RENDERING
+// DOM RENDERING - WEEKLY VIEW
 // ======================
-
-/**
- * Updates the week range display text on the page.
- */
-const updateWeekDisplay = () => {
-  document.getElementById("week-display").textContent = formatWeekRange(currentWeekStart);
-};
 
 /**
  * Clears the schedule container element's contents.
@@ -325,7 +319,6 @@ const getVenuesForDate = (date) => karaokeData.listings
  * Renders the current week's schedule in the DOM.
  */
 const renderWeek = () => {
-  updateWeekDisplay();
   clearScheduleContainer();
   for (let i = 0; i < 7; i++) {
     const date = new Date(currentWeekStart);
@@ -336,7 +329,7 @@ const renderWeek = () => {
 };
 
 // ======================
-// MODAL LOGIC
+// DOM RENDERING - ALPHABETICAL VIEW
 // ======================
 
 /**
@@ -355,6 +348,141 @@ const createScheduleList = (schedule) => {
 
   return `<ul>${items.join('')}</ul>`;
 };
+
+/**
+ * Creates HTML string for a single venue card with all information.
+ * @param {object} venue - Venue object.
+ * @returns {string} HTML string for the venue card.
+ */
+const createVenueHTML = (venue) => `
+  <div class="day-card">
+    <div class="day-header">
+      <span>${escapeHtml(venue.VenueName)}</span>
+      ${venue.Dedicated ? '<span class="date-number">Dedicated Venue</span>' : ''}
+    </div>
+    <div class="venue-list">
+      <div class="venue-item">
+        <div class="venue-address">
+          <strong>Address:</strong><br>
+          <a href="${escapeHtml(createMapLink(venue))}" target="_blank" rel="noopener noreferrer" title="View on Google Maps">
+            ${escapeHtml(venue.Address.Street)}<br>
+            ${escapeHtml(venue.Address.City)} ${escapeHtml(venue.Address.State)}, ${escapeHtml(venue.Address.Zip)}
+          </a>
+        </div>
+        
+        <div class="venue-time">
+          <strong>Schedule:</strong>
+          ${createScheduleList(venue.schedule)}
+        </div>
+        
+        <div class="venue-kj">
+          <strong>Karaoke Host:</strong><br>
+          ${venue.KJ.Company ? `<strong>Company: </strong>${escapeHtml(venue.KJ.Company)}<br>` : ''}
+          ${venue.KJ.Host ? `<strong>KJ: </strong>${escapeHtml(venue.KJ.Host)}<br>` : ''}
+          ${venue.KJ.Website ? `<strong>Website: </strong><a href="${escapeHtml(sanitizeUrl(venue.KJ.Website))}" target="_blank" rel="noopener noreferrer">${escapeHtml(venue.KJ.Website)}</a><br>` : ''}
+        </div>
+        
+        <div>
+          <strong>Venue Social Media:</strong><br>
+          ${createSocialLinks(venue)}
+        </div>
+        
+        ${venue.KJ.KJsocials ? `
+          <div style="margin-top: 10px;">
+            <strong>KJ Social Media:</strong><br>
+            ${createSocialLinks({ socials: venue.KJ.KJsocials })}
+          </div>
+        ` : ''}
+      </div>
+    </div>
+  </div>
+`;
+
+/**
+ * Gets all venues sorted alphabetically, applying filters.
+ * @returns {Array} Filtered and sorted list of venues.
+ */
+const getAllVenues = () => karaokeData.listings
+  .filter(venue => {
+    if (!showDedicated && venue.Dedicated) return false;
+    
+    // Check timeframe if it exists
+    const timeframe = venue.Timeframe;
+    if (timeframe) {
+      const today = new Date().toISOString().split('T')[0];
+      if (timeframe.StartDate && today < timeframe.StartDate) return false;
+      if (timeframe.EndDate && today > timeframe.EndDate) return false;
+    }
+    
+    return true;
+  })
+  .sort((a, b) => getSortableName(a.VenueName).localeCompare(getSortableName(b.VenueName)));
+
+/**
+ * Renders all venues in alphabetical order in the DOM.
+ */
+const renderAllVenues = () => {
+  clearScheduleContainer();
+  
+  const venues = getAllVenues();
+  
+  if (venues.length === 0) {
+    appendDayToContainer(`
+      <div class="day-card">
+        <div class="day-header">
+          <span>No Venues Found</span>
+        </div>
+        <div class="venue-list">
+          <div class="venue-item">
+            <div class="no-events">No venues found matching your criteria.</div>
+          </div>
+        </div>
+      </div>
+    `);
+    return;
+  }
+  
+  venues.forEach(venue => {
+    appendDayToContainer(createVenueHTML(venue));
+  });
+};
+
+// ======================
+// VIEW MANAGEMENT
+// ======================
+
+/**
+ * Updates the UI based on current view
+ */
+const updateViewDisplay = () => {
+  const weekDisplay = document.getElementById("week-display");
+  const controlsContainer = document.querySelector('.controls-container');
+  
+  if (currentView === 'weekly') {
+    weekDisplay.textContent = formatWeekRange(currentWeekStart);
+    controlsContainer.style.display = 'flex';
+  } else {
+    weekDisplay.textContent = 'Alphabetical Listing - All Venues';
+    controlsContainer.style.display = 'none';
+  }
+};
+
+/**
+ * Renders the appropriate view based on current state
+ */
+const renderCurrentView = () => {
+  if (currentView === 'weekly') {
+    renderWeek();
+  } else {
+    renderAllVenues();
+  }
+  updateViewDisplay();
+  updateViewToggleButtons();
+};
+
+// ======================
+// MODAL LOGIC
+// ======================
 
 /**
  * Builds the modal content HTML for a venue.
@@ -451,21 +579,21 @@ const setupEventListeners = () => {
   // Week navigation buttons
   document.getElementById("prev-week").addEventListener("click", () => {
     currentWeekStart.setDate(currentWeekStart.getDate() - 7);
-    renderWeek();
+    renderCurrentView();
   });
   document.getElementById("next-week").addEventListener("click", () => {
     currentWeekStart.setDate(currentWeekStart.getDate() + 7);
-    renderWeek();
+    renderCurrentView();
   });
   document.getElementById("this-week").addEventListener("click", () => {
     currentWeekStart = new Date();
-    renderWeek();
+    renderCurrentView();
   });
 
   // Dedicated venues toggle checkbox
   document.getElementById("dedicated-toggle").addEventListener("change", (e) => {
     showDedicated = e.target.checked;
-    renderWeek();
+    renderCurrentView();
   });
 
   // Venue details buttons (delegated event listener)
@@ -478,25 +606,92 @@ const setupEventListeners = () => {
       }
     }
   });
+
+  // View toggle buttons
+  document.getElementById("view-toggle-weekly").addEventListener("click", () => {
+    currentView = 'weekly';
+    renderCurrentView();
+  });
+  
+  document.getElementById("view-toggle-alphabetical").addEventListener("click", () => {
+    currentView = 'alphabetical';
+    renderCurrentView();
+  });
 };
 
 /**
- * Initializes the app: loads DOMPurify if needed, sets up event listeners, renders the initial week.
+ * Creates and adds view toggle buttons to the controls
+ */
+const addViewToggleButtons = () => {
+  const controlsContainer = document.querySelector('.controls-container');
+  
+  // Create view toggle container
+  const viewToggleContainer = document.createElement('div');
+  viewToggleContainer.className = 'view-toggle-container';
+  viewToggleContainer.style.display = 'flex';
+  viewToggleContainer.style.gap = '10px';
+  viewToggleContainer.style.marginBottom = '15px';
+  viewToggleContainer.style.justifyContent = 'center';
+  
+  // Create toggle buttons
+  const weeklyButton = document.createElement('button');
+  weeklyButton.id = 'view-toggle-weekly';
+  weeklyButton.textContent = 'Weekly View';
+  weeklyButton.title = 'Show venues by week';
+  
+  const alphabeticalButton = document.createElement('button');
+  alphabeticalButton.id = 'view-toggle-alphabetical';
+  alphabeticalButton.textContent = 'Alphabetical View';
+  alphabeticalButton.title = 'Show all venues in alphabetical order';
+  
+  viewToggleContainer.appendChild(weeklyButton);
+  viewToggleContainer.appendChild(alphabeticalButton);
+  
+  // Insert before the week navigation controls
+  controlsContainer.parentNode.insertBefore(viewToggleContainer, controlsContainer);
+};
+
+/**
+ * Updates active state of view toggle buttons
+ */
+const updateViewToggleButtons = () => {
+  const weeklyBtn = document.getElementById('view-toggle-weekly');
+  const alphabeticalBtn = document.getElementById('view-toggle-alphabetical');
+  
+  if (weeklyBtn && alphabeticalBtn) {
+    if (currentView === 'weekly') {
+      weeklyBtn.style.backgroundColor = '#f72a2a';
+      weeklyBtn.style.color = 'white';
+      alphabeticalBtn.style.backgroundColor = '#2f40d3';
+      alphabeticalBtn.style.color = 'white';
+    } else {
+      weeklyBtn.style.backgroundColor = '#2f40d3';
+      weeklyBtn.style.color = 'white';
+      alphabeticalBtn.style.backgroundColor = '#f72a2a';
+      alphabeticalBtn.style.color = 'white';
+    }
+  }
+};
+
+/**
+ * Initializes the app: loads DOMPurify if needed, sets up event listeners, renders the initial view.
  */
 const init = () => {
+  addViewToggleButtons();
+  
   if (typeof DOMPurify !== 'object') {
     const script = document.createElement('script');
     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.5/purify.min.js';
     script.onload = () => {
       setupModalEventListeners();
       setupEventListeners();
-      renderWeek();
+      renderCurrentView();
     };
     document.head.appendChild(script);
   } else {
     setupModalEventListeners();
     setupEventListeners();
-    renderWeek();
+    renderCurrentView();
   }
 };
 
