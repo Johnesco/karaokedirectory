@@ -1207,6 +1207,42 @@ const karaokeData = {
       ]
     },
     {
+      id: "punch-bowl-social-domain",
+      VenueName: "Punch Bowl Social (Domain)",
+      Address: {
+        Street: "11310 Domain Dr. STE 100",
+        City: "Austin",
+        State: "TX",
+        Zip: "78758"
+      },
+      Timeframe: {
+        StartDate: "2025-10-17",
+        EndDate: null
+      },
+      KJ: {
+        Host: "Average Joe",
+        Company: "Starling Karaoke",
+        KJsocials: {
+          Facebook: "https://www.facebook.com/starlingkaraoke",
+          Tiktok: "https://www.tiktok.com/@starlingkaraoke",
+          Instagram: "https://www.instagram.com/starling_karaoke",
+          Website: "https://www.starlingkaraoke.com/"
+        },
+      },
+      socials: {
+        Facebook: "https://www.facebook.com/punchbowlsocial/",
+        Instagram: "https://www.instagram.com/punchbowlsocial",
+        Website: "https://punchbowlsocial.com/location/austin-domain-texas/",
+        Tiktok: "https://www.tiktok.com/@punchbowlsocial"
+      },
+      schedule: [
+        {
+          day: ["every", "Friday"],
+          time: "9:00 PM - MIDNIGHT"
+        }
+      ]
+    },
+    {
       id: "rabbit-hole-cedarpark",
       VenueName: "Rabbit Hole (Cedar Park)",
       Address: {
