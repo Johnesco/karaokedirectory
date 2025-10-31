@@ -1341,7 +1341,7 @@ const karaokeData = {
       },
       "KJ": {
         "Host": "DJ P'Nasty",
-        "Company": "",
+        "Company": "Karaoke Under the Moon",
         "KJsocials": {
           "Facebook": "https://www.facebook.com/p/DJ-PNasty-100094228107834/",
           "Instagram": null,
@@ -1893,6 +1893,46 @@ const karaokeData = {
             "Tuesday"
           ],
           "time": "8:00 PM - MIDNIGHT"
+        }
+      ]
+    },
+     {
+      "id": "willies-joint",
+      "VenueName": "Willie's Joint",
+      "Dedicated": false,
+      "Address": {
+        "Street": "824 Main St",
+        "City": "Buda",
+        "State": "TX",
+        "Zip": "78610"
+      },
+      "KJ": {
+        "Host": "Kim",
+        "Company": "Smart Ass Entertainment",
+        "EventName": "Kowpoke Karaoke",
+        "KJsocials": {
+          "Facebook": "https://www.facebook.com/smartassentertainments/",
+          "Instagram": "https://www.instagram.com/smartassentertainment",
+          "Twitter": null,
+          "Website": "https://smartassentertainment.com/",
+          "Bluesky": null,
+          "Tiktok": null,
+          "Youtube": "https://www.youtube.com/@SmartAssEntertainment"
+        }
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/williesjoint/",
+        "Instagram": "https://www.instagram.com/williesjoint",
+        "Website": "https://williesjoint.com/",
+        "Bluesky": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Friday"
+          ],
+          "time": "8:00 PM - CLOSE"
         }
       ]
     },
