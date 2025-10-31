@@ -267,6 +267,52 @@ const karaokeData = {
       ]
     },
     {
+      "id": "cjs-sports-bar",
+      "VenueName": "CJ's Sports Bar",
+      "Address": {
+        "Street": "1010 N Austin Ave",
+        "City": "Georgetown",
+        "State": "TX",
+        "Zip": "78626"
+      },
+      "KJ": {
+        "Host": "",
+        "Company": ""
+      },
+      "socials": {
+        "Facebook": null,
+        "Instagram": null,
+        "Website": null,
+        "Bluesky": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "6:30 PM - 10:30 PM",
+          "description": "Every Wednesday and Second and Fourth Fridays"
+        },
+        {
+          "day": [
+            "second",
+            "Friday"
+          ],
+          "time": "7:00 PM - 11:00 PM",
+          "description": "Every Wednesday and Second and Fourth Fridays"
+        },
+        {
+          "day": [
+            "fourth",
+            "Friday"
+          ],
+          "time": "7:00 PM - 11:00 PM",
+          "description": "Every Wednesday and Second and Fourth Fridays"
+        }
+      ]
+    },
+    {
       "id": "canary-roost",
       "VenueName": "Canary Roost",
       "Dedicated": true,
@@ -409,52 +455,6 @@ const karaokeData = {
             "Saturday"
           ],
           "time": "9:00 PM - 1:00 AM"
-        }
-      ]
-    },
-    {
-      "id": "cjs-sports-bar",
-      "VenueName": "CJ's Sports Bar",
-      "Address": {
-        "Street": "1010 N Austin Ave",
-        "City": "Georgetown",
-        "State": "TX",
-        "Zip": "78626"
-      },
-      "KJ": {
-        "Host": "",
-        "Company": ""
-      },
-      "socials": {
-        "Facebook": null,
-        "Instagram": null,
-        "Website": null,
-        "Bluesky": null
-      },
-      "schedule": [
-        {
-          "day": [
-            "every",
-            "Wednesday"
-          ],
-          "time": "6:30 PM - 10:30 PM",
-          "description": "Every Wednesday and Second and Fourth Fridays"
-        },
-        {
-          "day": [
-            "second",
-            "Friday"
-          ],
-          "time": "7:00 PM - 11:00 PM",
-          "description": "Every Wednesday and Second and Fourth Fridays"
-        },
-        {
-          "day": [
-            "fourth",
-            "Friday"
-          ],
-          "time": "7:00 PM - 11:00 PM",
-          "description": "Every Wednesday and Second and Fourth Fridays"
         }
       ]
     },
@@ -637,44 +637,6 @@ const karaokeData = {
       ]
     },
     {
-      "id": "film-alley",
-      "VenueName": "Film Alley",
-      "Address": {
-        "Street": "420 Wolf Ranch Parkway",
-        "City": "Georgetown",
-        "State": "TX",
-        "Zip": "78628"
-      },
-      "KJ": {
-        "Host": "",
-        "Company": ""
-      },
-      "socials": {
-        "Facebook": "https://www.facebook.com/CityLightsGeorgetownTX",
-        "Instagram": null,
-        "Website": "https://georgetown.filmalley.net/",
-        "Bluesky": null
-      },
-      "schedule": [
-        {
-          "day": [
-            "second",
-            "Thursday"
-          ],
-          "time": "6:30 PM - ??? PM",
-          "description": "Second and Fourth Fridays"
-        },
-        {
-          "day": [
-            "fourth",
-            "Thursday"
-          ],
-          "time": "6:30 PM - 10:30 PM",
-          "description": "Second and Fourth Fridays"
-        }
-      ]
-    },
-    {
       "VenueName": "The Fieldhouse at the Crossover",
       "Dedicated": false,
       "Address": {
@@ -715,6 +677,44 @@ const karaokeData = {
             "Wednesday"
           ],
           "time": "7:00 PM - 10:00 PM"
+        }
+      ]
+    },
+    {
+      "id": "film-alley",
+      "VenueName": "Film Alley",
+      "Address": {
+        "Street": "420 Wolf Ranch Parkway",
+        "City": "Georgetown",
+        "State": "TX",
+        "Zip": "78628"
+      },
+      "KJ": {
+        "Host": "",
+        "Company": ""
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/CityLightsGeorgetownTX",
+        "Instagram": null,
+        "Website": "https://georgetown.filmalley.net/",
+        "Bluesky": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "second",
+            "Thursday"
+          ],
+          "time": "6:30 PM - ??? PM",
+          "description": "Second and Fourth Fridays"
+        },
+        {
+          "day": [
+            "fourth",
+            "Thursday"
+          ],
+          "time": "6:30 PM - 10:30 PM",
+          "description": "Second and Fourth Fridays"
         }
       ]
     },
@@ -1003,39 +1003,6 @@ const karaokeData = {
       ]
     },
     {
-      "id": "lone-star-bar",
-      "VenueName": "Lone Star Bar",
-      "Address": {
-        "Street": "403 FM 685",
-        "City": "Pflugerville",
-        "State": "TX",
-        "Zip": "78660"
-      },
-      "KJ": {
-        "Host": "Xpider",
-        "Company": ""
-      },
-      "socials": {
-        "Facebook": "https://www.facebook.com/LoneStarBarPflugerville/",
-        "Instagram": null,
-        "Twitter": null,
-        "Website": "https://lonestarbartexas.com/",
-        "Bluesky": null,
-        "Tiktok": null,
-        "Youtube": null
-      },
-      "schedule": [
-        {
-          "day": [
-            "every",
-            "Saturday"
-          ],
-          "time": "9:00 PM - 1:00 AM"
-        }
-      ],
-      "Dedicated": false
-    },
-    {
       "id": "lt-corner-pub",
       "VenueName": "LT Corner Pub",
       "Address": {
@@ -1069,6 +1036,39 @@ const karaokeData = {
           "day": [
             "every",
             "Wednesday"
+          ],
+          "time": "9:00 PM - 1:00 AM"
+        }
+      ],
+      "Dedicated": false
+    },
+    {
+      "id": "lone-star-bar",
+      "VenueName": "Lone Star Bar",
+      "Address": {
+        "Street": "403 FM 685",
+        "City": "Pflugerville",
+        "State": "TX",
+        "Zip": "78660"
+      },
+      "KJ": {
+        "Host": "Xpider",
+        "Company": ""
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/LoneStarBarPflugerville/",
+        "Instagram": null,
+        "Twitter": null,
+        "Website": "https://lonestarbartexas.com/",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Saturday"
           ],
           "time": "9:00 PM - 1:00 AM"
         }
@@ -1326,6 +1326,52 @@ const karaokeData = {
       ]
     },
     {
+      "id": "moontower-saloon",
+      "VenueName": "Moontower Saloon",
+      "Dedicated": false,
+      "Address": {
+        "Street": "10212 Menchaca Rd",
+        "City": "Austin",
+        "State": "TX",
+        "Zip": "78748"
+      },
+      "Timeframe": {
+        "StartDate": "2025-10-02",
+        "EndDate": null
+      },
+      "KJ": {
+        "Host": "DJ P'Nasty",
+        "Company": "",
+        "KJsocials": {
+          "Facebook": "https://www.facebook.com/p/DJ-PNasty-100094228107834/",
+          "Instagram": null,
+          "Twitter": null,
+          "Website": null,
+          "Bluesky": null,
+          "Tiktok": null,
+          "Youtube": null
+        }
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/profile.php?id=100064324614170#",
+        "Instagram": "https://www.instagram.com/moontowersaloon",
+        "Website": "https://moontowersaloon.com/",
+        "Twitter": "https://x.com/MoontowerSaloon",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Thursday"
+          ],
+          "time": "8:00 PM to 11pm (ish)"
+        }
+      ]
+    },
+    {
       "id": "oak-hill-social",
       "VenueName": "Oak Hill Social",
       "Address": {
@@ -1487,6 +1533,45 @@ const karaokeData = {
       ]
     },
     {
+      "id": "railhouse-bar",
+      "VenueName": "Railhouse Bar",
+      "Dedicated": false,
+      "Address": {
+        "Street": "107 E Center St",
+        "City": "Kyle",
+        "State": "TX",
+        "Zip": "78640"
+      },
+      "KJ": {
+        "Host": "Jen",
+        "Company": "Smart Ass Entertainment",
+        "KJsocials": {
+          "Facebook": "https://www.facebook.com/smartassentertainments/",
+          "Instagram": "https://www.instagram.com/smartassentertainment",
+          "Twitter": null,
+          "Website": "https://smartassentertainment.com/",
+          "Bluesky": null,
+          "Tiktok": null,
+          "Youtube": "https://www.youtube.com/@SmartAssEntertainment"
+        }
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/therailhousebartx/",
+        "Instagram": "https://www.instagram.com/therailhousetx/",
+        "Website": "https://railhousebar.com/",
+        "Bluesky": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "8:00 PM - CLOSE"
+        }
+      ]
+    },
+    {
       "id": "randys-ice-house",
       "VenueName": "Randy's Ice House",
       "Dedicated": false,
@@ -1532,45 +1617,6 @@ const karaokeData = {
             "Saturday"
           ],
           "time": "8:00 PM - 11:00 PM"
-        }
-      ]
-    },
-    {
-      "id": "railhouse-bar",
-      "VenueName": "Railhouse Bar",
-      "Dedicated": false,
-      "Address": {
-        "Street": "107 E Center St",
-        "City": "Kyle",
-        "State": "TX",
-        "Zip": "78640"
-      },
-      "KJ": {
-        "Host": "Jen",
-        "Company": "Smart Ass Entertainment",
-        "KJsocials": {
-          "Facebook": "https://www.facebook.com/smartassentertainments/",
-          "Instagram": "https://www.instagram.com/smartassentertainment",
-          "Twitter": null,
-          "Website": "https://smartassentertainment.com/",
-          "Bluesky": null,
-          "Tiktok": null,
-          "Youtube": "https://www.youtube.com/@SmartAssEntertainment"
-        }
-      },
-      "socials": {
-        "Facebook": "https://www.facebook.com/therailhousebartx/",
-        "Instagram": "https://www.instagram.com/therailhousetx/",
-        "Website": "https://railhousebar.com/",
-        "Bluesky": null
-      },
-      "schedule": [
-        {
-          "day": [
-            "every",
-            "Wednesday"
-          ],
-          "time": "8:00 PM - CLOSE"
         }
       ]
     },
