@@ -177,7 +177,7 @@ const karaokeData = {
       "Address": {
         "Street": "10402 Menchaca Rd, Unit D",
         "City": "Austin",
-        "State": "TX ",
+        "State": "TX",
         "Zip": "78748"
       },
       "KJ": {
@@ -391,7 +391,7 @@ const karaokeData = {
       "Address": {
         "Street": "5326 Menchaca Road",
         "City": "Austin",
-        "State": "Tx",
+        "State": "TX",
         "Zip": "78745"
       },
       "Timeframe": {
@@ -637,12 +637,13 @@ const karaokeData = {
       ]
     },
     {
+      "id": "the-fieldhouse-at-the-crossover",
       "VenueName": "The Fieldhouse at the Crossover",
       "Dedicated": false,
       "Address": {
         "Street": "1717 Scottsdale Dr Suite 160",
         "City": "Leander",
-        "State": "TX ",
+        "State": "TX",
         "Zip": "78641"
       },
       "Timeframe": {
