@@ -1797,7 +1797,7 @@ const karaokeData = {
             "third",
             "Wednesday"
           ],
-          "time": "7:00 PM - 11:00 PM",
+          "time": "7:00 PM - 9:00 PM",
           "description": "Every First and Third Wednesday"
         }
       ]
