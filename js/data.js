@@ -1306,7 +1306,7 @@ const karaokeData = {
         "Zip": "78621"
       },
       "KJ": {
-        "Host": "KJ Mandy",
+        "Host": "",
         "Company": ""
       },
       "socials": {
@@ -1759,6 +1759,46 @@ const karaokeData = {
             "Wednesday"
           ],
           "time": "10:00 PM - CLOSE"
+        }
+      ]
+    },
+    {
+      "id": "spirit-of-texas",
+      "VenueName": "Spirit of Texas Brewstillery",
+      "Address": {
+        "Street": "1715 Dalshank St.",
+        "City": "Pflugerville",
+        "State": "TX",
+        "Zip": "78660"
+      },
+      "KJ": {
+        "Host": "",
+        "Company": "",
+        "ShowName":"Karaoke Whiskey Wednesday"
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/SpiritofTexasDistillery/",
+        "Instagram": "https://www.instagram.com/spirit_of_tx",
+        "Website": "https://spiritoftx.com/home",
+        "Twitter": "https://x.com/spiritoftx1",
+        "Bluesky": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "first",
+            "Wednesday"
+          ],
+          "time": "7:00 PM - 9:00 PM",
+          "description": "Every First and Third Wednesday"
+        },
+        {
+          "day": [
+            "third",
+            "Wednesday"
+          ],
+          "time": "7:00 PM - 11:00 PM",
+          "description": "Every First and Third Wednesday"
         }
       ]
     },
