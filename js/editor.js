@@ -6,11 +6,11 @@ import {
     sanitizeUrl, 
     capitalizeFirstLetter, 
     getSortableName 
-} from './js/modules/stringUtils.js';
+} from './modules/stringUtils.js';
 
 import { 
     DEFAULT_VENUE 
-} from './js/modules/constants.js';
+} from './modules/constants.js';
 
 // ======================
 // EDITOR STATE
