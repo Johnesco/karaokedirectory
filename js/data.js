@@ -1774,7 +1774,7 @@ const karaokeData = {
       "KJ": {
         "Host": "",
         "Company": "",
-        "ShowName":"Karaoke Whiskey Wednesday"
+        "ShowName": "Karaoke Whiskey Wednesday"
       },
       "socials": {
         "Facebook": "https://www.facebook.com/SpiritofTexasDistillery/",
@@ -1937,7 +1937,7 @@ const karaokeData = {
         }
       ]
     },
-     {
+    {
       "id": "willies-joint",
       "VenueName": "Willie's Joint",
       "Dedicated": false,
