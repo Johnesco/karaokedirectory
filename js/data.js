@@ -1,41 +1,6 @@
 const karaokeData = {
   "listings": [
     {
-      "id": "the-alcove-cantina",
-      "VenueName": "The Alcove Cantina",
-      "Address": {
-        "Street": "119 E Main Street",
-        "City": "Round Rock",
-        "State": "TX",
-        "Zip": "78664"
-      },
-      "Timeframe": {
-        "StartDate": null,
-        "EndDate": null
-      },
-      "KJ": {
-        "Host": "",
-        "Company": "Diamond Karaoke Austin"
-      },
-      "socials": {
-        "Facebook": "https://www.facebook.com/groups/1594100210824616/user/100063785610717/",
-        "Instagram": "https://www.instagram.com/alcovecantinarr/",
-        "Website": "https://www.alcovecantina.com/",
-        "Twitter": "https://twitter.com/AlcoveCantina",
-        "Bluesky": null
-      },
-      "schedule": [
-        {
-          "day": [
-            "every",
-            "Wednesday"
-          ],
-          "time": "7:30 PM - MIDNIGHT",
-          "description": "Every Wednesday"
-        }
-      ]
-    },
-    {
       "id": "bar-louie",
       "VenueName": "Bar Louie",
       "Address": {
@@ -121,52 +86,6 @@ const karaokeData = {
             "Wednesday"
           ],
           "time": "9:00 PM - 2:00 AM"
-        }
-      ]
-    },
-    {
-      "id": "the-boat",
-      "VenueName": "The Boat",
-      "Dedicated": false,
-      "Address": {
-        "Street": "10931 Stonelake Blvd",
-        "City": "Austin",
-        "State": "TX",
-        "Zip": "78759"
-      },
-      "Timeframe": {
-        "StartDate": null,
-        "EndDate": null
-      },
-      "KJ": {
-        "Host": "Keith Ruckus",
-        "Company": "Ruckus ATX",
-        "KJsocials": {
-          "Facebook": "https://www.facebook.com/RuckusKaraoke/",
-          "Instagram": "https://www.instagram.com/ruckuskaraoke/",
-          "Twitter": null,
-          "Website": "http://ruckuskaraoke.com/",
-          "Bluesky": null,
-          "Tiktok": null,
-          "Youtube": null
-        }
-      },
-      "socials": {
-        "Facebook": "https://www.facebook.com/theboatatx/#",
-        "Instagram": "https://www.instagram.com/theboatatx",
-        "Website": "https://theboatatx.com/",
-        "Twitter": null,
-        "Bluesky": null,
-        "Tiktok": null,
-        "Youtube": null
-      },
-      "schedule": [
-        {
-          "day": [
-            "every",
-            "Tuesday"
-          ],
-          "time": "9:00 PM - MIDNIGHT"
         }
       ]
     },
@@ -263,52 +182,6 @@ const karaokeData = {
             "Sunday"
           ],
           "time": "7:30 PM - 11:30 PM"
-        }
-      ]
-    },
-    {
-      "id": "cjs-sports-bar",
-      "VenueName": "CJ's Sports Bar",
-      "Address": {
-        "Street": "1010 N Austin Ave",
-        "City": "Georgetown",
-        "State": "TX",
-        "Zip": "78626"
-      },
-      "KJ": {
-        "Host": "",
-        "Company": ""
-      },
-      "socials": {
-        "Facebook": null,
-        "Instagram": null,
-        "Website": null,
-        "Bluesky": null
-      },
-      "schedule": [
-        {
-          "day": [
-            "every",
-            "Wednesday"
-          ],
-          "time": "6:30 PM - 10:30 PM",
-          "description": "Every Wednesday and Second and Fourth Fridays"
-        },
-        {
-          "day": [
-            "second",
-            "Friday"
-          ],
-          "time": "7:00 PM - 11:00 PM",
-          "description": "Every Wednesday and Second and Fourth Fridays"
-        },
-        {
-          "day": [
-            "fourth",
-            "Friday"
-          ],
-          "time": "7:00 PM - 11:00 PM",
-          "description": "Every Wednesday and Second and Fourth Fridays"
         }
       ]
     },
@@ -459,74 +332,48 @@ const karaokeData = {
       ]
     },
     {
-      "id": "the-common-interest",
-      "VenueName": "The Common Interest",
-      "Dedicated": true,
+      "id": "cjs-sports-bar",
+      "VenueName": "CJ's Sports Bar",
       "Address": {
-        "Street": "8440 Burnet Rd",
-        "City": "Austin",
+        "Street": "1010 N Austin Ave",
+        "City": "Georgetown",
         "State": "TX",
-        "Zip": "78757"
+        "Zip": "78626"
       },
       "KJ": {
         "Host": "",
         "Company": ""
       },
       "socials": {
-        "Facebook": "https://www.facebook.com/TheCommonInterest",
-        "Instagram": "https://www.instagram.com/ciaustin/",
-        "Website": "https://ciaustin.com",
+        "Facebook": null,
+        "Instagram": null,
+        "Website": null,
         "Bluesky": null
       },
       "schedule": [
         {
           "day": [
             "every",
-            "Sunday"
-          ],
-          "time": "8:00 PM - 2:00 AM"
-        },
-        {
-          "day": [
-            "every",
-            "Monday"
-          ],
-          "time": "8:00 PM - 1:00 AM"
-        },
-        {
-          "day": [
-            "every",
-            "Tuesday"
-          ],
-          "time": "8:00 PM - 1:00 AM"
-        },
-        {
-          "day": [
-            "every",
             "Wednesday"
           ],
-          "time": "8:00 PM - 1:00 AM"
+          "time": "6:30 PM - 10:30 PM",
+          "description": "Every Wednesday and Second and Fourth Fridays"
         },
         {
           "day": [
-            "every",
-            "Thursday"
-          ],
-          "time": "8:00 PM - 1:00 AM"
-        },
-        {
-          "day": [
-            "every",
+            "second",
             "Friday"
           ],
-          "time": "7:00 PM - 1:00 AM"
+          "time": "7:00 PM - 11:00 PM",
+          "description": "Every Wednesday and Second and Fourth Fridays"
         },
         {
           "day": [
-            "every",
-            "Saturday"
+            "fourth",
+            "Friday"
           ],
-          "time": "8:00 PM - 2:00 AM"
+          "time": "7:00 PM - 11:00 PM",
+          "description": "Every Wednesday and Second and Fourth Fridays"
         }
       ]
     },
@@ -633,51 +480,6 @@ const karaokeData = {
             "Saturday"
           ],
           "time": "8:00 PM - 2:00 AM"
-        }
-      ]
-    },
-    {
-      "id": "the-fieldhouse-at-the-crossover",
-      "VenueName": "The Fieldhouse at the Crossover",
-      "Dedicated": false,
-      "Address": {
-        "Street": "1717 Scottsdale Dr Suite 160",
-        "City": "Leander",
-        "State": "TX",
-        "Zip": "78641"
-      },
-      "Timeframe": {
-        "StartDate": "2025-05-28"
-      },
-      "KJ": {
-        "Host": "",
-        "Company": "Texas Live Band Karaoke",
-        "KJsocials": {
-          "Facebook": "https://www.facebook.com/texaslbk",
-          "Instagram": "https://www.instagram.com/texaslivebandkaraoke/",
-          "Twitter": null,
-          "Website": "https://www.texaslivebandkaraoke.com/",
-          "Bluesky": null,
-          "Tiktok": null,
-          "Youtube": null
-        }
-      },
-      "socials": {
-        "Facebook": "https://www.facebook.com/thefieldhousetexas/",
-        "Instagram": "https://www.instagram.com/thefieldhousetexas",
-        "Twitter": null,
-        "Website": "https://www.thefieldhousetexas.com/",
-        "Bluesky": null,
-        "Tiktok": null,
-        "Youtube": null
-      },
-      "schedule": [
-        {
-          "day": [
-            "every",
-            "Wednesday"
-          ],
-          "time": "7:00 PM - 10:00 PM"
         }
       ]
     },
@@ -803,44 +605,6 @@ const karaokeData = {
       ]
     },
     {
-      "id": "the-hive",
-      "VenueName": "The Hive",
-      "Address": {
-        "Street": "10542 Menchaca Road",
-        "City": "Austin",
-        "State": "TX",
-        "Zip": "78748"
-      },
-      "KJ": {
-        "Host": "Andy Hartsock",
-        "Company": ""
-      },
-      "socials": {
-        "Facebook": "https://www.facebook.com/hiveaustin/",
-        "Instagram": "https://www.instagram.com/hiveaustin/",
-        "Website": "https://www.hiveaustin.com/",
-        "Twitter": "https://x.com/hiveaustin"
-      },
-      "schedule": [
-        {
-          "day": [
-            "second",
-            "Saturday"
-          ],
-          "time": "7:00 PM - 10:00 PM",
-          "description": "Second and Fourth Saturdays"
-        },
-        {
-          "day": [
-            "fourth",
-            "Saturday"
-          ],
-          "time": "7:00 PM - 10:00 PM",
-          "description": "Second and Fourth Saturdays"
-        }
-      ]
-    },
-    {
       "id": "hudson-tavern-xpider",
       "VenueName": "Hudson Tavern",
       "Address": {
@@ -925,48 +689,6 @@ const karaokeData = {
       ]
     },
     {
-      "id": "the-iron-bear",
-      "VenueName": "The Iron Bear",
-      "Dedicated": false,
-      "Address": {
-        "Street": "301 West. 6th St.",
-        "City": "Austin",
-        "State": "TX",
-        "Zip": "78701"
-      },
-      "KJ": {
-        "Host": "Murrah",
-        "Company": "Planet Karaoke"
-      },
-      "socials": {
-        "Facebook": null,
-        "Instagram": "https://www.instagram.com/theironbearaustin/",
-        "Twitter": null,
-        "Website": "http://www.theironbear.com/",
-        "Bluesky": null,
-        "Tiktok": null,
-        "Youtube": null
-      },
-      "schedule": [
-        {
-          "day": [
-            "every",
-            "Sunday"
-          ],
-          "time": "9:00 PM - 1:00 AM",
-          "description": "Sundays and Wednesdays"
-        },
-        {
-          "day": [
-            "every",
-            "Wednesday"
-          ],
-          "time": "9:00 PM - 1:00 AM",
-          "description": "Sundays and Wednesdays"
-        }
-      ]
-    },
-    {
       "id": "knomad-bar",
       "VenueName": "Knomad Bar",
       "Address": {
@@ -1004,6 +726,74 @@ const karaokeData = {
       ]
     },
     {
+      "id": "la-marea",
+      "VenueName": "La Marea",
+      "Address": {
+        "Street": "116 E Parsons St",
+        "City": "Manor",
+        "State": "TX",
+        "Zip": "78653"
+      },
+      "KJ": {
+        "Host": "",
+        "Company": ""
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/lamareaaustin/",
+        "Instagram": "https://www.instagram.com/pluisrodriguez/",
+        "Website": "https://www.lamarearestaurantseafoodtx.com/"
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Friday"
+          ],
+          "time": "8:00 PM - MIDNIGHT"
+        },
+        {
+          "day": [
+            "every",
+            "Saturday"
+          ],
+          "time": "8:00 PM - MIDNIGHT"
+        }
+      ]
+    },
+    {
+      "id": "lone-star-bar",
+      "VenueName": "Lone Star Bar",
+      "Address": {
+        "Street": "403 FM 685",
+        "City": "Pflugerville",
+        "State": "TX",
+        "Zip": "78660"
+      },
+      "KJ": {
+        "Host": "Xpider",
+        "Company": ""
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/LoneStarBarPflugerville/",
+        "Instagram": null,
+        "Twitter": null,
+        "Website": "https://lonestarbartexas.com/",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Saturday"
+          ],
+          "time": "9:00 PM - 1:00 AM"
+        }
+      ],
+      "Dedicated": false
+    },
+    {
       "id": "lt-corner-pub",
       "VenueName": "LT Corner Pub",
       "Address": {
@@ -1037,39 +827,6 @@ const karaokeData = {
           "day": [
             "every",
             "Wednesday"
-          ],
-          "time": "9:00 PM - 1:00 AM"
-        }
-      ],
-      "Dedicated": false
-    },
-    {
-      "id": "lone-star-bar",
-      "VenueName": "Lone Star Bar",
-      "Address": {
-        "Street": "403 FM 685",
-        "City": "Pflugerville",
-        "State": "TX",
-        "Zip": "78660"
-      },
-      "KJ": {
-        "Host": "Xpider",
-        "Company": ""
-      },
-      "socials": {
-        "Facebook": "https://www.facebook.com/LoneStarBarPflugerville/",
-        "Instagram": null,
-        "Twitter": null,
-        "Website": "https://lonestarbartexas.com/",
-        "Bluesky": null,
-        "Tiktok": null,
-        "Youtube": null
-      },
-      "schedule": [
-        {
-          "day": [
-            "every",
-            "Saturday"
           ],
           "time": "9:00 PM - 1:00 AM"
         }
@@ -1136,41 +893,6 @@ const karaokeData = {
             "Sunday"
           ],
           "time": "7:00 PM - 11:00 PM"
-        }
-      ]
-    },
-    {
-      "id": "la-marea",
-      "VenueName": "La Marea",
-      "Address": {
-        "Street": "116 E Parsons St",
-        "City": "Manor",
-        "State": "TX",
-        "Zip": "78653"
-      },
-      "KJ": {
-        "Host": "",
-        "Company": ""
-      },
-      "socials": {
-        "Facebook": "https://www.facebook.com/lamareaaustin/",
-        "Instagram": "https://www.instagram.com/pluisrodriguez/",
-        "Website": "https://www.lamarearestaurantseafoodtx.com/"
-      },
-      "schedule": [
-        {
-          "day": [
-            "every",
-            "Friday"
-          ],
-          "time": "8:00 PM - MIDNIGHT"
-        },
-        {
-          "day": [
-            "every",
-            "Saturday"
-          ],
-          "time": "8:00 PM - MIDNIGHT"
         }
       ]
     },
@@ -1249,52 +971,6 @@ const karaokeData = {
         }
       ],
       "Dedicated": false
-    },
-    {
-      "id": "the-mill",
-      "VenueName": "The Mill",
-      "Dedicated": false,
-      "Address": {
-        "Street": "9112 Anderson Mill Rd suite b 100",
-        "City": " Austin",
-        "State": "TX",
-        "Zip": "78729"
-      },
-      "Timeframe": {
-        "StartDate": "2025-06-16",
-        "EndDate": null
-      },
-      "KJ": {
-        "Host": "",
-        "Company": "",
-        "KJsocials": {
-          "Facebook": null,
-          "Instagram": null,
-          "Twitter": null,
-          "Website": null,
-          "Bluesky": null,
-          "Tiktok": null,
-          "Youtube": null
-        }
-      },
-      "socials": {
-        "Facebook": "https://www.facebook.com/themillbarandgrillaustin",
-        "Instagram": null,
-        "Website": null,
-        "Twitter": null,
-        "Bluesky": null,
-        "Tiktok": null,
-        "Youtube": null
-      },
-      "schedule": [
-        {
-          "day": [
-            "every",
-            "Tuesday"
-          ],
-          "time": "8:00 PM - 11:30 PM"
-        }
-      ]
     },
     {
       "id": "millies-on-main",
@@ -1702,6 +1378,10 @@ const karaokeData = {
         "State": "TX",
         "Zip": "78664"
       },
+      "Timeframe": {
+        "StartDate": null,
+        "EndDate": null
+      },
       "KJ": {
         "Host": "Marshall Joshua",
         "Company": ""
@@ -1709,8 +1389,7 @@ const karaokeData = {
       "socials": {
         "Facebook": "https://www.facebook.com/RoundRockTavern/",
         "Instagram": "https://www.instagram.com/roundrocktavern",
-        "Website": "https://www.roundrocktavern.com/",
-        "Bluesky": null
+        "Website": "https://www.roundrocktavern.com/"
       },
       "schedule": [
         {
@@ -1806,6 +1485,359 @@ const karaokeData = {
           ],
           "time": "7:00 PM - 9:00 PM",
           "description": "Every First and Third Wednesday"
+        }
+      ]
+    },
+    {
+      "id": "the-alcove-cantina",
+      "VenueName": "The Alcove Cantina",
+      "Address": {
+        "Street": "119 E Main Street",
+        "City": "Round Rock",
+        "State": "TX",
+        "Zip": "78664"
+      },
+      "Timeframe": {
+        "StartDate": null,
+        "EndDate": null
+      },
+      "KJ": {
+        "Host": "",
+        "Company": "Diamond Karaoke Austin"
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/groups/1594100210824616/user/100063785610717/",
+        "Instagram": "https://www.instagram.com/alcovecantinarr/",
+        "Website": "https://www.alcovecantina.com/",
+        "Twitter": "https://twitter.com/AlcoveCantina",
+        "Bluesky": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "7:30 PM - MIDNIGHT",
+          "description": "Every Wednesday"
+        }
+      ]
+    },
+    {
+      "id": "the-boat",
+      "VenueName": "The Boat",
+      "Dedicated": false,
+      "Address": {
+        "Street": "10931 Stonelake Blvd",
+        "City": "Austin",
+        "State": "TX",
+        "Zip": "78759"
+      },
+      "Timeframe": {
+        "StartDate": null,
+        "EndDate": null
+      },
+      "KJ": {
+        "Host": "Keith Ruckus",
+        "Company": "Ruckus ATX",
+        "KJsocials": {
+          "Facebook": "https://www.facebook.com/RuckusKaraoke/",
+          "Instagram": "https://www.instagram.com/ruckuskaraoke/",
+          "Twitter": null,
+          "Website": "http://ruckuskaraoke.com/",
+          "Bluesky": null,
+          "Tiktok": null,
+          "Youtube": null
+        }
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/theboatatx/#",
+        "Instagram": "https://www.instagram.com/theboatatx",
+        "Website": "https://theboatatx.com/",
+        "Twitter": null,
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Tuesday"
+          ],
+          "time": "9:00 PM - MIDNIGHT"
+        }
+      ]
+    },
+    {
+      "id": "the-common-interest",
+      "VenueName": "The Common Interest",
+      "Dedicated": true,
+      "Address": {
+        "Street": "8440 Burnet Rd",
+        "City": "Austin",
+        "State": "TX",
+        "Zip": "78757"
+      },
+      "KJ": {
+        "Host": "",
+        "Company": ""
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/TheCommonInterest",
+        "Instagram": "https://www.instagram.com/ciaustin/",
+        "Website": "https://ciaustin.com",
+        "Bluesky": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Sunday"
+          ],
+          "time": "8:00 PM - 2:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Monday"
+          ],
+          "time": "8:00 PM - 1:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Tuesday"
+          ],
+          "time": "8:00 PM - 1:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "8:00 PM - 1:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Thursday"
+          ],
+          "time": "8:00 PM - 1:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Friday"
+          ],
+          "time": "7:00 PM - 1:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Saturday"
+          ],
+          "time": "8:00 PM - 2:00 AM"
+        }
+      ]
+    },
+    {
+      "id": "the-fieldhouse-at-the-crossover",
+      "VenueName": "The Fieldhouse at the Crossover",
+      "Dedicated": false,
+      "Address": {
+        "Street": "1717 Scottsdale Dr Suite 160",
+        "City": "Leander",
+        "State": "TX",
+        "Zip": "78641"
+      },
+      "Timeframe": {
+        "StartDate": "2025-05-28"
+      },
+      "KJ": {
+        "Host": "",
+        "Company": "Texas Live Band Karaoke",
+        "KJsocials": {
+          "Facebook": "https://www.facebook.com/texaslbk",
+          "Instagram": "https://www.instagram.com/texaslivebandkaraoke/",
+          "Twitter": null,
+          "Website": "https://www.texaslivebandkaraoke.com/",
+          "Bluesky": null,
+          "Tiktok": null,
+          "Youtube": null
+        }
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/thefieldhousetexas/",
+        "Instagram": "https://www.instagram.com/thefieldhousetexas",
+        "Twitter": null,
+        "Website": "https://www.thefieldhousetexas.com/",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "7:00 PM - 10:00 PM"
+        }
+      ]
+    },
+    {
+      "id": "the-hive",
+      "VenueName": "The Hive",
+      "Address": {
+        "Street": "10542 Menchaca Road",
+        "City": "Austin",
+        "State": "TX",
+        "Zip": "78748"
+      },
+      "KJ": {
+        "Host": "Andy Hartsock",
+        "Company": ""
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/hiveaustin/",
+        "Instagram": "https://www.instagram.com/hiveaustin/",
+        "Website": "https://www.hiveaustin.com/",
+        "Twitter": "https://x.com/hiveaustin"
+      },
+      "schedule": [
+        {
+          "day": [
+            "second",
+            "Saturday"
+          ],
+          "time": "7:00 PM - 10:00 PM",
+          "description": "Second and Fourth Saturdays"
+        },
+        {
+          "day": [
+            "fourth",
+            "Saturday"
+          ],
+          "time": "7:00 PM - 10:00 PM",
+          "description": "Second and Fourth Saturdays"
+        }
+      ]
+    },
+    {
+      "id": "the-iron-bear",
+      "VenueName": "The Iron Bear",
+      "Dedicated": false,
+      "Address": {
+        "Street": "301 West. 6th St.",
+        "City": "Austin",
+        "State": "TX",
+        "Zip": "78701"
+      },
+      "KJ": {
+        "Host": "Murrah",
+        "Company": "Planet Karaoke"
+      },
+      "socials": {
+        "Facebook": null,
+        "Instagram": "https://www.instagram.com/theironbearaustin/",
+        "Twitter": null,
+        "Website": "http://www.theironbear.com/",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Sunday"
+          ],
+          "time": "9:00 PM - 1:00 AM",
+          "description": "Sundays and Wednesdays"
+        },
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "9:00 PM - 1:00 AM",
+          "description": "Sundays and Wednesdays"
+        }
+      ]
+    },
+    {
+      "id": "the-mill",
+      "VenueName": "The Mill",
+      "Dedicated": false,
+      "Address": {
+        "Street": "9112 Anderson Mill Rd suite b 100",
+        "City": " Austin",
+        "State": "TX",
+        "Zip": "78729"
+      },
+      "Timeframe": {
+        "StartDate": "2025-06-16",
+        "EndDate": null
+      },
+      "KJ": {
+        "Host": "",
+        "Company": "",
+        "KJsocials": {
+          "Facebook": null,
+          "Instagram": null,
+          "Twitter": null,
+          "Website": null,
+          "Bluesky": null,
+          "Tiktok": null,
+          "Youtube": null
+        }
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/themillbarandgrillaustin",
+        "Instagram": null,
+        "Website": null,
+        "Twitter": null,
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Tuesday"
+          ],
+          "time": "8:00 PM - 11:30 PM"
+        }
+      ]
+    },
+    {
+      "id": "the-whiskey-girls-saloon",
+      "VenueName": "The Whiskey Girls Saloon",
+      "Address": {
+        "Street": "13700 FM 973, Bldg A",
+        "City": "Manor",
+        "State": "TX",
+        "Zip": "78653"
+      },
+      "KJ": {
+        "Host": "",
+        "Company": "Party Pipes Karaoke"
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/thewhiskeygirlssaloon",
+        "Instagram": "https://www.instagram.com/the_whiskey_girls_saloon/",
+        "Website": "https://whiskeygirlssaloon.com/",
+        "Bluesky": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Tuesday"
+          ],
+          "time": "8:00 PM - MIDNIGHT"
         }
       ]
     },
@@ -1916,75 +1948,6 @@ const karaokeData = {
       ]
     },
     {
-      "id": "the-whiskey-girls-saloon",
-      "VenueName": "The Whiskey Girls Saloon",
-      "Address": {
-        "Street": "13700 FM 973, Bldg A",
-        "City": "Manor",
-        "State": "TX",
-        "Zip": "78653"
-      },
-      "KJ": {
-        "Host": "",
-        "Company": "Party Pipes Karaoke"
-      },
-      "socials": {
-        "Facebook": "https://www.facebook.com/thewhiskeygirlssaloon",
-        "Instagram": "https://www.instagram.com/the_whiskey_girls_saloon/",
-        "Website": "https://whiskeygirlssaloon.com/",
-        "Bluesky": null
-      },
-      "schedule": [
-        {
-          "day": [
-            "every",
-            "Tuesday"
-          ],
-          "time": "8:00 PM - MIDNIGHT"
-        }
-      ]
-    },
-    {
-      "id": "willies-joint",
-      "VenueName": "Willie's Joint",
-      "Dedicated": false,
-      "Address": {
-        "Street": "824 Main St",
-        "City": "Buda",
-        "State": "TX",
-        "Zip": "78610"
-      },
-      "KJ": {
-        "Host": "Kim",
-        "Company": "Smart Ass Entertainment",
-        "EventName": "Kowpoke Karaoke",
-        "KJsocials": {
-          "Facebook": "https://www.facebook.com/smartassentertainments/",
-          "Instagram": "https://www.instagram.com/smartassentertainment",
-          "Twitter": null,
-          "Website": "https://smartassentertainment.com/",
-          "Bluesky": null,
-          "Tiktok": null,
-          "Youtube": "https://www.youtube.com/@SmartAssEntertainment"
-        }
-      },
-      "socials": {
-        "Facebook": "https://www.facebook.com/williesjoint/",
-        "Instagram": "https://www.instagram.com/williesjoint",
-        "Website": "https://williesjoint.com/",
-        "Bluesky": null
-      },
-      "schedule": [
-        {
-          "day": [
-            "every",
-            "Friday"
-          ],
-          "time": "8:00 PM - CLOSE"
-        }
-      ]
-    },
-    {
       "id": "wildflower-corks-and-brew",
       "VenueName": "Wildflower Corks & Brew",
       "Dedicated": false,
@@ -2027,6 +1990,46 @@ const karaokeData = {
             "Thursday"
           ],
           "time": "7:00 PM - 11:00PM"
+        }
+      ]
+    },
+    {
+      "id": "willies-joint",
+      "VenueName": "Willie's Joint",
+      "Dedicated": false,
+      "Address": {
+        "Street": "824 Main St",
+        "City": "Buda",
+        "State": "TX",
+        "Zip": "78610"
+      },
+      "KJ": {
+        "Host": "Kim",
+        "Company": "Smart Ass Entertainment",
+        "EventName": "Kowpoke Karaoke",
+        "KJsocials": {
+          "Facebook": "https://www.facebook.com/smartassentertainments/",
+          "Instagram": "https://www.instagram.com/smartassentertainment",
+          "Twitter": null,
+          "Website": "https://smartassentertainment.com/",
+          "Bluesky": null,
+          "Tiktok": null,
+          "Youtube": "https://www.youtube.com/@SmartAssEntertainment"
+        }
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/williesjoint/",
+        "Instagram": "https://www.instagram.com/williesjoint",
+        "Website": "https://williesjoint.com/",
+        "Bluesky": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Friday"
+          ],
+          "time": "8:00 PM - CLOSE"
         }
       ]
     }
