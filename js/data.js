@@ -1726,6 +1726,13 @@ const karaokeData = {
             "Tuesday"
           ],
           "time": "9:00 PM - 1:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "7:00 PM - 10:00 PM"
         }
       ]
     },
@@ -1758,7 +1765,7 @@ const karaokeData = {
             "every",
             "Wednesday"
           ],
-          "time": "10:00 PM - CLOSE"
+          "time": "10:00 PM - 1:00 AM"
         }
       ]
     },
