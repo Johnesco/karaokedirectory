@@ -1759,7 +1759,7 @@ const karaokeData = {
     },
     {
       "id": "jackalope-south-shore",
-      "VenueName": "Jackalope South Shore",
+      "VenueName": "Jackalope South Shore (Showpony Lounge)",
       "Dedicated": false,
       "Address": {
         "Street": "1523 Tinnin Ford Rd",
@@ -1769,7 +1769,7 @@ const karaokeData = {
       },
       "KJ": {
         "Host": "",
-        "Company": "Poppin' off with Poppy Karaoke"
+        "Company": ""
       },
       "socials": {
         "Facebook": "https://www.facebook.com/thejackalopebaratx/",
