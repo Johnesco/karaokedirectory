@@ -1416,6 +1416,39 @@ const karaokeData = {
       ]
     },
     {
+      "id": "shooters-austin",
+      "VenueName": "Shooters (Austin)",
+      "Dedicated": false,
+      "Address": {
+        "Street": "11416 Ranch Rd 620 N, Austin, TX 78726",
+        "City": "Austin",
+        "State": "TX",
+        "Zip": "78726"
+      },
+      "KJ": {
+        "Host": "",
+        "Company": "Poppin' Off with Poppy Karaoke"
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/shootersatx",
+        "Instagram": "https://www.instagram.com/shootersatx/",
+        "Twitter": "https://twitter.com/shootersatx",
+        "Website": "https://shootersbilliards.net/locations/austin",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "10:00 PM - 1:00 AM"
+        }
+      ]
+    },
+    {
       "id": "shooters-cedar-park",
       "VenueName": "Shooters (Cedar Park)",
       "Dedicated": false,
@@ -1442,9 +1475,9 @@ const karaokeData = {
         {
           "day": [
             "every",
-            "Wednesday"
+            "Friday"
           ],
-          "time": "10:00 PM - 1:00 AM"
+          "time": "8:00 PM - CLOSE"
         }
       ]
     },
