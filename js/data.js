@@ -1758,6 +1758,56 @@ const karaokeData = {
       ]
     },
     {
+      "id": "jackalope-south-shore",
+      "VenueName": "Jackalope South Shore",
+      "Dedicated": false,
+      "Address": {
+        "Street": "1523 Tinnin Ford Rd",
+        "City": "Austin",
+        "State": "TX",
+        "Zip": "78741"
+      },
+      "KJ": {
+        "Host": "",
+        "Company": "Poppin' off with Poppy Karaoke"
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/thejackalopebaratx/",
+        "Instagram": "https://www.instagram.com/thejackalopebar/",
+        "Twitter": null,
+        "Website": "https://jackalopebar.com/",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Thursday"
+          ],
+          "time": "9:00 PM - 2:00 AM",
+          "description": "Thursdays, Fridays, and Sundays"
+        },
+        {
+          "day": [
+            "every",
+            "Friday"
+          ],
+          "time": "9:00 PM - 2:00 AM",
+          "description": "Thursdays, Fridays, and Sundays"
+        },
+        {
+          "day": [
+            "every",
+            "Sunday"
+          ],
+          "time": "9:00 PM - 2:00 AM",
+          "description": "Thursdays, Fridays, and Sundays"
+        }
+      ]
+    },
+    {
       "id": "the-iron-bear",
       "VenueName": "The Iron Bear",
       "Dedicated": false,
