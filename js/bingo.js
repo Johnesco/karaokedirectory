@@ -8,19 +8,27 @@ const words = [
 ];
 
 let bingoAchieved = false;
+let winningCells = [];
+
+// Vibrant colors for celebration
+const celebrationColors = [
+    '#ff0000', '#ff7700', '#ffdd00', '#00ff00', '#00ddff',
+    '#ff00ff', '#ff69b4', '#00ff7f', '#ffd700', '#ff1493'
+];
 
 // Shuffle the words array
 function shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+        [arr[i], arr[j]] = [arr[j], arr[i]];
     }
+    return arr;
 }
 
 // Generate a random set of 24 words (since the middle is a free space)
 function generateCard() {
-    shuffle(words);
-    return words.slice(0, 24);
+    return shuffle(words).slice(0, 24);
 }
 
 // Create the Bingo card
@@ -30,16 +38,20 @@ function createBingoCard() {
     const resetButton = document.getElementById('reset-button');
     bingoCard.innerHTML = '';
     bingoMessage.textContent = '';
-    resetButton.style.display = 'none';
+    bingoMessage.classList.remove('show');
+    resetButton.classList.remove('visible');
     bingoAchieved = false;
+    winningCells = [];
 
     const selectedWords = generateCard();
     const cardSize = 5;
     const middleCellIndex = Math.floor(cardSize * cardSize / 2);
+    let wordIndex = 0;
 
     for (let i = 0; i < cardSize * cardSize; i++) {
         const cell = document.createElement('div');
         cell.classList.add('cell');
+        cell.dataset.index = i;
 
         const front = document.createElement('div');
         front.classList.add('front');
@@ -49,10 +61,11 @@ function createBingoCard() {
         if (i === middleCellIndex) {
             front.textContent = "FREE";
             back.textContent = "FREE";
-            cell.classList.add('marked');
+            cell.classList.add('marked', 'free-space');
         } else {
-            front.textContent = selectedWords.pop();
-            back.textContent = front.textContent;
+            const word = selectedWords[wordIndex++];
+            front.textContent = word;
+            back.textContent = word;
         }
 
         cell.appendChild(front);
@@ -60,9 +73,15 @@ function createBingoCard() {
 
         cell.addEventListener('click', () => {
             // Prevent toggling the middle "FREE" space
-            if (i !== middleCellIndex) {
+            if (i !== middleCellIndex && !bingoAchieved) {
                 cell.classList.toggle('marked');
                 cell.classList.toggle('flipped');
+
+                // Haptic feedback on mobile
+                if (navigator.vibrate) {
+                    navigator.vibrate(10);
+                }
+
                 checkBingo();
             }
         });
@@ -77,54 +96,223 @@ function checkBingo() {
     const marked = Array.from(cells).map(cell => cell.classList.contains('marked'));
     const size = 5;
 
-    // Check rows, columns, and diagonals
-    const isBingo = checkLines(marked, size);
+    // Check rows, columns, and diagonals and get winning cells
+    const result = checkLines(marked, size);
 
     const bingoMessage = document.getElementById('bingo-message');
     const resetButton = document.getElementById('reset-button');
 
-    if (isBingo && !bingoAchieved) {
+    if (result.isBingo && !bingoAchieved) {
         bingoAchieved = true;
-        bingoMessage.textContent = "Bingo!";
-        resetButton.style.display = 'block';
-        createFireworks();
-    } else if (!isBingo && bingoAchieved) {
-        bingoAchieved = false;
-        bingoMessage.textContent = '';
-        resetButton.style.display = 'none';
+        winningCells = result.winningIndices;
+
+        // Highlight winning cells
+        winningCells.forEach(index => {
+            cells[index].classList.add('winning-cell');
+        });
+
+        // Trigger celebration
+        triggerCelebration();
+
+        bingoMessage.textContent = "BINGO!";
+        bingoMessage.classList.add('show');
+        resetButton.classList.add('visible');
+
+        // Strong haptic feedback
+        if (navigator.vibrate) {
+            navigator.vibrate([100, 50, 100, 50, 200]);
+        }
     }
 }
 
 // Check rows, columns, and diagonals for a Bingo
 function checkLines(marked, size) {
-    // Check rows and columns
+    // Check rows
     for (let i = 0; i < size; i++) {
-        if (marked.slice(i * size, (i + 1) * size).every(m => m)) return true;
-        if (marked.filter((_, index) => index % size === i).every(m => m)) return true;
+        const rowIndices = [];
+        for (let j = 0; j < size; j++) {
+            rowIndices.push(i * size + j);
+        }
+        if (rowIndices.every(idx => marked[idx])) {
+            return { isBingo: true, winningIndices: rowIndices };
+        }
     }
 
-    // Check diagonals
-    if (marked.filter((_, index) => index % (size + 1) === 0).every(m => m)) return true;
-    if (marked.filter((_, index) => index % (size - 1) === 0 && index !== 0 && index !== size * size - 1).every(m => m)) return true;
+    // Check columns
+    for (let i = 0; i < size; i++) {
+        const colIndices = [];
+        for (let j = 0; j < size; j++) {
+            colIndices.push(j * size + i);
+        }
+        if (colIndices.every(idx => marked[idx])) {
+            return { isBingo: true, winningIndices: colIndices };
+        }
+    }
 
-    return false;
+    // Check diagonal (top-left to bottom-right)
+    const diag1Indices = [];
+    for (let i = 0; i < size; i++) {
+        diag1Indices.push(i * size + i);
+    }
+    if (diag1Indices.every(idx => marked[idx])) {
+        return { isBingo: true, winningIndices: diag1Indices };
+    }
+
+    // Check diagonal (top-right to bottom-left)
+    const diag2Indices = [];
+    for (let i = 0; i < size; i++) {
+        diag2Indices.push(i * size + (size - 1 - i));
+    }
+    if (diag2Indices.every(idx => marked[idx])) {
+        return { isBingo: true, winningIndices: diag2Indices };
+    }
+
+    return { isBingo: false, winningIndices: [] };
 }
 
-// Create fireworks animation
-function createFireworks() {
-    const container = document.body;
-    for (let i = 0; i < 150; i++) {
-        const firework = document.createElement('div');
-        firework.classList.add('firework');
-        firework.style.left = `${Math.random() * 100}vw`;
-        firework.style.top = `${Math.random() * 100}vh`;
-        container.appendChild(firework);
-        setTimeout(() => firework.remove(), 1000);
+// Main celebration trigger
+function triggerCelebration() {
+    // Screen flash
+    createScreenFlash();
+
+    // Multiple waves of effects
+    createConfetti(80);
+    setTimeout(() => createFireworkBursts(5), 200);
+    setTimeout(() => createConfetti(60), 500);
+    setTimeout(() => createFireworkBursts(4), 700);
+    setTimeout(() => createStars(15), 300);
+    setTimeout(() => createConfetti(40), 1000);
+    setTimeout(() => createFireworkBursts(3), 1200);
+}
+
+// Screen flash effect
+function createScreenFlash() {
+    const flash = document.createElement('div');
+    flash.classList.add('screen-flash');
+    document.body.appendChild(flash);
+    setTimeout(() => flash.remove(), 300);
+}
+
+// Create confetti particles
+function createConfetti(count) {
+    for (let i = 0; i < count; i++) {
+        setTimeout(() => {
+            const confetti = document.createElement('div');
+            confetti.classList.add('confetti');
+
+            // Random shape
+            const shapes = ['square', 'circle', 'ribbon'];
+            confetti.classList.add(shapes[Math.floor(Math.random() * shapes.length)]);
+
+            // Random color
+            confetti.style.backgroundColor = celebrationColors[Math.floor(Math.random() * celebrationColors.length)];
+
+            // Random starting position (across the top)
+            confetti.style.left = `${Math.random() * 100}vw`;
+            confetti.style.top = `-20px`;
+
+            // Random size
+            const size = 8 + Math.random() * 12;
+            confetti.style.width = `${size}px`;
+            confetti.style.height = confetti.classList.contains('ribbon') ? `${size * 2.5}px` : `${size}px`;
+
+            // Random animation duration
+            const duration = 2 + Math.random() * 2;
+            confetti.style.animationDuration = `${duration}s`;
+
+            document.body.appendChild(confetti);
+            setTimeout(() => confetti.remove(), duration * 1000);
+        }, i * 30);
+    }
+}
+
+// Create firework bursts
+function createFireworkBursts(count) {
+    for (let i = 0; i < count; i++) {
+        setTimeout(() => {
+            createSingleFirework(
+                Math.random() * window.innerWidth,
+                Math.random() * window.innerHeight * 0.6
+            );
+        }, i * 200);
+    }
+}
+
+// Create a single firework burst
+function createSingleFirework(x, y) {
+    const burst = document.createElement('div');
+    burst.classList.add('firework-burst');
+    burst.style.left = `${x}px`;
+    burst.style.top = `${y}px`;
+
+    const particleCount = 20 + Math.floor(Math.random() * 15);
+    const color = celebrationColors[Math.floor(Math.random() * celebrationColors.length)];
+
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('firework-particle');
+        particle.style.backgroundColor = color;
+
+        // Calculate explosion direction
+        const angle = (i / particleCount) * Math.PI * 2;
+        const velocity = 50 + Math.random() * 100;
+        const endX = Math.cos(angle) * velocity;
+        const endY = Math.sin(angle) * velocity;
+
+        // Set custom end position via CSS variable
+        particle.style.setProperty('--end-x', `${endX}px`);
+        particle.style.setProperty('--end-y', `${endY}px`);
+        particle.style.animation = `fireworkExplode 1s ease-out forwards`;
+        particle.style.setProperty('transform', `translate(0, 0)`);
+
+        // Override the animation with inline keyframes
+        particle.animate([
+            { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+            { transform: `translate(${endX}px, ${endY}px) scale(0.3)`, opacity: 0 }
+        ], {
+            duration: 800 + Math.random() * 400,
+            easing: 'cubic-bezier(0, 0.5, 0.5, 1)',
+            fill: 'forwards'
+        });
+
+        burst.appendChild(particle);
+    }
+
+    document.body.appendChild(burst);
+    setTimeout(() => burst.remove(), 1500);
+}
+
+// Create star bursts
+function createStars(count) {
+    const starEmojis = ['⭐', '✨', '🌟', '💫'];
+
+    for (let i = 0; i < count; i++) {
+        setTimeout(() => {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            star.textContent = starEmojis[Math.floor(Math.random() * starEmojis.length)];
+            star.style.left = `${Math.random() * 100}vw`;
+            star.style.top = `${Math.random() * 100}vh`;
+            star.style.fontSize = `${20 + Math.random() * 30}px`;
+
+            document.body.appendChild(star);
+            setTimeout(() => star.remove(), 1500);
+        }, i * 100);
     }
 }
 
 // Reset the Bingo card
-document.getElementById('reset-button').addEventListener('click', createBingoCard);
+document.getElementById('reset-button').addEventListener('click', () => {
+    // Clear any remaining celebration elements
+    document.querySelectorAll('.confetti, .firework-burst, .star, .screen-flash').forEach(el => el.remove());
+
+    // Remove winning highlights
+    document.querySelectorAll('.winning-cell').forEach(cell => {
+        cell.classList.remove('winning-cell');
+    });
+
+    createBingoCard();
+});
 
 // Initialize the Bingo card
 createBingoCard();

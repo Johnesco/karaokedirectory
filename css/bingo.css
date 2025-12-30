@@ -1,17 +1,36 @@
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
     text-align: center;
-    background-color: #f0f0f0;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    min-height: 100vh;
     margin: 0;
-    padding: 20px;
+    padding: 15px;
+    color: #fff;
+    overflow-x: hidden;
+}
+
+h1 {
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
+    margin: 10px 0 15px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 #bingo-card {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
-    max-width: 90vw;
-    margin: 20px auto;
+    gap: clamp(4px, 1.5vw, 10px);
+    width: min(95vw, 500px);
+    margin: 0 auto 20px;
+    perspective: 1000px;
 }
 
 .cell {
@@ -19,19 +38,33 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #fff;
-    border: 2px solid #000;
+    background: linear-gradient(145deg, #ffffff, #e6e6e6);
+    border: none;
+    border-radius: clamp(6px, 2vw, 12px);
     cursor: pointer;
     text-align: center;
     user-select: none;
+    -webkit-user-select: none;
     aspect-ratio: 1 / 1;
     transform-style: preserve-3d;
-    transition: transform 0.5s;
-    font-size: min(2.5vw, 20px); /* Responsive font size */
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+    font-size: clamp(10px, 2.8vw, 14px);
+    font-weight: 600;
+    color: #1a1a2e;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    touch-action: manipulation;
 }
 
-.cell.marked {
-    background-color: #aaffaa;
+.cell:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.cell:active {
+    transform: scale(0.95);
+}
+
+.cell.marked:active {
+    transform: rotateY(180deg) scale(0.95);
 }
 
 .cell.flipped {
@@ -43,51 +76,321 @@ body {
     width: 100%;
     height: 100%;
     backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 5px;
-    box-sizing: border-box;
+    padding: clamp(3px, 1vw, 8px);
+    border-radius: inherit;
+    line-height: 1.2;
+    word-break: break-word;
+    hyphens: auto;
+}
+
+.cell .front {
+    background: linear-gradient(145deg, #ffffff, #e6e6e6);
 }
 
 .cell .back {
     transform: rotateY(180deg);
-    background-color: #aaffaa;
+    background: linear-gradient(145deg, #00d26a, #00b058);
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.cell.free-space .front,
+.cell.free-space .back {
+    background: linear-gradient(145deg, #ffd700, #ffaa00);
+    color: #1a1a2e;
+    font-weight: 800;
+}
+
+/* Bingo celebration overlay */
+#bingo-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+    overflow: hidden;
 }
 
 #bingo-message {
-    font-size: 24px;
-    font-weight: bold;
-    color: green;
-    margin-top: 20px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    font-size: clamp(4rem, 20vw, 10rem);
+    font-weight: 900;
+    color: transparent;
+    background: linear-gradient(45deg, #ff0000, #ff7700, #ffdd00, #00ff00, #00ddff, #ff00ff);
+    background-size: 400% 400%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    text-shadow:
+        0 0 20px rgba(255, 255, 255, 0.5),
+        0 0 40px rgba(255, 255, 255, 0.3),
+        0 0 60px rgba(255, 255, 255, 0.2);
+    z-index: 1001;
+    pointer-events: none;
+    opacity: 0;
+    letter-spacing: 0.1em;
+    filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.8));
+}
+
+#bingo-message.show {
+    animation: bingoAppear 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
+               bingoGlow 2s ease-in-out infinite 1s,
+               bingoRainbow 3s linear infinite;
+}
+
+@keyframes bingoAppear {
+    0% {
+        transform: translate(-50%, -50%) scale(0) rotate(-20deg);
+        opacity: 0;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.2) rotate(5deg);
+        opacity: 1;
+    }
+    75% {
+        transform: translate(-50%, -50%) scale(0.9) rotate(-2deg);
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+@keyframes bingoGlow {
+    0%, 100% {
+        filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.8)) brightness(1);
+    }
+    50% {
+        filter: drop-shadow(0 0 60px rgba(255, 100, 100, 1)) brightness(1.2);
+    }
+}
+
+@keyframes bingoRainbow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 #reset-button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
+    margin-top: 15px;
+    padding: clamp(12px, 3vw, 16px) clamp(24px, 6vw, 40px);
+    font-size: clamp(14px, 4vw, 18px);
+    font-weight: 600;
     cursor: pointer;
-    background-color: #007bff;
+    background: linear-gradient(145deg, #ff6b6b, #ee5a5a);
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(238, 90, 90, 0.4);
+    transition: all 0.3s ease;
+    touch-action: manipulation;
+    display: none;
 }
 
 #reset-button:hover {
-    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(238, 90, 90, 0.6);
 }
 
-/* Fireworks animation */
-@keyframes fireworks {
-    0% { transform: scale(1); opacity: 1; }
-    100% { transform: scale(3); opacity: 0; }
+#reset-button:active {
+    transform: translateY(0);
 }
 
-.firework {
-    position: absolute;
-    width: 60px;
-    height: 60px;
-    background-color: gold;
+#reset-button.visible {
+    display: inline-block;
+    animation: buttonAppear 0.5s ease-out;
+}
+
+@keyframes buttonAppear {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.back-link {
+    display: inline-block;
+    margin-top: 25px;
+    color: #48dbfb;
+    text-decoration: none;
+    font-size: clamp(14px, 3.5vw, 16px);
+    padding: 10px 20px;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(72, 219, 251, 0.3);
+}
+
+.back-link:hover {
+    background: rgba(72, 219, 251, 0.1);
+    border-color: rgba(72, 219, 251, 0.6);
+}
+
+/* Confetti particle */
+.confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    pointer-events: none;
+    z-index: 999;
+    animation: confettiFall linear forwards;
+}
+
+.confetti.square {
+    border-radius: 2px;
+}
+
+.confetti.circle {
     border-radius: 50%;
-    animation: fireworks 1s ease-out;
+}
+
+.confetti.ribbon {
+    width: 8px;
+    height: 20px;
+    border-radius: 2px;
+}
+
+@keyframes confettiFall {
+    0% {
+        opacity: 1;
+        transform: translateY(0) rotate(0deg) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(100vh) rotate(720deg) scale(0.5);
+    }
+}
+
+/* Firework burst */
+.firework-burst {
+    position: fixed;
+    pointer-events: none;
+    z-index: 998;
+}
+
+.firework-particle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    animation: fireworkExplode 1s ease-out forwards;
+}
+
+@keyframes fireworkExplode {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+/* Star burst */
+.star {
+    position: fixed;
+    pointer-events: none;
+    z-index: 997;
+    font-size: 30px;
+    animation: starBurst 1.5s ease-out forwards;
+}
+
+@keyframes starBurst {
+    0% {
+        transform: scale(0) rotate(0deg);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.5) rotate(180deg);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* Screen flash effect */
+.screen-flash {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: white;
+    pointer-events: none;
+    z-index: 1002;
+    animation: flash 0.3s ease-out forwards;
+}
+
+@keyframes flash {
+    0% { opacity: 0.8; }
+    100% { opacity: 0; }
+}
+
+/* Winning line highlight */
+.cell.winning-cell {
+    animation: winPulse 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes winPulse {
+    from {
+        box-shadow: 0 0 10px rgba(255, 215, 0, 0.5), 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    to {
+        box-shadow: 0 0 25px rgba(255, 215, 0, 1), 0 0 40px rgba(255, 215, 0, 0.6);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 400px) {
+    body {
+        padding: 10px;
+    }
+
+    h1 {
+        margin: 5px 0 10px;
+    }
+
+    #bingo-card {
+        gap: 3px;
+    }
+
+    .cell {
+        font-size: clamp(8px, 2.5vw, 12px);
+        border-radius: 4px;
+    }
+}
+
+@media (min-width: 600px) {
+    .cell {
+        font-size: 14px;
+    }
+}
+
+/* Landscape mode on mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+    h1 {
+        font-size: 1.2rem;
+        margin: 5px 0;
+    }
+
+    #bingo-card {
+        width: min(60vh, 400px);
+    }
+
+    .back-link {
+        margin-top: 10px;
+    }
 }
