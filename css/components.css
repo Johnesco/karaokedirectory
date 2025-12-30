@@ -148,7 +148,7 @@
 }
 
 .venue-card__name {
-    font-size: var(--font-size-base);
+    font-size: var(--font-size-lg);
     font-weight: 600;
     margin: 0;
 }
@@ -181,8 +181,8 @@
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
-    color: var(--text-secondary);
-    font-size: var(--font-size-sm);
+    color: var(--color-gray-300);
+    font-size: var(--font-size-base);
     margin-bottom: var(--spacing-xs);
 }
 
@@ -203,8 +203,8 @@
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
-    color: var(--text-secondary);
-    font-size: var(--font-size-sm);
+    color: var(--color-gray-300);
+    font-size: var(--font-size-base);
     margin-top: var(--spacing-xs);
 }
 

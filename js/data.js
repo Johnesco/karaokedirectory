@@ -2043,7 +2043,7 @@ const karaokeData = {
       "Dedicated": false,
       "Address": {
         "Street": "9112 Anderson Mill Rd suite b 100",
-        "City": " Austin",
+        "City": "Austin",
         "State": "TX",
         "Zip": "78729"
       },
