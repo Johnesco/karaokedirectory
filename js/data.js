@@ -1,6 +1,49 @@
 const karaokeData = {
   "listings": [
     {
+      "id": "the-austin-eagle",
+      "VenueName": "The Austin Eagle",
+      "Address": {
+        "Street": "8201 Cross Park",
+        "City": "Austin",
+        "State": "TX",
+        "Zip": "78754"
+      },
+      "KJ": {
+        "Host": "",
+        "Company": ""
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/profile.php?id=100088287849207",
+        "Instagram": "https://www.instagram.com/theaustineagle/",
+        "Twitter": null,
+        "Website": "https://theaustineagle.com/",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Sunday"
+          ],
+          "time": "8:00 PM - 12:00 AM"
+        },
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "8:00 PM - 12:00 AM"
+        }
+      ],
+      "coordinates": {
+        "lat": 30.333506172814,
+        "lng": -97.668169420107
+      }
+    },
+    {
       "id": "bar-louie",
       "VenueName": "Bar Louie",
       "Address": {
@@ -44,7 +87,7 @@ const karaokeData = {
         "Zip": "78660"
       },
       "coordinates": {
-        "lat": 30.450,
+        "lat": 30.45,
         "lng": -97.662
       },
       "KJ": {
@@ -887,7 +930,7 @@ const karaokeData = {
         "Zip": "78734"
       },
       "coordinates": {
-        "lat": 30.350,
+        "lat": 30.35,
         "lng": -97.965
       },
       "KJ": {
