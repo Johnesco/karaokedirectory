@@ -50,7 +50,7 @@ function normalizeLegacyVenue(old) {
             zip: old.Address?.Zip || '',
             neighborhood: ''
         },
-        coordinates: null,
+        coordinates: old.coordinates || null,
         schedule: normalizeLegacySchedule(old.schedule),
         host: normalizeLegacyHost(old.KJ),
         socials: normalizeLegacySocials(old.socials),

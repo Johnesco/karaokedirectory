@@ -114,10 +114,6 @@ export class MapView extends Component {
                 .addTo(this.map)
                 .bindPopup(this.createPopup(venue));
 
-            marker.on('click', () => {
-                emit(Events.VENUE_SELECTED, venue);
-            });
-
             this.markers.push(marker);
         });
 

@@ -7,11 +7,7 @@ const karaokeData = {
         "Street": "270 Bass Pro Dr",
         "City": "Round Rock",
         "State": "TX",
-        "Zip": "78665"
-      },
-      "coordinates": {
-        "lat": 30.571,
-        "lng": -97.689
+        "Zip": "78645"
       },
       "KJ": {
         "Host": "",
@@ -42,10 +38,6 @@ const karaokeData = {
         "City": "Pflugerville",
         "State": "TX",
         "Zip": "78660"
-      },
-      "coordinates": {
-        "lat": 30.450,
-        "lng": -97.662
       },
       "KJ": {
         "Host": "DJ Cysum & Mo",
@@ -95,11 +87,7 @@ const karaokeData = {
           ],
           "time": "9:00 PM - 2:00 AM"
         }
-      ],
-      "coordinates": {
-        "lat": 30.268406404771,
-        "lng": -97.744308114958
-      }
+      ]
     },
     {
       "id": "bodhis-bodacious-hideaway",
@@ -139,11 +127,7 @@ const karaokeData = {
           ],
           "time": "9:00 PM - Midnight"
         }
-      ],
-      "coordinates": {
-        "lat": 30.16687727666,
-        "lng": -97.827067719752
-      }
+      ]
     },
     {
       "id": "boomerz",
@@ -172,11 +156,7 @@ const karaokeData = {
           ],
           "time": "9:00 PM - 1:30 AM"
         }
-      ],
-      "coordinates": {
-        "lat": 30.235535450326,
-        "lng": -97.857494321857
-      }
+      ]
     },
     {
       "id": "buddys-place",
@@ -203,11 +183,7 @@ const karaokeData = {
           ],
           "time": "7:30 PM - 11:30 PM"
         }
-      ],
-      "coordinates": {
-        "lat": 30.368420126324,
-        "lng": -97.727481068614
-      }
+      ]
     },
     {
       "id": "canary-roost",
@@ -279,11 +255,7 @@ const karaokeData = {
           ],
           "time": "8:00 PM - 2:00 AM"
         }
-      ],
-      "coordinates": {
-        "lat": 30.399172993044,
-        "lng": -97.70406470663
-      }
+      ]
     },
     {
       "id": "captain-quacks-soundspace",
@@ -326,11 +298,7 @@ const karaokeData = {
           ],
           "time": "8:00 PM - 11:00PM"
         }
-      ],
-      "coordinates": {
-        "lat": 30.21774748789,
-        "lng": -97.796073697988
-      }
+      ]
     },
     {
       "id": "cheerz",
@@ -361,11 +329,7 @@ const karaokeData = {
           ],
           "time": "9:00 PM - 1:00 AM"
         }
-      ],
-      "coordinates": {
-        "lat": 30.350817410812,
-        "lng": -97.54671731632
-      }
+      ]
     },
     {
       "id": "cjs-sports-bar",
@@ -411,11 +375,7 @@ const karaokeData = {
           "time": "7:00 PM - 11:00 PM",
           "description": "Every Wednesday and Second and Fourth Fridays"
         }
-      ],
-      "coordinates": {
-        "lat": 30.651138319145,
-        "lng": -97.675020807298
-      }
+      ]
     },
     {
       "id": "dog-n-bone-pub",
@@ -448,11 +408,7 @@ const karaokeData = {
           ],
           "time": "7:00 PM - 10:00 PM"
         }
-      ],
-      "coordinates": {
-        "lat": 30.195500168236,
-        "lng": -98.089073552348
-      }
+      ]
     },
     {
       "id": "egos",
@@ -525,11 +481,7 @@ const karaokeData = {
           ],
           "time": "8:00 PM - 2:00 AM"
         }
-      ],
-      "coordinates": {
-        "lat": 30.256539029913,
-        "lng": -97.74717592511
-      }
+      ]
     },
     {
       "id": "film-alley",
@@ -567,11 +519,7 @@ const karaokeData = {
           "time": "6:30 PM - 10:30 PM",
           "description": "Second and Fourth Fridays"
         }
-      ],
-      "coordinates": {
-        "lat": 30.649118804323,
-        "lng": -97.688596150866
-      }
+      ]
     },
     {
       "id": "firewater-sports-bar",
@@ -598,11 +546,7 @@ const karaokeData = {
           ],
           "time": "8:00 PM - 11:00 PM"
         }
-      ],
-      "coordinates": {
-        "lat": 30.532343158579,
-        "lng": -97.781482978105
-      }
+      ]
     },
     {
       "id": "gnar-bar",
@@ -630,11 +574,7 @@ const karaokeData = {
           ],
           "time": "9:00 PM - 2:00 AM"
         }
-      ],
-      "coordinates": {
-        "lat": 30.267560447083,
-        "lng": -97.741235976414
-      }
+      ]
     },
     {
       "id": "hard-count-kitchen-and-cocktails",
@@ -662,11 +602,7 @@ const karaokeData = {
           ],
           "time": "9:00 PM - MIDNIGHT"
         }
-      ],
-      "coordinates": {
-        "lat": 30.649202770037,
-        "lng": -97.687912262317
-      }
+      ]
     },
     {
       "id": "hudson-tavern-xpider",
@@ -708,11 +644,7 @@ const karaokeData = {
           "time": "9:00 PM - 1:00 AM"
         }
       ],
-      "Dedicated": false,
-      "coordinates": {
-        "lat": 30.413296837711,
-        "lng": -97.927601334553
-      }
+      "Dedicated": false
     },
     {
       "id": "hudson-tavern-lynum",
@@ -754,11 +686,7 @@ const karaokeData = {
           ],
           "time": "7:00 PM - 11:00 PM"
         }
-      ],
-      "coordinates": {
-        "lat": 30.413296837711,
-        "lng": -97.927601334553
-      }
+      ]
     },
     {
       "id": "knomad-bar",
@@ -795,11 +723,7 @@ const karaokeData = {
           ],
           "time": "8:00 PM - 1:00 AM"
         }
-      ],
-      "coordinates": {
-        "lat": 30.312862411654,
-        "lng": -97.704776515518
-      }
+      ]
     },
     {
       "id": "la-marea",
@@ -834,11 +758,7 @@ const karaokeData = {
           ],
           "time": "8:00 PM - MIDNIGHT"
         }
-      ],
-      "coordinates": {
-        "lat": 30.3409806526,
-        "lng": -97.557495333572
-      }
+      ]
     },
     {
       "id": "lone-star-bar",
@@ -871,11 +791,7 @@ const karaokeData = {
           "time": "9:00 PM - 1:00 AM"
         }
       ],
-      "Dedicated": false,
-      "coordinates": {
-        "lat": 30.439171606086,
-        "lng": -97.612214318795
-      }
+      "Dedicated": false
     },
     {
       "id": "lt-corner-pub",
@@ -885,10 +801,6 @@ const karaokeData = {
         "City": "Lakeway",
         "State": "TX",
         "Zip": "78734"
-      },
-      "coordinates": {
-        "lat": 30.350,
-        "lng": -97.965
       },
       "KJ": {
         "Host": "Dan DeSetto",
@@ -930,10 +842,6 @@ const karaokeData = {
         "State": "TX",
         "Zip": "78645"
       },
-      "coordinates": {
-        "lat": 30.495,
-        "lng": -97.923
-      },
       "KJ": {
         "Host": "",
         "Company": ""
@@ -965,10 +873,6 @@ const karaokeData = {
         "State": "TX",
         "Zip": "78652"
       },
-      "coordinates": {
-        "lat": 30.137,
-        "lng": -97.84
-      },
       "KJ": {
         "Host": "John Roberts",
         "Company": ""
@@ -996,14 +900,10 @@ const karaokeData = {
       "id": "marios-seafood",
       "VenueName": "Mario's Seafood",
       "Address": {
-        "Street": "7522 N I-35 Frontage Rd Bld. C",
+        "Street": "522 N I-35 Frontage Rd Bld. C",
         "City": "Austin",
         "State": "TX",
         "Zip": "78752"
-      },
-      "coordinates": {
-        "lat": 30.3298,
-        "lng": -97.7104
       },
       "KJ": {
         "Host": "",
@@ -1070,11 +970,7 @@ const karaokeData = {
           "description": "TONIGHT ONLY!"
         }
       ],
-      "Dedicated": false,
-      "coordinates": {
-        "lat": 30.081779690499,
-        "lng": -97.842972984542
-      }
+      "Dedicated": false
     },
     {
       "id": "millies-on-main",
@@ -1104,11 +1000,7 @@ const karaokeData = {
           ],
           "time": "6:00 PM - 9:00 PM"
         }
-      ],
-      "coordinates": {
-        "lat": 30.34953312623,
-        "lng": -97.37127702619
-      }
+      ]
     },
     {
       "id": "moontower-saloon",
@@ -1154,11 +1046,7 @@ const karaokeData = {
           ],
           "time": "8:00 PM to 11pm (ish)"
         }
-      ],
-      "coordinates": {
-        "lat": 30.169170016597,
-        "lng": -97.825736200148
-      }
+      ]
     },
     {
       "id": "oak-hill-social",
@@ -1196,11 +1084,7 @@ const karaokeData = {
           ],
           "time": "7:00 PM - 11:30 PM"
         }
-      ],
-      "coordinates": {
-        "lat": 30.234548010446,
-        "lng": -97.911149551875
-      }
+      ]
     },
     {
       "id": "pfluttos-tavern-2",
@@ -1226,11 +1110,7 @@ const karaokeData = {
           ],
           "time": "7:00 PM - 11:00 PM"
         }
-      ],
-      "coordinates": {
-        "lat": 30.562185952763,
-        "lng": -97.602474393776
-      }
+      ]
     },
     {
       "id": "punch-bowl-social-domain",
@@ -1269,11 +1149,7 @@ const karaokeData = {
           ],
           "time": "9:00 PM - MIDNIGHT"
         }
-      ],
-      "coordinates": {
-        "lat": 30.398345412918,
-        "lng": -97.725845489627
-      }
+      ]
     },
     {
       "id": "rabbit-hole-cedarpark",
@@ -1302,11 +1178,7 @@ const karaokeData = {
           ],
           "time": "9:00 PM - 11:00 PM"
         }
-      ],
-      "coordinates": {
-        "lat": 30.542931253002,
-        "lng": -97.791489684585
-      }
+      ]
     },
     {
       "id": "rabbit-hole-leander",
@@ -1335,11 +1207,7 @@ const karaokeData = {
           ],
           "time": "9:00 PM - 11:00 PM"
         }
-      ],
-      "coordinates": {
-        "lat": 30.625663134324,
-        "lng": -97.86384382081
-      }
+      ]
     },
     {
       "id": "railhouse-bar",
@@ -1378,11 +1246,7 @@ const karaokeData = {
           ],
           "time": "8:00 PM - CLOSE"
         }
-      ],
-      "coordinates": {
-        "lat": 29.988565860046,
-        "lng": -97.875857133986
-      }
+      ]
     },
     {
       "id": "randys-ice-house",
@@ -1431,11 +1295,7 @@ const karaokeData = {
           ],
           "time": "8:00 PM - 11:00 PM"
         }
-      ],
-      "coordinates": {
-        "lat": 30.567831821031,
-        "lng": -97.423696055261
-      }
+      ]
     },
     {
       "id": "red-rooters-pub-and-grub",
@@ -1507,11 +1367,7 @@ const karaokeData = {
           ],
           "time": "9:00 PM - 2:00 AM"
         }
-      ],
-      "coordinates": {
-        "lat": 30.439820131343,
-        "lng": -97.620826633357
-      }
+      ]
     },
     {
       "id": "round-rock-tavern",
@@ -1557,25 +1413,17 @@ const karaokeData = {
           ],
           "time": "7:00 PM - 10:00 PM"
         }
-      ],
-      "coordinates": {
-        "lat": 30.508420324178,
-        "lng": -97.679124916654
-      }
+      ]
     },
     {
       "id": "shooters-austin",
       "VenueName": "Shooters (Austin)",
       "Dedicated": false,
       "Address": {
-        "Street": "11416 Ranch Rd 620 N",
+        "Street": "11416 Ranch Rd 620 N, Austin, TX 78726",
         "City": "Austin",
         "State": "TX",
         "Zip": "78726"
-      },
-      "coordinates": {
-        "lat": 30.4557,
-        "lng": -97.8365
       },
       "KJ": {
         "Host": "",
@@ -1631,11 +1479,7 @@ const karaokeData = {
           ],
           "time": "8:00 PM - CLOSE"
         }
-      ],
-      "coordinates": {
-        "lat": 30.5227775011,
-        "lng": -97.824634807705
-      }
+      ]
     },
     {
       "id": "spirit-of-texas",
@@ -1675,11 +1519,7 @@ const karaokeData = {
           "time": "7:00 PM - 9:00 PM",
           "description": "Every First and Third Wednesday"
         }
-      ],
-      "coordinates": {
-        "lat": 30.480545587194,
-        "lng": -97.584551992345
-      }
+      ]
     },
     {
       "id": "the-alcove-cantina",
@@ -1714,11 +1554,7 @@ const karaokeData = {
           "time": "7:30 PM - MIDNIGHT",
           "description": "Every Wednesday"
         }
-      ],
-      "coordinates": {
-        "lat": 30.508590041975,
-        "lng": -97.678557461551
-      }
+      ]
     },
     {
       "id": "the-boat",
@@ -1764,11 +1600,7 @@ const karaokeData = {
           ],
           "time": "9:00 PM - MIDNIGHT"
         }
-      ],
-      "coordinates": {
-        "lat": 30.400044107521,
-        "lng": -97.735557820103
-      }
+      ]
     },
     {
       "id": "the-common-interest",
@@ -1840,11 +1672,7 @@ const karaokeData = {
           ],
           "time": "8:00 PM - 2:00 AM"
         }
-      ],
-      "coordinates": {
-        "lat": 30.365051671403,
-        "lng": -97.728523950447
-      }
+      ]
     },
     {
       "id": "the-fieldhouse-at-the-crossover",
@@ -1889,11 +1717,7 @@ const karaokeData = {
           ],
           "time": "7:00 PM - 10:00 PM"
         }
-      ],
-      "coordinates": {
-        "lat": 30.550840314015,
-        "lng": -97.816453231715
-      }
+      ]
     },
     {
       "id": "the-hive",
@@ -1931,11 +1755,7 @@ const karaokeData = {
           "time": "7:00 PM - 10:00 PM",
           "description": "Second and Fourth Saturdays"
         }
-      ],
-      "coordinates": {
-        "lat": 30.165550768356,
-        "lng": -97.828347018014
-      }
+      ]
     },
     {
       "id": "jackalope-south-shore",
@@ -1985,11 +1805,7 @@ const karaokeData = {
           "time": "9:00 PM - 2:00 AM",
           "description": "Thursdays, Fridays, and Sundays"
         }
-      ],
-      "coordinates": {
-        "lat": 30.241075407773,
-        "lng": -97.726409173363
-      }
+      ]
     },
     {
       "id": "the-iron-bear",
@@ -2031,11 +1847,7 @@ const karaokeData = {
           "time": "9:00 PM - 1:00 AM",
           "description": "Sundays and Wednesdays"
         }
-      ],
-      "coordinates": {
-        "lat": 30.26867765836,
-        "lng": -97.745287351529
-      }
+      ]
     },
     {
       "id": "the-mill",
@@ -2081,11 +1893,7 @@ const karaokeData = {
           ],
           "time": "8:00 PM - 11:30 PM"
         }
-      ],
-      "coordinates": {
-        "lat": 30.452018258414,
-        "lng": -97.780280817501
-      }
+      ]
     },
     {
       "id": "the-whiskey-girls-saloon",
@@ -2114,11 +1922,7 @@ const karaokeData = {
           ],
           "time": "8:00 PM - MIDNIGHT"
         }
-      ],
-      "coordinates": {
-        "lat": 30.359734880631,
-        "lng": -97.53258881857
-      }
+      ]
     },
     {
       "id": "topspin-austin",
@@ -2200,11 +2004,7 @@ const karaokeData = {
           "time": "9:00 PM - 2:00 AM",
           "description": "Everday, 9pm to 2am"
         }
-      ],
-      "coordinates": {
-        "lat": 30.481030904829,
-        "lng": -97.829224991439
-      }
+      ]
     },
     {
       "id": "water-hole-71",
@@ -2228,11 +2028,7 @@ const karaokeData = {
           ],
           "time": "9:30 PM - 1:30 AM"
         }
-      ],
-      "coordinates": {
-        "lat": 30.185721312196,
-        "lng": -97.551510335946
-      }
+      ]
     },
     {
       "id": "wildflower-corks-and-brew",
@@ -2278,11 +2074,7 @@ const karaokeData = {
           ],
           "time": "7:00 PM - 11:00PM"
         }
-      ],
-      "coordinates": {
-        "lat": 30.568646598846,
-        "lng": -97.409323420439
-      }
+      ]
     },
     {
       "id": "willies-joint",
@@ -2322,11 +2114,7 @@ const karaokeData = {
           ],
           "time": "8:00 PM - CLOSE"
         }
-      ],
-      "coordinates": {
-        "lat": 30.085827672343,
-        "lng": -97.837691393518
-      }
+      ]
     }
   ]
 };
