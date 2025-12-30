@@ -1,149 +1,193 @@
-// ======================
-// MODULE IMPORTS
-// ======================
-import { 
-    getWeekDates, 
-    formatWeekRange 
-} from './modules/dateUtils.js';
-
-import { 
-    setupModalEventListeners,
-    clearScheduleContainer,
-    appendDayToContainer 
-} from './modules/domUtils.js';
-
-import { 
-    renderWeek 
-} from './modules/weeklyViewRenderer.js';
-
-import { 
-    renderAllVenues 
-} from './modules/alphabeticalViewRenderer.js';
-
-import { 
-    showVenueDetails 
-} from './modules/modalRenderer.js';
-
-import { 
-    updateViewDisplay,
-    updateViewToggleButtons,
-    addViewToggleButtons 
-} from './modules/viewManager.js';
-
-import { 
-    getVenuesForDate,
-    getAllVenues 
-} from './modules/venueUtils.js';
-
-// ======================
-// APP STATE
-// ======================
-const TODAY = new Date().toDateString();
-let currentWeekStart = new Date();
-let showDedicated = true;
-let currentView = 'weekly';
-
-// ======================
-// VIEW MANAGEMENT
-// ======================
-
 /**
- * Renders the appropriate view based on current state
+ * Austin Karaoke Directory - Main Application
+ * Entry point that initializes all components and views
  */
-const renderCurrentView = () => {
-    if (currentView === 'weekly') {
-        renderWeek(karaokeData, currentWeekStart, showDedicated, getVenuesForDate);
-    } else {
-        renderAllVenues(karaokeData, showDedicated, getAllVenues);
-    }
-    updateViewDisplay(currentView, currentWeekStart);
-    updateViewToggleButtons(currentView);
+
+import { setState, subscribe, getState, goToCurrentWeek } from './core/state.js';
+import { on, emit, Events } from './core/events.js';
+import { initVenues, getVenueById } from './services/venues.js';
+import { Navigation } from './components/Navigation.js';
+import { VenueModal } from './components/VenueModal.js';
+import { WeeklyView } from './views/WeeklyView.js';
+import { AlphabeticalView } from './views/AlphabeticalView.js';
+import { MapView } from './views/MapView.js';
+
+// View instances
+let navigation = null;
+let venueModal = null;
+let currentView = null;
+
+const views = {
+    weekly: WeeklyView,
+    alphabetical: AlphabeticalView,
+    map: MapView
 };
 
-// ======================
-// EVENT HANDLERS
-// ======================
+/**
+ * Initialize the application
+ */
+async function init() {
+    console.log('Initializing Austin Karaoke Directory...');
+
+    // Load venue data
+    await loadData();
+
+    // Initialize navigation
+    navigation = new Navigation('#navigation');
+    navigation.render();
+
+    // Initialize modal (always present, hidden by default)
+    venueModal = new VenueModal('#venue-modal');
+    venueModal.render();
+
+    // Subscribe to view changes
+    subscribe('view', (view) => {
+        renderView(view);
+    });
+
+    // Render initial view directly (setState won't trigger if value unchanged)
+    renderView('weekly');
+
+    // Expose helper for map popups
+    window.showVenueDetails = (venueId) => {
+        const venue = getVenueById(venueId);
+        if (venue) {
+            emit(Events.VENUE_SELECTED, venue);
+        }
+    };
+
+    // Expose helper for "Jump to Today" button
+    window.jumpToToday = () => {
+        // Go to current week
+        setState({ view: 'weekly', weekStart: new Date() });
+
+        // Wait for render, then scroll to today
+        setTimeout(() => {
+            const todayCard = document.querySelector('.day-card--today');
+            if (todayCard) {
+                todayCard.scrollIntoView({ behavior: 'instant', block: 'start' });
+            }
+        }, 50);
+    };
+
+    // Expose helper to check if viewing current week
+    window.isCurrentWeek = () => {
+        const weekStart = getState('weekStart');
+        const today = new Date();
+        const currentWeekStart = new Date(today);
+        currentWeekStart.setDate(today.getDate() - today.getDay());
+        currentWeekStart.setHours(0, 0, 0, 0);
+
+        const viewingWeekStart = new Date(weekStart);
+        viewingWeekStart.setDate(weekStart.getDate() - weekStart.getDay());
+        viewingWeekStart.setHours(0, 0, 0, 0);
+
+        return currentWeekStart.getTime() === viewingWeekStart.getTime();
+    };
+
+    console.log('Application initialized');
+}
 
 /**
- * Sets up general event listeners on buttons and UI elements.
+ * Load venue data from data.js
+ * Supports both global variable (old format) and ES module export (new format)
  */
-const setupEventListeners = () => {
-    // Back to top button visibility and click
-    const backToTop = document.getElementById("backToTop");
-    window.addEventListener("scroll", () => {
-        backToTop.classList.toggle("visible", window.pageYOffset > 300);
-    });
-    backToTop.addEventListener("click", () => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    });
+async function loadData() {
+    try {
+        let data = null;
 
-    // Week navigation buttons
-    document.getElementById("prev-week").addEventListener("click", () => {
-        currentWeekStart.setDate(currentWeekStart.getDate() - 7);
-        renderCurrentView();
-    });
-    document.getElementById("next-week").addEventListener("click", () => {
-        currentWeekStart.setDate(currentWeekStart.getDate() + 7);
-        renderCurrentView();
-    });
-    document.getElementById("this-week").addEventListener("click", () => {
-        currentWeekStart = new Date();
-        renderCurrentView();
-    });
-
-    // Dedicated venues toggle checkbox
-    document.getElementById("dedicated-toggle").addEventListener("change", (e) => {
-        showDedicated = e.target.checked;
-        renderCurrentView();
-    });
-
-    // Venue details buttons (delegated event listener)
-    document.getElementById("schedule-container").addEventListener("click", (e) => {
-        if (e.target.classList.contains("details-btn")) {
-            const venueId = e.target.dataset.id;
-            const venue = karaokeData.listings.find(v => v.id === venueId);
-            if (venue) {
-                showVenueDetails(venue);
+        // First, check if data is available as a global (loaded via script tag)
+        if (typeof karaokeData !== 'undefined') {
+            data = karaokeData;
+            console.log('Loaded data from global variable');
+        } else {
+            // Try dynamic import (for ES module format)
+            try {
+                const dataModule = await import('./data.js');
+                data = dataModule.karaokeData || dataModule.default;
+                console.log('Loaded data from ES module');
+            } catch (importError) {
+                console.warn('Could not import data.js as module:', importError);
             }
         }
-    });
 
-    // View toggle buttons
-    document.getElementById("view-toggle-weekly").addEventListener("click", () => {
-        currentView = 'weekly';
-        renderCurrentView();
-    });
-    
-    document.getElementById("view-toggle-alphabetical").addEventListener("click", () => {
-        currentView = 'alphabetical';
-        renderCurrentView();
-    });
-};
+        if (!data) {
+            throw new Error('No venue data found. Make sure data.js is loaded.');
+        }
 
-// ======================
-// INITIALIZATION
-// ======================
+        initVenues(data);
+        emit(Events.DATA_LOADED, data);
+    } catch (error) {
+        console.error('Failed to load venue data:', error);
+        emit(Events.DATA_ERROR, error);
+
+        // Show error to user
+        const container = document.querySelector('#main-content');
+        if (container) {
+            container.innerHTML = `
+                <div class="error-message">
+                    <h2>Error Loading Data</h2>
+                    <p>Failed to load venue data. Please refresh the page.</p>
+                    <pre>${error.message}</pre>
+                </div>
+            `;
+        }
+    }
+}
 
 /**
- * Initializes the app
+ * Render the specified view
  */
-const init = () => {
-    addViewToggleButtons();
-    
-    if (typeof DOMPurify !== 'object') {
-        const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.5/purify.min.js';
-        script.onload = () => {
-            setupModalEventListeners();
-            setupEventListeners();
-            renderCurrentView();
-        };
-        document.head.appendChild(script);
-    } else {
-        setupModalEventListeners();
-        setupEventListeners();
-        renderCurrentView();
+function renderView(viewName) {
+    const container = document.querySelector('#main-content');
+    if (!container) {
+        console.error('Main content container not found');
+        return;
     }
-};
 
-init();
+    // Destroy current view
+    if (currentView) {
+        currentView.destroy();
+        currentView = null;
+    }
+
+    // Create new view
+    const ViewClass = views[viewName];
+    if (!ViewClass) {
+        console.error(`Unknown view: ${viewName}`);
+        return;
+    }
+
+    currentView = new ViewClass(container);
+    currentView.render();
+}
+
+/**
+ * Handle URL hash for deep linking
+ */
+function handleHashChange() {
+    const hash = window.location.hash.slice(1);
+
+    if (hash.startsWith('venue=')) {
+        const venueId = hash.split('=')[1];
+        const venue = getVenueById(venueId);
+        if (venue) {
+            emit(Events.VENUE_SELECTED, venue);
+        }
+    } else if (['weekly', 'alphabetical', 'map'].includes(hash)) {
+        setState({ view: hash });
+    }
+}
+
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
+
+// Handle hash changes for deep linking
+window.addEventListener('hashchange', handleHashChange);
+
+// Export for debugging
+export { init, renderView, getState };

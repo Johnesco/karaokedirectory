@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Austin Karaoke Directory - JSON Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="css/karaoke.css" />
+    <link rel="stylesheet" href="css/editor.css" />
+</head>
+<body class="parallax">
+    <div class="controls">
+        <h1><i class="fas fa-edit"></i> Karaoke JSON Editor</h1>
+        <div class="editor-controls">
+            <button id="refresh-data"><i class="fas fa-sync-alt"></i> Refresh from JSON</button>
+            <button id="copy-json"><i class="fas fa-copy"></i> Copy JSON</button>
+            <button id="validate-json"><i class="fas fa-check"></i> Validate</button>
+            <button id="back-to-app"><i class="fas fa-external-link-alt"></i> Back to App</button>
+        </div>
+        
+        <div class="json-info">
+            <p><i class="fas fa-info-circle"></i> Edit the JSON below. Changes automatically update the preview.</p>
+            <p><i class="fas fa-sync-alt"></i> Two-way sync: Form changes update JSON, JSON changes update form</p>
+        </div>
+    </div>
+
+    <div id="editor-container">
+        <!-- Form Editor -->
+        <div id="form-editor" class="editor-section">
+            <h2><i class="fas fa-edit"></i> Venue Editor</h2>
+            
+            <div class="venue-selector">
+                <select id="venue-select">
+                    <option value="">Select a venue to edit...</option>
+                </select>
+                <button id="new-venue" class="btn-small"><i class="fas fa-plus"></i> New Venue</button>
+            </div>
+
+            <form id="venue-form">
+                <div class="form-section">
+                    <h3><i class="fas fa-info-circle"></i> Basic Information</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="venue-id">Venue ID:</label>
+                            <input type="text" id="venue-id" required pattern="[a-z0-9-]+">
+                            <small>Unique identifier (lowercase, hyphens)</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="venue-name">Venue Name:</label>
+                            <input type="text" id="venue-name" required>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="venue-dedicated">
+                        <label for="venue-dedicated">Dedicated Karaoke Venue</label>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3><i class="fas fa-map-marker-alt"></i> Address</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="address-street">Street:</label>
+                            <input type="text" id="address-street" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="address-city">City:</label>
+                            <input type="text" id="address-city" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="address-state">State:</label>
+                            <input type="text" id="address-state" value="TX" required maxlength="2">
+                        </div>
+                        <div class="form-group">
+                            <label for="address-zip">ZIP Code:</label>
+                            <input type="text" id="address-zip" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3><i class="fas fa-calendar-alt"></i> Timeframe (Optional)</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="timeframe-start">Start Date:</label>
+                            <input type="date" id="timeframe-start">
+                        </div>
+                        <div class="form-group">
+                            <label for="timeframe-end">End Date:</label>
+                            <input type="date" id="timeframe-end">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3><i class="fas fa-user"></i> Karaoke Jockey (KJ)</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="kj-host">Host Name:</label>
+                            <input type="text" id="kj-host">
+                        </div>
+                        <div class="form-group">
+                            <label for="kj-company">Company:</label>
+                            <input type="text" id="kj-company">
+                        </div>
+                    </div>
+                    
+                    <div class="sub-section">
+                        <h4>KJ Social Media</h4>
+                        <div id="kj-socials-container" class="dynamic-list">
+                            <!-- Generated by JavaScript -->
+                        </div>
+                        <button type="button" id="add-kj-social" class="btn-small">
+                            <i class="fas fa-plus"></i> Add Social Link
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3><i class="fas fa-calendar-day"></i> Schedule</h3>
+                    <div id="schedule-container" class="dynamic-list">
+                        <!-- Generated by JavaScript -->
+                    </div>
+                    <button type="button" id="add-schedule" class="btn-small">
+                        <i class="fas fa-plus"></i> Add Schedule Item
+                    </button>
+                </div>
+
+                <div class="form-section">
+                    <h3><i class="fas fa-link"></i> Venue Social Media</h3>
+                    <div id="venue-socials-container" class="dynamic-list">
+                        <!-- Generated by JavaScript -->
+                    </div>
+                    <button type="button" id="add-venue-social" class="btn-small">
+                        <i class="fas fa-plus"></i> Add Social Link
+                    </button>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" id="save-venue" class="btn-primary">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                    <button type="button" id="delete-venue" class="btn-danger">
+                        <i class="fas fa-trash"></i> Delete Venue
+                    </button>
+                    <button type="button" id="preview-venue" class="btn-preview">
+                        <i class="fas fa-eye"></i> Preview
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- JSON Editor -->
+        <div id="json-editor" class="editor-section">
+            <h2><i class="fas fa-code"></i> JSON Data</h2>
+            <div class="json-controls">
+                <span class="json-info">Venues: <span id="venue-count">0</span></span>
+                <button id="format-json" class="btn-small"><i class="fas fa-indent"></i> Format</button>
+                <button id="minify-json" class="btn-small"><i class="fas fa-compress"></i> Minify</button>
+            </div>
+            <textarea id="json-textarea" spellcheck="false" placeholder="{&quot;listings&quot;: [...]}"></textarea>
+            <div class="json-status" id="json-status"></div>
+        </div>
+
+        <!-- Preview Panel -->
+        <div id="preview-panel" class="editor-section">
+            <h2><i class="fas fa-eye"></i> Preview</h2>
+            <div id="preview-content"></div>
+        </div>
+    </div>
+
+    <!-- Status Message -->
+    <div id="status-message"></div>
+
+    <script src="js/data.js"></script>
+    <script src="js/editor.js"></script>
+</body>
+</html>

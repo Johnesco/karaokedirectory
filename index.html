@@ -1,65 +1,114 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Austin Karaoke Directory</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link rel="stylesheet" href="css/karaoke.css" />
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Application styles -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/views.css">
 </head>
-
-<body class="parallax">
-    <div class="controls">
-        <h1>Greater Austin Karaoke Directory</h1>
-        <div class="week-display" id="week-display"></div>
-
-        <!-- View toggle buttons will be inserted here by JavaScript -->
-
-        <div class="controls-container">
-            <button id="prev-week"><i class="fa-solid fa-arrow-left"></i> Previous Week</button>
-            <button id="this-week">This Week</button>
-            <button id="next-week">Next Week <i class="fa-solid fa-arrow-right"></i></button>
+<body>
+    <header class="site-header">
+        <div class="site-header__content">
+            <h1 class="site-header__title">Greater Austin Karaoke Directory</h1>
+            <p class="site-header__tagline">Find karaoke near you, every night of the week</p>
         </div>
-        <div class="toggle-container">
-            <label for="dedicated-toggle">Show dedicated:</label>
-            <input type="checkbox" id="dedicated-toggle" checked />
+    </header>
+
+    <nav id="navigation" class="navigation-container"></nav>
+
+    <main id="main-content" class="main-content">
+        <!-- Views render here -->
+        <div class="loading">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Loading venues...
         </div>
-    </div>
+    </main>
 
-    <div id="main-content">
-        <div id="schedule-container"></div>
-        <div id="venue-details-pane" class="venue-details-pane"></div>
-    </div>
+    <div id="venue-modal"></div>
 
-    <div id="venue-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <div id="modal-venue-name" class="modal-venue-name"></div>
-            <div id="modal-venue-info"></div>
+    <footer class="site-footer">
+        <div class="site-footer__social">
+            <h2>Follow Us</h2>
+            <div class="social-links">
+                <a href="https://www.facebook.com/groups/2494105004273043"
+                   target="_blank" rel="noopener noreferrer" title="Facebook">
+                    <i class="fa-brands fa-facebook fa-lg"></i>
+                </a>
+                <a href="https://www.instagram.com/karaokedirectory/"
+                   target="_blank" rel="noopener noreferrer" title="Instagram">
+                    <i class="fa-brands fa-instagram fa-lg"></i>
+                </a>
+            </div>
         </div>
-    </div>
-
-    <div class="controls">
-        <h1>Follow Us On Social Media!</h1>
-        <div class="social-links">
-            <a title="Facebook" rel="noopener noreferrer" href="https://www.facebook.com/groups/2494105004273043">
-                <i class="fa-brands fa-facebook"></i>
-            </a>
-            <a title="Instagram" rel="noopener noreferrer" href="https://www.instagram.com/karaokedirectory/">
-                <i class="fa-brands fa-instagram"></i>
-            </a>
+        <div class="site-footer__links">
+            <a href="about.html">About Us</a>
+            <a href="editor.html">Edit Venues</a>
         </div>
+        <p class="site-footer__copyright">
+            &copy; 2025 Austin Karaoke Directory
+        </p>
+    </footer>
 
-        <form action="about.html">
-            <button type="submit">About Us</button>
-        </form>
-    </div>
+    <button id="back-to-top" class="back-to-top" aria-label="Back to top" hidden>
+        <i class="fa-solid fa-chevron-up"></i>
+    </button>
 
-    <button id="backToTop" title="Go to top" aria-label="Scroll to top of page">Back to Top</button>
+    <button id="jump-to-today" class="jump-to-today" aria-label="Jump to today" hidden>
+        <i class="fa-solid fa-calendar-day"></i> Today
+    </button>
 
+    <!-- Application scripts -->
     <script src="js/data.js"></script>
     <script type="module" src="js/app.js"></script>
-</body>
 
+    <!-- Back to top and Jump to Today button behavior -->
+    <script>
+        const backToTop = document.getElementById('back-to-top');
+        const jumpToTodayBtn = document.getElementById('jump-to-today');
+
+        function updateTodayButtonVisibility() {
+            // Show button if not on current week
+            if (typeof window.isCurrentWeek === 'function' && !window.isCurrentWeek()) {
+                jumpToTodayBtn.hidden = false;
+                return;
+            }
+
+            // On current week - show button if today's card is not visible
+            const todayCard = document.querySelector('.day-card--today');
+            if (todayCard) {
+                const rect = todayCard.getBoundingClientRect();
+                const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+                jumpToTodayBtn.hidden = isVisible;
+            } else {
+                jumpToTodayBtn.hidden = true;
+            }
+        }
+
+        window.addEventListener('scroll', () => {
+            backToTop.hidden = window.scrollY < 300;
+            updateTodayButtonVisibility();
+        });
+
+        // Also update when week changes (check periodically)
+        setInterval(updateTodayButtonVisibility, 500);
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        jumpToTodayBtn.addEventListener('click', () => {
+            if (typeof window.jumpToToday === 'function') {
+                window.jumpToToday();
+            }
+        });
+    </script>
+</body>
 </html>
