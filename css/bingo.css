@@ -27,8 +27,8 @@ h1 {
 #bingo-card {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: clamp(4px, 1.5vw, 10px);
-    width: min(95vw, 500px);
+    gap: clamp(3px, 1.2vw, 10px);
+    width: min(98vw, 500px);
     margin: 0 auto 20px;
     perspective: 1000px;
 }
@@ -40,7 +40,7 @@ h1 {
     justify-content: center;
     background: linear-gradient(145deg, #ffffff, #e6e6e6);
     border: none;
-    border-radius: clamp(6px, 2vw, 12px);
+    border-radius: clamp(4px, 1.5vw, 12px);
     cursor: pointer;
     text-align: center;
     user-select: none;
@@ -48,7 +48,7 @@ h1 {
     aspect-ratio: 1 / 1;
     transform-style: preserve-3d;
     transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
-    font-size: clamp(10px, 2.8vw, 14px);
+    font-size: clamp(11px, 3.2vw, 14px);
     font-weight: 600;
     color: #1a1a2e;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
@@ -80,9 +80,9 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: clamp(3px, 1vw, 8px);
+    padding: 2px;
     border-radius: inherit;
-    line-height: 1.2;
+    line-height: 1.1;
     word-break: break-word;
     hyphens: auto;
 }
@@ -391,7 +391,7 @@ h1 {
 /* Responsive adjustments */
 @media (max-width: 400px) {
     body {
-        padding: 10px;
+        padding: 8px;
     }
 
     h1 {
@@ -399,12 +399,28 @@ h1 {
     }
 
     #bingo-card {
-        gap: 3px;
+        gap: 2px;
+        width: 98vw;
     }
 
     .cell {
-        font-size: clamp(8px, 2.5vw, 12px);
-        border-radius: 4px;
+        font-size: clamp(10px, 3.5vw, 13px);
+        border-radius: 3px;
+    }
+
+    .cell .front, .cell .back {
+        padding: 1px;
+    }
+}
+
+@media (min-width: 400px) and (max-width: 599px) {
+    #bingo-card {
+        width: 96vw;
+        gap: 4px;
+    }
+
+    .cell {
+        font-size: clamp(11px, 3.2vw, 14px);
     }
 }
 
