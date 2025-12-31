@@ -9,6 +9,102 @@ const words = [
 
 let bingoAchieved = false;
 let winningCells = [];
+let currentCardWords = [];
+let moveHistory = []; // Track all moves for undo
+
+const STORAGE_KEY = 'karaokeBingoState';
+
+// Save current state to localStorage
+function saveState() {
+    const cells = document.querySelectorAll('.cell');
+    const markedIndices = [];
+    cells.forEach((cell, index) => {
+        if (cell.classList.contains('marked') && index !== 12) { // 12 is the free space
+            markedIndices.push(index);
+        }
+    });
+
+    const state = {
+        cardWords: currentCardWords,
+        markedIndices: markedIndices,
+        bingoAchieved: bingoAchieved,
+        winningCells: winningCells,
+        moveHistory: moveHistory
+    };
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+// Update undo button visibility
+function updateUndoButton() {
+    const undoButton = document.getElementById('undo-button');
+    if (moveHistory.length > 0) {
+        undoButton.classList.add('visible');
+    } else {
+        undoButton.classList.remove('visible');
+    }
+}
+
+// Perform undo operation
+function undoLastMove() {
+    if (moveHistory.length === 0) return;
+
+    const lastMove = moveHistory.pop();
+    const cells = document.querySelectorAll('.cell');
+    const cell = cells[lastMove.cellIndex];
+
+    // If we're undoing a bingo, clear the bingo state first
+    if (bingoAchieved) {
+        bingoAchieved = false;
+        winningCells = [];
+
+        // Clear celebration elements
+        document.querySelectorAll('.confetti, .firework-burst, .star, .screen-flash').forEach(el => el.remove());
+
+        // Remove winning highlights from all cells
+        document.querySelectorAll('.winning-cell').forEach(c => {
+            c.classList.remove('winning-cell');
+        });
+
+        // Hide bingo message and reset button
+        const bingoMessage = document.getElementById('bingo-message');
+        const resetButton = document.getElementById('reset-button');
+        bingoMessage.textContent = '';
+        bingoMessage.classList.remove('show');
+        resetButton.classList.remove('visible');
+    }
+
+    // Restore cell to previous state
+    if (lastMove.wasMarked) {
+        cell.classList.add('marked', 'flipped');
+    } else {
+        cell.classList.remove('marked', 'flipped');
+    }
+
+    // Check if there's still a bingo after undo (in case of multiple winning lines)
+    checkBingo();
+
+    updateUndoButton();
+    saveState();
+}
+
+// Load state from localStorage
+function loadState() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+        try {
+            return JSON.parse(saved);
+        } catch (e) {
+            return null;
+        }
+    }
+    return null;
+}
+
+// Clear saved state
+function clearState() {
+    localStorage.removeItem(STORAGE_KEY);
+}
 
 // Vibrant colors for celebration
 const celebrationColors = [
@@ -32,7 +128,7 @@ function generateCard() {
 }
 
 // Create the Bingo card
-function createBingoCard() {
+function createBingoCard(savedState = null) {
     const bingoCard = document.getElementById('bingo-card');
     const bingoMessage = document.getElementById('bingo-message');
     const resetButton = document.getElementById('reset-button');
@@ -43,7 +139,13 @@ function createBingoCard() {
     bingoAchieved = false;
     winningCells = [];
 
-    const selectedWords = generateCard();
+    // Use saved words or generate new ones
+    const selectedWords = savedState ? savedState.cardWords : generateCard();
+    currentCardWords = selectedWords;
+
+    // Restore or reset move history
+    moveHistory = savedState && savedState.moveHistory ? savedState.moveHistory : [];
+
     const cardSize = 5;
     const middleCellIndex = Math.floor(cardSize * cardSize / 2);
     let wordIndex = 0;
@@ -66,6 +168,11 @@ function createBingoCard() {
             const word = selectedWords[wordIndex++];
             front.textContent = word;
             back.textContent = word;
+
+            // Restore marked state if loading from saved state
+            if (savedState && savedState.markedIndices.includes(i)) {
+                cell.classList.add('marked', 'flipped');
+            }
         }
 
         cell.appendChild(front);
@@ -74,6 +181,13 @@ function createBingoCard() {
         cell.addEventListener('click', () => {
             // Prevent toggling the middle "FREE" space
             if (i !== middleCellIndex && !bingoAchieved) {
+                // Record move before making it (store previous state)
+                const wasMarked = cell.classList.contains('marked');
+                moveHistory.push({
+                    cellIndex: i,
+                    wasMarked: wasMarked
+                });
+
                 cell.classList.toggle('marked');
                 cell.classList.toggle('flipped');
 
@@ -83,11 +197,31 @@ function createBingoCard() {
                 }
 
                 checkBingo();
+                updateUndoButton();
+                saveState();
             }
         });
 
         bingoCard.appendChild(cell);
     }
+
+    // Restore bingo state if was achieved
+    if (savedState && savedState.bingoAchieved) {
+        bingoAchieved = true;
+        winningCells = savedState.winningCells;
+
+        const cells = document.querySelectorAll('.cell');
+        winningCells.forEach(index => {
+            cells[index].classList.add('winning-cell');
+        });
+
+        bingoMessage.textContent = "BINGO!";
+        bingoMessage.classList.add('show');
+        resetButton.classList.add('visible');
+    }
+
+    // Update undo button visibility
+    updateUndoButton();
 }
 
 // Check for a Bingo
@@ -311,8 +445,21 @@ document.getElementById('reset-button').addEventListener('click', () => {
         cell.classList.remove('winning-cell');
     });
 
+    // Clear saved state and create fresh card
+    clearState();
     createBingoCard();
 });
 
-// Initialize the Bingo card
-createBingoCard();
+// Undo button handler
+document.getElementById('undo-button').addEventListener('click', () => {
+    undoLastMove();
+
+    // Haptic feedback on mobile
+    if (navigator.vibrate) {
+        navigator.vibrate(10);
+    }
+});
+
+// Initialize the Bingo card - restore from saved state if available
+const savedState = loadState();
+createBingoCard(savedState);

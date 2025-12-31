@@ -179,19 +179,28 @@ h1 {
     100% { background-position: 0% 50%; }
 }
 
-#reset-button {
+.button-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
     margin-top: 15px;
+}
+
+#reset-button, #undo-button {
     padding: clamp(12px, 3vw, 16px) clamp(24px, 6vw, 40px);
     font-size: clamp(14px, 4vw, 18px);
     font-weight: 600;
     cursor: pointer;
-    background: linear-gradient(145deg, #ff6b6b, #ee5a5a);
     color: white;
     border: none;
     border-radius: 50px;
-    box-shadow: 0 4px 15px rgba(238, 90, 90, 0.4);
     transition: all 0.3s ease;
     touch-action: manipulation;
+}
+
+#reset-button {
+    background: linear-gradient(145deg, #ff6b6b, #ee5a5a);
+    box-shadow: 0 4px 15px rgba(238, 90, 90, 0.4);
     display: none;
 }
 
@@ -207,6 +216,32 @@ h1 {
 #reset-button.visible {
     display: inline-block;
     animation: buttonAppear 0.5s ease-out;
+}
+
+#undo-button {
+    background: linear-gradient(145deg, #6b7fd6, #5a6bc4);
+    box-shadow: 0 4px 15px rgba(90, 107, 196, 0.4);
+    display: none;
+}
+
+#undo-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(90, 107, 196, 0.6);
+}
+
+#undo-button:active {
+    transform: translateY(0);
+}
+
+#undo-button.visible {
+    display: inline-block;
+    animation: buttonAppear 0.5s ease-out;
+}
+
+#undo-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
 }
 
 @keyframes buttonAppear {
