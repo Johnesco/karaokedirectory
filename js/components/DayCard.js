@@ -44,6 +44,9 @@ export class DayCard extends Component {
                     <h2 class="day-card__day">${dayName}</h2>
                     <span class="day-card__date">${dateStr}</span>
                     ${isToday(date) ? '<span class="day-card__today-badge">Today</span>' : ''}
+                    <span class="day-card__expand-indicator">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </span>
                 </header>
 
                 <div class="day-card__content">

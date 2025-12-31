@@ -38,6 +38,14 @@ export class WeeklyView extends Component {
     }
 
     afterRender() {
+        // Event delegation for past day card header clicks to toggle expansion
+        this.delegate('click', '.day-card--past .day-card__header', (_e, target) => {
+            const dayCard = target.closest('.day-card--past');
+            if (dayCard) {
+                dayCard.classList.toggle('day-card--expanded');
+            }
+        });
+
         // Event delegation for venue card clicks (whole card is clickable)
         this.delegate('click', '.venue-card', (e, target) => {
             // Don't trigger modal if clicking on a link (like address)

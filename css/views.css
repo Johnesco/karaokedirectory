@@ -21,6 +21,7 @@
 /* Past days - collapsed and dimmed */
 .day-card--past {
     opacity: 0.5;
+    cursor: pointer;
 }
 
 .day-card--past .day-card__content {
@@ -35,20 +36,40 @@
     border-radius: var(--border-radius);
 }
 
-.day-card--past:hover {
+/* Chevron indicator for collapsed past days */
+.day-card__expand-indicator {
+    display: none;
+    margin-left: auto;
+    color: var(--text-secondary);
+    transition: transform var(--transition-fast);
+}
+
+.day-card--past .day-card__expand-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Expanded state for past days (click to toggle) */
+.day-card--past.day-card--expanded {
     opacity: 0.8;
+    cursor: pointer;
 }
 
-.day-card--past:hover .day-card__content {
+.day-card--past.day-card--expanded .day-card__content {
     display: block;
 }
 
-.day-card--past:hover .day-card__footer {
+.day-card--past.day-card--expanded .day-card__footer {
     display: block;
 }
 
-.day-card--past:hover .day-card__header {
+.day-card--past.day-card--expanded .day-card__header {
     border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+.day-card--past.day-card--expanded .day-card__expand-indicator {
+    transform: rotate(180deg);
 }
 
 .day-card__header {
