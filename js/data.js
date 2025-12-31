@@ -845,6 +845,42 @@ const karaokeData = {
       }
     },
     {
+      "id": "last-call",
+      "VenueName": "Last Call",
+      "Address": {
+        "Street": "1615 Grand Ave Pkwy",
+        "City": "Pflugerville",
+        "State": "TX",
+        "Zip": "78660"
+      },
+      "KJ": {
+        "Host": "",
+        "Company": ""
+      },
+      "socials": {
+        "Facebook": null,
+        "Instagram": null,
+        "Twitter": null,
+        "Website": null,
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Saturday"
+          ],
+          "time": "9:00 PM - 1:00 AM"
+        }
+      ],
+      "coordinates": {
+        "lat": 30.456010150261,
+        "lng": -97.659020419193
+      }
+    },
+    {
       "id": "la-marea",
       "VenueName": "La Marea",
       "Address": {
