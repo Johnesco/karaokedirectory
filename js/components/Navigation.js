@@ -28,29 +28,36 @@ export class Navigation extends Component {
             <nav class="navigation">
                 <div class="navigation__views">
                     <button
-                        class="nav-btn ${view === 'weekly' ? 'nav-btn--active' : ''}"
+                        class="nav-btn nav-btn--labeled ${view === 'weekly' ? 'nav-btn--active' : ''}"
                         data-view="weekly"
                         type="button"
                     >
                         <i class="fa-regular fa-calendar"></i>
-                        <span>Weekly</span>
+                        <span class="nav-btn__label">CAL</span>
                     </button>
                     <button
-                        class="nav-btn ${view === 'alphabetical' ? 'nav-btn--active' : ''}"
+                        class="nav-btn nav-btn--labeled ${view === 'alphabetical' ? 'nav-btn--active' : ''}"
                         data-view="alphabetical"
                         type="button"
                     >
                         <i class="fa-solid fa-list"></i>
-                        <span>A-Z</span>
+                        <span class="nav-btn__label">A-Z</span>
                     </button>
                     <button
-                        class="nav-btn ${view === 'map' ? 'nav-btn--active' : ''}"
+                        class="nav-btn nav-btn--labeled ${view === 'map' ? 'nav-btn--active' : ''}"
                         data-view="map"
                         type="button"
                     >
                         <i class="fa-solid fa-map-location-dot"></i>
-                        <span>Map</span>
+                        <span class="nav-btn__label">MAP</span>
                     </button>
+                    <a
+                        class="nav-btn nav-btn--labeled"
+                        href="bingo.html"
+                    >
+                        <i class="fa-solid fa-table-cells"></i>
+                        <span class="nav-btn__label">BINGO</span>
+                    </a>
                 </div>
 
                 ${view === 'weekly' ? `
