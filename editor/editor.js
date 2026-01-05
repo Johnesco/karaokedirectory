@@ -69,6 +69,7 @@ function normalizeVenue(venue) {
                 zip: venue.Address?.Zip || '',
                 neighborhood: ''
             },
+            coordinates: venue.coordinates || null,
             schedule: normalizeSchedule(venue.schedule),
             host: normalizeHost(venue.KJ),
             socials: normalizeSocials(venue.socials),
@@ -375,7 +376,11 @@ function getFormData() {
         website: hostWebsite || undefined
     } : null;
 
-    return {
+    // Preserve coordinates from original venue if editing
+    const originalVenue = selectedVenueId ? venues.find(v => v.id === selectedVenueId) : null;
+    const coordinates = originalVenue?.coordinates || null;
+
+    const result = {
         id: document.getElementById('venue-id').value.trim(),
         name: document.getElementById('venue-name').value.trim(),
         active: document.getElementById('venue-active').checked,
@@ -391,6 +396,13 @@ function getFormData() {
         host: host,
         socials: Object.keys(socials).length ? socials : undefined
     };
+
+    // Include coordinates if they exist
+    if (coordinates) {
+        result.coordinates = coordinates;
+    }
+
+    return result;
 }
 
 /**
@@ -581,7 +593,7 @@ function copyJson() {
  * Convert venue to legacy format for export
  */
 function venueToLegacyFormat(venue) {
-    return {
+    const result = {
         id: venue.id,
         VenueName: venue.name,
         Dedicated: venue.dedicated || undefined,
@@ -609,6 +621,13 @@ function venueToLegacyFormat(venue) {
             time: formatTimeRange(s.startTime, s.endTime)
         }))
     };
+
+    // Preserve coordinates if they exist
+    if (venue.coordinates?.lat && venue.coordinates?.lng) {
+        result.coordinates = venue.coordinates;
+    }
+
+    return result;
 }
 
 /**

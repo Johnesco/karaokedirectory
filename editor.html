@@ -128,6 +128,19 @@
                             <small>Optional - helps with filtering</small>
                         </div>
                     </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="coord-lat"><i class="fa-solid fa-location-crosshairs"></i> Latitude</label>
+                            <input type="text" id="coord-lat" name="coordinates.lat"
+                                   placeholder="30.267560" pattern="-?\d+\.?\d*">
+                        </div>
+                        <div class="form-group">
+                            <label for="coord-lng"><i class="fa-solid fa-location-crosshairs"></i> Longitude</label>
+                            <input type="text" id="coord-lng" name="coordinates.lng"
+                                   placeholder="-97.741235" pattern="-?\d+\.?\d*">
+                        </div>
+                    </div>
+                    <small class="form-hint">Coordinates for map view. Run <code>node scripts/geocode-venues.js</code> to auto-fill from address.</small>
                 </fieldset>
 
                 <!-- Schedule -->
