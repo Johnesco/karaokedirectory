@@ -2286,6 +2286,42 @@ const karaokeData = {
       }
     },
     {
+      "id": "the-usual-local-bar",
+      "VenueName": "The Usual Local Bar",
+      "Address": {
+        "Street": "11101 Burnet Rd",
+        "City": "Austin",
+        "State": "TX",
+        "Zip": "78758"
+      },
+      "KJ": {
+        "Host": "Erin Hierholzer",
+        "Company": ""
+      },
+      "socials": {
+        "Facebook": null,
+        "Instagram": "https://www.instagram.com/the_usual_atx/",
+        "Twitter": null,
+        "Website": "https://theusualatx.bar/",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Monday"
+          ],
+          "time": "8:00 PM - 11:00 PM"
+        }
+      ],
+      "coordinates": {
+        "lat": 30.395238267297,
+        "lng": -97.72031672027
+      }
+    },
+    {
       "id": "water-hole-71",
       "VenueName": "Water Hole 71",
       "Address": {
