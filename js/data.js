@@ -2191,7 +2191,7 @@ const karaokeData = {
             "every",
             "Tuesday"
           ],
-          "time": "8:00 PM - MIDNIGHT"
+          "time": "8:00 PM - 11:00PM"
         }
       ],
       "coordinates": {
