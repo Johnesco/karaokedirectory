@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit a Venue - Austin Karaoke Directory</title>
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Application styles -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/views.css">
+
+    <style>
+        .submit-form {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: var(--spacing-lg);
+        }
+
+        .form-section {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        .form-section legend {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            color: var(--color-primary-light);
+            padding: 0 var(--spacing-sm);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .form-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+
+        .form-group--full {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-group .required {
+            color: var(--color-error);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-sm);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: border-color var(--transition-fast);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--color-primary);
+            outline: none;
+        }
+
+        .form-group small {
+            color: var(--text-muted);
+            font-size: var(--font-size-xs);
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .schedule-entry {
+            display: grid;
+            grid-template-columns: 1fr 1fr 2fr;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md);
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius-sm);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .schedule-entry:last-child {
+            margin-bottom: 0;
+        }
+
+        @media (max-width: 600px) {
+            .schedule-entry {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .add-schedule-btn {
+            margin-top: var(--spacing-sm);
+        }
+
+        .remove-schedule-btn {
+            background: var(--color-error);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            cursor: pointer;
+            font-size: var(--font-size-sm);
+            margin-top: var(--spacing-sm);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn--large {
+            padding: var(--spacing-md) var(--spacing-xl);
+            font-size: var(--font-size-lg);
+        }
+
+        .rate-limit-warning {
+            background: var(--color-warning);
+            color: var(--color-black);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .rate-limit-warning.error {
+            background: var(--color-error);
+            color: white;
+        }
+
+        .success-message {
+            background: var(--color-success);
+            color: white;
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius);
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        /* Honeypot - hidden from humans */
+        .hp-field {
+            position: absolute;
+            left: -9999px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .intro-text {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            border-left: 4px solid var(--color-primary);
+        }
+
+        .intro-text p {
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .intro-text p:last-child {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="site-header__content">
+            <h1 class="site-header__title">Greater Austin Karaoke Directory</h1>
+            <p class="site-header__tagline">Submit a New Venue</p>
+        </div>
+    </header>
+
+    <nav class="navigation-container">
+        <div class="navigation">
+            <a href="index.html" class="nav-btn">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back to Directory</span>
+            </a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="submit-form">
+            <div class="intro-text">
+                <p><strong>Know of a karaoke night we're missing?</strong></p>
+                <p>Fill out this form with as much information as you have. When you submit, it will open your email client with the venue details formatted and ready to send.</p>
+                <p><small>Don't worry if you don't have all the details - just fill in what you know!</small></p>
+            </div>
+
+            <div id="rate-limit-message" class="rate-limit-warning" style="display: none;"></div>
+            <div id="success-message" class="success-message" style="display: none;"></div>
+
+            <form id="venue-form">
+                <!-- Honeypot field to catch bots -->
+                <div class="hp-field" aria-hidden="true">
+                    <label for="website_url">Leave this empty</label>
+                    <input type="text" id="website_url" name="website_url" tabindex="-1" autocomplete="off">
+                </div>
+
+                <fieldset class="form-section">
+                    <legend><i class="fa-solid fa-music"></i> Venue Information</legend>
+                    <div class="form-row">
+                        <div class="form-group form-group--full">
+                            <label for="venue-name">Venue Name <span class="required">*</span></label>
+                            <input type="text" id="venue-name" name="venue-name" required placeholder="e.g., The Karaoke Bar">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dedicated">
+                                <input type="checkbox" id="dedicated" name="dedicated">
+                                Dedicated Karaoke Venue
+                            </label>
+                            <small>Check if this is primarily a karaoke venue</small>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset class="form-section">
+                    <legend><i class="fa-solid fa-location-dot"></i> Address</legend>
+                    <div class="form-row">
+                        <div class="form-group form-group--full">
+                            <label for="street">Street Address <span class="required">*</span></label>
+                            <input type="text" id="street" name="street" required placeholder="e.g., 123 Main Street">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="city">City <span class="required">*</span></label>
+                            <input type="text" id="city" name="city" required value="Austin" placeholder="Austin">
+                        </div>
+                        <div class="form-group">
+                            <label for="state">State</label>
+                            <input type="text" id="state" name="state" value="TX" maxlength="2">
+                        </div>
+                        <div class="form-group">
+                            <label for="zip">ZIP Code</label>
+                            <input type="text" id="zip" name="zip" pattern="\d{5}(-\d{4})?" placeholder="78701">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset class="form-section">
+                    <legend><i class="fa-solid fa-calendar"></i> Karaoke Schedule</legend>
+                    <div id="schedule-entries">
+                        <div class="schedule-entry" data-index="0">
+                            <div class="form-group">
+                                <label>Frequency</label>
+                                <select name="frequency-0">
+                                    <option value="every">Every</option>
+                                    <option value="first">First</option>
+                                    <option value="second">Second</option>
+                                    <option value="third">Third</option>
+                                    <option value="fourth">Fourth</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Day <span class="required">*</span></label>
+                                <select name="day-0" required>
+                                    <option value="">Select day...</option>
+                                    <option value="Sunday">Sunday</option>
+                                    <option value="Monday">Monday</option>
+                                    <option value="Tuesday">Tuesday</option>
+                                    <option value="Wednesday">Wednesday</option>
+                                    <option value="Thursday">Thursday</option>
+                                    <option value="Friday">Friday</option>
+                                    <option value="Saturday">Saturday</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Time</label>
+                                <input type="text" name="time-0" placeholder="e.g., 9:00 PM - 1:00 AM">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn--secondary add-schedule-btn" onclick="addScheduleEntry()">
+                        <i class="fa-solid fa-plus"></i> Add Another Day
+                    </button>
+                </fieldset>
+
+                <fieldset class="form-section">
+                    <legend><i class="fa-solid fa-microphone"></i> Host/KJ Info (Optional)</legend>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="host-name">Host Name</label>
+                            <input type="text" id="host-name" name="host-name" placeholder="e.g., DJ Mike">
+                        </div>
+                        <div class="form-group">
+                            <label for="company">Company</label>
+                            <input type="text" id="company" name="company" placeholder="e.g., Karaoke Kings">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group form-group--full">
+                            <label for="host-website">Host/Company Website</label>
+                            <input type="url" id="host-website" name="host-website" placeholder="https://">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset class="form-section">
+                    <legend><i class="fa-solid fa-share-nodes"></i> Venue Social Links (Optional)</legend>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="venue-website"><i class="fa-solid fa-globe"></i> Website</label>
+                            <input type="url" id="venue-website" name="venue-website" placeholder="https://">
+                        </div>
+                        <div class="form-group">
+                            <label for="venue-facebook"><i class="fa-brands fa-facebook"></i> Facebook</label>
+                            <input type="url" id="venue-facebook" name="venue-facebook" placeholder="https://facebook.com/...">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="venue-instagram"><i class="fa-brands fa-instagram"></i> Instagram</label>
+                            <input type="url" id="venue-instagram" name="venue-instagram" placeholder="https://instagram.com/...">
+                        </div>
+                        <div class="form-group">
+                            <label for="venue-twitter"><i class="fa-brands fa-x-twitter"></i> X/Twitter</label>
+                            <input type="url" id="venue-twitter" name="venue-twitter" placeholder="https://x.com/...">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset class="form-section">
+                    <legend><i class="fa-solid fa-comment"></i> Additional Notes</legend>
+                    <div class="form-row">
+                        <div class="form-group form-group--full">
+                            <label for="notes">Anything else we should know?</label>
+                            <textarea id="notes" name="notes" placeholder="e.g., Private rooms available, cover charge, special events, etc."></textarea>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group form-group--full">
+                            <label for="submitter-name">Your Name (Optional)</label>
+                            <input type="text" id="submitter-name" name="submitter-name" placeholder="So we can credit you!">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn--primary btn--large" id="submit-btn">
+                        <i class="fa-solid fa-paper-plane"></i> Generate Email
+                    </button>
+                    <button type="button" class="btn btn--secondary btn--large" onclick="previewJSON()">
+                        <i class="fa-solid fa-eye"></i> Preview JSON
+                    </button>
+                </div>
+            </form>
+
+            <!-- JSON Preview Modal -->
+            <div id="json-preview-modal" class="venue-modal">
+                <div class="venue-modal__backdrop" onclick="closePreview()"></div>
+                <div class="venue-modal__content">
+                    <button class="venue-modal__close" onclick="closePreview()">
+                        <i class="fa-solid fa-times"></i>
+                    </button>
+                    <h3 style="margin-bottom: var(--spacing-md);">JSON Preview</h3>
+                    <pre id="json-preview" style="background: var(--bg-secondary); padding: var(--spacing-md); border-radius: var(--border-radius-sm); overflow-x: auto; font-size: var(--font-size-sm);"></pre>
+                    <div style="margin-top: var(--spacing-md); display: flex; gap: var(--spacing-sm);">
+                        <button class="btn btn--primary" onclick="copyJSON()">
+                            <i class="fa-solid fa-copy"></i> Copy JSON
+                        </button>
+                        <button class="btn btn--secondary" onclick="closePreview()">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="site-footer__social">
+            <h2>Follow Us</h2>
+            <div class="social-links">
+                <a href="https://www.facebook.com/groups/2494105004273043"
+                   target="_blank" rel="noopener noreferrer" title="Facebook">
+                    <i class="fa-brands fa-facebook fa-lg"></i>
+                </a>
+                <a href="https://www.instagram.com/karaokedirectory/"
+                   target="_blank" rel="noopener noreferrer" title="Instagram">
+                    <i class="fa-brands fa-instagram fa-lg"></i>
+                </a>
+            </div>
+        </div>
+        <div class="site-footer__links">
+            <a href="about.html">About Us</a>
+            <a href="submit.html">Submit Venue</a>
+        </div>
+        <p class="site-footer__copyright">
+            &copy; 2025 Austin Karaoke Directory
+        </p>
+    </footer>
+
+    <script>
+        // Rate limiting configuration
+        const RATE_LIMIT_CONFIG = {
+            maxSubmissions: 3,      // Max submissions allowed
+            windowMs: 60 * 60 * 1000, // Time window: 1 hour in milliseconds
+            storageKey: 'karaoke-submit-history'
+        };
+
+        // Email configuration
+        const EMAIL_ADDRESS = 'your-email@example.com'; // Change this to your email
+
+        let scheduleCount = 1;
+
+        // Check rate limit on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkRateLimit();
+        });
+
+        function getSubmissionHistory() {
+            try {
+                const history = localStorage.getItem(RATE_LIMIT_CONFIG.storageKey);
+                return history ? JSON.parse(history) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveSubmission() {
+            const history = getSubmissionHistory();
+            history.push(Date.now());
+            localStorage.setItem(RATE_LIMIT_CONFIG.storageKey, JSON.stringify(history));
+        }
+
+        function checkRateLimit() {
+            const history = getSubmissionHistory();
+            const now = Date.now();
+            const windowStart = now - RATE_LIMIT_CONFIG.windowMs;
+
+            // Filter to only submissions within the time window
+            const recentSubmissions = history.filter(timestamp => timestamp > windowStart);
+
+            // Clean up old entries
+            localStorage.setItem(RATE_LIMIT_CONFIG.storageKey, JSON.stringify(recentSubmissions));
+
+            const messageEl = document.getElementById('rate-limit-message');
+            const submitBtn = document.getElementById('submit-btn');
+
+            if (recentSubmissions.length >= RATE_LIMIT_CONFIG.maxSubmissions) {
+                const oldestRecent = Math.min(...recentSubmissions);
+                const resetTime = new Date(oldestRecent + RATE_LIMIT_CONFIG.windowMs);
+                const minutesRemaining = Math.ceil((resetTime - now) / (60 * 1000));
+
+                messageEl.textContent = `You've reached the submission limit (${RATE_LIMIT_CONFIG.maxSubmissions} per hour). Please try again in ${minutesRemaining} minute${minutesRemaining !== 1 ? 's' : ''}.`;
+                messageEl.classList.add('error');
+                messageEl.style.display = 'block';
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.5';
+                submitBtn.style.cursor = 'not-allowed';
+                return false;
+            } else if (recentSubmissions.length >= RATE_LIMIT_CONFIG.maxSubmissions - 1) {
+                messageEl.textContent = `You have 1 submission remaining this hour.`;
+                messageEl.classList.remove('error');
+                messageEl.style.display = 'block';
+            } else {
+                messageEl.style.display = 'none';
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.style.opacity = '1';
+            submitBtn.style.cursor = 'pointer';
+            return true;
+        }
+
+        function addScheduleEntry() {
+            const container = document.getElementById('schedule-entries');
+            const entry = document.createElement('div');
+            entry.className = 'schedule-entry';
+            entry.dataset.index = scheduleCount;
+
+            entry.innerHTML = `
+                <div class="form-group">
+                    <label>Frequency</label>
+                    <select name="frequency-${scheduleCount}">
+                        <option value="every">Every</option>
+                        <option value="first">First</option>
+                        <option value="second">Second</option>
+                        <option value="third">Third</option>
+                        <option value="fourth">Fourth</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Day</label>
+                    <select name="day-${scheduleCount}">
+                        <option value="">Select day...</option>
+                        <option value="Sunday">Sunday</option>
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                        <option value="Saturday">Saturday</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Time</label>
+                    <input type="text" name="time-${scheduleCount}" placeholder="e.g., 9:00 PM - 1:00 AM">
+                </div>
+                <button type="button" class="remove-schedule-btn" onclick="removeScheduleEntry(this)">
+                    <i class="fa-solid fa-trash"></i> Remove
+                </button>
+            `;
+
+            container.appendChild(entry);
+            scheduleCount++;
+        }
+
+        function removeScheduleEntry(btn) {
+            btn.closest('.schedule-entry').remove();
+        }
+
+        function generateVenueId(name) {
+            return name.toLowerCase()
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .trim();
+        }
+
+        function collectFormData() {
+            const form = document.getElementById('venue-form');
+            const formData = new FormData(form);
+
+            // Check honeypot
+            if (formData.get('website_url')) {
+                return null; // Bot detected
+            }
+
+            const venueName = formData.get('venue-name')?.trim();
+            if (!venueName) return null;
+
+            // Collect schedule entries
+            const scheduleEntries = document.querySelectorAll('.schedule-entry');
+            const schedule = [];
+
+            scheduleEntries.forEach((entry) => {
+                const index = entry.dataset.index;
+                const frequency = formData.get(`frequency-${index}`);
+                const day = formData.get(`day-${index}`);
+                const time = formData.get(`time-${index}`)?.trim();
+
+                if (day) {
+                    const scheduleItem = {
+                        day: [frequency, day],
+                        time: time || 'Time TBD'
+                    };
+                    schedule.push(scheduleItem);
+                }
+            });
+
+            // Build venue object
+            const venue = {
+                id: generateVenueId(venueName),
+                VenueName: venueName,
+                Address: {
+                    Street: formData.get('street')?.trim() || '',
+                    City: formData.get('city')?.trim() || 'Austin',
+                    State: formData.get('state')?.trim() || 'TX',
+                    Zip: formData.get('zip')?.trim() || ''
+                },
+                schedule: schedule
+            };
+
+            // Optional: Dedicated flag
+            if (formData.get('dedicated')) {
+                venue.Dedicated = true;
+            }
+
+            // Optional: KJ info
+            const hostName = formData.get('host-name')?.trim();
+            const company = formData.get('company')?.trim();
+            const hostWebsite = formData.get('host-website')?.trim();
+
+            if (hostName || company || hostWebsite) {
+                venue.KJ = {
+                    Host: hostName || '',
+                    Company: company || '',
+                    Website: hostWebsite || ''
+                };
+            }
+
+            // Optional: Venue socials
+            const venueWebsite = formData.get('venue-website')?.trim();
+            const venueFacebook = formData.get('venue-facebook')?.trim();
+            const venueInstagram = formData.get('venue-instagram')?.trim();
+            const venueTwitter = formData.get('venue-twitter')?.trim();
+
+            if (venueWebsite || venueFacebook || venueInstagram || venueTwitter) {
+                venue.socials = {
+                    Website: venueWebsite || null,
+                    Facebook: venueFacebook || null,
+                    Instagram: venueInstagram || null,
+                    Twitter: venueTwitter || null
+                };
+            }
+
+            // Collect metadata
+            const notes = formData.get('notes')?.trim();
+            const submitterName = formData.get('submitter-name')?.trim();
+
+            return {
+                venue,
+                notes,
+                submitterName
+            };
+        }
+
+        function formatEmailBody(data) {
+            if (!data) return null;
+
+            let body = 'NEW VENUE SUBMISSION\n';
+            body += '='.repeat(40) + '\n\n';
+
+            if (data.submitterName) {
+                body += `Submitted by: ${data.submitterName}\n\n`;
+            }
+
+            body += 'VENUE JSON (copy/paste ready):\n';
+            body += '-'.repeat(40) + '\n';
+            body += JSON.stringify(data.venue, null, 2);
+            body += '\n' + '-'.repeat(40) + '\n\n';
+
+            if (data.notes) {
+                body += 'ADDITIONAL NOTES:\n';
+                body += data.notes + '\n\n';
+            }
+
+            body += 'TODO:\n';
+            body += '- [ ] Verify venue information\n';
+            body += '- [ ] Add coordinates (lat/lng)\n';
+            body += '- [ ] Add to data.js\n';
+
+            return body;
+        }
+
+        function previewJSON() {
+            const data = collectFormData();
+
+            if (!data) {
+                alert('Please fill in at least the venue name.');
+                return;
+            }
+
+            const preview = document.getElementById('json-preview');
+            preview.textContent = JSON.stringify(data.venue, null, 2);
+
+            const modal = document.getElementById('json-preview-modal');
+            modal.classList.add('venue-modal--open');
+        }
+
+        function closePreview() {
+            const modal = document.getElementById('json-preview-modal');
+            modal.classList.remove('venue-modal--open');
+        }
+
+        function copyJSON() {
+            const data = collectFormData();
+            if (data) {
+                navigator.clipboard.writeText(JSON.stringify(data.venue, null, 2))
+                    .then(() => alert('JSON copied to clipboard!'))
+                    .catch(() => alert('Failed to copy. Please select and copy manually.'));
+            }
+        }
+
+        // Form submission
+        document.getElementById('venue-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Check rate limit
+            if (!checkRateLimit()) {
+                return;
+            }
+
+            const data = collectFormData();
+
+            if (!data) {
+                // Could be bot or empty form
+                alert('Please fill in the required fields.');
+                return;
+            }
+
+            const emailBody = formatEmailBody(data);
+            const subject = `New Venue Submission: ${data.venue.VenueName}`;
+
+            // Create mailto link
+            const mailtoLink = `mailto:${EMAIL_ADDRESS}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+
+            // Record submission for rate limiting
+            saveSubmission();
+
+            // Open email client
+            window.location.href = mailtoLink;
+
+            // Show success message
+            const successEl = document.getElementById('success-message');
+            successEl.innerHTML = `
+                <i class="fa-solid fa-check-circle"></i>
+                <strong>Email prepared!</strong><br>
+                Your email client should open with the venue details. If it doesn't,
+                <a href="${mailtoLink}" style="color: white; text-decoration: underline;">click here</a>.
+            `;
+            successEl.style.display = 'block';
+
+            // Update rate limit display
+            checkRateLimit();
+
+            // Scroll to top to show message
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
