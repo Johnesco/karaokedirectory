@@ -2,8 +2,8 @@
  * String manipulation utilities
  */
 
-// Articles to ignore when sorting names
-const ARTICLES = ['the', 'a', 'an'];
+// Articles to ignore when sorting names (English and Spanish)
+const ARTICLES = ['the', 'a', 'an', 'la', 'el'];
 
 /**
  * Escape HTML special characters to prevent XSS

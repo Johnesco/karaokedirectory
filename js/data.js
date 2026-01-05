@@ -52,10 +52,6 @@ const karaokeData = {
         "State": "TX",
         "Zip": "78665"
       },
-      "coordinates": {
-        "lat": 30.571,
-        "lng": -97.689
-      },
       "KJ": {
         "Host": "",
         "Company": ""
@@ -63,8 +59,11 @@ const karaokeData = {
       "socials": {
         "Facebook": null,
         "Instagram": null,
+        "Twitter": null,
         "Website": "https://www.barlouie.com/locations/us/tx/round-rock/round-rock",
-        "Bluesky": null
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -79,16 +78,11 @@ const karaokeData = {
     {
       "id": "big-easy-saloon",
       "VenueName": "Big Easy Saloon",
-      "Dedicated": false,
       "Address": {
         "Street": "15601 Vision Dr.",
         "City": "Pflugerville",
         "State": "TX",
         "Zip": "78660"
-      },
-      "coordinates": {
-        "lat": 30.45,
-        "lng": -97.662
       },
       "KJ": {
         "Host": "DJ Cysum & Mo",
@@ -127,8 +121,13 @@ const karaokeData = {
         "Company": ""
       },
       "socials": {
+        "Facebook": null,
+        "Instagram": "https://www.instagram.com/blindsidelounge",
+        "Twitter": null,
         "Website": "https://blindsidelounge.com/",
-        "Instagram": "https://www.instagram.com/blindsidelounge"
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -147,7 +146,6 @@ const karaokeData = {
     {
       "id": "bodhis-bodacious-hideaway",
       "VenueName": "Bodhi's Bodacious Hideaway",
-      "Dedicated": false,
       "Address": {
         "Street": "10402 Menchaca Rd, Unit D",
         "City": "Austin",
@@ -156,14 +154,7 @@ const karaokeData = {
       },
       "KJ": {
         "Host": "Ill Will",
-        "Company": "Live Music In Austin",
-        "KJsocials": {
-          "Facebook": "",
-          "Instagram": "https://www.instagram.com/livemusicinaustin/",
-          "Website": "",
-          "Twitter": "",
-          "Bluesky": ""
-        }
+        "Company": "Live Music In Austin"
       },
       "socials": {
         "Facebook": "https://www.facebook.com/bodhishideaway/",
@@ -180,7 +171,7 @@ const karaokeData = {
             "every",
             "Tuesday"
           ],
-          "time": "9:00 PM - Midnight"
+          "time": "9:00 PM - 12:00 AM"
         }
       ],
       "coordinates": {
@@ -204,8 +195,11 @@ const karaokeData = {
       "socials": {
         "Facebook": "https://www.facebook.com/boomerzaustin",
         "Instagram": "https://www.instagram.com/boomerzaustin/",
+        "Twitter": null,
         "Website": "https://boomerzaustin.com/",
-        "Bluesky": null
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -235,8 +229,13 @@ const karaokeData = {
         "Company": ""
       },
       "socials": {
+        "Facebook": null,
+        "Instagram": "https://www.instagram.com/buddysplaceatx/",
+        "Twitter": null,
         "Website": "https://buddysplaceatx.com/",
-        "Instagram": "https://www.instagram.com/buddysplaceatx/"
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -269,8 +268,11 @@ const karaokeData = {
       "socials": {
         "Facebook": "https://www.facebook.com/canaryroostatx",
         "Instagram": "https://www.instagram.com/canaryroostatx/",
+        "Twitter": null,
         "Website": null,
-        "Bluesky": null
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -331,32 +333,21 @@ const karaokeData = {
     {
       "id": "captain-quacks-soundspace",
       "VenueName": "Captain Quack's Soundspace",
-      "Dedicated": false,
       "Address": {
         "Street": "5326 Menchaca Road",
         "City": "Austin",
         "State": "TX",
         "Zip": "78745"
       },
-      "Timeframe": {
-        "StartDate": "2025-06-27",
-        "EndDate": null
-      },
       "KJ": {
         "Host": "Average Joe",
-        "Company": "Starling Karaoke",
-        "KJsocials": {
-          "Facebook": "https://www.facebook.com/starlingkaraoke",
-          "Tiktok": "https://www.tiktok.com/@starlingkaraoke",
-          "Instagram": "https://www.instagram.com/starling_karaoke",
-          "Website": "https://www.starlingkaraoke.com/"
-        }
+        "Company": "Starling Karaoke"
       },
       "socials": {
         "Facebook": null,
         "Instagram": "https://www.instagram.com/coffeehouse/",
-        "Website": "https://soundspaceatx.com/",
         "Twitter": null,
+        "Website": "https://soundspaceatx.com/",
         "Bluesky": null,
         "Tiktok": null,
         "Youtube": null
@@ -367,7 +358,7 @@ const karaokeData = {
             "first",
             "Saturday"
           ],
-          "time": "8:00 PM - 11:00PM"
+          "time": "8:00 PM - 11:00 PM"
         }
       ],
       "coordinates": {
@@ -388,7 +379,15 @@ const karaokeData = {
         "Host": "Kevin",
         "Company": ""
       },
-      "socials": {},
+      "socials": {
+        "Facebook": null,
+        "Instagram": null,
+        "Twitter": null,
+        "Website": null,
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
       "schedule": [
         {
           "day": [
@@ -426,8 +425,11 @@ const karaokeData = {
       "socials": {
         "Facebook": null,
         "Instagram": null,
+        "Twitter": null,
         "Website": null,
-        "Bluesky": null
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -435,24 +437,21 @@ const karaokeData = {
             "every",
             "Wednesday"
           ],
-          "time": "6:30 PM - 10:30 PM",
-          "description": "Every Wednesday and Second and Fourth Fridays"
+          "time": "6:30 PM - 10:30 PM"
         },
         {
           "day": [
             "second",
             "Friday"
           ],
-          "time": "7:00 PM - 11:00 PM",
-          "description": "Every Wednesday and Second and Fourth Fridays"
+          "time": "7:00 PM - 11:00 PM"
         },
         {
           "day": [
             "fourth",
             "Friday"
           ],
-          "time": "7:00 PM - 11:00 PM",
-          "description": "Every Wednesday and Second and Fourth Fridays"
+          "time": "7:00 PM - 11:00 PM"
         }
       ],
       "coordinates": {
@@ -463,7 +462,6 @@ const karaokeData = {
     {
       "id": "dog-n-bone-pub",
       "VenueName": "Dog 'n' Bone Pub",
-      "Dedicated": false,
       "Address": {
         "Street": "310 Old Fitzhugh Rd.",
         "City": "Dripping Springs",
@@ -516,7 +514,9 @@ const karaokeData = {
         "Instagram": "https://www.instagram.com/egosbaratx",
         "Twitter": "https://x.com/egos_bar",
         "Website": null,
-        "Bluesky": null
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -590,8 +590,11 @@ const karaokeData = {
       "socials": {
         "Facebook": "https://www.facebook.com/CityLightsGeorgetownTX",
         "Instagram": null,
+        "Twitter": null,
         "Website": "https://georgetown.filmalley.net/",
-        "Bluesky": null
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -599,16 +602,14 @@ const karaokeData = {
             "second",
             "Thursday"
           ],
-          "time": "6:30 PM - ??? PM",
-          "description": "Second and Fourth Fridays"
+          "time": "6:30 PM - Close"
         },
         {
           "day": [
             "fourth",
             "Thursday"
           ],
-          "time": "6:30 PM - 10:30 PM",
-          "description": "Second and Fourth Fridays"
+          "time": "6:30 PM - 10:30 PM"
         }
       ],
       "coordinates": {
@@ -630,8 +631,13 @@ const karaokeData = {
         "Company": ""
       },
       "socials": {
+        "Facebook": null,
         "Instagram": "https://www.instagram.com/firewaterbarcafe",
-        "Website": "https://firewatersportsbar.com/"
+        "Twitter": null,
+        "Website": "https://firewatersportsbar.com/",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -661,9 +667,13 @@ const karaokeData = {
         "Company": ""
       },
       "socials": {
-        "Website": "https://gnarbaratx.com/",
         "Facebook": "https://www.facebook.com/gnarbaratx/",
-        "Instagram": "https://www.instagram.com/gnarbaratx/"
+        "Instagram": "https://www.instagram.com/gnarbaratx/",
+        "Twitter": null,
+        "Website": "https://gnarbaratx.com/",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -695,7 +705,11 @@ const karaokeData = {
       "socials": {
         "Facebook": "https://www.facebook.com/hardcountgtown/?ref=page_internal",
         "Instagram": "https://www.instagram.com/hardcountgtown/",
-        "Website": "https://hardcountgtown.com/"
+        "Twitter": null,
+        "Website": "https://hardcountgtown.com/",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -703,7 +717,7 @@ const karaokeData = {
             "every",
             "Saturday"
           ],
-          "time": "9:00 PM - MIDNIGHT"
+          "time": "9:00 PM - 12:00 AM"
         }
       ],
       "coordinates": {
@@ -722,16 +736,7 @@ const karaokeData = {
       },
       "KJ": {
         "Host": "Xpider",
-        "Company": "",
-        "KJsocials": {
-          "Facebook": "",
-          "Instagram": "https://www.instagram.com/analyzeyourreality/",
-          "Twitter": null,
-          "Website": null,
-          "Bluesky": null,
-          "Tiktok": null,
-          "Youtube": null
-        }
+        "Company": ""
       },
       "socials": {
         "Facebook": "https://www.facebook.com/thehudsontavern/",
@@ -751,7 +756,6 @@ const karaokeData = {
           "time": "9:00 PM - 1:00 AM"
         }
       ],
-      "Dedicated": false,
       "coordinates": {
         "lat": 30.413296837711,
         "lng": -97.927601334553
@@ -760,7 +764,6 @@ const karaokeData = {
     {
       "id": "hudson-tavern-lynum",
       "VenueName": "Hudson Tavern",
-      "Dedicated": false,
       "Address": {
         "Street": "5000 Hudson Bend Rd Suite D",
         "City": "Lake Travis",
@@ -769,16 +772,7 @@ const karaokeData = {
       },
       "KJ": {
         "Host": "Jason Lynum",
-        "Company": "CPR Mobile DJs",
-        "KJsocials": {
-          "Facebook": "",
-          "Instagram": null,
-          "Twitter": null,
-          "Website": "https://cprmobiledjs.com/",
-          "Bluesky": null,
-          "Tiktok": null,
-          "Youtube": null
-        }
+        "Company": "CPR Mobile DJs"
       },
       "socials": {
         "Facebook": null,
@@ -814,21 +808,16 @@ const karaokeData = {
       },
       "KJ": {
         "Host": "",
-        "Company": "The Karaoke Underground",
-        "KJsocials": {
-          "Facebook": "https://www.facebook.com/profile.php?id=100031017777100",
-          "Instagram": "https://www.instagram.com/karaokeunderground/",
-          "Website": "https://karaokeunderground.com/",
-          "Twitter": "https://twitter.com/KUAustin",
-          "Bluesky": "https://bsky.app/profile/karaokeunderground.bsky.social"
-        }
+        "Company": "The Karaoke Underground"
       },
       "socials": {
         "Facebook": "https://www.facebook.com/NomadBarATX",
         "Instagram": "https://www.instagram.com/alcovecantinarr/",
-        "Website": "http://knomadbar.com/",
         "Twitter": null,
-        "Bluesky": null
+        "Website": "http://knomadbar.com/",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -896,7 +885,11 @@ const karaokeData = {
       "socials": {
         "Facebook": "https://www.facebook.com/lamareaaustin/",
         "Instagram": "https://www.instagram.com/pluisrodriguez/",
-        "Website": "https://www.lamarearestaurantseafoodtx.com/"
+        "Twitter": null,
+        "Website": "https://www.lamarearestaurantseafoodtx.com/",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -904,14 +897,14 @@ const karaokeData = {
             "every",
             "Friday"
           ],
-          "time": "8:00 PM - MIDNIGHT"
+          "time": "8:00 PM - 12:00 AM"
         },
         {
           "day": [
             "every",
             "Saturday"
           ],
-          "time": "8:00 PM - MIDNIGHT"
+          "time": "8:00 PM - 12:00 AM"
         }
       ],
       "coordinates": {
@@ -950,7 +943,6 @@ const karaokeData = {
           "time": "9:00 PM - 1:00 AM"
         }
       ],
-      "Dedicated": false,
       "coordinates": {
         "lat": 30.439171606086,
         "lng": -97.612214318795
@@ -965,20 +957,9 @@ const karaokeData = {
         "State": "TX",
         "Zip": "78734"
       },
-      "coordinates": {
-        "lat": 30.35,
-        "lng": -97.965
-      },
       "KJ": {
         "Host": "Dan DeSetto",
-        "Company": "",
-        "KJsocials": {
-          "Facebook": null,
-          "Instagram": "https://www.instagram.com/dandesetto/",
-          "Twitter": null,
-          "Tiktok": null,
-          "Youtube": "https://www.youtube.com/channel/UCh1m0mUuSfjpugtHPMgkunA"
-        }
+        "Company": ""
       },
       "socials": {
         "Facebook": "https://www.facebook.com/ltcornerpub/",
@@ -997,8 +978,7 @@ const karaokeData = {
           ],
           "time": "9:00 PM - 1:00 AM"
         }
-      ],
-      "Dedicated": false
+      ]
     },
     {
       "id": "lucky-rabbit",
@@ -1009,10 +989,6 @@ const karaokeData = {
         "State": "TX",
         "Zip": "78645"
       },
-      "coordinates": {
-        "lat": 30.495,
-        "lng": -97.923
-      },
       "KJ": {
         "Host": "",
         "Company": ""
@@ -1020,8 +996,10 @@ const karaokeData = {
       "socials": {
         "Facebook": "https://www.facebook.com/LuckyRabbitJonestown/",
         "Instagram": "https://www.instagram.com/luckyrabbitjonestown/",
+        "Twitter": null,
         "Website": "https://www.luckyrabbitbar.com/",
         "Bluesky": null,
+        "Tiktok": null,
         "Youtube": "https://www.youtube.com/@LuckyRabbitBar"
       },
       "schedule": [
@@ -1037,16 +1015,11 @@ const karaokeData = {
     {
       "id": "manchaca-springs-saloon",
       "VenueName": "Manchaca Springs Saloon",
-      "Dedicated": false,
       "Address": {
         "Street": "737 Farm to Market 1626",
         "City": "Manchaca",
         "State": "TX",
         "Zip": "78652"
-      },
-      "coordinates": {
-        "lat": 30.137,
-        "lng": -97.84
       },
       "KJ": {
         "Host": "John Roberts",
@@ -1080,10 +1053,6 @@ const karaokeData = {
         "State": "TX",
         "Zip": "78752"
       },
-      "coordinates": {
-        "lat": 30.3298,
-        "lng": -97.7104
-      },
       "KJ": {
         "Host": "",
         "Company": ""
@@ -1091,8 +1060,11 @@ const karaokeData = {
       "socials": {
         "Facebook": null,
         "Instagram": null,
+        "Twitter": null,
         "Website": "https://marioseafood.com/",
-        "Bluesky": null
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -1100,9 +1072,13 @@ const karaokeData = {
             "every",
             "Thursday"
           ],
-          "time": "7ish PM - MIDNIGHT"
+          "time": "9:00 PM - Close"
         }
-      ]
+      ],
+      "coordinates": {
+        "lat": 30.33662379696,
+        "lng": -97.702250272333
+      }
     },
     {
       "id": "meridian-buda",
@@ -1113,28 +1089,15 @@ const karaokeData = {
         "State": "TX",
         "Zip": "78610"
       },
-      "Timeframe": {
-        "StartDate": "2025-05-21",
-        "EndDate": "2025-05-29"
-      },
       "KJ": {
         "Host": "",
-        "Company": "",
-        "KJsocials": {
-          "Facebook": null,
-          "Instagram": null,
-          "Twitter": null,
-          "Website": null,
-          "Bluesky": null,
-          "Tiktok": null,
-          "Youtube": null
-        }
+        "Company": ""
       },
       "socials": {
         "Facebook": "https://www.facebook.com/meridianbuda",
         "Instagram": "https://www.instagram.com/meridianbuda",
-        "Website": "https://www.meridianbuda.com/",
         "Twitter": null,
+        "Website": "https://www.meridianbuda.com/",
         "Bluesky": null,
         "Tiktok": null,
         "Youtube": null
@@ -1145,11 +1108,9 @@ const karaokeData = {
             "every",
             "Wednesday"
           ],
-          "time": "6:00 PM - 9:00 PM",
-          "description": "TONIGHT ONLY!"
+          "time": "6:00 PM - 9:00 PM"
         }
       ],
-      "Dedicated": false,
       "coordinates": {
         "lat": 30.081779690499,
         "lng": -97.842972984542
@@ -1171,9 +1132,11 @@ const karaokeData = {
       "socials": {
         "Facebook": "https://www.facebook.com/milliesonmainetx",
         "Instagram": "https://www.instagram.com/milliesonmainetx",
+        "Twitter": null,
         "Website": "https://www.milliesonmainetx.com/",
         "Bluesky": null,
-        "Tiktok": "https://www.tiktok.com/@millies.on.main.e"
+        "Tiktok": "https://www.tiktok.com/@millies.on.main.e",
+        "Youtube": null
       },
       "schedule": [
         {
@@ -1192,35 +1155,21 @@ const karaokeData = {
     {
       "id": "moontower-saloon",
       "VenueName": "Moontower Saloon",
-      "Dedicated": false,
       "Address": {
         "Street": "10212 Menchaca Rd",
         "City": "Austin",
         "State": "TX",
         "Zip": "78748"
       },
-      "Timeframe": {
-        "StartDate": "2025-10-02",
-        "EndDate": null
-      },
       "KJ": {
         "Host": "DJ P'Nasty",
-        "Company": "Karaoke Under the Moon",
-        "KJsocials": {
-          "Facebook": "https://www.facebook.com/p/DJ-PNasty-100094228107834/",
-          "Instagram": null,
-          "Twitter": null,
-          "Website": null,
-          "Bluesky": null,
-          "Tiktok": null,
-          "Youtube": null
-        }
+        "Company": "Karaoke Under the Moon"
       },
       "socials": {
         "Facebook": "https://www.facebook.com/profile.php?id=100064324614170#",
         "Instagram": "https://www.instagram.com/moontowersaloon",
-        "Website": "https://moontowersaloon.com/",
         "Twitter": "https://x.com/MoontowerSaloon",
+        "Website": "https://moontowersaloon.com/",
         "Bluesky": null,
         "Tiktok": null,
         "Youtube": null
@@ -1231,7 +1180,7 @@ const karaokeData = {
             "every",
             "Thursday"
           ],
-          "time": "8:00 PM to 11pm (ish)"
+          "time": "8:00 PM - 11:00 PM"
         }
       ],
       "coordinates": {
@@ -1250,22 +1199,16 @@ const karaokeData = {
       },
       "KJ": {
         "Host": "KJ Average Joe",
-        "Company": "Starling Karaoke",
-        "KJsocials": {
-          "Facebook": "https://www.facebook.com/starlingkaraoke",
-          "Tiktok": "https://www.tiktok.com/@starlingkaraoke",
-          "Instagram": "https://www.instagram.com/starling_karaoke",
-          "Website": "https://www.starlingkaraoke.com/"
-        }
+        "Company": "Starling Karaoke"
       },
       "socials": {
         "Facebook": "https://www.facebook.com/people/Oak-Hill-Social/61552863291533/",
         "Instagram": "https://www.instagram.com/oakhillsocial",
-        "Website": "https://www.oakhillsocial.com/"
-      },
-      "Timeframe": {
-        "StartDate": "2025-07-08",
-        "EndDate": null
+        "Twitter": null,
+        "Website": "https://www.oakhillsocial.com/",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -1295,7 +1238,13 @@ const karaokeData = {
         "Company": "Diamond Karaoke Austin"
       },
       "socials": {
-        "Facebook": "https://www.facebook.com/profile.php?id=61563834987547"
+        "Facebook": "https://www.facebook.com/profile.php?id=61563834987547",
+        "Instagram": null,
+        "Twitter": null,
+        "Website": null,
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -1320,25 +1269,18 @@ const karaokeData = {
         "State": "TX",
         "Zip": "78758"
       },
-      "Timeframe": {
-        "StartDate": "2025-10-17",
-        "EndDate": null
-      },
       "KJ": {
         "Host": "Average Joe",
-        "Company": "Starling Karaoke",
-        "KJsocials": {
-          "Facebook": "https://www.facebook.com/starlingkaraoke",
-          "Tiktok": "https://www.tiktok.com/@starlingkaraoke",
-          "Instagram": "https://www.instagram.com/starling_karaoke",
-          "Website": "https://www.starlingkaraoke.com/"
-        }
+        "Company": "Starling Karaoke"
       },
       "socials": {
         "Facebook": "https://www.facebook.com/punchbowlsocial/",
         "Instagram": "https://www.instagram.com/punchbowlsocial",
+        "Twitter": null,
         "Website": "https://punchbowlsocial.com/location/austin-domain-texas/",
-        "Tiktok": "https://www.tiktok.com/@punchbowlsocial"
+        "Bluesky": null,
+        "Tiktok": "https://www.tiktok.com/@punchbowlsocial",
+        "Youtube": null
       },
       "schedule": [
         {
@@ -1346,7 +1288,7 @@ const karaokeData = {
             "every",
             "Friday"
           ],
-          "time": "9:00 PM - MIDNIGHT"
+          "time": "9:00 PM - 12:00 AM"
         }
       ],
       "coordinates": {
@@ -1370,8 +1312,11 @@ const karaokeData = {
       "socials": {
         "Facebook": null,
         "Instagram": null,
+        "Twitter": null,
         "Website": "https://www.rabbitholetx.com/",
-        "Bluesky": null
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -1403,8 +1348,11 @@ const karaokeData = {
       "socials": {
         "Facebook": "https://www.facebook.com/Rabbitholetx/",
         "Instagram": "https://www.instagram.com/rabbit.hole.leander/",
+        "Twitter": null,
         "Website": "https://www.rabbitholetx.com/",
-        "Bluesky": null
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -1423,7 +1371,6 @@ const karaokeData = {
     {
       "id": "railhouse-bar",
       "VenueName": "Railhouse Bar",
-      "Dedicated": false,
       "Address": {
         "Street": "107 E Center St",
         "City": "Kyle",
@@ -1432,22 +1379,16 @@ const karaokeData = {
       },
       "KJ": {
         "Host": "Jen",
-        "Company": "Smart Ass Entertainment",
-        "KJsocials": {
-          "Facebook": "https://www.facebook.com/smartassentertainments/",
-          "Instagram": "https://www.instagram.com/smartassentertainment",
-          "Twitter": null,
-          "Website": "https://smartassentertainment.com/",
-          "Bluesky": null,
-          "Tiktok": null,
-          "Youtube": "https://www.youtube.com/@SmartAssEntertainment"
-        }
+        "Company": "Smart Ass Entertainment"
       },
       "socials": {
         "Facebook": "https://www.facebook.com/therailhousebartx/",
         "Instagram": "https://www.instagram.com/therailhousetx/",
+        "Twitter": null,
         "Website": "https://railhousebar.com/",
-        "Bluesky": null
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -1455,7 +1396,7 @@ const karaokeData = {
             "every",
             "Wednesday"
           ],
-          "time": "8:00 PM - CLOSE"
+          "time": "8:00 PM - Close"
         }
       ],
       "coordinates": {
@@ -1466,7 +1407,6 @@ const karaokeData = {
     {
       "id": "randys-ice-house",
       "VenueName": "Randy's Ice House",
-      "Dedicated": false,
       "Address": {
         "Street": "1321 W 2nd St",
         "City": "Taylor",
@@ -1475,16 +1415,7 @@ const karaokeData = {
       },
       "KJ": {
         "Host": "Jason Lynum",
-        "Company": "CPR Mobile DJs",
-        "KJsocials": {
-          "Facebook": null,
-          "Instagram": null,
-          "Twitter": null,
-          "Website": "https://cprmobiledjs.com/",
-          "Bluesky": null,
-          "Tiktok": null,
-          "Youtube": null
-        }
+        "Company": "CPR Mobile DJs"
       },
       "socials": {
         "Facebook": "https://www.facebook.com/tayloricehouse",
@@ -1533,8 +1464,11 @@ const karaokeData = {
       "socials": {
         "Facebook": "https://www.facebook.com/PartyPubAndGrub",
         "Instagram": null,
+        "Twitter": null,
         "Website": "https://www.roosteraustin.com/",
-        "Bluesky": null
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -1601,10 +1535,6 @@ const karaokeData = {
         "State": "TX",
         "Zip": "78664"
       },
-      "Timeframe": {
-        "StartDate": null,
-        "EndDate": null
-      },
       "KJ": {
         "Host": "Marshall Joshua",
         "Company": ""
@@ -1612,7 +1542,11 @@ const karaokeData = {
       "socials": {
         "Facebook": "https://www.facebook.com/RoundRockTavern/",
         "Instagram": "https://www.instagram.com/roundrocktavern",
-        "Website": "https://www.roundrocktavern.com/"
+        "Twitter": null,
+        "Website": "https://www.roundrocktavern.com/",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -1645,16 +1579,11 @@ const karaokeData = {
     {
       "id": "shooters-austin",
       "VenueName": "Shooters (Austin)",
-      "Dedicated": false,
       "Address": {
         "Street": "11416 Ranch Rd 620 N",
         "City": "Austin",
         "State": "TX",
         "Zip": "78726"
-      },
-      "coordinates": {
-        "lat": 30.4557,
-        "lng": -97.8365
       },
       "KJ": {
         "Host": "",
@@ -1682,7 +1611,6 @@ const karaokeData = {
     {
       "id": "shooters-cedar-park",
       "VenueName": "Shooters (Cedar Park)",
-      "Dedicated": false,
       "Address": {
         "Street": "601 E Whitestone Blvd",
         "City": "Cedar Park",
@@ -1708,7 +1636,7 @@ const karaokeData = {
             "every",
             "Friday"
           ],
-          "time": "8:00 PM - CLOSE"
+          "time": "8:00 PM - Close"
         }
       ],
       "coordinates": {
@@ -1727,15 +1655,16 @@ const karaokeData = {
       },
       "KJ": {
         "Host": "",
-        "Company": "",
-        "ShowName": "Karaoke Whiskey Wednesday"
+        "Company": ""
       },
       "socials": {
         "Facebook": "https://www.facebook.com/SpiritofTexasDistillery/",
         "Instagram": "https://www.instagram.com/spirit_of_tx",
-        "Website": "https://spiritoftx.com/home",
         "Twitter": "https://x.com/spiritoftx1",
-        "Bluesky": null
+        "Website": "https://spiritoftx.com/home",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -1743,16 +1672,14 @@ const karaokeData = {
             "first",
             "Wednesday"
           ],
-          "time": "7:00 PM - 9:00 PM",
-          "description": "Every First and Third Wednesday"
+          "time": "7:00 PM - 9:00 PM"
         },
         {
           "day": [
             "third",
             "Wednesday"
           ],
-          "time": "7:00 PM - 9:00 PM",
-          "description": "Every First and Third Wednesday"
+          "time": "7:00 PM - 9:00 PM"
         }
       ],
       "coordinates": {
@@ -1769,10 +1696,6 @@ const karaokeData = {
         "State": "TX",
         "Zip": "78664"
       },
-      "Timeframe": {
-        "StartDate": null,
-        "EndDate": null
-      },
       "KJ": {
         "Host": "",
         "Company": "Diamond Karaoke Austin"
@@ -1780,9 +1703,11 @@ const karaokeData = {
       "socials": {
         "Facebook": "https://www.facebook.com/groups/1594100210824616/user/100063785610717/",
         "Instagram": "https://www.instagram.com/alcovecantinarr/",
-        "Website": "https://www.alcovecantina.com/",
         "Twitter": "https://twitter.com/AlcoveCantina",
-        "Bluesky": null
+        "Website": "https://www.alcovecantina.com/",
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -1790,8 +1715,7 @@ const karaokeData = {
             "every",
             "Wednesday"
           ],
-          "time": "7:30 PM - MIDNIGHT",
-          "description": "Every Wednesday"
+          "time": "7:30 PM - 12:00 AM"
         }
       ],
       "coordinates": {
@@ -1802,35 +1726,21 @@ const karaokeData = {
     {
       "id": "the-boat",
       "VenueName": "The Boat",
-      "Dedicated": false,
       "Address": {
         "Street": "10931 Stonelake Blvd",
         "City": "Austin",
         "State": "TX",
         "Zip": "78759"
       },
-      "Timeframe": {
-        "StartDate": null,
-        "EndDate": null
-      },
       "KJ": {
         "Host": "Keith Ruckus",
-        "Company": "Ruckus ATX",
-        "KJsocials": {
-          "Facebook": "https://www.facebook.com/RuckusKaraoke/",
-          "Instagram": "https://www.instagram.com/ruckuskaraoke/",
-          "Twitter": null,
-          "Website": "http://ruckuskaraoke.com/",
-          "Bluesky": null,
-          "Tiktok": null,
-          "Youtube": null
-        }
+        "Company": "Ruckus ATX"
       },
       "socials": {
         "Facebook": "https://www.facebook.com/theboatatx/#",
         "Instagram": "https://www.instagram.com/theboatatx",
-        "Website": "https://theboatatx.com/",
         "Twitter": null,
+        "Website": "https://theboatatx.com/",
         "Bluesky": null,
         "Tiktok": null,
         "Youtube": null
@@ -1841,7 +1751,7 @@ const karaokeData = {
             "every",
             "Tuesday"
           ],
-          "time": "9:00 PM - MIDNIGHT"
+          "time": "9:00 PM - 12:00 AM"
         }
       ],
       "coordinates": {
@@ -1866,8 +1776,11 @@ const karaokeData = {
       "socials": {
         "Facebook": "https://www.facebook.com/TheCommonInterest",
         "Instagram": "https://www.instagram.com/ciaustin/",
+        "Twitter": null,
         "Website": "https://ciaustin.com",
-        "Bluesky": null
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -1928,28 +1841,15 @@ const karaokeData = {
     {
       "id": "the-fieldhouse-at-the-crossover",
       "VenueName": "The Fieldhouse at the Crossover",
-      "Dedicated": false,
       "Address": {
         "Street": "1717 Scottsdale Dr Suite 160",
         "City": "Leander",
         "State": "TX",
         "Zip": "78641"
       },
-      "Timeframe": {
-        "StartDate": "2025-05-28"
-      },
       "KJ": {
         "Host": "",
-        "Company": "Texas Live Band Karaoke",
-        "KJsocials": {
-          "Facebook": "https://www.facebook.com/texaslbk",
-          "Instagram": "https://www.instagram.com/texaslivebandkaraoke/",
-          "Twitter": null,
-          "Website": "https://www.texaslivebandkaraoke.com/",
-          "Bluesky": null,
-          "Tiktok": null,
-          "Youtube": null
-        }
+        "Company": "Texas Live Band Karaoke"
       },
       "socials": {
         "Facebook": "https://www.facebook.com/thefieldhousetexas/",
@@ -1990,8 +1890,11 @@ const karaokeData = {
       "socials": {
         "Facebook": "https://www.facebook.com/hiveaustin/",
         "Instagram": "https://www.instagram.com/hiveaustin/",
+        "Twitter": "https://x.com/hiveaustin",
         "Website": "https://www.hiveaustin.com/",
-        "Twitter": "https://x.com/hiveaustin"
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -1999,16 +1902,14 @@ const karaokeData = {
             "second",
             "Saturday"
           ],
-          "time": "7:00 PM - 10:00 PM",
-          "description": "Second and Fourth Saturdays"
+          "time": "7:00 PM - 10:00 PM"
         },
         {
           "day": [
             "fourth",
             "Saturday"
           ],
-          "time": "7:00 PM - 10:00 PM",
-          "description": "Second and Fourth Saturdays"
+          "time": "7:00 PM - 10:00 PM"
         }
       ],
       "coordinates": {
@@ -2019,7 +1920,6 @@ const karaokeData = {
     {
       "id": "jackalope-south-shore",
       "VenueName": "Jackalope South Shore (Showpony Lounge)",
-      "Dedicated": false,
       "Address": {
         "Street": "1523 Tinnin Ford Rd",
         "City": "Austin",
@@ -2045,24 +1945,21 @@ const karaokeData = {
             "every",
             "Thursday"
           ],
-          "time": "9:00 PM - 2:00 AM",
-          "description": "Thursdays, Fridays, and Sundays"
+          "time": "9:00 PM - 2:00 AM"
         },
         {
           "day": [
             "every",
             "Friday"
           ],
-          "time": "9:00 PM - 2:00 AM",
-          "description": "Thursdays, Fridays, and Sundays"
+          "time": "9:00 PM - 2:00 AM"
         },
         {
           "day": [
             "every",
             "Sunday"
           ],
-          "time": "9:00 PM - 2:00 AM",
-          "description": "Thursdays, Fridays, and Sundays"
+          "time": "9:00 PM - 2:00 AM"
         }
       ],
       "coordinates": {
@@ -2073,7 +1970,6 @@ const karaokeData = {
     {
       "id": "the-iron-bear",
       "VenueName": "The Iron Bear",
-      "Dedicated": false,
       "Address": {
         "Street": "301 West. 6th St.",
         "City": "Austin",
@@ -2099,16 +1995,14 @@ const karaokeData = {
             "every",
             "Sunday"
           ],
-          "time": "9:00 PM - 1:00 AM",
-          "description": "Sundays and Wednesdays"
+          "time": "9:00 PM - 1:00 AM"
         },
         {
           "day": [
             "every",
             "Wednesday"
           ],
-          "time": "9:00 PM - 1:00 AM",
-          "description": "Sundays and Wednesdays"
+          "time": "9:00 PM - 1:00 AM"
         }
       ],
       "coordinates": {
@@ -2119,35 +2013,21 @@ const karaokeData = {
     {
       "id": "the-mill",
       "VenueName": "The Mill",
-      "Dedicated": false,
       "Address": {
         "Street": "9112 Anderson Mill Rd suite b 100",
         "City": "Austin",
         "State": "TX",
         "Zip": "78729"
       },
-      "Timeframe": {
-        "StartDate": "2025-06-16",
-        "EndDate": null
-      },
       "KJ": {
         "Host": "",
-        "Company": "",
-        "KJsocials": {
-          "Facebook": null,
-          "Instagram": null,
-          "Twitter": null,
-          "Website": null,
-          "Bluesky": null,
-          "Tiktok": null,
-          "Youtube": null
-        }
+        "Company": ""
       },
       "socials": {
         "Facebook": "https://www.facebook.com/themillbarandgrillaustin",
         "Instagram": null,
-        "Website": null,
         "Twitter": null,
+        "Website": null,
         "Bluesky": null,
         "Tiktok": null,
         "Youtube": null
@@ -2182,8 +2062,11 @@ const karaokeData = {
       "socials": {
         "Facebook": "https://www.facebook.com/thewhiskeygirlssaloon",
         "Instagram": "https://www.instagram.com/the_whiskey_girls_saloon/",
+        "Twitter": null,
         "Website": "https://whiskeygirlssaloon.com/",
-        "Bluesky": null
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -2191,7 +2074,7 @@ const karaokeData = {
             "every",
             "Tuesday"
           ],
-          "time": "8:00 PM - 11:00PM"
+          "time": "8:00 PM - 11:00 PM"
         }
       ],
       "coordinates": {
@@ -2228,56 +2111,49 @@ const karaokeData = {
             "every",
             "Sunday"
           ],
-          "time": "9:00 PM - 2:00 AM",
-          "description": "Everday, 9pm to 2am"
+          "time": "9:00 PM - 2:00 AM"
         },
         {
           "day": [
             "every",
             "Monday"
           ],
-          "time": "9:00 PM - 2:00 AM",
-          "description": "Everday, 9pm to 2am"
+          "time": "9:00 PM - 2:00 AM"
         },
         {
           "day": [
             "every",
             "Tuesday"
           ],
-          "time": "9:00 PM - 2:00 AM",
-          "description": "Everday, 9pm to 2am"
+          "time": "9:00 PM - 2:00 AM"
         },
         {
           "day": [
             "every",
             "Wednesday"
           ],
-          "time": "9:00 PM - 2:00 AM",
-          "description": "Everday, 9pm to 2am"
+          "time": "9:00 PM - 2:00 AM"
         },
         {
           "day": [
             "every",
             "Thursday"
           ],
-          "time": "9:00 PM - 2:00 AM",
-          "description": "Everday, 9pm to 2am"
+          "time": "9:00 PM - 2:00 AM"
         },
         {
           "day": [
             "every",
             "Friday"
           ],
-          "time": "9:00 PM - 2:00 AM",
-          "description": "Everday, 9pm to 2am"
+          "time": "9:00 PM - 2:00 AM"
         },
         {
           "day": [
             "every",
             "Saturday"
           ],
-          "time": "9:00 PM - 2:00 AM",
-          "description": "Everday, 9pm to 2am"
+          "time": "9:00 PM - 2:00 AM"
         }
       ],
       "coordinates": {
@@ -2334,7 +2210,15 @@ const karaokeData = {
         "Host": "TJ",
         "Company": ""
       },
-      "socials": {},
+      "socials": {
+        "Facebook": null,
+        "Instagram": null,
+        "Twitter": null,
+        "Website": null,
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
       "schedule": [
         {
           "day": [
@@ -2350,37 +2234,59 @@ const karaokeData = {
       }
     },
     {
-      "id": "wildflower-corks-and-brew",
-      "VenueName": "Wildflower Corks & Brew",
-      "Dedicated": false,
+      "id": "whiskey-room-pflugerville",
+      "VenueName": "The Whiskey Room",
       "Address": {
-        "Street": "108 E. 2nd St.",
-        "City": "Taylor",
+        "Street": "113 E Pecan St",
+        "City": "Pflugerville",
         "State": "TX",
-        "Zip": "76574"
-      },
-      "Timeframe": {
-        "StartDate": null,
-        "EndDate": null
+        "Zip": "78660"
       },
       "KJ": {
         "Host": "",
-        "Company": "Diamond Karaoke",
-        "KJsocials": {
-          "Facebook": null,
-          "Instagram": "https://www.instagram.com/diamondkaraokeatx/",
-          "Twitter": null,
-          "Website": "http://www.diamondkaraoke.com/",
-          "Bluesky": null,
-          "Tiktok": null,
-          "Youtube": null
-        }
+        "Company": ""
       },
       "socials": {
-        "Facebook": "https://www.facebook.com/profile.php?id=61573452677081",
-        "Instagram": "https://www.instagram.com/wildflowertaylortx/",
-        "Website": null,
+        "Facebook": null,
+        "Instagram": null,
         "Twitter": null,
+        "Website": null,
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Wednesday"
+          ],
+          "time": "8:00 PM - 11:00 PM"
+        }
+      ],
+      "coordinates": {
+        "lat": 30.43980447779,
+        "lng": -97.620795326256
+      }
+    },
+    {
+      "id": "main-street-bar-round-rock",
+      "VenueName": "Main Street Bar",
+      "Address": {
+        "Street": "101 E Main St",
+        "City": "Round Rock",
+        "State": "TX",
+        "Zip": "78664"
+      },
+      "KJ": {
+        "Host": "",
+        "Company": ""
+      },
+      "socials": {
+        "Facebook": null,
+        "Instagram": null,
+        "Twitter": null,
+        "Website": null,
         "Bluesky": null,
         "Tiktok": null,
         "Youtube": null
@@ -2391,7 +2297,79 @@ const karaokeData = {
             "every",
             "Thursday"
           ],
-          "time": "7:00 PM - 11:00PM"
+          "time": "9:00 PM - 1:00 AM"
+        }
+      ],
+      "coordinates": {
+        "lat": 30.5085442157,
+        "lng": -97.678727018783
+      }
+    },
+    {
+      "id": "big-shotz-neighborhood-bar",
+      "VenueName": "Big Shotz Neighborhood Bar",
+      "Address": {
+        "Street": "399 W Louis Henna Blvd",
+        "City": "Austin",
+        "State": "TX",
+        "Zip": "78728"
+      },
+      "KJ": {
+        "Host": "",
+        "Company": ""
+      },
+      "socials": {
+        "Facebook": null,
+        "Instagram": null,
+        "Twitter": null,
+        "Website": null,
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Friday"
+          ],
+          "time": "9:30 PM - 1:30 AM"
+        }
+      ],
+      "coordinates": {
+        "lat": 30.478942898013,
+        "lng": -97.684787186765
+      }
+    },
+    {
+      "id": "wildflower-corks-and-brew",
+      "VenueName": "Wildflower Corks & Brew",
+      "Address": {
+        "Street": "108 E. 2nd St.",
+        "City": "Taylor",
+        "State": "TX",
+        "Zip": "76574"
+      },
+      "KJ": {
+        "Host": "",
+        "Company": "Diamond Karaoke"
+      },
+      "socials": {
+        "Facebook": "https://www.facebook.com/profile.php?id=61573452677081",
+        "Instagram": "https://www.instagram.com/wildflowertaylortx/",
+        "Twitter": null,
+        "Website": null,
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
+      },
+      "schedule": [
+        {
+          "day": [
+            "every",
+            "Thursday"
+          ],
+          "time": "7:00 PM - 11:00 PM"
         }
       ],
       "coordinates": {
@@ -2402,7 +2380,6 @@ const karaokeData = {
     {
       "id": "willies-joint",
       "VenueName": "Willie's Joint",
-      "Dedicated": false,
       "Address": {
         "Street": "824 Main St",
         "City": "Buda",
@@ -2411,23 +2388,16 @@ const karaokeData = {
       },
       "KJ": {
         "Host": "Kim",
-        "Company": "Smart Ass Entertainment",
-        "EventName": "Kowpoke Karaoke",
-        "KJsocials": {
-          "Facebook": "https://www.facebook.com/smartassentertainments/",
-          "Instagram": "https://www.instagram.com/smartassentertainment",
-          "Twitter": null,
-          "Website": "https://smartassentertainment.com/",
-          "Bluesky": null,
-          "Tiktok": null,
-          "Youtube": "https://www.youtube.com/@SmartAssEntertainment"
-        }
+        "Company": "Smart Ass Entertainment"
       },
       "socials": {
         "Facebook": "https://www.facebook.com/williesjoint/",
         "Instagram": "https://www.instagram.com/williesjoint",
+        "Twitter": null,
         "Website": "https://williesjoint.com/",
-        "Bluesky": null
+        "Bluesky": null,
+        "Tiktok": null,
+        "Youtube": null
       },
       "schedule": [
         {
@@ -2435,7 +2405,7 @@ const karaokeData = {
             "every",
             "Friday"
           ],
-          "time": "8:00 PM - CLOSE"
+          "time": "8:00 PM - Close"
         }
       ],
       "coordinates": {
