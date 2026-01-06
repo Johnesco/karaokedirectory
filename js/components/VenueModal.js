@@ -184,6 +184,10 @@ export class VenueModal extends Component {
     }
 
     open(venue) {
+        // Don't open modal on wide screens where detail pane is visible
+        if (window.innerWidth >= 1400) {
+            return;
+        }
         this.setState({ venue, isOpen: true });
         document.body.style.overflow = 'hidden';
         emit(Events.MODAL_OPEN, venue);

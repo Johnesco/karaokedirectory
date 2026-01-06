@@ -53,15 +53,23 @@
         </div>
     </header>
 
-    <nav id="navigation" class="navigation-container"></nav>
+    <div class="app-layout">
+        <div class="app-layout__list">
+            <nav id="navigation" class="navigation-container"></nav>
 
-    <main id="main-content" class="main-content">
-        <!-- Views render here -->
-        <div class="loading">
-            <i class="fa-solid fa-spinner fa-spin"></i>
-            Loading venues...
+            <main id="main-content" class="main-content">
+                <!-- Views render here -->
+                <div class="loading">
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    Loading venues...
+                </div>
+            </main>
         </div>
-    </main>
+
+        <aside class="app-layout__detail" id="venue-detail-pane">
+            <!-- VenueDetailPane renders here on wide screens -->
+        </aside>
+    </div>
 
     <div id="venue-modal"></div>
 

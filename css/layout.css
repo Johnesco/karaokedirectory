@@ -196,6 +196,50 @@
     min-height: calc(100vh - 300px);
 }
 
+/* Two-Pane Layout for Wide Screens */
+.app-layout {
+    display: block; /* Default: single column */
+}
+
+.app-layout__detail {
+    display: none; /* Hidden by default (mobile/tablet) */
+}
+
+@media (min-width: 1400px) {
+    .app-layout {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        max-width: 1800px;
+        margin: 0 auto;
+        height: calc(100vh - 140px); /* Account for header */
+    }
+
+    .app-layout__list {
+        min-width: 0; /* Prevent grid blowout */
+        overflow-y: auto;
+        height: 100%;
+    }
+
+    .app-layout__list .navigation-container {
+        position: sticky;
+        top: 0;
+        z-index: var(--z-sticky);
+    }
+
+    .app-layout__list .main-content {
+        max-width: none;
+        margin: 0;
+    }
+
+    .app-layout__detail {
+        display: block;
+        height: 100%;
+        overflow-y: auto;
+        border-left: 1px solid var(--border-color);
+        background: var(--bg-secondary);
+    }
+}
+
 /* Site footer */
 .site-footer {
     background: var(--bg-overlay);

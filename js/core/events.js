@@ -80,6 +80,7 @@ export const Events = {
     // Venue events
     VENUE_SELECTED: 'venue:selected',
     VENUE_CLOSED: 'venue:closed',
+    VENUE_DETAIL_SHOWN: 'venue:detail-shown',
 
     // View events
     VIEW_CHANGED: 'view:changed',

@@ -8,6 +8,7 @@ import { on, emit, Events } from './core/events.js';
 import { initVenues, getVenueById } from './services/venues.js';
 import { Navigation } from './components/Navigation.js';
 import { VenueModal } from './components/VenueModal.js';
+import { VenueDetailPane } from './components/VenueDetailPane.js';
 import { WeeklyView } from './views/WeeklyView.js';
 import { AlphabeticalView } from './views/AlphabeticalView.js';
 import { MapView } from './views/MapView.js';
@@ -15,6 +16,7 @@ import { MapView } from './views/MapView.js';
 // View instances
 let navigation = null;
 let venueModal = null;
+let venueDetailPane = null;
 let currentView = null;
 
 const views = {
@@ -36,9 +38,34 @@ async function init() {
     navigation = new Navigation('#navigation');
     navigation.render();
 
-    // Initialize modal (always present, hidden by default)
+    // Initialize modal (for mobile/tablet, hidden by default)
     venueModal = new VenueModal('#venue-modal');
     venueModal.render();
+
+    // Initialize detail pane (for wide screens, shown via CSS)
+    venueDetailPane = new VenueDetailPane('#venue-detail-pane');
+    venueDetailPane.render();
+
+    // Handle venue selection highlighting
+    on(Events.VENUE_SELECTED, (venue) => {
+        // Remove selected state from all venue cards
+        document.querySelectorAll('.venue-card--selected').forEach(card => {
+            card.classList.remove('venue-card--selected');
+        });
+        // Add selected state to matching card(s)
+        if (venue) {
+            document.querySelectorAll(`[data-venue-id="${venue.id}"]`).forEach(card => {
+                card.classList.add('venue-card--selected');
+            });
+        }
+    });
+
+    // Clear selection when venue is closed (modal closed)
+    on(Events.VENUE_CLOSED, () => {
+        document.querySelectorAll('.venue-card--selected').forEach(card => {
+            card.classList.remove('venue-card--selected');
+        });
+    });
 
     // Subscribe to view changes
     subscribe('view', (view) => {
