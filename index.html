@@ -17,11 +17,33 @@
 <body>
     <header class="site-header">
         <div class="karaoke-video-bg">
-            <div class="karaoke-lyrics" id="karaoke-lyrics">
-                <div class="lyric-line" data-delay="0">When the lights, go down</div>
-                <div class="lyric-line" data-delay="1">in the city...</div>
-                <div class="lyric-line" data-delay="2">And the sun shines on the bay.</div>
-                <div class="lyric-line" data-delay="3">Oh I wanna be there, in your city...</div>
+            <!-- Song 1 -->
+            <div class="karaoke-lyrics" data-song="0">
+                <div class="lyric-line">When the lights, go down</div>
+                <div class="lyric-line">in the city...</div>
+                <div class="lyric-line">And the sun shines on the bay.</div>
+                <div class="lyric-line">Oh I wanna be there, in your city...</div>
+            </div>
+            <!-- Song 2 -->
+            <div class="karaoke-lyrics" data-song="1">
+                <div class="lyric-line">Just a small town girl</div>
+                <div class="lyric-line">living in a lonely world...</div>
+                <div class="lyric-line">She took the midnight train</div>
+                <div class="lyric-line">going anywhere...</div>
+            </div>
+            <!-- Song 3 -->
+            <div class="karaoke-lyrics" data-song="2">
+                <div class="lyric-line">Is this the real life?</div>
+                <div class="lyric-line">Is this just fantasy?</div>
+                <div class="lyric-line">Caught in a landslide,</div>
+                <div class="lyric-line">no escape from reality...</div>
+            </div>
+            <!-- Song 4 -->
+            <div class="karaoke-lyrics" data-song="3">
+                <div class="lyric-line">Sweet Caroline...</div>
+                <div class="lyric-line">Good times never seemed so good!</div>
+                <div class="lyric-line">I've been inclined...</div>
+                <div class="lyric-line">to believe they never would...</div>
             </div>
             <div class="scanlines"></div>
         </div>
@@ -128,13 +150,23 @@
         (function() {
             const header = document.querySelector('.site-header');
             const videoBg = document.querySelector('.karaoke-video-bg');
-            const lyricsContainer = document.querySelector('.karaoke-lyrics');
-            const lyricLines = document.querySelectorAll('.lyric-line');
+            const songs = document.querySelectorAll('.karaoke-lyrics');
+            const TOTAL_SONGS = songs.length;
 
             const TITLE_DISPLAY_TIME = 10000; // 10 seconds showing title
             const LYRIC_DISPLAY_TIME = 2500;  // Time per lyric line
 
+            let currentSong = 0;
+
             function showLyrics() {
+                // Get current song container and its lyrics
+                const songContainer = songs[currentSong];
+                const lyricLines = songContainer.querySelectorAll('.lyric-line');
+
+                // Hide all songs, show current one
+                songs.forEach(s => s.classList.remove('active-song'));
+                songContainer.classList.add('active-song');
+
                 // Force animation restart by removing and re-adding class
                 header.classList.remove('karaoke-active');
                 void header.offsetWidth; // Trigger reflow
@@ -157,7 +189,9 @@
             }
 
             function showTitle() {
-                // Reset all lyrics
+                // Reset all lyrics in current song
+                const songContainer = songs[currentSong];
+                const lyricLines = songContainer.querySelectorAll('.lyric-line');
                 lyricLines.forEach(line => {
                     line.classList.remove('visible', 'highlight');
                 });
@@ -166,7 +200,10 @@
                 videoBg.classList.remove('active');
                 header.classList.remove('karaoke-active');
 
-                // After title display time, show lyrics again
+                // Move to next song for next cycle
+                currentSong = (currentSong + 1) % TOTAL_SONGS;
+
+                // After title display time, show next song
                 setTimeout(showLyrics, TITLE_DISPLAY_TIME);
             }
 

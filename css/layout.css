@@ -64,13 +64,18 @@
     width: 100%;
     text-align: center;
     padding: 1rem;
-    display: flex;
+    display: none;
     flex-direction: column;
     justify-content: center;
 }
 
+/* Only show the active song */
+.karaoke-lyrics.active-song {
+    display: flex;
+}
+
 /* When active, scroll the lyrics up slowly */
-.site-header.karaoke-active .karaoke-lyrics {
+.site-header.karaoke-active .karaoke-lyrics.active-song {
     animation: scrollLyrics 12s ease-in-out forwards;
 }
 
