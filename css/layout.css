@@ -23,6 +23,148 @@
     margin: 0;
 }
 
+/* Karaoke Video Background */
+.karaoke-video-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 1s ease-in;
+}
+
+.karaoke-video-bg.active {
+    opacity: 1;
+}
+
+.site-header {
+    position: relative;
+    overflow: hidden;
+}
+
+.site-header__content {
+    position: relative;
+    z-index: 2;
+    transition: opacity 0.5s ease;
+}
+
+.site-header.karaoke-active .site-header__content {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Karaoke Lyrics Container */
+.karaoke-lyrics {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -30%);
+    width: 100%;
+    text-align: center;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* When active, scroll the lyrics up slowly */
+.site-header.karaoke-active .karaoke-lyrics {
+    animation: scrollLyrics 12s ease-in-out forwards;
+}
+
+@keyframes scrollLyrics {
+    0% {
+        transform: translate(-50%, -30%);
+    }
+    100% {
+        transform: translate(-50%, -70%);
+    }
+}
+
+/* Individual Lyric Lines */
+.lyric-line {
+    font-family: 'Courier New', monospace;
+    font-size: clamp(1rem, 4vw, 2rem);
+    font-weight: bold;
+    color: transparent;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 0.5rem 0;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    text-shadow: none;
+    /* Pixelated effect via text rendering */
+    -webkit-font-smoothing: none;
+    image-rendering: pixelated;
+}
+
+.lyric-line.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Karaoke highlight animation - text fills with color */
+.lyric-line.highlight {
+    animation: karaokeHighlight 2.5s ease-in-out forwards;
+}
+
+@keyframes karaokeHighlight {
+    0% {
+        color: #4a6fa5;
+        text-shadow: 0 0 10px rgba(74, 111, 165, 0.5);
+    }
+    50% {
+        color: #00ffff;
+        text-shadow:
+            0 0 5px #00ffff,
+            0 0 10px #00ffff,
+            0 0 20px #00ffff,
+            0 0 40px #00ffff;
+    }
+    100% {
+        color: #ff69b4;
+        text-shadow:
+            0 0 5px #ff69b4,
+            0 0 10px #ff69b4,
+            2px 2px 0 #000;
+    }
+}
+
+/* CRT Scanlines overlay */
+.scanlines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15) 0px,
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Pixel grid overlay for extra retro effect */
+.karaoke-video-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+    pointer-events: none;
+    z-index: 0;
+}
+
 /* Navigation container */
 .navigation-container {
     background: var(--bg-card);

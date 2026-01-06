@@ -16,6 +16,15 @@
 </head>
 <body>
     <header class="site-header">
+        <div class="karaoke-video-bg">
+            <div class="karaoke-lyrics" id="karaoke-lyrics">
+                <div class="lyric-line" data-delay="0">When the lights, go down</div>
+                <div class="lyric-line" data-delay="1">in the city...</div>
+                <div class="lyric-line" data-delay="2">And the sun shines on the bay.</div>
+                <div class="lyric-line" data-delay="3">Oh I wanna be there, in your city...</div>
+            </div>
+            <div class="scanlines"></div>
+        </div>
         <div class="site-header__content">
             <h1 class="site-header__title">Greater Austin Karaoke Directory</h1>
             <p class="site-header__tagline">Find karaoke near you, every night of the week</p>
@@ -112,6 +121,58 @@
                 window.jumpToToday();
             }
         });
+    </script>
+
+    <!-- Karaoke header animation -->
+    <script>
+        (function() {
+            const header = document.querySelector('.site-header');
+            const videoBg = document.querySelector('.karaoke-video-bg');
+            const lyricsContainer = document.querySelector('.karaoke-lyrics');
+            const lyricLines = document.querySelectorAll('.lyric-line');
+
+            const TITLE_DISPLAY_TIME = 10000; // 10 seconds showing title
+            const LYRIC_DISPLAY_TIME = 2500;  // Time per lyric line
+
+            function showLyrics() {
+                // Force animation restart by removing and re-adding class
+                header.classList.remove('karaoke-active');
+                void header.offsetWidth; // Trigger reflow
+
+                // Fade out title, show lyrics
+                videoBg.classList.add('active');
+                header.classList.add('karaoke-active');
+
+                // Animate each lyric line with staggered timing
+                lyricLines.forEach((line, index) => {
+                    setTimeout(() => {
+                        line.classList.add('visible');
+                        line.classList.add('highlight');
+                    }, index * LYRIC_DISPLAY_TIME);
+                });
+
+                // After all lyrics shown, wait a bit then go back to title
+                const lyricsDuration = lyricLines.length * LYRIC_DISPLAY_TIME + 2000;
+                setTimeout(showTitle, lyricsDuration);
+            }
+
+            function showTitle() {
+                // Reset all lyrics
+                lyricLines.forEach(line => {
+                    line.classList.remove('visible', 'highlight');
+                });
+
+                // Fade out lyrics, show title
+                videoBg.classList.remove('active');
+                header.classList.remove('karaoke-active');
+
+                // After title display time, show lyrics again
+                setTimeout(showLyrics, TITLE_DISPLAY_TIME);
+            }
+
+            // Start the cycle after initial 10 seconds of title
+            setTimeout(showLyrics, TITLE_DISPLAY_TIME);
+        })();
     </script>
 </body>
 </html>
