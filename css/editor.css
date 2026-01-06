@@ -2,18 +2,18 @@
  * Editor-specific styles
  */
 
-/* Editor Header */
+/* Editor Header - compact for more form space */
 .editor-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--spacing-md) var(--spacing-lg);
+    padding: var(--spacing-sm) var(--spacing-lg);
     background: var(--bg-card);
     border-bottom: 1px solid var(--border-color);
 }
 
 .editor-header h1 {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-lg);
     margin: 0;
 }
 
@@ -37,11 +37,38 @@
     }
 }
 
-/* Main Layout */
+/* Editor Footer - minimal */
+.editor-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    background: var(--bg-card);
+    border-top: 1px solid var(--border-color);
+    font-size: var(--font-size-sm);
+}
+
+.editor-footer a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.editor-footer a:hover {
+    color: var(--color-primary);
+}
+
+.editor-footer__copyright {
+    color: var(--text-muted);
+}
+
+/* Main Layout - adjusted for header + footer */
 .editor-main {
     display: grid;
     grid-template-columns: 280px 1fr 350px;
-    height: calc(100vh - 70px);
+    height: calc(100vh - 90px);
     overflow: hidden;
 }
 
@@ -136,7 +163,7 @@
 /* Form Editor */
 .editor-form {
     overflow-y: auto;
-    padding: var(--spacing-lg);
+    padding: var(--spacing-md);
     background: var(--bg-primary);
 }
 
@@ -162,8 +189,8 @@
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
-    padding: var(--spacing-lg);
-    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
 }
 
 .form-section legend {

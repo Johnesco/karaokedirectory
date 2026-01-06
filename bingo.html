@@ -6,19 +6,66 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <title>Karaoke Bingo - Austin Karaoke Directory</title>
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Application styles -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/bingo.css">
 </head>
 <body>
-    <h1>Karaoke Bingo</h1>
-    <div id="bingo-card"></div>
-    <div id="bingo-message"></div>
-    <div class="button-row">
-        <button id="undo-button">Undo</button>
-        <button id="reset-button">New Card</button>
-    </div>
-    <div>
-        <a href="index.html" class="back-link">← Back to Directory</a>
-    </div>
+    <header class="site-header site-header--compact">
+        <div class="site-header__content">
+            <h1 class="site-header__title"><i class="fa-solid fa-dice"></i> Karaoke Bingo</h1>
+            <p class="site-header__tagline">Mark off what you see at karaoke night!</p>
+        </div>
+    </header>
+
+    <nav class="navigation-container">
+        <div class="navigation">
+            <a href="index.html" class="nav-btn">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back to Directory</span>
+            </a>
+        </div>
+    </nav>
+
+    <main class="bingo-main">
+        <div class="bingo-card-wrapper">
+            <div id="bingo-card"></div>
+        </div>
+        <div id="bingo-message"></div>
+        <div class="button-row">
+            <button id="undo-button">Undo</button>
+            <button id="reset-button">New Card</button>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="site-footer__social">
+            <h2>Follow Us</h2>
+            <div class="social-links">
+                <a href="https://www.facebook.com/groups/2494105004273043"
+                   target="_blank" rel="noopener noreferrer" title="Facebook">
+                    <i class="fa-brands fa-facebook fa-lg"></i>
+                </a>
+                <a href="https://www.instagram.com/karaokedirectory/"
+                   target="_blank" rel="noopener noreferrer" title="Instagram">
+                    <i class="fa-brands fa-instagram fa-lg"></i>
+                </a>
+            </div>
+        </div>
+        <div class="site-footer__links">
+            <a href="about.html">About Us</a>
+            <a href="submit.html">Submit Venue</a>
+        </div>
+        <p class="site-footer__copyright">
+            &copy; 2025 Austin Karaoke Directory
+        </p>
+    </footer>
+
     <script src="js/bingo.js"></script>
 </body>
 </html>
