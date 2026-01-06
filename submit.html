@@ -99,7 +99,7 @@
 
         .schedule-entry {
             display: grid;
-            grid-template-columns: 1fr 1fr 2fr;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
             gap: var(--spacing-sm);
             padding: var(--spacing-md);
             background: var(--bg-secondary);
@@ -111,7 +111,13 @@
             margin-bottom: 0;
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 700px) {
+            .schedule-entry {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 500px) {
             .schedule-entry {
                 grid-template-columns: 1fr;
             }
@@ -288,18 +294,22 @@
                                 <label>Day <span class="required">*</span></label>
                                 <select name="day-0" required>
                                     <option value="">Select day...</option>
-                                    <option value="Sunday">Sunday</option>
-                                    <option value="Monday">Monday</option>
-                                    <option value="Tuesday">Tuesday</option>
-                                    <option value="Wednesday">Wednesday</option>
-                                    <option value="Thursday">Thursday</option>
-                                    <option value="Friday">Friday</option>
-                                    <option value="Saturday">Saturday</option>
+                                    <option value="sunday">Sunday</option>
+                                    <option value="monday">Monday</option>
+                                    <option value="tuesday">Tuesday</option>
+                                    <option value="wednesday">Wednesday</option>
+                                    <option value="thursday">Thursday</option>
+                                    <option value="friday">Friday</option>
+                                    <option value="saturday">Saturday</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>Time</label>
-                                <input type="text" name="time-0" placeholder="e.g., 9:00 PM - 1:00 AM">
+                                <label>Start Time</label>
+                                <input type="time" name="startTime-0" value="21:00">
+                            </div>
+                            <div class="form-group">
+                                <label>End Time</label>
+                                <input type="time" name="endTime-0" value="01:00">
                             </div>
                         </div>
                     </div>
@@ -515,18 +525,22 @@
                     <label>Day</label>
                     <select name="day-${scheduleCount}">
                         <option value="">Select day...</option>
-                        <option value="Sunday">Sunday</option>
-                        <option value="Monday">Monday</option>
-                        <option value="Tuesday">Tuesday</option>
-                        <option value="Wednesday">Wednesday</option>
-                        <option value="Thursday">Thursday</option>
-                        <option value="Friday">Friday</option>
-                        <option value="Saturday">Saturday</option>
+                        <option value="sunday">Sunday</option>
+                        <option value="monday">Monday</option>
+                        <option value="tuesday">Tuesday</option>
+                        <option value="wednesday">Wednesday</option>
+                        <option value="thursday">Thursday</option>
+                        <option value="friday">Friday</option>
+                        <option value="saturday">Saturday</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Time</label>
-                    <input type="text" name="time-${scheduleCount}" placeholder="e.g., 9:00 PM - 1:00 AM">
+                    <label>Start Time</label>
+                    <input type="time" name="startTime-${scheduleCount}" value="21:00">
+                </div>
+                <div class="form-group">
+                    <label>End Time</label>
+                    <input type="time" name="endTime-${scheduleCount}" value="01:00">
                 </div>
                 <button type="button" class="remove-schedule-btn" onclick="removeScheduleEntry(this)">
                     <i class="fa-solid fa-trash"></i> Remove
@@ -569,46 +583,43 @@
                 const index = entry.dataset.index;
                 const frequency = formData.get(`frequency-${index}`);
                 const day = formData.get(`day-${index}`);
-                const time = formData.get(`time-${index}`)?.trim();
+                const startTime = formData.get(`startTime-${index}`) || '21:00';
+                const endTime = formData.get(`endTime-${index}`) || '01:00';
 
                 if (day) {
-                    const scheduleItem = {
-                        day: [frequency, day],
-                        time: time || 'Time TBD'
-                    };
-                    schedule.push(scheduleItem);
+                    schedule.push({
+                        frequency: frequency,
+                        day: day,
+                        startTime: startTime,
+                        endTime: endTime
+                    });
                 }
             });
 
-            // Build venue object
+            // Build venue object in standard format
             const venue = {
                 id: generateVenueId(venueName),
-                VenueName: venueName,
-                Address: {
-                    Street: formData.get('street')?.trim() || '',
-                    City: formData.get('city')?.trim() || 'Austin',
-                    State: formData.get('state')?.trim() || 'TX',
-                    Zip: formData.get('zip')?.trim() || ''
+                name: venueName,
+                dedicated: formData.get('dedicated') ? true : false,
+                address: {
+                    street: formData.get('street')?.trim() || '',
+                    city: formData.get('city')?.trim() || 'Austin',
+                    state: formData.get('state')?.trim() || 'TX',
+                    zip: formData.get('zip')?.trim() || ''
                 },
                 schedule: schedule
             };
 
-            // Optional: Dedicated flag
-            if (formData.get('dedicated')) {
-                venue.Dedicated = true;
-            }
-
-            // Optional: KJ info
+            // Optional: Host info
             const hostName = formData.get('host-name')?.trim();
             const company = formData.get('company')?.trim();
             const hostWebsite = formData.get('host-website')?.trim();
 
             if (hostName || company || hostWebsite) {
-                venue.KJ = {
-                    Host: hostName || '',
-                    Company: company || '',
-                    Website: hostWebsite || ''
-                };
+                venue.host = {};
+                if (hostName) venue.host.name = hostName;
+                if (company) venue.host.company = company;
+                if (hostWebsite) venue.host.website = hostWebsite;
             }
 
             // Optional: Venue socials
@@ -618,12 +629,11 @@
             const venueTwitter = formData.get('venue-twitter')?.trim();
 
             if (venueWebsite || venueFacebook || venueInstagram || venueTwitter) {
-                venue.socials = {
-                    Website: venueWebsite || null,
-                    Facebook: venueFacebook || null,
-                    Instagram: venueInstagram || null,
-                    Twitter: venueTwitter || null
-                };
+                venue.socials = {};
+                if (venueWebsite) venue.socials.website = venueWebsite;
+                if (venueFacebook) venue.socials.facebook = venueFacebook;
+                if (venueInstagram) venue.socials.instagram = venueInstagram;
+                if (venueTwitter) venue.socials.twitter = venueTwitter;
             }
 
             // Collect metadata
@@ -712,7 +722,7 @@
             }
 
             const emailBody = formatEmailBody(data);
-            const subject = `New Venue Submission: ${data.venue.VenueName}`;
+            const subject = `New Venue Submission: ${data.venue.name}`;
 
             // Create mailto link
             const mailtoLink = `mailto:${EMAIL_ADDRESS}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
