@@ -1196,6 +1196,142 @@
             }
         }
 
+        // Toggle visual feedback for quick report options
+        document.querySelectorAll('.quick-report-option input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const option = this.closest('.quick-report-option');
+                if (this.checked) {
+                    option.classList.add('selected');
+                } else {
+                    option.classList.remove('selected');
+                }
+                // Clear validation error when any checkbox is selected
+                document.getElementById('report-issue-error').style.display = 'none';
+            });
+        });
+
+        // Validate report form - at least one issue must be selected
+        function validateReportForm() {
+            const checkboxes = document.querySelectorAll('.quick-report-options input[type="checkbox"]');
+            const hasSelection = Array.from(checkboxes).some(cb => cb.checked);
+
+            if (!hasSelection) {
+                document.getElementById('report-issue-error').style.display = 'block';
+                document.getElementById('report-issue-error').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return false;
+            }
+
+            const venueName = document.getElementById('report-venue-name').value.trim();
+            if (!venueName) {
+                document.getElementById('report-venue-name').focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        // Collect report form data
+        function collectReportData() {
+            const venueName = document.getElementById('report-venue-name').value.trim();
+            const details = document.getElementById('report-details').value.trim();
+            const contact = document.getElementById('report-contact').value.trim();
+
+            const issues = [];
+            const issueLabels = {
+                'issue-closed': 'Venue closed / No longer exists',
+                'issue-address': 'Wrong address or location',
+                'issue-hours': 'Wrong hours or schedule',
+                'issue-cancelled': 'Event cancelled / No longer happening',
+                'issue-kj': 'KJ / Host changed',
+                'issue-other': 'Other issue'
+            };
+
+            document.querySelectorAll('.quick-report-options input[type="checkbox"]:checked').forEach(cb => {
+                issues.push(issueLabels[cb.name] || cb.value);
+            });
+
+            return {
+                venueName,
+                issues,
+                details,
+                contact
+            };
+        }
+
+        // Format report email body
+        function formatReportEmailBody(data) {
+            let body = 'VENUE ISSUE REPORT\n';
+            body += '='.repeat(40) + '\n\n';
+
+            body += `VENUE: ${data.venueName}\n\n`;
+
+            body += 'REPORTED ISSUES:\n';
+            data.issues.forEach(issue => {
+                body += `- ${issue}\n`;
+            });
+            body += '\n';
+
+            if (data.details) {
+                body += 'ADDITIONAL DETAILS:\n';
+                body += data.details + '\n\n';
+            }
+
+            if (data.contact) {
+                body += 'REPORTER CONTACT:\n';
+                body += data.contact + '\n\n';
+            }
+
+            body += 'TODO:\n';
+            body += '- [ ] Verify reported issues\n';
+            body += '- [ ] Update venue listing\n';
+
+            return body;
+        }
+
+        // Report form submission
+        document.getElementById('report-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Validate
+            if (!validateReportForm()) {
+                return;
+            }
+
+            // Check rate limit
+            if (!checkRateLimit()) {
+                return;
+            }
+
+            const data = collectReportData();
+            const emailBody = formatReportEmailBody(data);
+            const subject = `Issue Report: ${data.venueName}`;
+
+            // Create mailto link
+            const mailtoLink = `mailto:${EMAIL_ADDRESS}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+
+            // Record submission for rate limiting
+            saveSubmission();
+
+            // Open email client
+            window.location.href = mailtoLink;
+
+            // Show success message
+            const successEl = document.getElementById('success-message');
+            successEl.innerHTML = `
+                <i class="fa-solid fa-check-circle"></i>
+                <strong>Report prepared!</strong><br>
+                Your email client should open with the issue report. If it doesn't,
+                <a href="${mailtoLink}" style="color: white; text-decoration: underline;">click here</a>.
+            `;
+            successEl.style.display = 'block';
+
+            // Update rate limit display
+            checkRateLimit();
+
+            // Scroll to top to show message
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
         // Form submission
         document.getElementById('venue-form').addEventListener('submit', function(e) {
             e.preventDefault();
