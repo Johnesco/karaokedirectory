@@ -395,10 +395,18 @@
     }
 }
 
+/* Mobile: small gaps */
+@media (max-width: 768px) {
+    .bingo-main {
+        padding: var(--spacing-md) 0;
+        max-width: 100%;
+    }
+}
+
 /* Responsive adjustments */
 @media (max-width: 400px) {
     .bingo-main {
-        padding: var(--spacing-sm);
+        padding: var(--spacing-sm) 0;
     }
 
     .bingo-card-wrapper {

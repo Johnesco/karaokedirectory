@@ -211,22 +211,9 @@
     text-decoration: none;
 }
 
-.alphabetical-view__group {
-    margin-bottom: var(--spacing-xl);
-    scroll-margin-top: calc(var(--nav-height) + 80px); /* nav + index bar height */
-}
-
-.alphabetical-view__letter {
-    font-size: var(--font-size-3xl);
-    color: var(--color-primary);
-    padding-bottom: var(--spacing-sm);
-    border-bottom: 2px solid var(--color-primary);
-    margin-bottom: var(--spacing-md);
-}
-
-.alphabetical-view__venues {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+.alphabetical-view__list {
+    display: flex;
+    flex-direction: column;
     gap: var(--spacing-md);
 }
 
@@ -244,19 +231,118 @@
     border-top: 1px solid var(--border-color);
 }
 
+/* Letter Card - similar structure to Day Card */
+.letter-card {
+    background: var(--bg-card);
+    border-radius: var(--border-radius);
+    display: flex;
+    flex-direction: column;
+    scroll-margin-top: calc(var(--nav-height) + 80px);
+}
+
+.letter-card__header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    border-bottom: 1px solid var(--border-color);
+    border-radius: var(--border-radius) var(--border-radius) 50px 0;
+    position: -webkit-sticky;
+    position: sticky;
+    top: var(--nav-height);
+    z-index: 50;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.letter-card__letter {
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin: 0;
+    color: var(--color-white);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.letter-card__count {
+    margin-left: auto;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: var(--font-size-sm);
+}
+
+.letter-card__content {
+    flex: 1;
+    padding: var(--spacing-md);
+}
+
+.letter-card__venues {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    list-style: none;
+}
+
+.letter-card__venue-item {
+    list-style: none;
+}
+
+.letter-card__venue-item .venue-card {
+    background: var(--color-gray-700);
+}
+
 @media (max-width: 768px) {
-    .alphabetical-view__index {
-        position: static;
-    }
-
-    .alphabetical-view__venues {
-        grid-template-columns: 1fr;
-    }
-
     .day-card__header {
         position: -webkit-sticky;
         position: sticky;
         top: var(--nav-height-mobile);
+    }
+
+    .letter-card__header {
+        position: -webkit-sticky;
+        position: sticky;
+        top: var(--nav-height-mobile);
+    }
+
+    .alphabetical-view__index {
+        position: static;
+    }
+
+    /* Edge-to-edge cards only on index page */
+    .page--edge-to-edge .day-card {
+        border-radius: 0;
+    }
+
+    .page--edge-to-edge .day-card__header {
+        border-radius: 0;
+    }
+
+    .page--edge-to-edge .day-card--past .day-card__header {
+        border-radius: 0;
+    }
+
+    .page--edge-to-edge .day-card--past.day-card--expanded .day-card__header {
+        border-radius: 0;
+    }
+
+    .page--edge-to-edge .letter-card {
+        border-radius: 0;
+    }
+
+    .page--edge-to-edge .letter-card__header {
+        border-radius: 0;
+    }
+
+    .page--edge-to-edge .alphabetical-view__index {
+        border-radius: 0;
+    }
+
+    .page--edge-to-edge .map-view__container {
+        border-radius: 0;
+    }
+
+    .page--edge-to-edge .map-view__info {
+        border-radius: 0;
     }
 }
 

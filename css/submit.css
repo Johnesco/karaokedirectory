@@ -349,3 +349,10 @@
     padding: var(--spacing-lg);
     border: 1px solid var(--border-color);
 }
+
+/* Mobile: small gaps */
+@media (max-width: 768px) {
+    .submit-form {
+        padding: var(--spacing-md) 0;
+    }
+}

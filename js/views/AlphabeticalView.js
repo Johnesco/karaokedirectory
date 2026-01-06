@@ -42,16 +42,21 @@ export class AlphabeticalView extends Component {
 
                 <div class="alphabetical-view__list">
                     ${Object.entries(groups).map(([letter, letterVenues]) => `
-                        <section class="alphabetical-view__group" id="venues-${letter}">
-                            <h2 class="alphabetical-view__letter">${letter}</h2>
-                            <div class="alphabetical-view__venues">
-                                ${letterVenues.map(venue => `
-                                    <div class="alphabetical-view__venue">
-                                        ${renderVenueCard(venue, { mode: 'full' })}
-                                    </div>
-                                `).join('')}
+                        <article class="letter-card" id="venues-${letter}">
+                            <header class="letter-card__header">
+                                <h2 class="letter-card__letter">${letter}</h2>
+                                <span class="letter-card__count">${letterVenues.length} venue${letterVenues.length !== 1 ? 's' : ''}</span>
+                            </header>
+                            <div class="letter-card__content">
+                                <ul class="letter-card__venues">
+                                    ${letterVenues.map(venue => `
+                                        <li class="letter-card__venue-item">
+                                            ${renderVenueCard(venue, { mode: 'full' })}
+                                        </li>
+                                    `).join('')}
+                                </ul>
                             </div>
-                        </section>
+                        </article>
                     `).join('')}
                 </div>
 
