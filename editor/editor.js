@@ -537,7 +537,14 @@ function markVenueUnsaved() {
  * Copy JSON to clipboard
  */
 function copyJson() {
-    const output = { listings: venues };
+    // Sort venues alphabetically (ignoring articles) before export
+    const sortedVenues = [...venues].sort((a, b) => {
+        const nameA = getSortableName(a.name).toLowerCase();
+        const nameB = getSortableName(b.name).toLowerCase();
+        return nameA.localeCompare(nameB);
+    });
+
+    const output = { listings: sortedVenues };
     const json = JSON.stringify(output, null, 2);
 
     navigator.clipboard.writeText(`const karaokeData = ${json};`).then(() => {

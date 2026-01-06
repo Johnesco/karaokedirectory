@@ -64,6 +64,10 @@ export function getVenuesForDate(date, options = {}) {
 
         // Check if any schedule matches this date
         return venue.schedule.some(sched => scheduleMatchesDate(sched, date));
+    }).sort((a, b) => {
+        const nameA = getSortableName(a.name).toLowerCase();
+        const nameB = getSortableName(b.name).toLowerCase();
+        return nameA.localeCompare(nameB);
     });
 }
 
@@ -199,7 +203,12 @@ export function filterVenues(filters = {}) {
         );
     }
 
-    return result;
+    // Sort alphabetically, ignoring articles
+    return result.sort((a, b) => {
+        const nameA = getSortableName(a.name).toLowerCase();
+        const nameB = getSortableName(b.name).toLowerCase();
+        return nameA.localeCompare(nameB);
+    });
 }
 
 /**
