@@ -98,7 +98,7 @@
 /* Rainbow colors for each day - ROYGBIV order starting Sunday */
 .day-card--sunday .day-card__header { background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); }
 .day-card--monday .day-card__header { background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%); }
-.day-card--tuesday .day-card__header { background: linear-gradient(135deg, #ca8a04 0%, #a16207 100%); }
+.day-card--tuesday .day-card__header { background: linear-gradient(135deg, hwb(55 0% 7%) 0%, #c8c500 100%); }
 .day-card--wednesday .day-card__header { background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); }
 .day-card--thursday .day-card__header { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); }
 .day-card--friday .day-card__header { background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); }
