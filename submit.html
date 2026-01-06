@@ -270,6 +270,91 @@
             margin-top: var(--spacing-xs);
         }
 
+        /* Submission type tabs */
+        .submission-tabs {
+            display: flex;
+            gap: var(--spacing-xs);
+            margin-bottom: var(--spacing-lg);
+            background: var(--color-gray-800);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-xs);
+        }
+
+        .submission-tab {
+            flex: 1;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            font-size: var(--font-size-base);
+            font-weight: 500;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+        }
+
+        .submission-tab:hover {
+            color: var(--text-primary);
+            background: var(--color-gray-700);
+        }
+
+        .submission-tab.active {
+            background: var(--color-primary);
+            color: var(--color-white);
+        }
+
+        /* Quick report options */
+        .quick-report-options {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .quick-report-option {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: var(--color-gray-800);
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            border: 2px solid transparent;
+        }
+
+        .quick-report-option:hover {
+            background: var(--color-gray-700);
+        }
+
+        .quick-report-option.selected {
+            border-color: var(--color-primary);
+            background: var(--color-gray-700);
+        }
+
+        .quick-report-option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--color-primary);
+        }
+
+        .quick-report-option i {
+            width: 20px;
+            color: var(--color-primary);
+        }
+
+        /* Hidden sections */
+        .form-mode {
+            display: none;
+        }
+
+        .form-mode.active {
+            display: block;
+        }
+
         /* Wrapper for consistent background - matches index page cards */
         .submit-wrapper {
             background: var(--bg-card);
@@ -300,14 +385,107 @@
         <div class="submit-form">
             <div class="submit-wrapper">
             <div class="intro-text">
-                <p><strong>Know of a karaoke night we're missing?</strong></p>
-                <p>Fill out this form with as much information as you have. When you submit, it will open your email client with the venue details formatted and ready to send.</p>
-                <p><small>Don't worry if you don't have all the details - just fill in what you know!</small></p>
+                <p><strong>Help us keep the directory accurate!</strong></p>
+                <p>Submit a new venue or report an issue with an existing listing.</p>
+            </div>
+
+            <!-- Submission Type Tabs -->
+            <div class="submission-tabs">
+                <button type="button" class="submission-tab active" onclick="switchMode('new')" id="tab-new">
+                    <i class="fa-solid fa-plus"></i> New Venue
+                </button>
+                <button type="button" class="submission-tab" onclick="switchMode('report')" id="tab-report">
+                    <i class="fa-solid fa-flag"></i> Report Issue
+                </button>
             </div>
 
             <div id="rate-limit-message" class="rate-limit-warning" style="display: none;"></div>
             <div id="success-message" class="success-message" style="display: none;"></div>
 
+            <!-- Report Issue Form -->
+            <div id="report-mode" class="form-mode">
+                <form id="report-form">
+                    <fieldset class="form-section">
+                        <legend><i class="fa-solid fa-location-dot"></i> Which Venue?</legend>
+                        <div class="form-row">
+                            <div class="form-group form-group--full">
+                                <label for="report-venue-name">Venue Name <span class="required">*</span></label>
+                                <input type="text" id="report-venue-name" name="report-venue-name" required placeholder="Enter the venue name">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="form-section">
+                        <legend><i class="fa-solid fa-triangle-exclamation"></i> What's the Issue?</legend>
+                        <div class="form-row">
+                            <div class="form-group form-group--full">
+                                <label>Select all that apply <span class="required">*</span></label>
+                                <div id="report-issue-error" class="validation-error" style="display: none;">
+                                    Please select at least one issue
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="quick-report-options">
+                            <label class="quick-report-option">
+                                <input type="checkbox" name="issue-closed" value="closed">
+                                <i class="fa-solid fa-store-slash"></i>
+                                <span>Venue closed / No longer exists</span>
+                            </label>
+                            <label class="quick-report-option">
+                                <input type="checkbox" name="issue-address" value="address">
+                                <i class="fa-solid fa-map-marker-alt"></i>
+                                <span>Wrong address or location</span>
+                            </label>
+                            <label class="quick-report-option">
+                                <input type="checkbox" name="issue-hours" value="hours">
+                                <i class="fa-solid fa-clock"></i>
+                                <span>Wrong hours or schedule</span>
+                            </label>
+                            <label class="quick-report-option">
+                                <input type="checkbox" name="issue-cancelled" value="cancelled">
+                                <i class="fa-solid fa-calendar-xmark"></i>
+                                <span>Event cancelled / No longer happening</span>
+                            </label>
+                            <label class="quick-report-option">
+                                <input type="checkbox" name="issue-kj" value="kj">
+                                <i class="fa-solid fa-microphone"></i>
+                                <span>KJ / Host changed</span>
+                            </label>
+                            <label class="quick-report-option">
+                                <input type="checkbox" name="issue-other" value="other">
+                                <i class="fa-solid fa-circle-info"></i>
+                                <span>Other issue</span>
+                            </label>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="form-section">
+                        <legend><i class="fa-solid fa-comment"></i> Additional Details</legend>
+                        <div class="form-row">
+                            <div class="form-group form-group--full">
+                                <label for="report-details">Tell us more (optional)</label>
+                                <textarea id="report-details" name="report-details" placeholder="Any additional information that would help us update the listing..."></textarea>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group form-group--full">
+                                <label for="report-contact">Your email (optional)</label>
+                                <input type="email" id="report-contact" name="report-contact" placeholder="In case we need to follow up">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn--primary btn--large" id="report-submit-btn">
+                            <i class="fa-solid fa-paper-plane"></i> Submit Report
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- New Venue Form -->
+            <div id="new-mode" class="form-mode active">
             <form id="venue-form">
                 <!-- Honeypot field to catch bots -->
                 <div class="hp-field" aria-hidden="true">
@@ -544,6 +722,7 @@
                     </button>
                 </div>
             </form>
+            </div><!-- end new-mode -->
             </div><!-- end submit-wrapper -->
 
             <!-- JSON Preview Modal -->
@@ -601,6 +780,29 @@
         const EMAIL_ADDRESS = 'karaokedirectoryatx@gmail.com'; // Change this to your email
 
         let scheduleCount = 1;
+
+        // Switch between New Venue and Report Issue modes
+        function switchMode(mode) {
+            const newMode = document.getElementById('new-mode');
+            const reportMode = document.getElementById('report-mode');
+            const tabNew = document.getElementById('tab-new');
+            const tabReport = document.getElementById('tab-report');
+
+            if (mode === 'new') {
+                newMode.classList.add('active');
+                reportMode.classList.remove('active');
+                tabNew.classList.add('active');
+                tabReport.classList.remove('active');
+            } else {
+                newMode.classList.remove('active');
+                reportMode.classList.add('active');
+                tabNew.classList.remove('active');
+                tabReport.classList.add('active');
+            }
+
+            // Clear any displayed messages
+            document.getElementById('success-message').style.display = 'none';
+        }
 
         // Toggle submitter type - show/hide required indicators
         function toggleSubmitterType() {
