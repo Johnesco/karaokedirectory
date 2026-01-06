@@ -84,7 +84,7 @@
 
     /* Layout heights */
     --nav-height: 50px;
-    --nav-height-mobile: 140px;
+    --nav-height-mobile: 155px;
 }
 
 /* Reset */
@@ -99,6 +99,7 @@
 html {
     font-size: 16px;
     scroll-behavior: smooth;
+    overflow-x: hidden;
 }
 
 body {
@@ -112,7 +113,7 @@ body {
     background-position: center;
     background-attachment: fixed;
     min-height: 100vh;
-    overflow-x: hidden;
+    overscroll-behavior-x: none;
 }
 
 /* Typography */
