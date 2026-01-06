@@ -22,7 +22,7 @@
         }
 
         .form-section {
-            background: var(--bg-card);
+            background: var(--color-gray-700);
             border-radius: var(--border-radius);
             padding: var(--spacing-lg);
             margin-bottom: var(--spacing-lg);
@@ -182,7 +182,7 @@
         }
 
         .intro-text {
-            background: var(--bg-card);
+            background: var(--color-gray-700);
             border-radius: var(--border-radius);
             padding: var(--spacing-lg);
             margin-bottom: var(--spacing-lg);
@@ -195,6 +195,87 @@
 
         .intro-text p:last-child {
             margin-bottom: 0;
+        }
+
+        /* Radio button group */
+        .radio-group {
+            display: flex;
+            gap: var(--spacing-lg);
+            flex-wrap: wrap;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            cursor: pointer;
+        }
+
+        .radio-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--color-primary);
+        }
+
+        /* Conditional section - hidden by default */
+        .conditional-section {
+            display: none;
+            margin-top: var(--spacing-md);
+            padding-top: var(--spacing-md);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .conditional-section.visible {
+            display: block;
+        }
+
+        /* Checkbox group for contact methods */
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            cursor: pointer;
+        }
+
+        .checkbox-option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--color-primary);
+        }
+
+        .contact-input {
+            margin-left: var(--spacing-xl);
+            margin-top: var(--spacing-xs);
+        }
+
+        .contact-input input,
+        .contact-input textarea {
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .contact-input.hidden {
+            display: none;
+        }
+
+        .validation-error {
+            color: var(--color-error);
+            font-size: var(--font-size-sm);
+            margin-top: var(--spacing-xs);
+        }
+
+        /* Wrapper for consistent background - matches index page cards */
+        .submit-wrapper {
+            background: var(--bg-card);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            border: 1px solid var(--border-color);
         }
     </style>
 </head>
@@ -217,6 +298,7 @@
 
     <main class="main-content">
         <div class="submit-form">
+            <div class="submit-wrapper">
             <div class="intro-text">
                 <p><strong>Know of a karaoke night we're missing?</strong></p>
                 <p>Fill out this form with as much information as you have. When you submit, it will open your email client with the venue details formatted and ready to send.</p>
@@ -370,10 +452,85 @@
                             <textarea id="notes" name="notes" placeholder="e.g., Private rooms available, cover charge, special events, etc."></textarea>
                         </div>
                     </div>
+                </fieldset>
+
+                <fieldset class="form-section">
+                    <legend><i class="fa-solid fa-user"></i> About You</legend>
                     <div class="form-row">
                         <div class="form-group form-group--full">
-                            <label for="submitter-name">Your Name (Optional)</label>
+                            <label>Are you the KJ/Host for this venue?</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="submitter-type" value="fan" checked onchange="toggleSubmitterType()">
+                                    <span>Just a fan / patron</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="submitter-type" value="kj" onchange="toggleSubmitterType()">
+                                    <span>I'm the KJ / Host</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row" style="margin-top: var(--spacing-md);">
+                        <div class="form-group form-group--full">
+                            <label for="submitter-name">Your Name <span id="name-required" class="required" style="display: none;">*</span></label>
                             <input type="text" id="submitter-name" name="submitter-name" placeholder="So we can credit you!">
+                            <div id="name-error" class="validation-error" style="display: none;">
+                                Name is required for KJs/Hosts
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group form-group--full">
+                            <label>How would you like to be contacted? <span id="contact-required" class="required" style="display: none;">*</span></label>
+                            <small id="contact-hint">Optional - provide if you'd like us to reach out</small>
+                            <div id="contact-error" class="validation-error" style="display: none;">
+                                Please provide at least one contact method
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <div>
+                            <label class="checkbox-option">
+                                <input type="checkbox" name="contact-email-check" onchange="toggleContactInput('email')">
+                                <span><i class="fa-solid fa-envelope"></i> Email</span>
+                            </label>
+                            <div id="contact-email-input" class="contact-input hidden">
+                                <input type="email" name="contact-email" placeholder="your@email.com">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="checkbox-option">
+                                <input type="checkbox" name="contact-text-check" onchange="toggleContactInput('text')">
+                                <span><i class="fa-solid fa-message"></i> Phone (Text)</span>
+                            </label>
+                            <div id="contact-text-input" class="contact-input hidden">
+                                <input type="tel" name="contact-text" placeholder="(512) 555-1234">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="checkbox-option">
+                                <input type="checkbox" name="contact-call-check" onchange="toggleContactInput('call')">
+                                <span><i class="fa-solid fa-phone"></i> Phone (Call)</span>
+                            </label>
+                            <div id="contact-call-input" class="contact-input hidden">
+                                <input type="tel" name="contact-call" placeholder="(512) 555-1234">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="checkbox-option">
+                                <input type="checkbox" name="contact-other-check" onchange="toggleContactInput('other')">
+                                <span><i class="fa-solid fa-ellipsis"></i> Other</span>
+                            </label>
+                            <div id="contact-other-input" class="contact-input hidden">
+                                <textarea name="contact-other" placeholder="e.g., Instagram DM @handle, Facebook, etc." rows="2"></textarea>
+                            </div>
                         </div>
                     </div>
                 </fieldset>
@@ -387,6 +544,7 @@
                     </button>
                 </div>
             </form>
+            </div><!-- end submit-wrapper -->
 
             <!-- JSON Preview Modal -->
             <div id="json-preview-modal" class="venue-modal">
@@ -440,9 +598,96 @@
         };
 
         // Email configuration
-        const EMAIL_ADDRESS = 'your-email@example.com'; // Change this to your email
+        const EMAIL_ADDRESS = 'karaokedirectoryatx@gmail.com'; // Change this to your email
 
         let scheduleCount = 1;
+
+        // Toggle submitter type - show/hide required indicators
+        function toggleSubmitterType() {
+            const isKJ = document.querySelector('input[name="submitter-type"]:checked')?.value === 'kj';
+
+            // Toggle required indicators
+            document.getElementById('name-required').style.display = isKJ ? 'inline' : 'none';
+            document.getElementById('contact-required').style.display = isKJ ? 'inline' : 'none';
+
+            // Update hint text
+            const hint = document.getElementById('contact-hint');
+            hint.textContent = isKJ
+                ? 'Required - please provide at least one contact method'
+                : 'Optional - provide if you\'d like us to reach out';
+
+            // Clear errors when switching
+            document.getElementById('name-error').style.display = 'none';
+            document.getElementById('contact-error').style.display = 'none';
+        }
+
+        // Toggle individual contact input visibility
+        function toggleContactInput(type) {
+            const checkbox = document.querySelector(`input[name="contact-${type}-check"]`);
+            const inputDiv = document.getElementById(`contact-${type}-input`);
+
+            if (checkbox.checked) {
+                inputDiv.classList.remove('hidden');
+                inputDiv.querySelector('input, textarea')?.focus();
+            } else {
+                inputDiv.classList.add('hidden');
+                // Clear the input when unchecking
+                const input = inputDiv.querySelector('input, textarea');
+                if (input) input.value = '';
+            }
+
+            // Clear contact error when any checkbox is checked
+            document.getElementById('contact-error').style.display = 'none';
+        }
+
+        // Validate submitter info (name required for KJ, contact required for KJ)
+        function validateSubmitterInfo() {
+            const isKJ = document.querySelector('input[name="submitter-type"]:checked')?.value === 'kj';
+
+            if (!isKJ) return true; // No validation needed for fans
+
+            let isValid = true;
+
+            // Validate name for KJ
+            const name = document.getElementById('submitter-name').value.trim();
+            if (!name) {
+                document.getElementById('name-error').style.display = 'block';
+                document.getElementById('submitter-name').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                isValid = false;
+            } else {
+                document.getElementById('name-error').style.display = 'none';
+            }
+
+            // Validate contact for KJ
+            const emailCheck = document.querySelector('input[name="contact-email-check"]').checked;
+            const textCheck = document.querySelector('input[name="contact-text-check"]').checked;
+            const callCheck = document.querySelector('input[name="contact-call-check"]').checked;
+            const otherCheck = document.querySelector('input[name="contact-other-check"]').checked;
+
+            const email = document.querySelector('input[name="contact-email"]').value.trim();
+            const text = document.querySelector('input[name="contact-text"]').value.trim();
+            const call = document.querySelector('input[name="contact-call"]').value.trim();
+            const other = document.querySelector('textarea[name="contact-other"]').value.trim();
+
+            // Check if at least one contact method is provided with a value
+            const hasValidContact =
+                (emailCheck && email) ||
+                (textCheck && text) ||
+                (callCheck && call) ||
+                (otherCheck && other);
+
+            if (!hasValidContact) {
+                document.getElementById('contact-error').style.display = 'block';
+                if (isValid) { // Only scroll if name was valid (so we don't override name scroll)
+                    document.getElementById('contact-error').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                isValid = false;
+            } else {
+                document.getElementById('contact-error').style.display = 'none';
+            }
+
+            return isValid;
+        }
 
         // Check rate limit on page load
         document.addEventListener('DOMContentLoaded', function() {
@@ -639,23 +884,65 @@
             // Collect metadata
             const notes = formData.get('notes')?.trim();
             const submitterName = formData.get('submitter-name')?.trim();
+            const submitterType = formData.get('submitter-type');
+
+            // Collect contact info (for both fans and KJs)
+            const contactMethods = [];
+            if (formData.get('contact-email-check')) {
+                const email = formData.get('contact-email')?.trim();
+                if (email) contactMethods.push({ type: 'email', value: email });
+            }
+            if (formData.get('contact-text-check')) {
+                const text = formData.get('contact-text')?.trim();
+                if (text) contactMethods.push({ type: 'text', value: text });
+            }
+            if (formData.get('contact-call-check')) {
+                const call = formData.get('contact-call')?.trim();
+                if (call) contactMethods.push({ type: 'call', value: call });
+            }
+            if (formData.get('contact-other-check')) {
+                const other = formData.get('contact-other')?.trim();
+                if (other) contactMethods.push({ type: 'other', value: other });
+            }
 
             return {
                 venue,
                 notes,
-                submitterName
+                submitterName,
+                submitterType,
+                contactMethods
             };
         }
 
         function formatEmailBody(data) {
             if (!data) return null;
 
+            const isKJ = data.submitterType === 'kj';
+
             let body = 'NEW VENUE SUBMISSION\n';
             body += '='.repeat(40) + '\n\n';
 
+            // Submitter info
+            body += 'SUBMITTED BY:\n';
             if (data.submitterName) {
-                body += `Submitted by: ${data.submitterName}\n\n`;
+                body += `Name: ${data.submitterName}\n`;
             }
+            body += `Type: ${isKJ ? 'KJ / Host' : 'Fan / Patron'}\n`;
+
+            // Contact info (for both fans and KJs)
+            if (data.contactMethods && data.contactMethods.length > 0) {
+                body += `\n${isKJ ? 'KJ ' : ''}CONTACT PREFERENCES:\n`;
+                data.contactMethods.forEach(method => {
+                    const labels = {
+                        email: 'Email',
+                        text: 'Phone (Text)',
+                        call: 'Phone (Call)',
+                        other: 'Other'
+                    };
+                    body += `- ${labels[method.type]}: ${method.value}\n`;
+                });
+            }
+            body += '\n';
 
             body += 'VENUE JSON (copy/paste ready):\n';
             body += '-'.repeat(40) + '\n';
@@ -671,6 +958,9 @@
             body += '- [ ] Verify venue information\n';
             body += '- [ ] Add coordinates (lat/lng)\n';
             body += '- [ ] Add to data.js\n';
+            if (isKJ) {
+                body += '- [ ] Contact KJ to confirm details\n';
+            }
 
             return body;
         }
@@ -710,6 +1000,11 @@
 
             // Check rate limit
             if (!checkRateLimit()) {
+                return;
+            }
+
+            // Validate submitter info (name and contact required for KJs)
+            if (!validateSubmitterInfo()) {
                 return;
             }
 
