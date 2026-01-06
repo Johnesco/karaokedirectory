@@ -34,12 +34,13 @@ export class DayCard extends Component {
 
         const dayName = getDayDisplayName(date);
         const dateStr = formatDateShort(date);
+        const dayOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'][date.getDay()];
         const todayClass = isToday(date) ? 'day-card--today' : '';
         const pastClass = isPast(date) ? 'day-card--past' : '';
         const emptyClass = venues.length === 0 ? 'day-card--empty' : '';
 
         return `
-            <article class="day-card ${todayClass} ${pastClass} ${emptyClass}">
+            <article class="day-card day-card--${dayOfWeek} ${todayClass} ${pastClass} ${emptyClass}">
                 <header class="day-card__header">
                     <h2 class="day-card__day">${dayName}</h2>
                     <span class="day-card__date">${dateStr}</span>
