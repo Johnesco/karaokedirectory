@@ -526,3 +526,27 @@
         flex-direction: column;
     }
 }
+
+/* Mobile overflow prevention */
+@media (max-width: 768px) {
+    .navigation__week-range {
+        min-width: auto;
+    }
+
+    .venue-card,
+    .day-card,
+    .day-card__header,
+    .day-card__content {
+        max-width: 100%;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+    }
+
+    .site-header,
+    .navigation-container,
+    .main-content,
+    .site-footer {
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+}

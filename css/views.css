@@ -81,7 +81,7 @@
     border-bottom: 1px solid var(--border-color);
     border-radius: var(--border-radius) var(--border-radius) 50px 0;
     position: sticky;
-    top: 85px; /* Below the navigation bar on all views */
+    top: var(--nav-height);
     z-index: 10;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
@@ -188,7 +188,7 @@
     background: var(--bg-card);
     border-radius: var(--border-radius);
     position: sticky;
-    top: 80px;
+    top: var(--nav-height);
     z-index: var(--z-dropdown);
 }
 
@@ -212,7 +212,7 @@
 
 .alphabetical-view__group {
     margin-bottom: var(--spacing-xl);
-    scroll-margin-top: 140px;
+    scroll-margin-top: calc(var(--nav-height) + 80px); /* nav + index bar height */
 }
 
 .alphabetical-view__letter {
@@ -253,9 +253,7 @@
     }
 
 .day-card__header {
-    top: 145px; /* Below the navigation bar on mobile views */
-    z-index: 10;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    top: var(--nav-height-mobile);
 }
 }
 
