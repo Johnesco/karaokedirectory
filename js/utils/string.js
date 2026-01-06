@@ -2,8 +2,12 @@
  * String manipulation utilities
  */
 
-// Articles to ignore when sorting names (English and Spanish)
-const ARTICLES = ['the', 'a', 'an', 'la', 'el'];
+/**
+ * Articles to ignore when sorting names alphabetically.
+ * Add new articles here to affect sorting across the entire site.
+ * Examples: English (the, a, an), Spanish (la, el, los, las)
+ */
+export const SORT_ARTICLES = ['a', 'an', 'the', 'le', 'la', 'l\'', 'les', 'un', 'une', 'des', 'el', 'lo', 'los', 'las', 'uno', 'una', 'unos', 'unas', 'il', 'i', 'gli', 'un\'', 'o', 'os', 'as', 'um', 'uma', 'uns', 'umas'];
 
 /**
  * Escape HTML special characters to prevent XSS
@@ -45,7 +49,7 @@ export function titleCase(str) {
 export function getSortableName(name) {
     if (!name) return '';
     const words = name.trim().split(/\s+/);
-    if (words.length > 1 && ARTICLES.includes(words[0].toLowerCase())) {
+    if (words.length > 1 && SORT_ARTICLES.includes(words[0].toLowerCase())) {
         return `${words.slice(1).join(' ')}, ${words[0]}`;
     }
     return name;

@@ -4,7 +4,7 @@
 
 import { renderVenueCard } from '../js/components/VenueCard.js';
 import { formatTimeRange } from '../js/utils/date.js';
-import { escapeHtml } from '../js/utils/string.js';
+import { escapeHtml, getSortableName } from '../js/utils/string.js';
 import { buildMapUrl, formatAddress, createSocialLinks } from '../js/utils/url.js';
 
 // State
@@ -164,7 +164,7 @@ function renderVenueList(filter = '') {
     const filtered = venues.filter(v =>
         v.name.toLowerCase().includes(filterLower) ||
         v.address.city.toLowerCase().includes(filterLower)
-    ).sort((a, b) => a.name.localeCompare(b.name));
+    ).sort((a, b) => getSortableName(a.name).localeCompare(getSortableName(b.name)));
 
     elements.venueList.innerHTML = filtered.map(venue => `
         <li class="venue-list-item ${venue.id === selectedVenueId ? 'active' : ''}"
