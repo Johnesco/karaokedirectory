@@ -6,7 +6,7 @@
 :root {
     /* Colors */
     --color-primary: #6366f1;
-    --color-primary-dark: #4f46e5;
+    --color-primary-dark: #fbbcbc;
     --color-primary-light: #818cf8;
 
     --color-secondary: #ec4899;
@@ -37,7 +37,7 @@
     --bg-overlay: rgba(0, 0, 0, 0.7);
 
     /* Text */
-    --text-primary: var(--color-gray-100);
+    --text-primary: var(--color-primary-dark);
     --text-secondary: var(--color-gray-400);
     --text-muted: var(--color-gray-500);
 
