@@ -89,11 +89,19 @@
     margin: 0;
 }
 
-/* Back to top button */
-.back-to-top {
+/* Floating Action Button Group */
+.fab-group {
     position: fixed;
     bottom: var(--spacing-lg);
     right: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+    z-index: var(--z-dropdown);
+}
+
+.fab-group__btn {
     width: 48px;
     height: 48px;
     border-radius: 50%;
@@ -103,37 +111,82 @@
     align-items: center;
     justify-content: center;
     box-shadow: var(--shadow-lg);
-    transition: background var(--transition-fast), transform var(--transition-fast);
-    z-index: var(--z-dropdown);
+    transition: background var(--transition-fast), transform var(--transition-fast), opacity var(--transition-fast);
+    font-size: var(--font-size-lg);
 }
 
-.back-to-top:hover {
+.fab-group__btn:hover {
     background: var(--color-primary-dark);
-    transform: translateY(-2px);
+    transform: scale(1.1);
 }
 
-/* Jump to Today button */
-.jump-to-today {
-    position: fixed;
-    bottom: var(--spacing-lg);
-    left: 50%;
-    transform: translateX(-50%);
-    padding: var(--spacing-sm) var(--spacing-lg);
-    border-radius: var(--border-radius-lg);
+.fab-group__btn[hidden] {
+    display: none;
+}
+
+/* Today button - appears above back-to-top */
+.fab-group__btn--today {
     background: var(--color-primary);
-    color: var(--color-white);
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    box-shadow: var(--shadow-lg);
-    transition: background var(--transition-fast), transform var(--transition-fast);
-    z-index: var(--z-dropdown);
-    font-weight: 500;
 }
 
-.jump-to-today:hover {
+.fab-group__btn--today:hover {
     background: var(--color-primary-dark);
-    transform: translateX(-50%) translateY(-2px);
+}
+
+/* Back to top button */
+.fab-group__btn--top {
+    background: var(--color-primary);
+}
+
+.fab-group__btn--top:hover {
+    background: var(--color-primary-dark);
+}
+
+/* Mobile: Show "Today" text next to icon */
+@media (max-width: 768px) {
+    .fab-group__btn--today {
+        width: auto;
+        padding: 0 var(--spacing-md);
+        border-radius: var(--border-radius-lg);
+        gap: var(--spacing-xs);
+    }
+
+    .fab-group__btn--today .fab-label {
+        display: inline;
+    }
+}
+
+/* Hide label on desktop */
+.fab-group__btn .fab-label {
+    display: none;
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+}
+
+/* Tooltip on hover */
+.fab-group__btn {
+    position: relative;
+}
+
+.fab-group__btn::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    right: 100%;
+    margin-right: var(--spacing-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--color-gray-900);
+    color: var(--color-white);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    border-radius: var(--border-radius-sm);
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-fast);
+}
+
+.fab-group__btn:hover::before {
+    opacity: 1;
 }
 
 /* Responsive grid utilities */

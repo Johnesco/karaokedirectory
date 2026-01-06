@@ -57,13 +57,16 @@
         </p>
     </footer>
 
-    <button id="back-to-top" class="back-to-top" aria-label="Back to top" hidden>
-        <i class="fa-solid fa-chevron-up"></i>
-    </button>
-
-    <button id="jump-to-today" class="jump-to-today" aria-label="Jump to today" hidden>
-        <i class="fa-solid fa-calendar-day"></i> Today
-    </button>
+    <!-- Floating Action Buttons -->
+    <div class="fab-group">
+        <button id="jump-to-today" class="fab-group__btn fab-group__btn--today" aria-label="Jump to today" data-tooltip="Today" hidden>
+            <i class="fa-solid fa-calendar-day"></i>
+            <span class="fab-label">Today</span>
+        </button>
+        <button id="back-to-top" class="fab-group__btn fab-group__btn--top" aria-label="Back to top" data-tooltip="Back to top" hidden>
+            <i class="fa-solid fa-chevron-up"></i>
+        </button>
+    </div>
 
     <!-- Application scripts -->
     <script src="js/data.js"></script>
