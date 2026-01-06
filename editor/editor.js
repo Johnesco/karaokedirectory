@@ -12,6 +12,7 @@ let venues = [];
 let selectedVenueId = null;
 let hasUnsavedChanges = false;
 const STORAGE_KEY = 'karaoke-editor-draft';
+const PREVIEW_STATE_KEY = 'karaoke-editor-preview';
 
 // DOM Elements
 const elements = {
@@ -28,11 +29,57 @@ const elements = {
 };
 
 /**
+ * Toggle preview panel visibility
+ */
+function togglePreviewPanel() {
+    const main = document.querySelector('.editor-main');
+    const preview = document.querySelector('.editor-preview');
+    const btn = document.getElementById('btn-toggle-preview');
+
+    const isVisible = main.classList.toggle('preview-visible');
+    main.classList.toggle('preview-hidden', !isVisible);
+    preview.classList.toggle('hidden', !isVisible);
+    btn.classList.toggle('preview-visible', isVisible);
+    btn.classList.toggle('preview-hidden', !isVisible);
+
+    // Update button icon
+    const icon = btn.querySelector('i');
+    icon.className = isVisible ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash';
+
+    // Save preference
+    localStorage.setItem(PREVIEW_STATE_KEY, isVisible ? 'visible' : 'hidden');
+}
+
+/**
+ * Initialize preview panel state from localStorage
+ */
+function initPreviewState() {
+    const saved = localStorage.getItem(PREVIEW_STATE_KEY);
+    const main = document.querySelector('.editor-main');
+    const preview = document.querySelector('.editor-preview');
+    const btn = document.getElementById('btn-toggle-preview');
+
+    // Default to visible on large screens, hidden on small
+    const isLargeScreen = window.innerWidth > 1200;
+    const shouldShow = saved === 'visible' || (saved === null && isLargeScreen);
+
+    main.classList.toggle('preview-visible', shouldShow);
+    main.classList.toggle('preview-hidden', !shouldShow);
+    preview.classList.toggle('hidden', !shouldShow);
+    btn.classList.toggle('preview-visible', shouldShow);
+    btn.classList.toggle('preview-hidden', !shouldShow);
+
+    const icon = btn.querySelector('i');
+    icon.className = shouldShow ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash';
+}
+
+/**
  * Initialize the editor
  */
 function init() {
     loadData();
     setupEventListeners();
+    initPreviewState();
     loadDraft();
     console.log('Editor initialized');
 }
@@ -42,8 +89,7 @@ function init() {
  */
 function loadData() {
     if (typeof karaokeData !== 'undefined') {
-        // Normalize venues to new format
-        venues = karaokeData.listings.map(normalizeVenue);
+        venues = karaokeData.listings;
         renderVenueList();
         updateVenueCount();
     } else {
@@ -52,107 +98,14 @@ function loadData() {
 }
 
 /**
- * Normalize venue from legacy format to new format
- */
-function normalizeVenue(venue) {
-    // Handle legacy format
-    if (venue.VenueName) {
-        return {
-            id: venue.id,
-            name: venue.VenueName,
-            active: true,
-            dedicated: venue.Dedicated || false,
-            address: {
-                street: venue.Address?.Street || '',
-                city: venue.Address?.City || '',
-                state: venue.Address?.State || 'TX',
-                zip: venue.Address?.Zip || '',
-                neighborhood: ''
-            },
-            coordinates: venue.coordinates || null,
-            schedule: normalizeSchedule(venue.schedule),
-            host: normalizeHost(venue.KJ),
-            socials: normalizeSocials(venue.socials),
-            dateRange: venue.Timeframe ? {
-                start: venue.Timeframe.StartDate,
-                end: venue.Timeframe.EndDate
-            } : null
-        };
-    }
-    return venue;
-}
-
-function normalizeSchedule(schedule) {
-    if (!schedule) return [];
-    return schedule.map(entry => {
-        if (Array.isArray(entry.day)) {
-            const [frequency, day] = entry.day;
-            const { startTime, endTime } = parseTimeString(entry.time);
-            return { frequency: frequency.toLowerCase(), day: day.toLowerCase(), startTime, endTime, note: entry.description || '' };
-        }
-        return entry;
-    });
-}
-
-function parseTimeString(timeStr) {
-    if (!timeStr) return { startTime: '21:00', endTime: null };
-    const normalized = timeStr.toUpperCase();
-    if (normalized.includes('CLOSE') || normalized.includes('???')) {
-        const match = timeStr.match(/(\d{1,2}):?(\d{2})?\s*(AM|PM)/i);
-        if (match) return { startTime: to24Hour(match[1], match[2], match[3]), endTime: null };
-    }
-    if (normalized.includes('MIDNIGHT')) {
-        const match = timeStr.match(/(\d{1,2}):?(\d{2})?\s*(AM|PM)/i);
-        if (match) return { startTime: to24Hour(match[1], match[2], match[3]), endTime: '00:00' };
-    }
-    const parts = timeStr.split(/\s*[-–to]+\s*/i);
-    if (parts.length >= 2) {
-        const startMatch = parts[0].match(/(\d{1,2}):?(\d{2})?\s*(AM|PM)?/i);
-        const endMatch = parts[1].match(/(\d{1,2}):?(\d{2})?\s*(AM|PM)?/i);
-        if (startMatch && endMatch) {
-            const endPeriod = endMatch[3] || 'AM';
-            const startPeriod = startMatch[3] || 'PM';
-            return {
-                startTime: to24Hour(startMatch[1], startMatch[2], startPeriod),
-                endTime: to24Hour(endMatch[1], endMatch[2], endPeriod)
-            };
-        }
-    }
-    return { startTime: '21:00', endTime: null };
-}
-
-function to24Hour(hours, minutes, period) {
-    let h = parseInt(hours, 10);
-    const m = minutes || '00';
-    if (period?.toUpperCase() === 'PM' && h !== 12) h += 12;
-    if (period?.toUpperCase() === 'AM' && h === 12) h = 0;
-    return `${h.toString().padStart(2, '0')}:${m}`;
-}
-
-function normalizeHost(kj) {
-    if (!kj) return null;
-    const host = {};
-    if (kj.Host?.trim()) host.name = kj.Host.trim();
-    if (kj.Company?.trim()) host.company = kj.Company.trim();
-    if (kj.Website?.trim()) host.website = kj.Website.trim();
-    return Object.keys(host).length ? host : null;
-}
-
-function normalizeSocials(socials) {
-    if (!socials) return {};
-    const result = {};
-    for (const [key, value] of Object.entries(socials)) {
-        if (value?.trim?.()) result[key.toLowerCase()] = value.trim();
-    }
-    return result;
-}
-
-/**
  * Setup event listeners
  */
 function setupEventListeners() {
     // New venue button
     document.getElementById('btn-new-venue').addEventListener('click', createNewVenue);
+
+    // Preview toggle
+    document.getElementById('btn-toggle-preview').addEventListener('click', togglePreviewPanel);
 
     // Venue search
     elements.venueSearch.addEventListener('input', (e) => {
@@ -280,6 +233,10 @@ function fillForm(venue) {
     document.getElementById('address-zip').value = venue.address?.zip || '';
     document.getElementById('address-neighborhood').value = venue.address?.neighborhood || '';
 
+    // Coordinates
+    document.getElementById('coord-lat').value = venue.coordinates?.lat || '';
+    document.getElementById('coord-lng').value = venue.coordinates?.lng || '';
+
     // Host
     document.getElementById('host-name').value = venue.host?.name || '';
     document.getElementById('host-company').value = venue.host?.company || '';
@@ -376,9 +333,13 @@ function getFormData() {
         website: hostWebsite || undefined
     } : null;
 
-    // Preserve coordinates from original venue if editing
-    const originalVenue = selectedVenueId ? venues.find(v => v.id === selectedVenueId) : null;
-    const coordinates = originalVenue?.coordinates || null;
+    // Get coordinates from form fields
+    const latValue = document.getElementById('coord-lat').value.trim();
+    const lngValue = document.getElementById('coord-lng').value.trim();
+    const coordinates = (latValue && lngValue) ? {
+        lat: parseFloat(latValue),
+        lng: parseFloat(lngValue)
+    } : null;
 
     const result = {
         id: document.getElementById('venue-id').value.trim(),
@@ -576,10 +537,7 @@ function markVenueUnsaved() {
  * Copy JSON to clipboard
  */
 function copyJson() {
-    const output = {
-        listings: venues.map(venueToLegacyFormat)
-    };
-
+    const output = { listings: venues };
     const json = JSON.stringify(output, null, 2);
 
     navigator.clipboard.writeText(`const karaokeData = ${json};`).then(() => {
@@ -587,47 +545,6 @@ function copyJson() {
     }).catch(() => {
         showToast('Failed to copy to clipboard', 'error');
     });
-}
-
-/**
- * Convert venue to legacy format for export
- */
-function venueToLegacyFormat(venue) {
-    const result = {
-        id: venue.id,
-        VenueName: venue.name,
-        Dedicated: venue.dedicated || undefined,
-        Address: {
-            Street: venue.address.street,
-            City: venue.address.city,
-            State: venue.address.state,
-            Zip: venue.address.zip
-        },
-        KJ: {
-            Host: venue.host?.name || '',
-            Company: venue.host?.company || ''
-        },
-        socials: {
-            Facebook: venue.socials?.facebook || null,
-            Instagram: venue.socials?.instagram || null,
-            Twitter: venue.socials?.twitter || null,
-            Website: venue.socials?.website || null,
-            Bluesky: venue.socials?.bluesky || null,
-            Tiktok: venue.socials?.tiktok || null,
-            Youtube: venue.socials?.youtube || null
-        },
-        schedule: venue.schedule.map(s => ({
-            day: [s.frequency, s.day.charAt(0).toUpperCase() + s.day.slice(1)],
-            time: formatTimeRange(s.startTime, s.endTime)
-        }))
-    };
-
-    // Preserve coordinates if they exist
-    if (venue.coordinates?.lat && venue.coordinates?.lng) {
-        result.coordinates = venue.coordinates;
-    }
-
-    return result;
 }
 
 /**

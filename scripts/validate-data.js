@@ -46,12 +46,12 @@ console.log('With coordinates:', withCoords);
 let issues = [];
 
 data.listings.forEach((venue, i) => {
-    const name = venue.VenueName || venue.name || `index ${i}`;
+    const name = venue.name || `index ${i}`;
 
     // Required fields
     if (!venue.id) issues.push(`${name}: missing id`);
-    if (!venue.VenueName && !venue.name) issues.push(`${name}: missing name`);
-    if (!venue.Address && !venue.address) issues.push(`${name}: missing address`);
+    if (!venue.name) issues.push(`${name}: missing name`);
+    if (!venue.address) issues.push(`${name}: missing address`);
     if (!venue.schedule || venue.schedule.length === 0) issues.push(`${name}: missing schedule`);
 
     // Check for duplicate IDs
@@ -82,7 +82,7 @@ if (issues.length > 0) {
 console.log('\n=== Data Quality ===');
 
 // Duplicate names
-const names = data.listings.map(v => v.VenueName);
+const names = data.listings.map(v => v.name);
 const dupeNames = names.filter((n, i) => names.indexOf(n) !== i);
 if (dupeNames.length > 0) {
     console.log('Duplicate venue names:', [...new Set(dupeNames)].join(', '));
@@ -91,7 +91,7 @@ if (dupeNames.length > 0) {
 }
 
 // Cities
-const cities = [...new Set(data.listings.map(v => v.Address?.City))].sort();
+const cities = [...new Set(data.listings.map(v => v.address?.city))].sort();
 console.log('Cities covered:', cities.length);
 console.log(' ', cities.join(', '));
 

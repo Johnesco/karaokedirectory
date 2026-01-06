@@ -7,11 +7,9 @@ import { scheduleMatchesDate, isDateInRange } from '../utils/date.js';
 import { getSortableName, containsIgnoreCase } from '../utils/string.js';
 
 let venues = [];
-let isLegacyFormat = false;
 
 /**
  * Initialize venues from data
- * Supports both legacy and new formats
  * @param {Object} data - Karaoke data object
  */
 export function initVenues(data) {
@@ -21,129 +19,8 @@ export function initVenues(data) {
         return;
     }
 
-    // Detect format version
-    isLegacyFormat = !data.version;
-
-    if (isLegacyFormat) {
-        // Convert legacy format on the fly
-        venues = data.listings.map(normalizeLegacyVenue);
-    } else {
-        venues = data.listings;
-    }
-
-    console.log(`Loaded ${venues.length} venues (format: ${isLegacyFormat ? 'legacy' : 'v' + data.version})`);
-}
-
-/**
- * Normalize legacy venue format to new format
- */
-function normalizeLegacyVenue(old) {
-    return {
-        id: old.id,
-        name: old.VenueName,
-        active: true,
-        dedicated: old.Dedicated || false,
-        address: {
-            street: old.Address?.Street || '',
-            city: old.Address?.City || '',
-            state: old.Address?.State || 'TX',
-            zip: old.Address?.Zip || '',
-            neighborhood: ''
-        },
-        coordinates: old.coordinates || null,
-        schedule: normalizeLegacySchedule(old.schedule),
-        host: normalizeLegacyHost(old.KJ),
-        socials: normalizeLegacySocials(old.socials),
-        dateRange: old.Timeframe ? {
-            start: old.Timeframe.StartDate,
-            end: old.Timeframe.EndDate
-        } : null,
-        lastVerified: null
-    };
-}
-
-function normalizeLegacySchedule(schedule) {
-    if (!schedule) return [];
-    return schedule.map(entry => {
-        const [frequency, day] = Array.isArray(entry.day) ? entry.day : ['every', entry.day];
-        const { startTime, endTime } = parseLegacyTime(entry.time);
-        return {
-            frequency: frequency.toLowerCase(),
-            day: day.toLowerCase(),
-            startTime,
-            endTime,
-            note: entry.description || null
-        };
-    });
-}
-
-function parseLegacyTime(timeStr) {
-    if (!timeStr) return { startTime: '21:00', endTime: null };
-
-    const normalized = timeStr.toUpperCase();
-
-    // Handle "CLOSE" or unknown end times
-    if (normalized.includes('CLOSE') || normalized.includes('???')) {
-        const match = timeStr.match(/(\d{1,2}):?(\d{2})?\s*(AM|PM)/i);
-        if (match) {
-            return { startTime: to24Hour(match[1], match[2], match[3]), endTime: null };
-        }
-    }
-
-    // Handle "MIDNIGHT"
-    if (normalized.includes('MIDNIGHT')) {
-        const match = timeStr.match(/(\d{1,2}):?(\d{2})?\s*(AM|PM)/i);
-        if (match) {
-            return { startTime: to24Hour(match[1], match[2], match[3]), endTime: '00:00' };
-        }
-    }
-
-    // Standard: "9:00 PM - 12:00 AM"
-    const parts = timeStr.split(/\s*[-–to]+\s*/i);
-    if (parts.length >= 2) {
-        const startMatch = parts[0].match(/(\d{1,2}):?(\d{2})?\s*(AM|PM)?/i);
-        const endMatch = parts[1].match(/(\d{1,2}):?(\d{2})?\s*(AM|PM)?/i);
-        if (startMatch && endMatch) {
-            const endPeriod = endMatch[3] || 'AM';
-            const startPeriod = startMatch[3] || (parseInt(startMatch[1]) < 6 ? 'AM' : 'PM');
-            return {
-                startTime: to24Hour(startMatch[1], startMatch[2], startPeriod),
-                endTime: to24Hour(endMatch[1], endMatch[2], endPeriod)
-            };
-        }
-    }
-
-    return { startTime: '21:00', endTime: null };
-}
-
-function to24Hour(hours, minutes, period) {
-    let h = parseInt(hours, 10);
-    const m = minutes || '00';
-    if (period?.toUpperCase() === 'PM' && h !== 12) h += 12;
-    if (period?.toUpperCase() === 'AM' && h === 12) h = 0;
-    return `${h.toString().padStart(2, '0')}:${m}`;
-}
-
-function normalizeLegacyHost(kj) {
-    if (!kj) return null;
-    const host = {};
-    if (kj.Host?.trim()) host.name = kj.Host.trim();
-    if (kj.Company?.trim()) host.company = kj.Company.trim();
-    if (kj.Website?.trim()) host.website = kj.Website.trim();
-    if (kj.KJsocials) {
-        const socials = normalizeLegacySocials(kj.KJsocials);
-        if (Object.keys(socials).length) host.socials = socials;
-    }
-    return Object.keys(host).length ? host : null;
-}
-
-function normalizeLegacySocials(socials) {
-    if (!socials) return {};
-    const result = {};
-    for (const [key, value] of Object.entries(socials)) {
-        if (value?.trim?.()) result[key.toLowerCase()] = value.trim();
-    }
-    return result;
+    venues = data.listings;
+    console.log(`Loaded ${venues.length} venues`);
 }
 
 /**
@@ -353,4 +230,4 @@ export function getVenuesWithCoordinates() {
     return venues.filter(v => v.coordinates?.lat && v.coordinates?.lng);
 }
 
-export { venues, isLegacyFormat };
+export { venues };

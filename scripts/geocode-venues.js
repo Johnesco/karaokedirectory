@@ -53,14 +53,13 @@ function geocodeAddress(address) {
  * Build full address string from venue
  */
 function buildAddress(venue) {
-    // Handle both legacy and new format
-    const addr = venue.Address || venue.address;
+    const addr = venue.address;
     if (!addr) return null;
 
-    const street = addr.Street || addr.street || '';
-    const city = addr.City || addr.city || '';
-    const state = addr.State || addr.state || 'TX';
-    const zip = addr.Zip || addr.zip || '';
+    const street = addr.street || '';
+    const city = addr.city || '';
+    const state = addr.state || 'TX';
+    const zip = addr.zip || '';
 
     return `${street}, ${city}, ${state} ${zip}`.trim();
 }
@@ -106,7 +105,7 @@ async function main() {
 
     for (let i = 0; i < venues.length; i++) {
         const venue = venues[i];
-        const name = venue.VenueName || venue.name;
+        const name = venue.name;
 
         // Check if already has coordinates
         if (venue.coordinates?.lat && venue.coordinates?.lng) {
