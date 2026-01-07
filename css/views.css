@@ -310,19 +310,18 @@
 
     /* Edge-to-edge cards only on index page */
     .page--edge-to-edge .day-card {
-        border-radius: 0;
-    }
+        border-radius: 0 0 50px 0;
 
     .page--edge-to-edge .day-card__header {
-        border-radius: 0;
+        border-radius: 0 0 50px 0;
     }
 
     .page--edge-to-edge .day-card--past .day-card__header {
-        border-radius: 0;
+        border-radius: 0 0 50px 0;
     }
 
     .page--edge-to-edge .day-card--past.day-card--expanded .day-card__header {
-        border-radius: 0;
+        border-radius: 0 0 50px 0;
     }
 
     .page--edge-to-edge .letter-card {
@@ -330,7 +329,7 @@
     }
 
     .page--edge-to-edge .letter-card__header {
-        border-radius: 0;
+        border-radius: 0 0 50px 0;
     }
 
     .page--edge-to-edge .alphabetical-view__index {
