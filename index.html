@@ -1,84 +1,309 @@
+<!--
+  ============================================================================
+  Austin Karaoke Directory - Main Page (index.html)
+  ============================================================================
+
+  This is the main entry point for the Austin Karaoke Directory website.
+  It's a single-page application (SPA) that displays karaoke venues.
+
+  FILE STRUCTURE:
+  - <head>     : Metadata, stylesheets (stuff the browser needs but users don't see)
+  - <body>     : The visible page content
+  - <script>   : JavaScript that makes the page interactive
+
+  HOW THIS APP WORKS:
+  1. Browser loads this HTML file
+  2. CSS files style the page
+  3. JavaScript (app.js) fetches venue data and renders the views
+  4. Users can browse venues by day, alphabetically, or on a map
+
+  ============================================================================
+-->
 <!DOCTYPE html>
+<!--
+  DOCTYPE tells the browser this is an HTML5 document.
+  Always put this on line 1 of any HTML file.
+-->
+
 <html lang="en">
+<!--
+  The "lang" attribute tells browsers and screen readers this page is in English.
+  This helps with accessibility and SEO (search engine optimization).
+-->
+
 <head>
+    <!--
+      The <head> section contains metadata - information ABOUT the page,
+      not content that appears ON the page. Think of it as the page's "settings".
+    -->
+
     <meta charset="UTF-8">
+    <!--
+      Character encoding - UTF-8 supports virtually all languages and symbols.
+      Without this, special characters like é, ñ, or emojis might display incorrectly.
+      Always include this as the FIRST meta tag.
+    -->
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--
+      CRITICAL for mobile devices!
+      - "width=device-width" = page width matches the device screen width
+      - "initial-scale=1.0" = no zoom when page first loads
+      Without this, mobile browsers display a tiny "desktop" version of your site.
+    -->
+
     <title>Austin Karaoke Directory</title>
+    <!--
+      The <title> appears in:
+      - Browser tab
+      - Bookmarks
+      - Search engine results
+      Keep it concise but descriptive (50-60 characters max for SEO).
+    -->
 
-    <!-- Font Awesome for icons -->
+    <!--
+      =====================
+      EXTERNAL STYLESHEETS
+      =====================
+      CSS (Cascading Style Sheets) controls how the page LOOKS.
+      We load external CSS files using <link> tags.
+      ORDER MATTERS - later files can override earlier ones.
+    -->
+
+    <!-- Font Awesome - A popular icon library -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!--
+      Font Awesome gives us icons like:
+      - <i class="fa-solid fa-calendar"></i> (calendar icon)
+      - <i class="fa-brands fa-facebook"></i> (Facebook logo)
 
-    <!-- Application styles -->
+      The "cdnjs.cloudflare.com" URL is a CDN (Content Delivery Network).
+      CDNs serve files from servers close to the user for faster loading.
+    -->
+
+    <!--
+      Our Custom CSS - Split into logical files for maintainability
+
+      WHY MULTIPLE FILES?
+      - Easier to find and edit specific styles
+      - Multiple developers can work on different files
+      - Better organization as projects grow
+
+      LOAD ORDER (each builds on the previous):
+      1. base.css       - CSS variables, reset defaults, typography
+      2. layout.css     - Page structure (header, footer, grids)
+      3. components.css - Reusable UI pieces (buttons, cards, modals)
+      4. views.css      - Styles specific to each view (weekly, map, etc.)
+    -->
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/views.css">
 </head>
+
 <body class="page--edge-to-edge">
+<!--
+  The <body> contains everything visible on the page.
+
+  CLASS NAMING: We use BEM (Block Element Modifier) convention:
+  - "page" is the Block (the component)
+  - "--edge-to-edge" is a Modifier (a variation)
+
+  BEM makes CSS more predictable and maintainable.
+  Pattern: block__element--modifier
+-->
+
+    <!--
+      ====================
+      HEADER SECTION
+      ====================
+      The hero area at the top of the page.
+      Features an animated karaoke lyrics effect that cycles through songs.
+    -->
     <header class="site-header">
+        <!--
+          Karaoke Animation Background
+          This container holds the animated lyrics that appear periodically.
+          The animation is controlled by JavaScript at the bottom of this file.
+        -->
         <div class="karaoke-video-bg">
-            <!-- Song 1 -->
+            <!--
+              SONG LYRICS
+              Each song is in its own container with a data-song attribute.
+
+              DATA ATTRIBUTES:
+              - "data-*" attributes store custom data on HTML elements
+              - JavaScript can read these: element.dataset.song
+              - Here, data-song="0" means this is song index 0 (first song)
+            -->
+
+            <!-- Song 1: "Lights" by Journey -->
             <div class="karaoke-lyrics" data-song="0">
                 <div class="lyric-line">When the lights, go down</div>
                 <div class="lyric-line">in the city...</div>
                 <div class="lyric-line">And the sun shines on the bay.</div>
                 <div class="lyric-line">Oh I wanna be there, in your city...</div>
             </div>
-            <!-- Song 2 -->
+
+            <!-- Song 2: "Don't Stop Believin'" by Journey -->
             <div class="karaoke-lyrics" data-song="1">
                 <div class="lyric-line">Just a small town girl</div>
                 <div class="lyric-line">living in a lonely world...</div>
                 <div class="lyric-line">She took the midnight train</div>
                 <div class="lyric-line">going anywhere...</div>
             </div>
-            <!-- Song 3 -->
+
+            <!-- Song 3: "Bohemian Rhapsody" by Queen -->
             <div class="karaoke-lyrics" data-song="2">
                 <div class="lyric-line">Is this the real life?</div>
                 <div class="lyric-line">Is this just fantasy?</div>
                 <div class="lyric-line">Caught in a landslide,</div>
                 <div class="lyric-line">no escape from reality...</div>
             </div>
-            <!-- Song 4 -->
+
+            <!-- Song 4: "Sweet Caroline" by Neil Diamond -->
             <div class="karaoke-lyrics" data-song="3">
                 <div class="lyric-line">Sweet Caroline...</div>
                 <div class="lyric-line">Good times never seemed so good!</div>
                 <div class="lyric-line">I've been inclined...</div>
                 <div class="lyric-line">to believe they never would...</div>
             </div>
+
+            <!-- Scanlines overlay - creates retro CRT monitor effect -->
             <div class="scanlines"></div>
         </div>
+
+        <!-- Main header content (title and tagline) -->
         <div class="site-header__content">
+            <!--
+              HEADING HIERARCHY:
+              <h1> is the most important heading - use only ONE per page.
+              Search engines use <h1> to understand what the page is about.
+            -->
             <h1 class="site-header__title">Greater Austin Karaoke Directory</h1>
             <p class="site-header__tagline">Find karaoke near you, every night of the week</p>
         </div>
     </header>
 
+    <!--
+      ====================
+      MAIN APPLICATION LAYOUT
+      ====================
+      This is the core of the single-page application.
+
+      RESPONSIVE DESIGN:
+      - Mobile (< 1200px): Single column, venues open in a modal popup
+      - Desktop (≥ 1200px): Two columns side-by-side (list + detail pane)
+
+      The CSS handles this switch using @media queries.
+    -->
     <div class="app-layout">
+        <!--
+          LEFT SIDE: Navigation + Main Content
+          On mobile, this takes the full width.
+          On desktop, this is the left column.
+        -->
         <div class="app-layout__list">
+            <!--
+              Navigation Container
+              JavaScript (Navigation.js component) will inject the tab buttons here:
+              - Weekly View
+              - A-Z View
+              - Map View
+
+              WHY EMPTY?
+              This is a common SPA pattern - HTML provides structure,
+              JavaScript fills in the content dynamically.
+            -->
             <nav id="navigation" class="navigation-container"></nav>
+            <!--
+              NAV vs DIV:
+              <nav> is semantic HTML - it tells browsers and screen readers
+              "this contains navigation links". Always use semantic elements
+              when appropriate (<header>, <main>, <footer>, <article>, etc.)
+            -->
 
             <main id="main-content" class="main-content">
-                <!-- Views render here -->
+                <!--
+                  MAIN CONTENT AREA
+                  JavaScript renders different "views" here based on user selection:
+                  - WeeklyView: Shows venues organized by day of the week
+                  - AlphabeticalView: Shows venues A-Z
+                  - MapView: Shows venues on an interactive map
+
+                  <main> is semantic HTML indicating the primary content area.
+                  There should only be ONE <main> per page.
+                -->
+
+                <!--
+                  Loading Spinner
+                  Shown while JavaScript loads venue data.
+                  JavaScript will replace this with actual content.
+                -->
                 <div class="loading">
+                    <!--
+                      Font Awesome icon with animation:
+                      - "fa-solid" = solid style icon
+                      - "fa-spinner" = spinner icon
+                      - "fa-spin" = makes it rotate continuously (CSS animation)
+                    -->
                     <i class="fa-solid fa-spinner fa-spin"></i>
                     Loading venues...
                 </div>
             </main>
         </div>
 
+        <!--
+          RIGHT SIDE: Venue Detail Pane (Desktop Only)
+          When users click a venue on desktop, details appear here
+          instead of a modal popup.
+
+          <aside> is semantic HTML for content tangentially related
+          to the main content - perfect for a detail panel.
+
+          CSS hides this on mobile and shows it on screens ≥ 1200px.
+        -->
         <aside class="app-layout__detail" id="venue-detail-pane">
-            <!-- VenueDetailPane renders here on wide screens -->
+            <!-- VenueDetailPane.js component renders venue details here -->
         </aside>
     </div>
 
+    <!--
+      ====================
+      MODAL CONTAINER
+      ====================
+      On mobile, clicking a venue opens details in this modal (popup).
+      The modal covers the screen with the venue information.
+
+      WHY EMPTY?
+      VenueModal.js creates the modal content dynamically when needed.
+      This empty div is just a "mounting point" for that content.
+    -->
     <div id="venue-modal"></div>
 
+    <!--
+      ====================
+      FOOTER
+      ====================
+      Site footer with social links and navigation.
+    -->
     <footer class="site-footer">
+        <!-- Social Media Links Section -->
         <div class="site-footer__social">
             <h2>Follow Us</h2>
             <div class="social-links">
+                <!--
+                  EXTERNAL LINK BEST PRACTICES:
+                  - target="_blank" : Opens link in new tab
+                  - rel="noopener"  : Security - prevents new page from accessing our page
+                  - rel="noreferrer": Privacy - doesn't send referrer information
+                  - title="..."     : Tooltip text on hover (also helps accessibility)
+
+                  Always use both noopener and noreferrer with target="_blank"!
+                -->
                 <a href="https://www.facebook.com/groups/2494105004273043"
                    target="_blank" rel="noopener noreferrer" title="Facebook">
+                    <!-- "fa-brands" is for brand/logo icons -->
                     <i class="fa-brands fa-facebook fa-lg"></i>
                 </a>
                 <a href="https://www.instagram.com/karaokedirectory/"
@@ -87,137 +312,429 @@
                 </a>
             </div>
         </div>
+
+        <!-- Internal Navigation Links -->
         <div class="site-footer__links">
             <a href="about.html">About Us</a>
             <a href="submit.html">Submit Venue</a>
         </div>
+
+        <!-- Copyright Notice -->
         <p class="site-footer__copyright">
+            <!--
+              &copy; is an HTML entity for the © symbol.
+              HTML entities are used for special characters:
+              - &copy;  → ©
+              - &amp;   → &
+              - &lt;    → <
+              - &gt;    → >
+              - &nbsp;  → non-breaking space
+            -->
             &copy; 2025 Austin Karaoke Directory
         </p>
     </footer>
 
-    <!-- Floating Action Buttons -->
+    <!--
+      ====================
+      FLOATING ACTION BUTTONS (FABs)
+      ====================
+      These buttons float in the bottom-right corner of the screen.
+      They appear/disappear based on scroll position.
+
+      FABs are a common UI pattern from Material Design - they provide
+      quick access to primary actions without cluttering the interface.
+    -->
     <div class="fab-group">
-        <button id="jump-to-today" class="fab-group__btn fab-group__btn--today" aria-label="Jump to today" data-tooltip="Today" hidden>
+        <!--
+          "Jump to Today" Button
+          - Only visible in Weekly View
+          - Shows when user scrolls away from today's section
+          - Clicking scrolls/navigates back to today
+
+          ACCESSIBILITY ATTRIBUTES:
+          - aria-label: Text for screen readers (since button only has an icon)
+          - hidden: HTML5 attribute that hides element (better than CSS for accessibility)
+        -->
+        <button id="jump-to-today"
+                class="fab-group__btn fab-group__btn--today"
+                aria-label="Jump to today"
+                data-tooltip="Today"
+                hidden>
             <i class="fa-solid fa-calendar-day"></i>
             <span class="fab-label">Today</span>
         </button>
-        <button id="back-to-top" class="fab-group__btn fab-group__btn--top" aria-label="Back to top" data-tooltip="Back to top" hidden>
+
+        <!--
+          "Back to Top" Button
+          - Shows when user scrolls down more than 300px
+          - Clicking smoothly scrolls back to the top of the page
+        -->
+        <button id="back-to-top"
+                class="fab-group__btn fab-group__btn--top"
+                aria-label="Back to top"
+                data-tooltip="Back to top"
+                hidden>
             <i class="fa-solid fa-chevron-up"></i>
         </button>
     </div>
 
-    <!-- Application scripts -->
+    <!--
+      ====================
+      JAVASCRIPT FILES
+      ====================
+      Scripts go at the END of <body> for two reasons:
+      1. HTML renders first, so users see content faster
+      2. DOM elements exist when scripts run, so we can reference them
+
+      (Alternative: use "defer" attribute in <head>)
+    -->
+
+    <!--
+      Venue Database
+      This file contains all the karaoke venue information as a JavaScript object.
+      It's loaded as a regular script (not a module) so it creates a global variable.
+    -->
     <script src="js/data.js"></script>
+
+    <!--
+      Main Application Entry Point
+
+      type="module" means this is an ES6 module, which allows:
+      - import/export statements
+      - Automatic strict mode
+      - Module-level scope (variables don't leak to global)
+
+      app.js imports other modules and initializes the application.
+    -->
     <script type="module" src="js/app.js"></script>
 
-    <!-- Back to top and Jump to Today button behavior -->
+    <!--
+      ====================
+      INLINE SCRIPTS
+      ====================
+      These scripts are written directly in the HTML rather than separate files.
+
+      WHEN TO USE INLINE SCRIPTS:
+      - Small, page-specific functionality
+      - Code that doesn't need to be reused elsewhere
+      - When you want to avoid extra HTTP requests
+
+      WHEN TO USE EXTERNAL FILES:
+      - Larger, complex code
+      - Code shared between pages
+      - Code that benefits from caching
+    -->
+
+    <!--
+      ----------------------------------------
+      FLOATING ACTION BUTTON (FAB) BEHAVIOR
+      ----------------------------------------
+      Controls when the "Back to Top" and "Jump to Today" buttons appear.
+    -->
     <script>
+        // ============================================
+        // GET REFERENCES TO DOM ELEMENTS
+        // ============================================
+        // document.getElementById() finds an element by its id attribute.
+        // We store these in variables so we don't have to look them up repeatedly.
+        // Using "const" because these references never change.
+
         const backToTop = document.getElementById('back-to-top');
         const jumpToTodayBtn = document.getElementById('jump-to-today');
 
+        // ============================================
+        // FUNCTION: updateTodayButtonVisibility
+        // ============================================
+        // Decides whether to show or hide the "Jump to Today" button.
+        // This function is called whenever the user scrolls.
+
         function updateTodayButtonVisibility() {
-            // Show button if not on current week
+            // -----------------------------------------
+            // CASE 1: User is viewing a different week
+            // -----------------------------------------
+            // window.isCurrentWeek is a function exposed by WeeklyView.js
+            // It returns true if we're viewing the current week, false otherwise.
+            //
+            // "typeof" checks if something exists and what type it is.
+            // We check typeof === 'function' to make sure it exists before calling it.
+            // This prevents errors if WeeklyView hasn't loaded yet.
+
             if (typeof window.isCurrentWeek === 'function' && !window.isCurrentWeek()) {
+                // Not on current week - always show the button so user can get back
                 jumpToTodayBtn.hidden = false;
-                return;
+                return; // Exit the function early, no need to check visibility
             }
 
-            // On current week - show button if today's card is not visible
+            // -----------------------------------------
+            // CASE 2: User is on current week
+            // -----------------------------------------
+            // Only show button if today's card has scrolled out of view.
+
+            // querySelector finds the FIRST element matching a CSS selector.
+            // .day-card--today is a class added to today's day card.
             const todayCard = document.querySelector('.day-card--today');
+
             if (todayCard) {
+                // getBoundingClientRect() returns the element's position relative to viewport
+                // Returns an object with: top, bottom, left, right, width, height
                 const rect = todayCard.getBoundingClientRect();
+
+                // Check if ANY part of the card is visible in the viewport:
+                // - rect.top < window.innerHeight : top edge is above bottom of screen
+                // - rect.bottom > 0 : bottom edge is below top of screen
                 const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+
+                // Hide button if card is visible, show if it's not
+                // Setting hidden = true hides the element, hidden = false shows it
                 jumpToTodayBtn.hidden = isVisible;
             } else {
+                // No today card found (maybe in A-Z or Map view) - hide the button
                 jumpToTodayBtn.hidden = true;
             }
         }
 
+        // ============================================
+        // EVENT LISTENER: Scroll
+        // ============================================
+        // addEventListener attaches a function to run when an event occurs.
+        // The 'scroll' event fires whenever the user scrolls the page.
+        //
+        // Arrow function syntax: () => { } is shorthand for function() { }
+
         window.addEventListener('scroll', () => {
+            // -----------------------------------------
+            // Back to Top Button Visibility
+            // -----------------------------------------
+            // window.scrollY = how many pixels user has scrolled from top
+            // Show button only if scrolled more than 300 pixels
             backToTop.hidden = window.scrollY < 300;
+
+            // -----------------------------------------
+            // Jump to Today Button Visibility
+            // -----------------------------------------
             updateTodayButtonVisibility();
         });
 
-        // Also update when week changes (check periodically)
+        // ============================================
+        // PERIODIC CHECK: Update Today Button
+        // ============================================
+        // setInterval runs a function repeatedly at a set interval.
+        // Here we check every 500ms (half a second) to catch week changes
+        // that happen without scrolling (like clicking nav buttons).
+        //
+        // 500 = milliseconds (1000ms = 1 second)
+
         setInterval(updateTodayButtonVisibility, 500);
 
+        // ============================================
+        // EVENT LISTENER: Back to Top Click
+        // ============================================
+        // When the button is clicked, scroll to the top of the page.
+
         backToTop.addEventListener('click', () => {
+            // window.scrollTo() scrolls to a specific position
+            // - top: 0 = scroll to the very top
+            // - behavior: 'smooth' = animate the scroll (not instant jump)
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
+        // ============================================
+        // EVENT LISTENER: Jump to Today Click
+        // ============================================
+        // When clicked, jump to today's date in the calendar.
+
         jumpToTodayBtn.addEventListener('click', () => {
+            // window.jumpToToday is a function exposed by WeeklyView.js
+            // It navigates to the current week and scrolls to today's card.
+            // Again, we check it exists before calling to prevent errors.
             if (typeof window.jumpToToday === 'function') {
                 window.jumpToToday();
             }
         });
     </script>
 
-    <!-- Karaoke header animation -->
+    <!--
+      ----------------------------------------
+      KARAOKE HEADER ANIMATION
+      ----------------------------------------
+      Creates the animated karaoke lyrics effect in the header.
+      Lyrics cycle through 4 songs, with the title showing between songs.
+    -->
     <script>
+        // ============================================
+        // IIFE: Immediately Invoked Function Expression
+        // ============================================
+        // (function() { ... })();
+        //
+        // This pattern creates a function and runs it immediately.
+        // WHY USE IT?
+        // - Variables inside are private (don't pollute global scope)
+        // - Code runs once when the page loads
+        // - Common pattern for initialization code
+        //
+        // The outer parentheses wrap the function, the final () calls it.
+
         (function() {
+            // ============================================
+            // DOM ELEMENT REFERENCES
+            // ============================================
+            // Cache DOM lookups for better performance.
+            // querySelector() with a class selector finds the first matching element.
+            // querySelectorAll() returns ALL matching elements as a NodeList.
+
             const header = document.querySelector('.site-header');
             const videoBg = document.querySelector('.karaoke-video-bg');
             const songs = document.querySelectorAll('.karaoke-lyrics');
-            const TOTAL_SONGS = songs.length;
 
-            const TITLE_DISPLAY_TIME = 10000; // 10 seconds showing title
-            const LYRIC_DISPLAY_TIME = 2500;  // Time per lyric line
+            // Get total number of songs from the NodeList length
+            const TOTAL_SONGS = songs.length; // Will be 4
+
+            // ============================================
+            // TIMING CONSTANTS
+            // ============================================
+            // Using ALL_CAPS for constants is a common convention.
+            // It signals "this value should never change".
+            //
+            // All times are in milliseconds (1000ms = 1 second)
+
+            const TITLE_DISPLAY_TIME = 10000; // 10 seconds showing the title
+            const LYRIC_DISPLAY_TIME = 2500;  // 2.5 seconds per lyric line
+
+            // ============================================
+            // STATE VARIABLE
+            // ============================================
+            // Tracks which song we're currently showing (0-3)
+            // Using "let" because this value changes during execution
 
             let currentSong = 0;
 
+            // ============================================
+            // FUNCTION: showLyrics
+            // ============================================
+            // Displays the current song's lyrics with animation.
+            // Each line appears one after another (staggered timing).
+
             function showLyrics() {
-                // Get current song container and its lyrics
+                // Get the container for the current song using array index notation
+                // songs is a NodeList, which works like an array
                 const songContainer = songs[currentSong];
+
+                // Get all lyric lines within this song
                 const lyricLines = songContainer.querySelectorAll('.lyric-line');
 
-                // Hide all songs, show current one
+                // -----------------------------------------
+                // Hide all songs, show only the current one
+                // -----------------------------------------
+                // forEach loops through each item in the NodeList
+                // The arrow function receives each song element as 's'
                 songs.forEach(s => s.classList.remove('active-song'));
                 songContainer.classList.add('active-song');
+                // classList is used to add/remove CSS classes from elements
 
-                // Force animation restart by removing and re-adding class
+                // -----------------------------------------
+                // Force CSS animation to restart
+                // -----------------------------------------
+                // Removing and re-adding a class that triggers animation
+                // won't replay the animation unless we force a "reflow".
+                //
+                // void header.offsetWidth is a trick that forces the browser
+                // to recalculate the element's layout, which resets animations.
+                // "void" just discards the value (we don't need offsetWidth).
+
                 header.classList.remove('karaoke-active');
-                void header.offsetWidth; // Trigger reflow
+                void header.offsetWidth; // Trigger reflow - this is the magic line!
 
-                // Fade out title, show lyrics
+                // -----------------------------------------
+                // Start the transition
+                // -----------------------------------------
+                // Adding these classes triggers CSS transitions defined in our stylesheets:
+                // - 'active' on videoBg: fades in the lyrics background
+                // - 'karaoke-active' on header: fades out the title
+
                 videoBg.classList.add('active');
                 header.classList.add('karaoke-active');
 
+                // -----------------------------------------
                 // Animate each lyric line with staggered timing
+                // -----------------------------------------
+                // forEach provides both the element and its index
+                // We use the index to calculate delay: line 0 = 0ms, line 1 = 2500ms, etc.
+
                 lyricLines.forEach((line, index) => {
+                    // setTimeout runs a function ONCE after a delay
+                    // delay = index * LYRIC_DISPLAY_TIME
+                    // Line 0: 0 * 2500 = 0ms (immediate)
+                    // Line 1: 1 * 2500 = 2500ms (2.5 seconds)
+                    // Line 2: 2 * 2500 = 5000ms (5 seconds)
+                    // etc.
+
                     setTimeout(() => {
-                        line.classList.add('visible');
-                        line.classList.add('highlight');
+                        // Add classes that trigger CSS animations
+                        line.classList.add('visible');   // Fades the line in
+                        line.classList.add('highlight'); // Adds glow/highlight effect
                     }, index * LYRIC_DISPLAY_TIME);
                 });
 
-                // After all lyrics shown, wait a bit then go back to title
+                // -----------------------------------------
+                // Schedule return to title
+                // -----------------------------------------
+                // Calculate how long all lyrics take, plus a 2-second pause
+                // lyricLines.length = number of lines (4)
+                // Duration = 4 * 2500 + 2000 = 12000ms (12 seconds)
+
                 const lyricsDuration = lyricLines.length * LYRIC_DISPLAY_TIME + 2000;
+
+                // After lyrics finish, call showTitle to transition back
                 setTimeout(showTitle, lyricsDuration);
             }
 
+            // ============================================
+            // FUNCTION: showTitle
+            // ============================================
+            // Transitions back to showing the site title.
+            // Resets the current song's lyrics and queues the next song.
+
             function showTitle() {
-                // Reset all lyrics in current song
+                // Get current song's elements
                 const songContainer = songs[currentSong];
                 const lyricLines = songContainer.querySelectorAll('.lyric-line');
+
+                // Reset all lyric lines to hidden state
+                // (removes the classes we added in showLyrics)
                 lyricLines.forEach(line => {
                     line.classList.remove('visible', 'highlight');
                 });
 
-                // Fade out lyrics, show title
+                // Remove active classes to fade out lyrics, fade in title
                 videoBg.classList.remove('active');
                 header.classList.remove('karaoke-active');
 
-                // Move to next song for next cycle
+                // -----------------------------------------
+                // Advance to next song
+                // -----------------------------------------
+                // The modulo operator (%) wraps around:
+                // (0 + 1) % 4 = 1
+                // (1 + 1) % 4 = 2
+                // (2 + 1) % 4 = 3
+                // (3 + 1) % 4 = 0  <-- wraps back to start!
+                //
+                // This creates an endless loop through all songs.
+
                 currentSong = (currentSong + 1) % TOTAL_SONGS;
 
-                // After title display time, show next song
+                // Schedule next song after title displays for a while
                 setTimeout(showLyrics, TITLE_DISPLAY_TIME);
             }
 
-            // Start the cycle after initial 10 seconds of title
+            // ============================================
+            // START THE ANIMATION CYCLE
+            // ============================================
+            // Begin by showing title for 10 seconds, then start first song.
+            // This setTimeout kicks off the whole animation sequence.
+
             setTimeout(showLyrics, TITLE_DISPLAY_TIME);
-        })();
+
+        })(); // <-- These parentheses INVOKE (run) the function immediately
     </script>
 </body>
 </html>

@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Explained - Austin Karaoke Directory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <style>
+        /* Page-specific styles for the documentation */
+        .docs-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: var(--spacing-xl);
+            background: var(--bg-card);
+            border-radius: var(--border-radius-lg);
+            margin-top: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .docs-header {
+            text-align: center;
+            margin-bottom: var(--spacing-2xl);
+            padding-bottom: var(--spacing-xl);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .docs-header h1 {
+            color: var(--color-primary-light);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .docs-header p {
+            color: var(--text-secondary);
+            font-size: var(--font-size-lg);
+        }
+
+        .docs-nav {
+            background: var(--bg-secondary);
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius);
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .docs-nav h2 {
+            font-size: var(--font-size-lg);
+            margin-bottom: var(--spacing-md);
+            color: var(--color-primary-light);
+        }
+
+        .docs-nav ul {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-sm);
+        }
+
+        .docs-nav a {
+            display: block;
+            padding: var(--spacing-sm);
+            border-radius: var(--border-radius-sm);
+            transition: background var(--transition-fast);
+        }
+
+        .docs-nav a:hover {
+            background: var(--color-gray-700);
+            text-decoration: none;
+        }
+
+        .docs-section {
+            margin-bottom: var(--spacing-2xl);
+            padding-bottom: var(--spacing-xl);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .docs-section:last-child {
+            border-bottom: none;
+        }
+
+        .docs-section h2 {
+            color: var(--color-primary-light);
+            font-size: var(--font-size-2xl);
+            margin-bottom: var(--spacing-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .docs-section h2 i {
+            color: var(--color-secondary);
+        }
+
+        .docs-section h3 {
+            color: var(--color-primary-dark);
+            font-size: var(--font-size-xl);
+            margin-top: var(--spacing-xl);
+            margin-bottom: var(--spacing-md);
+            padding-left: var(--spacing-md);
+            border-left: 3px solid var(--color-primary);
+        }
+
+        .docs-section h4 {
+            color: var(--text-primary);
+            font-size: var(--font-size-lg);
+            margin-top: var(--spacing-lg);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .docs-section p {
+            color: var(--text-primary);
+            line-height: 1.8;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .docs-section ul, .docs-section ol {
+            margin-left: var(--spacing-xl);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .docs-section li {
+            margin-bottom: var(--spacing-sm);
+            line-height: 1.7;
+        }
+
+        .docs-section ul li {
+            list-style-type: disc;
+        }
+
+        .docs-section ol li {
+            list-style-type: decimal;
+        }
+
+        .code-term {
+            background: var(--color-gray-800);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+            color: var(--color-primary-light);
+        }
+
+        .highlight-box {
+            background: rgba(99, 102, 241, 0.1);
+            border-left: 4px solid var(--color-primary);
+            padding: var(--spacing-md) var(--spacing-lg);
+            margin: var(--spacing-lg) 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+
+        .highlight-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .warning-box {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--color-warning);
+            padding: var(--spacing-md) var(--spacing-lg);
+            margin: var(--spacing-lg) 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+
+        .file-structure {
+            background: var(--color-gray-800);
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius);
+            font-family: monospace;
+            font-size: var(--font-size-sm);
+            overflow-x: auto;
+            white-space: pre;
+            line-height: 1.6;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-lg);
+            color: var(--text-secondary);
+        }
+
+        .back-link:hover {
+            color: var(--color-primary-light);
+        }
+
+        @media (max-width: 768px) {
+            .docs-container {
+                margin: var(--spacing-md);
+                padding: var(--spacing-lg);
+            }
+
+            .docs-nav ul {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="docs-container">
+        <a href="index.html" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i> Back to Directory
+        </a>
+
+        <header class="docs-header">
+            <h1><i class="fa-solid fa-code"></i> Code Explained</h1>
+            <p>A complete beginner's guide to understanding every line of code in the Austin Karaoke Directory</p>
+        </header>
+
+        <nav class="docs-nav">
+            <h2><i class="fa-solid fa-list"></i> Table of Contents</h2>
+            <ul>
+                <li><a href="#overview">1. Project Overview</a></li>
+                <li><a href="#html-structure">2. HTML Structure</a></li>
+                <li><a href="#css-styling">3. CSS Styling</a></li>
+                <li><a href="#javascript-architecture">4. JavaScript Architecture</a></li>
+                <li><a href="#data-management">5. Data Management</a></li>
+                <li><a href="#state-management">6. State Management</a></li>
+                <li><a href="#event-system">7. Event System</a></li>
+                <li><a href="#component-system">8. Component System</a></li>
+                <li><a href="#views">9. Views Explained</a></li>
+                <li><a href="#utilities">10. Utility Functions</a></li>
+                <li><a href="#how-it-works">11. How Everything Works Together</a></li>
+            </ul>
+        </nav>
+
+        <!-- SECTION 1: PROJECT OVERVIEW -->
+        <section id="overview" class="docs-section">
+            <h2><i class="fa-solid fa-circle-info"></i> 1. Project Overview</h2>
+
+            <p>The Austin Karaoke Directory is what developers call a "Single Page Application" or SPA. This means that instead of loading a new page every time you click something, JavaScript updates the content on the same page. This makes the app feel faster and more responsive, similar to how apps on your phone work.</p>
+
+            <h3>What Technologies Does This App Use?</h3>
+
+            <p>This application is built with three core web technologies that every website uses:</p>
+
+            <ul>
+                <li><strong>HTML (HyperText Markup Language)</strong> - This is the skeleton of the website. HTML defines the structure and content - things like headings, paragraphs, buttons, and where different sections go on the page. Think of it like the blueprint of a house.</li>
+                <li><strong>CSS (Cascading Style Sheets)</strong> - This is the paint and decoration. CSS controls how everything looks - colors, fonts, spacing, animations, and how the layout changes on different screen sizes. Think of it like the interior design of a house.</li>
+                <li><strong>JavaScript</strong> - This is the electricity and plumbing that makes things work. JavaScript adds interactivity - clicking buttons, loading data, switching views, and responding to user actions. Think of it like the systems that make a house functional.</li>
+            </ul>
+
+            <h3>Why No Framework?</h3>
+
+            <p>Many modern websites use frameworks like React, Vue, or Angular. These are pre-built libraries that make development faster but add complexity. This project uses "vanilla JavaScript" - meaning plain JavaScript without any framework. This approach has several benefits:</p>
+
+            <ul>
+                <li><strong>Smaller file size</strong> - No framework code to download means faster loading</li>
+                <li><strong>Easier to understand</strong> - Everything is written in standard JavaScript</li>
+                <li><strong>No build process</strong> - You can edit files and refresh the browser immediately</li>
+                <li><strong>Educational value</strong> - You can see exactly how everything works without framework "magic"</li>
+            </ul>
+
+            <h3>Project File Structure</h3>
+
+            <p>Understanding how files are organized is crucial for navigating any codebase. Here's how this project is structured:</p>
+
+            <div class="file-structure">
+karaokedirectory/
+├── index.html          # Main page - the entry point users see
+├── about.html          # About page
+├── bingo.html          # Karaoke bingo game
+├── editor.html         # Venue data editor
+├── submit.html         # Venue submission form
+├── codeexplained.html  # This documentation page
+│
+├── css/                # All styling files
+│   ├── base.css        # Variables, reset, typography
+│   ├── layout.css      # Page structure, header, footer
+│   ├── components.css  # Reusable UI components
+│   └── views.css       # View-specific styles
+│
+├── js/                 # All JavaScript files
+│   ├── app.js          # Main application entry point
+│   ├── data.js         # Venue database
+│   │
+│   ├── core/           # Core application systems
+│   │   ├── state.js    # State management (stores app data)
+│   │   └── events.js   # Event bus (component communication)
+│   │
+│   ├── components/     # Reusable UI pieces
+│   │   ├── Component.js     # Base component class
+│   │   ├── Navigation.js    # Navigation tabs
+│   │   ├── VenueCard.js     # Venue display card
+│   │   ├── VenueModal.js    # Popup venue details
+│   │   ├── VenueDetailPane.js # Side panel details
+│   │   └── DayCard.js       # Day schedule card
+│   │
+│   ├── views/          # Full-page views
+│   │   ├── WeeklyView.js      # Calendar view
+│   │   ├── AlphabeticalView.js # A-Z list view
+│   │   └── MapView.js         # Interactive map
+│   │
+│   ├── services/       # Data handling
+│   │   └── venues.js   # Venue data operations
+│   │
+│   └── utils/          # Helper functions
+│       ├── date.js     # Date formatting
+│       ├── string.js   # Text manipulation
+│       └── url.js      # URL building
+│
+└── assets/             # Images and static files
+            </div>
+
+            <div class="highlight-box">
+                <p><strong>Key Concept: Separation of Concerns</strong></p>
+                <p>Notice how different types of code are in different folders. This is a fundamental principle called "separation of concerns" - keeping code organized by what it does. This makes it easier to find things and prevents the codebase from becoming a tangled mess.</p>
+            </div>
+        </section>
+
+        <!-- SECTION 2: HTML STRUCTURE -->
+        <section id="html-structure" class="docs-section">
+            <h2><i class="fa-brands fa-html5"></i> 2. HTML Structure</h2>
+
+            <p>HTML is written using "tags" - special keywords surrounded by angle brackets. Tags usually come in pairs: an opening tag and a closing tag. Everything between them is the content. For example, <span class="code-term">&lt;p&gt;Hello&lt;/p&gt;</span> creates a paragraph containing the word "Hello".</p>
+
+            <h3>The DOCTYPE Declaration</h3>
+
+            <p>Every HTML file starts with <span class="code-term">&lt;!DOCTYPE html&gt;</span>. This isn't actually an HTML tag - it's an instruction to the web browser saying "this is an HTML5 document." HTML5 is the current version of HTML. Without this line, browsers might render your page in an older compatibility mode, which can cause layout problems.</p>
+
+            <h3>The html Tag and Language</h3>
+
+            <p>After the DOCTYPE, we have <span class="code-term">&lt;html lang="en"&gt;</span>. This is the root element - everything else goes inside it. The <span class="code-term">lang="en"</span> attribute tells browsers and assistive technologies (like screen readers for visually impaired users) that the page content is in English. This helps with pronunciation in text-to-speech and affects things like spell-checking.</p>
+
+            <h3>The head Section</h3>
+
+            <p>The <span class="code-term">&lt;head&gt;</span> section contains metadata - information ABOUT the page that doesn't appear visually on screen. This includes:</p>
+
+            <h4>Character Encoding (meta charset)</h4>
+
+            <p>The line <span class="code-term">&lt;meta charset="UTF-8"&gt;</span> tells the browser how to interpret the text characters in your file. UTF-8 is a universal encoding that supports virtually every language and symbol, including emojis. Without this, special characters might display as garbage (like "Ã©" instead of "é").</p>
+
+            <h4>Viewport Meta Tag</h4>
+
+            <p>The viewport meta tag is critical for mobile devices: <span class="code-term">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</span>. Before smartphones, websites were designed for desktop monitors. When mobile browsers first loaded these sites, they would show a tiny zoomed-out version. The viewport tag tells the browser "make the page width match the device width, and don't zoom in or out initially." Without this, your responsive designs won't work on mobile.</p>
+
+            <h4>The Title Tag</h4>
+
+            <p>The <span class="code-term">&lt;title&gt;</span> tag sets the text that appears in the browser tab. It's also what shows up in search engine results and when someone bookmarks your page. It should be descriptive but concise - search engines typically show about 50-60 characters.</p>
+
+            <h4>Link Tags for CSS</h4>
+
+            <p>We use <span class="code-term">&lt;link rel="stylesheet" href="..."&gt;</span> to connect CSS files to our HTML. The browser loads these in order, which matters because CSS rules can override each other. Our app loads Font Awesome (for icons) first, then our custom stylesheets in a specific order: base (variables and resets), layout (structure), components (UI pieces), and views (page-specific styles).</p>
+
+            <h3>The body Section</h3>
+
+            <p>The <span class="code-term">&lt;body&gt;</span> section contains everything users actually see on the page. In our app, this is organized into several main areas:</p>
+
+            <h4>Semantic HTML Elements</h4>
+
+            <p>Instead of using generic <span class="code-term">&lt;div&gt;</span> tags for everything, we use "semantic" elements that describe their purpose:</p>
+
+            <ul>
+                <li><strong>&lt;header&gt;</strong> - The top section, typically containing the logo and main navigation</li>
+                <li><strong>&lt;nav&gt;</strong> - Navigation links and controls</li>
+                <li><strong>&lt;main&gt;</strong> - The primary content area (only use one per page)</li>
+                <li><strong>&lt;aside&gt;</strong> - Secondary content, like our venue detail sidebar</li>
+                <li><strong>&lt;footer&gt;</strong> - The bottom section, typically containing copyright and secondary links</li>
+                <li><strong>&lt;article&gt;</strong> - A self-contained piece of content</li>
+                <li><strong>&lt;section&gt;</strong> - A thematic grouping of content</li>
+            </ul>
+
+            <p>Using semantic elements helps screen readers understand your page structure, improves SEO (search engine optimization), and makes your code more readable to other developers.</p>
+
+            <h4>Data Attributes</h4>
+
+            <p>You'll see attributes like <span class="code-term">data-song="0"</span> or <span class="code-term">data-venue-id="..."</span> throughout the HTML. These "data attributes" let us store custom information on HTML elements that JavaScript can read later. Any attribute starting with <span class="code-term">data-</span> is accessible in JavaScript via <span class="code-term">element.dataset.attributeName</span>.</p>
+
+            <h4>Accessibility Attributes</h4>
+
+            <p>Attributes starting with <span class="code-term">aria-</span> are for accessibility. For example, <span class="code-term">aria-label="Close"</span> tells screen readers what a button does when it only has an icon and no visible text. The <span class="code-term">hidden</span> attribute hides elements from both visual display AND screen readers.</p>
+        </section>
+
+        <!-- SECTION 3: CSS STYLING -->
+        <section id="css-styling" class="docs-section">
+            <h2><i class="fa-brands fa-css3-alt"></i> 3. CSS Styling</h2>
+
+            <p>CSS works by selecting HTML elements and applying style rules to them. A CSS rule has two parts: a selector (what to style) and declarations (how to style it). For example: <span class="code-term">.button { color: blue; }</span> selects all elements with the class "button" and makes their text blue.</p>
+
+            <h3>CSS Custom Properties (Variables)</h3>
+
+            <p>At the top of base.css, you'll see a block starting with <span class="code-term">:root</span>. This is where we define CSS custom properties, also known as CSS variables. They look like <span class="code-term">--color-primary: #6366f1;</span>.</p>
+
+            <p>The <span class="code-term">:root</span> selector targets the root element (the <span class="code-term">&lt;html&gt;</span> tag), making these variables available throughout the entire document. We use them with the <span class="code-term">var()</span> function: <span class="code-term">color: var(--color-primary);</span>.</p>
+
+            <p>Why use variables? If we want to change the primary color of the entire site, we only need to change it in one place. Without variables, we'd have to find and update every instance of that color value throughout our stylesheets.</p>
+
+            <h3>The CSS Reset</h3>
+
+            <p>Browsers have built-in default styles - paragraphs have margins, headings have specific sizes, lists have bullet points. Unfortunately, different browsers have slightly different defaults. The CSS reset at the top of base.css removes these inconsistencies:</p>
+
+            <ul>
+                <li><strong>box-sizing: border-box</strong> - Makes width and height include padding and border, not just content. This makes layouts much more predictable.</li>
+                <li><strong>margin: 0; padding: 0</strong> - Removes all default spacing so we start with a clean slate.</li>
+                <li><strong>list-style: none</strong> - Removes bullet points from lists (we'll add our own styling).</li>
+            </ul>
+
+            <h3>BEM Naming Convention</h3>
+
+            <p>Our CSS classes follow a pattern called BEM (Block, Element, Modifier). This naming convention helps organize styles and prevent conflicts:</p>
+
+            <ul>
+                <li><strong>Block</strong> - A standalone component: <span class="code-term">.venue-card</span></li>
+                <li><strong>Element</strong> - A part of a block (double underscore): <span class="code-term">.venue-card__header</span></li>
+                <li><strong>Modifier</strong> - A variation (double dash): <span class="code-term">.venue-card--compact</span></li>
+            </ul>
+
+            <p>This creates a clear hierarchy. When you see <span class="code-term">.day-card__header</span>, you immediately know it's the header element inside a day-card block, not just any header on the page.</p>
+
+            <h3>Responsive Design</h3>
+
+            <p>The app looks different on phones versus desktops. This is achieved through "media queries" - CSS rules that only apply at certain screen sizes. For example:</p>
+
+            <p><span class="code-term">@media (min-width: 1200px) { ... }</span> means "only apply these styles when the screen is at least 1200 pixels wide."</p>
+
+            <p>Our app uses a "mobile-first" approach: we write styles for small screens first, then add media queries to enhance the layout for larger screens. This generally results in cleaner, more maintainable CSS.</p>
+
+            <h3>CSS Transitions and Animations</h3>
+
+            <p>When elements change state (like when you hover over a button), we use transitions to make the change smooth rather than instant. The <span class="code-term">transition</span> property specifies what should animate, how long it takes, and the easing function (how the animation accelerates/decelerates).</p>
+
+            <p>For example, <span class="code-term">transition: color 200ms ease;</span> means "when the color changes, animate the change over 200 milliseconds with an ease timing function."</p>
+        </section>
+
+        <!-- SECTION 4: JAVASCRIPT ARCHITECTURE -->
+        <section id="javascript-architecture" class="docs-section">
+            <h2><i class="fa-brands fa-js"></i> 4. JavaScript Architecture</h2>
+
+            <p>JavaScript makes websites interactive. When you click a button, switch views, or see content load dynamically, that's JavaScript at work. Our app uses modern JavaScript features (ES6+) and a modular architecture.</p>
+
+            <h3>ES6 Modules</h3>
+
+            <p>Traditional JavaScript puts everything in one global space, which can cause naming conflicts. ES6 modules solve this by letting files explicitly import and export functionality:</p>
+
+            <ul>
+                <li><strong>export</strong> - Makes a function, variable, or class available to other files: <span class="code-term">export function formatDate() { ... }</span></li>
+                <li><strong>import</strong> - Brings in functionality from another file: <span class="code-term">import { formatDate } from './utils/date.js';</span></li>
+            </ul>
+
+            <p>In HTML, we load a module with <span class="code-term">&lt;script type="module" src="..."&gt;</span>. The browser then follows the import chain, loading each required file.</p>
+
+            <h3>The Application Entry Point (app.js)</h3>
+
+            <p>Every application needs a starting point. Our app begins in app.js, which does several things when the page loads:</p>
+
+            <ol>
+                <li><strong>Loads venue data</strong> from data.js</li>
+                <li><strong>Creates the navigation</strong> component and renders it</li>
+                <li><strong>Creates the modal</strong> component (for mobile venue details)</li>
+                <li><strong>Creates the detail pane</strong> component (for desktop venue details)</li>
+                <li><strong>Sets up event listeners</strong> for venue selection</li>
+                <li><strong>Renders the initial view</strong> (the weekly calendar)</li>
+            </ol>
+
+            <p>The <span class="code-term">init()</span> function orchestrates all of this. It's called when the DOM (Document Object Model - the browser's representation of your HTML) is ready.</p>
+
+            <h3>Async/Await</h3>
+
+            <p>You'll see the <span class="code-term">async</span> and <span class="code-term">await</span> keywords in our code. These handle "asynchronous" operations - things that take time to complete, like loading data from a file.</p>
+
+            <p><span class="code-term">async function loadData() { ... }</span> marks a function as asynchronous. Inside it, <span class="code-term">await someOperation()</span> pauses execution until that operation completes. This makes asynchronous code read like synchronous code, which is much easier to understand.</p>
+
+            <h3>The Window Object</h3>
+
+            <p>In browsers, <span class="code-term">window</span> is the global object representing the browser window. We use it to:</p>
+
+            <ul>
+                <li>Expose functions globally: <span class="code-term">window.jumpToToday = () => { ... }</span></li>
+                <li>Add event listeners: <span class="code-term">window.addEventListener('scroll', ...)</span></li>
+                <li>Access scroll position: <span class="code-term">window.scrollY</span></li>
+                <li>Get window dimensions: <span class="code-term">window.innerWidth</span>, <span class="code-term">window.innerHeight</span></li>
+            </ul>
+        </section>
+
+        <!-- SECTION 5: DATA MANAGEMENT -->
+        <section id="data-management" class="docs-section">
+            <h2><i class="fa-solid fa-database"></i> 5. Data Management</h2>
+
+            <p>Our app displays information about karaoke venues. This data is stored in data.js as a JavaScript object and managed through venues.js service.</p>
+
+            <h3>The Data Structure</h3>
+
+            <p>The venue data is organized as a JavaScript object with a "listings" array. Each venue in the array has properties describing it:</p>
+
+            <ul>
+                <li><strong>id</strong> - A unique identifier (like "the-common-interest"). Used to reference venues in code.</li>
+                <li><strong>name</strong> - The display name of the venue.</li>
+                <li><strong>dedicated</strong> - A boolean (true/false) indicating if it's a dedicated karaoke venue (karaoke every day).</li>
+                <li><strong>address</strong> - An object containing street, city, state, and zip.</li>
+                <li><strong>schedule</strong> - An array of schedule entries, each with frequency (every, first, second, etc.), day, start time, and end time.</li>
+                <li><strong>host</strong> - Information about the karaoke host/KJ.</li>
+                <li><strong>socials</strong> - Links to social media profiles.</li>
+                <li><strong>coordinates</strong> - Latitude and longitude for the map.</li>
+            </ul>
+
+            <h3>The Venues Service (venues.js)</h3>
+
+            <p>Instead of accessing the raw data directly, components use functions from venues.js. This is called a "service layer" - it provides a clean interface for working with data:</p>
+
+            <ul>
+                <li><strong>initVenues(data)</strong> - Loads the venue data into the service.</li>
+                <li><strong>getAllVenues()</strong> - Returns all venues.</li>
+                <li><strong>getVenueById(id)</strong> - Finds a specific venue by its ID.</li>
+                <li><strong>getVenuesForDate(date)</strong> - Returns venues that have karaoke on a specific date.</li>
+                <li><strong>getVenuesSorted()</strong> - Returns all venues sorted alphabetically.</li>
+                <li><strong>searchVenues(query)</strong> - Searches venues by name, city, or host.</li>
+                <li><strong>filterVenues(filters)</strong> - Filters venues by multiple criteria.</li>
+            </ul>
+
+            <p>This abstraction has several benefits: if we ever change how data is stored (maybe fetching from a server instead of a local file), we only need to update the service - all the components using it continue to work unchanged.</p>
+
+            <h3>Schedule Matching</h3>
+
+            <p>One of the trickier parts of the app is determining which venues have karaoke on a given date. The <span class="code-term">scheduleMatchesDate()</span> function in date.js handles this. It considers:</p>
+
+            <ul>
+                <li>The day of the week (Monday, Tuesday, etc.)</li>
+                <li>The frequency (every week, first Saturday, second Thursday, last Friday, etc.)</li>
+            </ul>
+
+            <p>For "first", "second", etc., it calculates which occurrence of that weekday in the month the date falls on. For "last", it checks if there's another occurrence of that weekday later in the same month.</p>
+        </section>
+
+        <!-- SECTION 6: STATE MANAGEMENT -->
+        <section id="state-management" class="docs-section">
+            <h2><i class="fa-solid fa-layer-group"></i> 6. State Management</h2>
+
+            <p>"State" refers to the data that can change as users interact with the app. In our case, this includes which view is active, what week is being displayed, whether dedicated venues are shown, and which venue (if any) is selected.</p>
+
+            <h3>Why Centralized State?</h3>
+
+            <p>Without centralized state, components would need to directly communicate with each other, creating a tangled web of dependencies. With centralized state, components simply read from and write to one place. When state changes, the system notifies all interested components.</p>
+
+            <h3>The State Object (state.js)</h3>
+
+            <p>Our state is stored in a simple JavaScript object:</p>
+
+            <ul>
+                <li><strong>venues</strong> - The array of all venue data.</li>
+                <li><strong>filteredVenues</strong> - Venues after applying filters.</li>
+                <li><strong>filters</strong> - Current filter settings.</li>
+                <li><strong>view</strong> - Current view ('weekly', 'alphabetical', or 'map').</li>
+                <li><strong>weekStart</strong> - The date of the currently displayed week's Sunday.</li>
+                <li><strong>showDedicated</strong> - Whether to include dedicated venues.</li>
+                <li><strong>selectedVenue</strong> - The currently selected venue (for detail view).</li>
+                <li><strong>isLoading</strong> - Whether data is currently loading.</li>
+            </ul>
+
+            <h3>The Subscribe Pattern</h3>
+
+            <p>Components can "subscribe" to state changes using <span class="code-term">subscribe(key, callback)</span>. When that piece of state changes, the callback function is called with the new value. This is similar to how you might subscribe to a YouTube channel - you get notified when new content appears.</p>
+
+            <p>For example: <span class="code-term">subscribe('view', (newView) => this.render())</span> means "whenever the view state changes, re-render this component."</p>
+
+            <h3>Updating State</h3>
+
+            <p>State is updated via <span class="code-term">setState({ key: value })</span>. This function:</p>
+
+            <ol>
+                <li>Compares new values to current values</li>
+                <li>Updates only the values that changed</li>
+                <li>Notifies subscribers of changes</li>
+            </ol>
+
+            <p>This is a "reactive" pattern - changes automatically propagate through the system. You don't need to manually tell every component "hey, the view changed" - it happens automatically.</p>
+        </section>
+
+        <!-- SECTION 7: EVENT SYSTEM -->
+        <section id="event-system" class="docs-section">
+            <h2><i class="fa-solid fa-bolt"></i> 7. Event System</h2>
+
+            <p>While state management handles data changes, the event system handles actions and communication between components. Think of events as announcements: "A venue was selected!" or "The modal was closed!"</p>
+
+            <h3>The Event Bus (events.js)</h3>
+
+            <p>Our event bus is like a bulletin board where components can post messages and other components can listen for them. It provides several functions:</p>
+
+            <ul>
+                <li><strong>on(event, callback)</strong> - Subscribe to an event. When that event is emitted, your callback runs.</li>
+                <li><strong>once(event, callback)</strong> - Subscribe to an event for a single execution only.</li>
+                <li><strong>off(event, callback)</strong> - Unsubscribe from an event.</li>
+                <li><strong>emit(event, data)</strong> - Broadcast an event to all subscribers.</li>
+            </ul>
+
+            <h3>Why Events Instead of Direct Communication?</h3>
+
+            <p>Imagine the VenueCard component needs to tell the VenueModal to open with specific venue details. Without events, VenueCard would need to know about VenueModal directly, creating a tight coupling. If we change or remove VenueModal, VenueCard breaks.</p>
+
+            <p>With events, VenueCard just announces <span class="code-term">emit(Events.VENUE_SELECTED, venue)</span>. It doesn't know or care who's listening. VenueModal (and VenueDetailPane, and anything else that cares) independently listens for that event. Components are decoupled - they can be added, removed, or changed without affecting each other.</p>
+
+            <h3>Common Events</h3>
+
+            <p>The <span class="code-term">Events</span> object defines all event names used in the app:</p>
+
+            <ul>
+                <li><strong>VENUE_SELECTED</strong> - User clicked on a venue</li>
+                <li><strong>VENUE_CLOSED</strong> - Venue detail was closed</li>
+                <li><strong>VIEW_CHANGED</strong> - User switched views</li>
+                <li><strong>WEEK_CHANGED</strong> - User navigated to different week</li>
+                <li><strong>FILTER_CHANGED</strong> - Filter settings changed</li>
+                <li><strong>DATA_LOADED</strong> - Venue data finished loading</li>
+            </ul>
+
+            <div class="highlight-box">
+                <p><strong>Design Pattern: Pub/Sub</strong></p>
+                <p>This event system implements the Publisher/Subscriber (Pub/Sub) pattern. Publishers (emit) don't need to know about subscribers (on), and subscribers don't need to know about publishers. This loose coupling makes the code more flexible and easier to maintain.</p>
+            </div>
+        </section>
+
+        <!-- SECTION 8: COMPONENT SYSTEM -->
+        <section id="component-system" class="docs-section">
+            <h2><i class="fa-solid fa-puzzle-piece"></i> 8. Component System</h2>
+
+            <p>Modern web development organizes UIs into "components" - reusable, self-contained pieces. Our app has a simple component system built without any framework.</p>
+
+            <h3>The Base Component Class (Component.js)</h3>
+
+            <p>All our UI components extend the <span class="code-term">Component</span> class. This base class provides common functionality:</p>
+
+            <h4>Constructor</h4>
+
+            <p>When you create a component with <span class="code-term">new Navigation('#navigation')</span>, the constructor:</p>
+            <ol>
+                <li>Finds the container element (by selector or reference)</li>
+                <li>Stores the props (properties passed in)</li>
+                <li>Initializes empty state</li>
+                <li>Sets up arrays to track subscriptions and event listeners (for cleanup)</li>
+                <li>Calls the <span class="code-term">init()</span> method</li>
+            </ol>
+
+            <h4>The Render Cycle</h4>
+
+            <p>When <span class="code-term">render()</span> is called:</p>
+            <ol>
+                <li><span class="code-term">template()</span> is called to generate HTML string</li>
+                <li>That HTML is injected into the container via <span class="code-term">innerHTML</span></li>
+                <li><span class="code-term">afterRender()</span> is called to set up event listeners</li>
+            </ol>
+
+            <p>This pattern separates concerns: <span class="code-term">template()</span> focuses purely on generating HTML, while <span class="code-term">afterRender()</span> handles interactivity.</p>
+
+            <h4>State and Props</h4>
+
+            <ul>
+                <li><strong>Props</strong> - Data passed into the component from outside. Like function arguments. Should not be modified by the component.</li>
+                <li><strong>State</strong> - Internal data that can change. The component owns and manages its state.</li>
+            </ul>
+
+            <p>When you call <span class="code-term">setState({ key: value })</span>, the component automatically re-renders with the new state.</p>
+
+            <h4>Event Delegation</h4>
+
+            <p>The <span class="code-term">delegate(event, selector, handler)</span> method enables "event delegation" - a technique where a single event listener on a parent handles events from many children. Instead of adding click listeners to 50 venue cards, we add one listener to their container that checks if the clicked element matches '.venue-card'.</p>
+
+            <p>Event delegation is more efficient and automatically handles dynamically added elements.</p>
+
+            <h4>Cleanup with destroy()</h4>
+
+            <p>When a component is removed, <span class="code-term">destroy()</span> cleans up:</p>
+            <ul>
+                <li>Removes all event listeners</li>
+                <li>Unsubscribes from all state/event subscriptions</li>
+                <li>Clears the container</li>
+            </ul>
+
+            <p>This prevents "memory leaks" - leftover handlers that waste memory and can cause bugs.</p>
+
+            <h3>Specific Components</h3>
+
+            <h4>Navigation</h4>
+            <p>Renders the view tabs (Calendar, A-Z, Map), week navigation arrows, and the "Show dedicated venues" toggle. Subscribes to view and weekStart state to update when these change.</p>
+
+            <h4>VenueCard</h4>
+            <p>Displays a venue in either "compact" mode (for day cards) or "full" mode (for alphabetical view). Handles click events to select the venue.</p>
+
+            <h4>VenueModal</h4>
+            <p>A full-screen popup for venue details on mobile. Listens for VENUE_SELECTED events and opens. Handles closing via button click, backdrop click, or Escape key.</p>
+
+            <h4>VenueDetailPane</h4>
+            <p>A sticky side panel for venue details on desktop (1200px+ screens). Similar to VenueModal but displayed inline instead of as an overlay.</p>
+
+            <h4>DayCard</h4>
+            <p>Shows all venues for a specific day. Displays the day name, date, "Today" badge if applicable, and a list of VenueCards. Past days are collapsed by default.</p>
+        </section>
+
+        <!-- SECTION 9: VIEWS -->
+        <section id="views" class="docs-section">
+            <h2><i class="fa-solid fa-eye"></i> 9. Views Explained</h2>
+
+            <p>Views are full-page components that display venue information in different formats. The app has three views that users can switch between.</p>
+
+            <h3>WeeklyView</h3>
+
+            <p>The default view shows a 7-day calendar. Here's how it works:</p>
+
+            <ol>
+                <li><strong>Gets the week start date</strong> from state (which Sunday)</li>
+                <li><strong>Generates an array of 7 dates</strong> for that week</li>
+                <li><strong>For each date, renders a DayCard</strong> showing venues with karaoke that day</li>
+                <li><strong>Automatically scrolls to today</strong> if viewing the current week</li>
+            </ol>
+
+            <p>The view subscribes to <span class="code-term">weekStart</span> and <span class="code-term">showDedicated</span> state. When users navigate weeks or toggle the dedicated filter, the view re-renders.</p>
+
+            <h4>Past Days Behavior</h4>
+            <p>Days in the past get a <span class="code-term">day-card--past</span> class which collapses them by default. Users can click the header to expand and see that day's venues. This keeps the interface focused on upcoming events.</p>
+
+            <h3>AlphabeticalView</h3>
+
+            <p>Shows all venues sorted A-Z, grouped by first letter:</p>
+
+            <ol>
+                <li><strong>Gets all venues</strong> from the venues service</li>
+                <li><strong>Sorts alphabetically</strong> (ignoring articles like "The")</li>
+                <li><strong>Groups by first letter</strong></li>
+                <li><strong>Renders a letter index</strong> at the top (click to jump to that letter)</li>
+                <li><strong>Renders each group</strong> with a header and list of VenueCards</li>
+            </ol>
+
+            <p>The "ignore articles" logic is in <span class="code-term">getSortableName()</span> - it moves articles like "The", "A", "An" to the end for sorting purposes. So "The Common Interest" sorts under "C", not "T".</p>
+
+            <h3>MapView</h3>
+
+            <p>Displays venues on an interactive map using Leaflet.js:</p>
+
+            <ol>
+                <li><strong>Loads Leaflet library</strong> if not already loaded (CSS and JS)</li>
+                <li><strong>Creates a map</strong> centered on Austin, TX</li>
+                <li><strong>Adds a tile layer</strong> from OpenStreetMap</li>
+                <li><strong>Places markers</strong> for each venue with coordinates</li>
+                <li><strong>Adjusts the view</strong> to fit all markers</li>
+            </ol>
+
+            <p>Each marker has a popup with the venue name, schedule, and a "View Details" button that emits a VENUE_SELECTED event.</p>
+
+            <div class="warning-box">
+                <p><strong>Note About Map Coordinates</strong></p>
+                <p>Not all venues have coordinates in the data. The map shows how many venues are mapped and suggests using the editor to add coordinates for unmapped venues.</p>
+            </div>
+        </section>
+
+        <!-- SECTION 10: UTILITIES -->
+        <section id="utilities" class="docs-section">
+            <h2><i class="fa-solid fa-toolbox"></i> 10. Utility Functions</h2>
+
+            <p>Utility functions are small, reusable pieces of code that don't belong to any specific component. They're organized by purpose in the utils folder.</p>
+
+            <h3>Date Utilities (date.js)</h3>
+
+            <p>Working with dates in JavaScript is notoriously tricky. Our date utilities handle common operations:</p>
+
+            <ul>
+                <li><strong>getDayName(date)</strong> - Returns lowercase day name ("monday", "tuesday", etc.)</li>
+                <li><strong>isToday(date)</strong> - Checks if a date is today</li>
+                <li><strong>formatDateShort(date)</strong> - Formats as "Mon 12/25"</li>
+                <li><strong>formatDateFull(date)</strong> - Formats as "Monday, December 25, 2025"</li>
+                <li><strong>formatWeekRange(startDate)</strong> - Formats as "Dec 23 - Dec 29, 2025"</li>
+                <li><strong>getWeekDates(startDate)</strong> - Returns array of 7 dates for a week</li>
+                <li><strong>getWeekStart(date)</strong> - Returns the Sunday of that week</li>
+                <li><strong>formatTime12(time24)</strong> - Converts "21:00" to "9:00 PM"</li>
+                <li><strong>formatTimeRange(start, end)</strong> - Formats as "9:00 PM - 2:00 AM"</li>
+                <li><strong>scheduleMatchesDate(schedule, date)</strong> - Checks if a schedule entry applies to a date</li>
+            </ul>
+
+            <h3>String Utilities (string.js)</h3>
+
+            <p>Functions for manipulating and formatting text:</p>
+
+            <ul>
+                <li><strong>escapeHtml(str)</strong> - Prevents XSS attacks by converting special characters to HTML entities. Critical for security when displaying user-generated content.</li>
+                <li><strong>capitalize(str)</strong> - Capitalizes first letter</li>
+                <li><strong>titleCase(str)</strong> - Capitalizes First Letter Of Each Word</li>
+                <li><strong>getSortableName(name)</strong> - Moves articles to end for sorting ("The Mill" becomes "Mill, The")</li>
+                <li><strong>slugify(str)</strong> - Converts to URL-safe format ("The Mill" becomes "the-mill")</li>
+                <li><strong>truncate(str, maxLength)</strong> - Shortens with ellipsis if too long</li>
+                <li><strong>containsIgnoreCase(str, search)</strong> - Case-insensitive search</li>
+            </ul>
+
+            <h3>URL Utilities (url.js)</h3>
+
+            <p>Functions for building and validating URLs:</p>
+
+            <ul>
+                <li><strong>sanitizeUrl(url)</strong> - Validates URL, blocks javascript: and data: URLs (security), adds https:// if missing</li>
+                <li><strong>buildMapUrl(address, name)</strong> - Creates Google Maps search URL</li>
+                <li><strong>buildDirectionsUrl(address, name)</strong> - Creates Google Maps directions URL</li>
+                <li><strong>createSocialLink(platform, url)</strong> - Creates an icon link for a social platform</li>
+                <li><strong>createSocialLinks(socials)</strong> - Creates all social links for a venue</li>
+                <li><strong>formatAddress(address)</strong> - Formats address object as string</li>
+            </ul>
+
+            <div class="highlight-box">
+                <p><strong>Why Escape HTML?</strong></p>
+                <p>If venue data contained <span class="code-term">&lt;script&gt;alert('hacked')&lt;/script&gt;</span> and we rendered it directly, that script would execute. The <span class="code-term">escapeHtml()</span> function converts < to &amp;lt; and > to &amp;gt; so it displays as text instead of executing. Always escape user-provided content!</p>
+            </div>
+        </section>
+
+        <!-- SECTION 11: HOW IT ALL WORKS TOGETHER -->
+        <section id="how-it-works" class="docs-section">
+            <h2><i class="fa-solid fa-gears"></i> 11. How Everything Works Together</h2>
+
+            <p>Now let's trace through what happens when you perform common actions in the app.</p>
+
+            <h3>When the Page First Loads</h3>
+
+            <ol>
+                <li>Browser loads index.html and parses the HTML structure</li>
+                <li>Browser loads CSS files and applies styles</li>
+                <li>Browser loads data.js, creating the <span class="code-term">karaokeData</span> global variable</li>
+                <li>Browser loads app.js as a module, which imports its dependencies</li>
+                <li>When DOM is ready, app.js calls <span class="code-term">init()</span></li>
+                <li><span class="code-term">init()</span> calls <span class="code-term">loadData()</span>, which passes venue data to <span class="code-term">initVenues()</span></li>
+                <li><span class="code-term">init()</span> creates Navigation, VenueModal, and VenueDetailPane components</li>
+                <li><span class="code-term">init()</span> calls <span class="code-term">renderView('weekly')</span>, which creates and renders WeeklyView</li>
+                <li>WeeklyView generates DayCards for the current week, which generate VenueCards</li>
+                <li>WeeklyView scrolls to today's card</li>
+            </ol>
+
+            <h3>When You Click a Venue</h3>
+
+            <ol>
+                <li>Click event bubbles up to WeeklyView's container</li>
+                <li>Event delegation matches '.venue-card' selector</li>
+                <li>Handler extracts venue ID from <span class="code-term">data-venue-id</span> attribute</li>
+                <li>Handler calls <span class="code-term">getVenueById()</span> to get full venue data</li>
+                <li>Handler emits <span class="code-term">Events.VENUE_SELECTED</span> with venue data</li>
+                <li>VenueModal (on mobile) receives event, calls <span class="code-term">open(venue)</span></li>
+                <li>VenueModal updates state, re-renders with venue details, shows modal</li>
+                <li>VenueDetailPane (on desktop) also receives event, updates its content</li>
+                <li>app.js handler adds 'venue-card--selected' class to highlight the card</li>
+            </ol>
+
+            <h3>When You Switch Views</h3>
+
+            <ol>
+                <li>Click on navigation tab (e.g., "A-Z")</li>
+                <li>Navigation's event delegation captures click</li>
+                <li>Handler calls <span class="code-term">setState({ view: 'alphabetical' })</span></li>
+                <li>State system notifies subscribers</li>
+                <li>app.js's subscriber calls <span class="code-term">renderView('alphabetical')</span></li>
+                <li>Current view's <span class="code-term">destroy()</span> is called (cleanup)</li>
+                <li>AlphabeticalView is created and rendered</li>
+                <li>Navigation re-renders to show new active tab</li>
+            </ol>
+
+            <h3>When You Navigate Weeks</h3>
+
+            <ol>
+                <li>Click on left/right arrow in Navigation</li>
+                <li>Handler calls <span class="code-term">navigateWeek(-1)</span> or <span class="code-term">navigateWeek(1)</span></li>
+                <li><span class="code-term">navigateWeek()</span> calculates new date and calls <span class="code-term">setState({ weekStart: newDate })</span></li>
+                <li>WeeklyView's subscriber triggers re-render</li>
+                <li>Navigation's subscriber triggers re-render (to update week range display)</li>
+                <li>WeeklyView generates new DayCards for the new week</li>
+            </ol>
+
+            <h3>The Flow of Data</h3>
+
+            <p>Understanding data flow is key to understanding any application:</p>
+
+            <ul>
+                <li><strong>Data Source</strong>: data.js contains the raw venue information</li>
+                <li><strong>Data Service</strong>: venues.js processes, filters, and serves data to components</li>
+                <li><strong>State</strong>: state.js holds application-wide data like current view and filters</li>
+                <li><strong>Components</strong>: Read from state and service, render UI, handle user input</li>
+                <li><strong>Events</strong>: Communicate between components without direct dependencies</li>
+            </ul>
+
+            <p>Data flows down (from state to components), while events flow up (from user interactions to state changes). This unidirectional flow makes the app predictable and easier to debug.</p>
+
+            <div class="highlight-box">
+                <p><strong>Congratulations!</strong></p>
+                <p>You've just learned the fundamentals of how a modern JavaScript application works. The concepts here - components, state management, event systems, modules - are used in frameworks like React, Vue, and Angular. Understanding them at this fundamental level will make learning any framework much easier.</p>
+            </div>
+        </section>
+
+        <footer style="text-align: center; padding-top: var(--spacing-xl); color: var(--text-secondary);">
+            <p>Austin Karaoke Directory - Code Documentation</p>
+            <p><a href="index.html"><i class="fa-solid fa-home"></i> Back to Directory</a></p>
+        </footer>
+    </div>
+</body>
+</html>
