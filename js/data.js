@@ -1482,6 +1482,33 @@ const karaokeData = {
       }
     },
     {
+      "id": "raggedy-annes-bar-grill",
+      "name": "Raggedy Anne's Bar & Grill",
+      "active": true,
+      "dedicated": false,
+      "address": {
+        "street": "2113 Wells Branch Pkwy, Ste 600",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78728",
+        "neighborhood": ""
+      },
+      "schedule": [
+        {
+          "frequency": "every",
+          "day": "friday",
+          "startTime": "22:00",
+          "endTime": "02:00"
+        }
+      ],
+      "host": {
+        "company": "Marshall Joshua Entertainment"
+      },
+      "socials": {
+        "facebook": "https://www.facebook.com/profile.php?id=100040267276872"
+      }
+    },
+    {
       "id": "railhouse-bar",
       "name": "Railhouse Bar",
       "dedicated": false,
