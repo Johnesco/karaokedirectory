@@ -311,6 +311,7 @@
     /* Edge-to-edge cards only on index page */
     .page--edge-to-edge .day-card {
         border-radius: 0 0 50px 0;
+    }
 
     .page--edge-to-edge .day-card__header {
         border-radius: 0 0 50px 0;
