@@ -50,6 +50,10 @@ karaokedirectory/
 ├── editor.html            # Venue data editor tool
 ├── codeexplained.html     # Interactive code documentation
 │
+├── tests/                 # Test suite (not linked from site)
+│   ├── index.html         # Visual test runner
+│   └── schedule-tests.js  # Schedule matching tests
+│
 ├── css/
 │   ├── base.css           # CSS variables, reset, typography (ALWAYS FIRST)
 │   ├── layout.css         # Header, nav, footer, page structure
@@ -87,6 +91,7 @@ karaokedirectory/
 │   │
 │   └── utils/
 │       ├── date.js        # Date formatting, schedule matching
+│       ├── debug.js       # Debug mode utilities
 │       ├── string.js      # Text manipulation, escaping
 │       ├── url.js         # URL building, sanitization
 │       └── validation.js  # Form validation
@@ -242,6 +247,27 @@ Use these semantic elements consistently:
 - Component changes: `css/components.css`
 - View-specific: `css/views.css`
 
+## Testing
+
+### Test Suite
+Open `tests/index.html` in a browser to run the test suite. Tests cover:
+- Schedule matching logic (`scheduleMatchesDate()`)
+- Date utilities (week calculations, formatting)
+- Venue filtering and sorting
+
+### Debug Mode
+Enable debug mode to see why venues appear on specific dates:
+1. Add `?debug=1` to the URL (e.g., `index.html?debug=1`)
+2. Or run in console: `localStorage.setItem('debug', '1')`
+
+When enabled:
+- A "Debug Mode" indicator appears in the top-right corner
+- Venue cards show their schedule match reason (e.g., "Every Friday", "First Saturday")
+- Hover over cards for detailed match info
+
+### Interactive Date Tester
+The test page includes a date picker to check which venues appear on any date and why.
+
 ## Current Feature Status
 
 ### Implemented
@@ -255,6 +281,8 @@ Use these semantic elements consistently:
 - [x] Venue submission form
 - [x] Venue editor tool
 - [x] Comprehensive code documentation (codeexplained.html)
+- [x] Test suite for schedule verification (tests/index.html)
+- [x] Debug mode for schedule troubleshooting (?debug=1)
 
 ### Potential Future Enhancements
 - [ ] Search/filter by host, city, or neighborhood
@@ -267,6 +295,9 @@ Use these semantic elements consistently:
 ## Project History
 
 ### Recent Changes
+- **2025-01**: Added test suite (`tests/index.html`) for schedule verification
+- **2025-01**: Added debug mode with visual overlay (`?debug=1`)
+- **2025-01**: Created `js/utils/debug.js` for debug utilities
 - **2025-01**: Standardized CSS loading across all pages for consistency
 - **2025-01**: Created `css/docs.css` - moved inline styles from codeexplained.html
 - **2025-01**: Added components.css to bingo.html and editor.html

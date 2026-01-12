@@ -8,6 +8,7 @@ import { escapeHtml } from '../utils/string.js';
 import { formatTimeRange } from '../utils/date.js';
 import { buildMapUrl, createSocialLinks, formatAddress } from '../utils/url.js';
 import { emit, Events } from '../core/events.js';
+import { isDebugMode, getDebugHtml } from '../utils/debug.js';
 
 export class VenueCard extends Component {
     /**
@@ -50,8 +51,12 @@ export class VenueCard extends Component {
             ? `${hostName} (${hostCompany})`
             : hostName || hostCompany || '';
 
+        // Debug info for schedule matching
+        const debugHtml = getDebugHtml(venue, date);
+
         return `
             <div class="venue-card venue-card--compact" data-venue-id="${escapeHtml(venue.id)}">
+                ${debugHtml}
                 <div class="venue-card__header">
                     <h3 class="venue-card__name">
                         <button class="venue-card__link" type="button">

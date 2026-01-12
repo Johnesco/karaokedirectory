@@ -12,6 +12,7 @@ import { VenueDetailPane } from './components/VenueDetailPane.js';
 import { WeeklyView } from './views/WeeklyView.js';
 import { AlphabeticalView } from './views/AlphabeticalView.js';
 import { MapView } from './views/MapView.js';
+import { initDebugMode } from './utils/debug.js';
 
 // View instances
 let navigation = null;
@@ -30,6 +31,9 @@ const views = {
  */
 async function init() {
     console.log('Initializing Austin Karaoke Directory...');
+
+    // Initialize debug mode (check for ?debug=1 in URL)
+    initDebugMode();
 
     // Load venue data
     await loadData();
