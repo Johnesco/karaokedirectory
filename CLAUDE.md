@@ -51,13 +51,14 @@ karaokedirectory/
 ├── codeexplained.html     # Interactive code documentation
 │
 ├── css/
-│   ├── base.css           # CSS variables, reset, typography
-│   ├── layout.css         # Header, nav, page structure
+│   ├── base.css           # CSS variables, reset, typography (ALWAYS FIRST)
+│   ├── layout.css         # Header, nav, footer, page structure
 │   ├── components.css     # Buttons, cards, modals, forms
-│   ├── views.css          # View-specific styles
-│   ├── bingo.css          # Bingo game styles
-│   ├── editor.css         # Editor page styles
-│   └── submit.css         # Submission form styles
+│   ├── views.css          # View-specific styles (weekly, map, etc.)
+│   ├── bingo.css          # Bingo game styles (extends components)
+│   ├── editor.css         # Editor page styles (extends components)
+│   ├── submit.css         # Submission form styles (extends components)
+│   └── docs.css           # Documentation page styles (codeexplained.html)
 │
 ├── js/
 │   ├── app.js             # Application entry point
@@ -179,6 +180,26 @@ on(Events.VENUE_SELECTED, (venue) => showDetails(venue));
 
 ## CSS Conventions
 
+### CSS Loading Order (IMPORTANT)
+All pages should load CSS in this order for consistency:
+```html
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="css/base.css">      <!-- 1. Variables, reset -->
+<link rel="stylesheet" href="css/layout.css">    <!-- 2. Page structure -->
+<link rel="stylesheet" href="css/components.css"> <!-- 3. UI components -->
+<link rel="stylesheet" href="css/[page].css">    <!-- 4. Page-specific (optional) -->
+```
+
+### Page CSS Requirements
+| Page | CSS Files |
+|------|-----------|
+| index.html | base, layout, components, views |
+| about.html | base, layout, components, views |
+| submit.html | base, layout, components, views, submit |
+| bingo.html | base, layout, components, bingo |
+| editor.html | base, layout, components, editor |
+| codeexplained.html | base, layout, components, docs |
+
 ### BEM Naming
 - Block: `.venue-card`
 - Element: `.venue-card__header`
@@ -190,6 +211,17 @@ on(Events.VENUE_SELECTED, (venue) => showDetails(venue));
 - Typography: `--font-size-sm` through `--font-size-2xl`
 - Borders: `--border-radius`, `--border-color`
 - Transitions: `--transition-fast`, `--transition-normal`
+
+### Standard Page Structure
+Use these semantic elements consistently:
+```html
+<body>
+    <header class="site-header">...</header>
+    <nav class="navigation-container">...</nav>
+    <main class="main-content">...</main>
+    <footer class="site-footer">...</footer>
+</body>
+```
 
 ## Common Development Tasks
 
@@ -235,6 +267,10 @@ on(Events.VENUE_SELECTED, (venue) => showDetails(venue));
 ## Project History
 
 ### Recent Changes
+- **2025-01**: Standardized CSS loading across all pages for consistency
+- **2025-01**: Created `css/docs.css` - moved inline styles from codeexplained.html
+- **2025-01**: Added components.css to bingo.html and editor.html
+- **2025-01**: Added CLAUDE.md for persistent project memory
 - **2024**: Added Raggedy Anne's venue
 - **2024**: Added comprehensive documentation to index.html
 - **2024**: Created codeexplained.html documentation page

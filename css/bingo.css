@@ -209,15 +209,11 @@
     margin-top: 15px;
 }
 
+/* Bingo buttons extend the base .btn class from components.css */
 #reset-button, #undo-button {
     padding: clamp(12px, 3vw, 16px) clamp(24px, 6vw, 40px);
     font-size: clamp(14px, 4vw, 18px);
-    font-weight: 600;
-    cursor: pointer;
-    color: white;
-    border: none;
     border-radius: 50px;
-    transition: all 0.3s ease;
     touch-action: manipulation;
 }
 
