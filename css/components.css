@@ -226,6 +226,23 @@
     color: var(--color-secondary);
 }
 
+/* Venue Tags */
+.venue-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-sm);
+}
+
+.venue-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: var(--border-radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    white-space: nowrap;
+}
+
 /* Full venue card */
 .venue-card--full {
     padding: var(--spacing-lg);

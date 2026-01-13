@@ -8,6 +8,7 @@ import { escapeHtml } from '../utils/string.js';
 import { formatTimeRange } from '../utils/date.js';
 import { buildMapUrl, buildDirectionsUrl, createSocialLinks, formatAddress } from '../utils/url.js';
 import { on, emit, Events } from '../core/events.js';
+import { renderTags } from '../utils/tags.js';
 
 export class VenueDetailPane extends Component {
     init() {
@@ -43,6 +44,7 @@ export class VenueDetailPane extends Component {
                     </h2>
                     ${venue.dedicated ? '<span class="detail-pane__badge">Dedicated Karaoke Venue</span>' : ''}
                     ${venue.eventName ? `<p class="detail-pane__event-name">${escapeHtml(venue.eventName)}</p>` : ''}
+                    ${renderTags(venue.tags)}
                 </header>
 
                 <section class="detail-pane__section">

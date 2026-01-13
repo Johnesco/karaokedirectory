@@ -13,6 +13,7 @@ import { WeeklyView } from './views/WeeklyView.js';
 import { AlphabeticalView } from './views/AlphabeticalView.js';
 import { MapView } from './views/MapView.js';
 import { initDebugMode } from './utils/debug.js';
+import { initTagConfig } from './utils/tags.js';
 
 // View instances
 let navigation = null;
@@ -145,6 +146,9 @@ async function loadData() {
         if (!data) {
             throw new Error('No venue data found. Make sure data.js is loaded.');
         }
+
+        // Initialize tag configuration from data
+        initTagConfig(data.tagDefinitions);
 
         initVenues(data);
         emit(Events.DATA_LOADED, data);

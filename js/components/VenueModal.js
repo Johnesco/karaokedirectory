@@ -8,6 +8,7 @@ import { escapeHtml } from '../utils/string.js';
 import { formatTimeRange } from '../utils/date.js';
 import { buildMapUrl, buildDirectionsUrl, createSocialLinks, formatAddress } from '../utils/url.js';
 import { on, emit, Events } from '../core/events.js';
+import { renderTags } from '../utils/tags.js';
 
 export class VenueModal extends Component {
     init() {
@@ -50,6 +51,7 @@ export class VenueModal extends Component {
                         </h2>
                         ${venue.dedicated ? '<span class="venue-modal__badge">Dedicated Karaoke Venue</span>' : ''}
                         ${venue.eventName ? `<p class="venue-modal__event-name">${escapeHtml(venue.eventName)}</p>` : ''}
+                        ${renderTags(venue.tags)}
                     </header>
 
                     <section class="venue-modal__section">

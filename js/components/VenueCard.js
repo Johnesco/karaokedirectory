@@ -9,6 +9,7 @@ import { formatTimeRange } from '../utils/date.js';
 import { buildMapUrl, createSocialLinks, formatAddress } from '../utils/url.js';
 import { emit, Events } from '../core/events.js';
 import { isDebugMode, getDebugHtml } from '../utils/debug.js';
+import { renderTags } from '../utils/tags.js';
 
 export class VenueCard extends Component {
     /**
@@ -65,6 +66,7 @@ export class VenueCard extends Component {
                     </h3>
                     ${venue.dedicated ? '<span class="venue-card__badge">Dedicated</span>' : ''}
                 </div>
+                ${renderTags(venue.tags)}
                 ${showSchedule && timeDisplay ? `
                     <div class="venue-card__time">
                         <i class="fa-regular fa-clock"></i> ${timeDisplay}
@@ -103,6 +105,7 @@ export class VenueCard extends Component {
                     </h3>
                     ${venue.dedicated ? '<span class="venue-card__badge">Dedicated</span>' : ''}
                 </div>
+                ${renderTags(venue.tags)}
 
                 <div class="venue-card__address">
                     <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" class="venue-card__map-link">
