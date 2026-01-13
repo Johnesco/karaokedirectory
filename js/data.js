@@ -1151,6 +1151,10 @@ const karaokeData = {
         "instagram": "https://www.instagram.com/luckyrabbitjonestown/",
         "website": "https://www.luckyrabbitbar.com/",
         "youtube": "https://www.youtube.com/@LuckyRabbitBar"
+      },
+      "coordinates": {
+        "lat": 30.4943848,
+        "lng": -97.9250839
       }
     },
     {
@@ -1202,6 +1206,10 @@ const karaokeData = {
       "socials": {
         "facebook": "https://www.facebook.com/ManchacaSpringsSaloon",
         "instagram": "https://www.instagram.com/manchaca_springs_saloon/"
+      },
+      "coordinates": {
+        "lat": 30.140096,
+        "lng": -97.8270408
       }
     },
     {
@@ -1772,6 +1780,10 @@ const karaokeData = {
         "instagram": "https://www.instagram.com/shootersatx/",
         "twitter": "https://twitter.com/shootersatx",
         "website": "https://shootersbilliards.net/locations/austin"
+      },
+      "coordinates": {
+        "lat": 30.4537083,
+        "lng": -97.8296554
       }
     },
     {
