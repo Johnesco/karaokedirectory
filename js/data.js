@@ -1,4 +1,51 @@
 const karaokeData = {
+  "tagDefinitions": {
+    "lgbtq": {
+      "label": "LGBTQ+",
+      "color": "#e040fb",
+      "textColor": "#fff"
+    },
+    "dive": {
+      "label": "Dive Bar",
+      "color": "#8d6e63",
+      "textColor": "#fff"
+    },
+    "sports-bar": {
+      "label": "Sports Bar",
+      "color": "#4caf50",
+      "textColor": "#fff"
+    },
+    "country-bar": {
+      "label": "Country",
+      "color": "#ff9800",
+      "textColor": "#fff"
+    },
+    "21+": {
+      "label": "21+",
+      "color": "#f44336",
+      "textColor": "#fff"
+    },
+    "18+": {
+      "label": "18+",
+      "color": "#ffc107",
+      "textColor": "#333"
+    },
+    "all-ages": {
+      "label": "All Ages",
+      "color": "#2196f3",
+      "textColor": "#fff"
+    },
+    "family-friendly": {
+      "label": "Family",
+      "color": "#03a9f4",
+      "textColor": "#fff"
+    },
+    "smoking-inside": {
+      "label": "Smoking OK",
+      "color": "#757575",
+      "textColor": "#fff"
+    }
+  },
   "listings": [
     {
       "id": "the-alcove-cantina",
@@ -119,6 +166,10 @@ const karaokeData = {
         "facebook": "https://www.facebook.com/bigeasysaloonpflugerville/",
         "instagram": "https://www.instagram.com/bigeasysaloonpflugerville/",
         "website": "https://www.bigeasysaloonpflugerville.com/"
+      },
+      "coordinates": {
+        "lat": 30.449363,
+        "lng": -97.6617298
       }
     },
     {
@@ -958,6 +1009,9 @@ const karaokeData = {
     {
       "id": "knomad-bar",
       "name": "Knomad Bar",
+      "tags": [
+        "lgbtq"
+      ],
       "dedicated": false,
       "address": {
         "street": "1213 Corona Dr.",
@@ -1067,6 +1121,10 @@ const karaokeData = {
         "instagram": "https://www.instagram.com/ltcornerpub",
         "twitter": "https://www.twitter.com/ltcornerpub",
         "website": "https://ltcornerpub.com/"
+      },
+      "coordinates": {
+        "lat": 30.3499863,
+        "lng": -97.9678955
       }
     },
     {
@@ -1506,6 +1564,10 @@ const karaokeData = {
       },
       "socials": {
         "facebook": "https://www.facebook.com/profile.php?id=100040267276872"
+      },
+      "coordinates": {
+        "lat": 30.43637453421,
+        "lng": -97.683838000503
       }
     },
     {
@@ -1936,6 +1998,9 @@ const karaokeData = {
     {
       "id": "whiskey-room-pflugerville",
       "name": "The Whiskey Room",
+      "tags": [
+        "smoking-inside"
+      ],
       "dedicated": false,
       "address": {
         "street": "113 E Pecan St",
