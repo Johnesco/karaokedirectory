@@ -8,6 +8,7 @@
     border-radius: var(--border-radius);
     display: flex;
     flex-direction: column;
+    scroll-margin-top: var(--nav-height);
 }
 
 .day-card--today {
@@ -292,6 +293,10 @@
 }
 
 @media (max-width: 768px) {
+    .day-card {
+        scroll-margin-top: var(--nav-height-mobile);
+    }
+
     .day-card__header {
         position: -webkit-sticky;
         position: sticky;
