@@ -417,7 +417,9 @@
     margin-bottom: var(--spacing-xs);
 }
 
-.venue-modal__badge {
+/* Shared venue detail styles (modal and side pane) */
+.venue-modal__badge,
+.detail-pane__badge {
     display: inline-block;
     background: var(--color-secondary);
     color: var(--color-white);
@@ -427,17 +429,20 @@
     margin-bottom: var(--spacing-sm);
 }
 
-.venue-modal__event-name {
+.venue-modal__event-name,
+.detail-pane__event-name {
     color: var(--color-primary-light);
     font-style: italic;
     margin: 0;
 }
 
-.venue-modal__section {
+.venue-modal__section,
+.detail-pane__section {
     margin-bottom: var(--spacing-lg);
 }
 
-.venue-modal__section h3 {
+.venue-modal__section h3,
+.detail-pane__section h3 {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
@@ -446,11 +451,13 @@
     margin-bottom: var(--spacing-sm);
 }
 
-.venue-modal__section h3 i {
+.venue-modal__section h3 i,
+.detail-pane__section h3 i {
     color: var(--color-primary-light);
 }
 
-.venue-modal__address {
+.venue-modal__address,
+.detail-pane__address {
     font-style: normal;
     color: var(--text-primary);
 }
@@ -461,71 +468,84 @@
     margin-top: var(--spacing-md);
 }
 
-.venue-modal__schedule-table {
+.venue-modal__schedule-table,
+.detail-pane__schedule-table {
     width: 100%;
     border-collapse: collapse;
 }
 
 .venue-modal__schedule-table th,
-.venue-modal__schedule-table td {
+.venue-modal__schedule-table td,
+.detail-pane__schedule-table th,
+.detail-pane__schedule-table td {
     padding: var(--spacing-sm);
     text-align: left;
     border-bottom: 1px solid var(--border-color);
 }
 
-.venue-modal__schedule-table th {
+.venue-modal__schedule-table th,
+.detail-pane__schedule-table th {
     color: var(--text-muted);
     font-weight: 500;
     font-size: var(--font-size-sm);
 }
 
-.venue-modal__schedule-table .schedule-note {
+.venue-modal__schedule-table .schedule-note,
+.detail-pane__schedule-table .schedule-note {
     color: var(--text-muted);
     font-style: italic;
     font-size: var(--font-size-sm);
 }
 
-.venue-modal__date-range {
+.venue-modal__date-range,
+.detail-pane__date-range {
     color: var(--color-warning);
     font-size: var(--font-size-sm);
     margin-top: var(--spacing-sm);
 }
 
-.venue-modal__host-name {
+.venue-modal__host-name,
+.detail-pane__host-name {
     font-weight: 500;
     margin-bottom: var(--spacing-xs);
 }
 
-.venue-modal__host-company {
+.venue-modal__host-company,
+.detail-pane__host-company {
     color: var(--text-secondary);
     margin-bottom: var(--spacing-xs);
 }
 
-.venue-modal__host-website {
+.venue-modal__host-website,
+.detail-pane__host-website {
     display: inline-flex;
     align-items: center;
     gap: var(--spacing-xs);
 }
 
-.venue-modal__socials-label {
+.venue-modal__socials-label,
+.detail-pane__socials-label {
     font-size: var(--font-size-sm);
     color: var(--text-muted);
     margin-top: var(--spacing-md);
     margin-bottom: var(--spacing-xs);
 }
 
-.venue-modal__host-socials {
+.venue-modal__host-socials,
+.detail-pane__host-socials {
     display: flex;
     gap: var(--spacing-sm);
 }
 
-.venue-modal__socials {
+.venue-modal__socials,
+.detail-pane__socials {
     display: flex;
     flex-wrap: wrap;
     gap: var(--spacing-sm);
 }
 
-.venue-modal__phone {
+.venue-modal__phone,
+.detail-pane__phone {
     font-size: var(--font-size-lg);
 }
 
@@ -597,117 +617,12 @@
     color: var(--text-primary);
 }
 
-.detail-pane__badge {
-    display: inline-block;
-    background: var(--color-secondary);
-    color: var(--color-white);
-    font-size: var(--font-size-sm);
-    padding: 4px 12px;
-    border-radius: var(--border-radius);
-    margin-bottom: var(--spacing-sm);
-}
-
-.detail-pane__event-name {
-    color: var(--color-primary-light);
-    font-style: italic;
-    margin: 0;
-}
-
-.detail-pane__section {
-    margin-bottom: var(--spacing-lg);
-}
-
-.detail-pane__section h3 {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    font-size: var(--font-size-base);
-    color: var(--text-muted);
-    margin-bottom: var(--spacing-sm);
-}
-
-.detail-pane__section h3 i {
-    color: var(--color-primary-light);
-}
-
-.detail-pane__address {
-    font-style: normal;
-    color: var(--text-primary);
-}
-
+/* Detail pane specific styles (map links layout differs from modal) */
 .detail-pane__map-links {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-sm);
     margin-top: var(--spacing-md);
-}
-
-.detail-pane__schedule-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.detail-pane__schedule-table th,
-.detail-pane__schedule-table td {
-    padding: var(--spacing-sm);
-    text-align: left;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.detail-pane__schedule-table th {
-    color: var(--text-muted);
-    font-weight: 500;
-    font-size: var(--font-size-sm);
-}
-
-.detail-pane__schedule-table .schedule-note {
-    color: var(--text-muted);
-    font-style: italic;
-    font-size: var(--font-size-sm);
-}
-
-.detail-pane__date-range {
-    color: var(--color-warning);
-    font-size: var(--font-size-sm);
-    margin-top: var(--spacing-sm);
-}
-
-.detail-pane__host-name {
-    font-weight: 500;
-    margin-bottom: var(--spacing-xs);
-}
-
-.detail-pane__host-company {
-    color: var(--text-secondary);
-    margin-bottom: var(--spacing-xs);
-}
-
-.detail-pane__host-website {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-}
-
-.detail-pane__socials-label {
-    font-size: var(--font-size-sm);
-    color: var(--text-muted);
-    margin-top: var(--spacing-md);
-    margin-bottom: var(--spacing-xs);
-}
-
-.detail-pane__host-socials {
-    display: flex;
-    gap: var(--spacing-sm);
-}
-
-.detail-pane__socials {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-sm);
-}
-
-.detail-pane__phone {
-    font-size: var(--font-size-lg);
 }
 
 /* Mobile overflow prevention */

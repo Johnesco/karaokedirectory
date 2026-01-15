@@ -217,4 +217,56 @@ export function isDateInRange(date, startDate, endDate) {
     return true;
 }
 
+/**
+ * Format a schedule entry for display
+ * Returns an object with formatted day, frequency prefix, and time
+ * @param {Object} entry - Schedule entry with day, frequency, startTime, endTime
+ * @param {Object} options - Formatting options
+ * @param {boolean} options.showEvery - Whether to show "Every" prefix (default: true)
+ * @returns {Object} Formatted schedule parts { day, frequencyPrefix, time, fullText }
+ */
+export function formatScheduleEntry(entry, options = {}) {
+    const { showEvery = true } = options;
+
+    // Capitalize day name
+    const day = entry.day.charAt(0).toUpperCase() + entry.day.slice(1);
+
+    // Format frequency prefix
+    let frequencyPrefix = '';
+    if (entry.frequency === 'every') {
+        frequencyPrefix = showEvery ? 'Every ' : '';
+    } else {
+        frequencyPrefix = entry.frequency.charAt(0).toUpperCase() + entry.frequency.slice(1) + ' ';
+    }
+
+    // Format time range
+    const time = formatTimeRange(entry.startTime, entry.endTime);
+
+    // Build full display text
+    const fullText = `${frequencyPrefix}${day}: ${time}`;
+
+    return { day, frequencyPrefix, time, fullText };
+}
+
+/**
+ * Format a date range for display
+ * @param {Object} dateRange - Object with start and/or end date strings
+ * @returns {string} Formatted date range text, or empty string if no range
+ */
+export function formatDateRangeText(dateRange) {
+    if (!dateRange) return '';
+
+    const { start, end } = dateRange;
+
+    if (start && end) {
+        return `Available ${start} to ${end}`;
+    } else if (start) {
+        return `Starting ${start}`;
+    } else if (end) {
+        return `Until ${end}`;
+    }
+
+    return '';
+}
+
 export { WEEKDAYS, WEEKDAY_NAMES, ORDINALS };

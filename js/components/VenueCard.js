@@ -5,11 +5,12 @@
 
 import { Component } from './Component.js';
 import { escapeHtml } from '../utils/string.js';
-import { formatTimeRange } from '../utils/date.js';
+import { formatTimeRange, formatScheduleEntry } from '../utils/date.js';
 import { buildMapUrl, createSocialLinks, formatAddress } from '../utils/url.js';
 import { emit, Events } from '../core/events.js';
 import { isDebugMode, getDebugHtml } from '../utils/debug.js';
 import { renderTags } from '../utils/tags.js';
+import { formatHostDisplay, renderDedicatedBadge } from '../utils/render.js';
 
 export class VenueCard extends Component {
     /**
@@ -45,12 +46,8 @@ export class VenueCard extends Component {
         const fullAddress = formatAddress(venue.address);
         const mapsUrl = buildMapUrl(venue.address, venue.name);
 
-        // KJ/Host info
-        const hostName = venue.host?.name || '';
-        const hostCompany = venue.host?.company || '';
-        const hostDisplay = hostName && hostCompany
-            ? `${hostName} (${hostCompany})`
-            : hostName || hostCompany || '';
+        // KJ/Host info using shared utility
+        const hostDisplay = formatHostDisplay(venue.host);
 
         // Debug info for schedule matching
         const debugHtml = getDebugHtml(venue, date);
@@ -64,7 +61,7 @@ export class VenueCard extends Component {
                             ${escapeHtml(venue.name)}
                         </button>
                     </h3>
-                    ${venue.dedicated ? '<span class="venue-card__badge">Dedicated</span>' : ''}
+                    ${renderDedicatedBadge(venue.dedicated, 'venue-card')}
                 </div>
                 ${renderTags(venue.tags)}
                 ${showSchedule && timeDisplay ? `
@@ -81,8 +78,7 @@ export class VenueCard extends Component {
                 </div>
                 ${hostDisplay ? `
                     <div class="venue-card__host-info">
-                        <i class="fa-solid fa-microphone"></i>
-                        ${escapeHtml(hostDisplay)}
+                        Presented by ${escapeHtml(hostDisplay)}
                     </div>
                 ` : ''}
             </div>
@@ -103,7 +99,7 @@ export class VenueCard extends Component {
                             ${escapeHtml(venue.name)}
                         </button>
                     </h3>
-                    ${venue.dedicated ? '<span class="venue-card__badge">Dedicated</span>' : ''}
+                    ${renderDedicatedBadge(venue.dedicated, 'venue-card')}
                 </div>
                 ${renderTags(venue.tags)}
 
@@ -143,13 +139,11 @@ export class VenueCard extends Component {
         }
 
         const items = schedule.map(entry => {
-            const day = entry.day.charAt(0).toUpperCase() + entry.day.slice(1);
-            const freq = entry.frequency === 'every' ? '' : `${entry.frequency.charAt(0).toUpperCase() + entry.frequency.slice(1)} `;
-            const time = formatTimeRange(entry.startTime, entry.endTime);
+            const { day, frequencyPrefix, time } = formatScheduleEntry(entry, { showEvery: false });
 
             return `
                 <li class="venue-card__schedule-item">
-                    <span class="venue-card__schedule-day">${freq}${day}</span>
+                    <span class="venue-card__schedule-day">${frequencyPrefix}${day}</span>
                     <span class="venue-card__schedule-time">${time}</span>
                     ${entry.note ? `<span class="venue-card__schedule-note">${escapeHtml(entry.note)}</span>` : ''}
                 </li>

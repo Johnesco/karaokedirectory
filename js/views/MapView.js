@@ -10,9 +10,10 @@ import { getState, setState, subscribe } from '../core/state.js';
 import { emit, on, Events } from '../core/events.js';
 import { getVenuesWithCoordinates, getAllVenues } from '../services/venues.js';
 import { escapeHtml } from '../utils/string.js';
-import { formatTimeRange } from '../utils/date.js';
+import { formatScheduleEntry } from '../utils/date.js';
 import { buildDirectionsUrl } from '../utils/url.js';
 import { renderTags } from '../utils/tags.js';
+import { renderDedicatedBadge } from '../utils/render.js';
 
 export class MapView extends Component {
     init() {
@@ -225,12 +226,10 @@ export class MapView extends Component {
         const cardEl = this.$('#map-venue-card');
         if (!cardEl || !venue) return;
 
-        // Build schedule HTML
+        // Build schedule HTML using shared utility
         const scheduleHtml = venue.schedule.map(s => {
-            const day = s.day.charAt(0).toUpperCase() + s.day.slice(1);
-            const freq = s.frequency === 'every' ? '' : s.frequency.charAt(0).toUpperCase() + s.frequency.slice(1) + ' ';
-            const time = formatTimeRange(s.startTime, s.endTime);
-            return `<div>${freq}${day}: ${time}</div>`;
+            const { fullText } = formatScheduleEntry(s, { showEvery: false });
+            return `<div>${fullText}</div>`;
         }).join('');
 
         // Build directions URL
@@ -245,7 +244,7 @@ export class MapView extends Component {
             </button>
             <div class="map-venue-card__header">
                 <h3 class="map-venue-card__title">${escapeHtml(venue.name)}</h3>
-                ${venue.dedicated ? '<span class="map-venue-card__badge">Dedicated</span>' : ''}
+                ${renderDedicatedBadge(venue.dedicated, 'map-venue-card')}
                 ${tagsHtml}
             </div>
             <div class="map-venue-card__schedule">${scheduleHtml}</div>

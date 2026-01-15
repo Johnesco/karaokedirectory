@@ -5,10 +5,10 @@
 
 import { Component } from './Component.js';
 import { escapeHtml } from '../utils/string.js';
-import { formatTimeRange } from '../utils/date.js';
 import { buildMapUrl, buildDirectionsUrl, createSocialLinks, formatAddress } from '../utils/url.js';
 import { on, emit, Events } from '../core/events.js';
 import { renderTags } from '../utils/tags.js';
+import { renderScheduleTable, renderDateRange, renderHostSection, renderDedicatedBadge } from '../utils/render.js';
 
 export class VenueDetailPane extends Component {
     init() {
@@ -32,9 +32,6 @@ export class VenueDetailPane extends Component {
         const mapUrl = buildMapUrl(venue.address, venue.name);
         const directionsUrl = buildDirectionsUrl(venue.address, venue.name);
         const socialLinksHtml = createSocialLinks(venue.socials, { size: 'fa-lg' });
-        const hostSocialsHtml = venue.host?.socials
-            ? createSocialLinks(venue.host.socials, { size: 'fa-lg' })
-            : '';
 
         return `
             <div class="detail-pane">
@@ -42,7 +39,7 @@ export class VenueDetailPane extends Component {
                     <h2 class="detail-pane__title">
                         ${escapeHtml(venue.name)}
                     </h2>
-                    ${venue.dedicated ? '<span class="detail-pane__badge">Dedicated Karaoke Venue</span>' : ''}
+                    ${renderDedicatedBadge(venue.dedicated, 'detail-pane', { fullText: true })}
                     ${venue.eventName ? `<p class="detail-pane__event-name">${escapeHtml(venue.eventName)}</p>` : ''}
                     ${renderTags(venue.tags)}
                 </header>
@@ -64,28 +61,11 @@ export class VenueDetailPane extends Component {
 
                 <section class="detail-pane__section">
                     <h3><i class="fa-regular fa-calendar"></i> Schedule</h3>
-                    ${this.renderSchedule(venue.schedule)}
-                    ${venue.dateRange ? this.renderDateRange(venue.dateRange) : ''}
+                    ${renderScheduleTable(venue.schedule, 'detail-pane')}
+                    ${renderDateRange(venue.dateRange, 'detail-pane')}
                 </section>
 
-                ${venue.host ? `
-                    <section class="detail-pane__section">
-                        <h3><i class="fa-solid fa-microphone"></i> Karaoke Host</h3>
-                        <div class="detail-pane__host">
-                            ${venue.host.name ? `<p class="detail-pane__host-name">${escapeHtml(venue.host.name)}</p>` : ''}
-                            ${venue.host.company ? `<p class="detail-pane__host-company">${escapeHtml(venue.host.company)}</p>` : ''}
-                            ${venue.host.website ? `
-                                <a href="${escapeHtml(venue.host.website)}" target="_blank" rel="noopener noreferrer" class="detail-pane__host-website">
-                                    <i class="fa-solid fa-globe"></i> Website
-                                </a>
-                            ` : ''}
-                            ${hostSocialsHtml ? `
-                                <p class="detail-pane__socials-label">KJ Social Media</p>
-                                <div class="detail-pane__host-socials">${hostSocialsHtml}</div>
-                            ` : ''}
-                        </div>
-                    </section>
-                ` : ''}
+                ${renderHostSection(venue.host, 'detail-pane')}
 
                 ${socialLinksHtml ? `
                     <section class="detail-pane__section">
@@ -115,58 +95,6 @@ export class VenueDetailPane extends Component {
                 </div>
             </div>
         `;
-    }
-
-    renderSchedule(schedule) {
-        if (!schedule || schedule.length === 0) {
-            return '<p>No schedule information available.</p>';
-        }
-
-        const rows = schedule.map(entry => {
-            const day = entry.day.charAt(0).toUpperCase() + entry.day.slice(1);
-            const freq = entry.frequency === 'every'
-                ? 'Every'
-                : entry.frequency.charAt(0).toUpperCase() + entry.frequency.slice(1);
-            const time = formatTimeRange(entry.startTime, entry.endTime);
-
-            return `
-                <tr>
-                    <td>${freq} ${day}</td>
-                    <td>${time}</td>
-                    ${entry.note ? `<td class="schedule-note">${escapeHtml(entry.note)}</td>` : '<td></td>'}
-                </tr>
-            `;
-        }).join('');
-
-        return `
-            <table class="detail-pane__schedule-table">
-                <thead>
-                    <tr>
-                        <th>Day</th>
-                        <th>Time</th>
-                        <th>Note</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${rows}
-                </tbody>
-            </table>
-        `;
-    }
-
-    renderDateRange(dateRange) {
-        const { start, end } = dateRange;
-        let text = '';
-
-        if (start && end) {
-            text = `Available ${start} to ${end}`;
-        } else if (start) {
-            text = `Starting ${start}`;
-        } else if (end) {
-            text = `Until ${end}`;
-        }
-
-        return text ? `<p class="detail-pane__date-range"><i class="fa-solid fa-calendar-check"></i> ${text}</p>` : '';
     }
 
     showVenue(venue) {
