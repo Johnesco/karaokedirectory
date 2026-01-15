@@ -180,6 +180,9 @@ function renderView(viewName) {
         return;
     }
 
+    // Toggle body class for immersive map mode
+    document.body.classList.toggle('view--map', viewName === 'map');
+
     // Destroy current view
     if (currentView) {
         currentView.destroy();

@@ -93,6 +93,7 @@ karaokedirectory/
 │       ├── date.js        # Date formatting, schedule matching
 │       ├── debug.js       # Debug mode utilities
 │       ├── string.js      # Text manipulation, escaping
+│       ├── tags.js        # Venue tag rendering and configuration
 │       ├── url.js         # URL building, sanitization
 │       └── validation.js  # Form validation
 │
@@ -116,7 +117,9 @@ When adding or modifying venues in `js/data.js`, follow this structure:
 {
   id: "venue-slug",           // Unique, lowercase, hyphenated
   name: "Venue Name",
+  active: true,               // Optional: false to hide venue from all pages (default: true)
   dedicated: false,           // true if karaoke-only venue
+  tags: ["lgbtq", "21+"],     // Optional: array of tag IDs
   address: {
     street: "123 Main St",
     city: "Austin",
@@ -147,6 +150,29 @@ When adding or modifying venues in `js/data.js`, follow this structure:
   }
 }
 ```
+
+### Venue Tags
+
+Tags are defined in `tagDefinitions` at the top of `js/data.js`. Each tag has:
+- **id** (key): Machine-readable identifier
+- **label**: Human-readable display name
+- **color**: Background color (hex)
+- **textColor**: Text color for contrast
+
+Available tags:
+| Tag ID | Label | Description |
+|--------|-------|-------------|
+| `lgbtq` | LGBTQ+ | LGBTQ+ friendly venue |
+| `dive` | Dive Bar | Dive bar atmosphere |
+| `sports-bar` | Sports Bar | Sports bar venue |
+| `country-bar` | Country Bar | Country/western bar |
+| `21+` | 21+ | 21 and over only |
+| `18+` | 18+ | 18 and over only |
+| `all-ages` | All Ages | No age restriction |
+| `family-friendly` | Family | Family-friendly venue |
+| `smoking-inside` | Smoking Inside | Indoor smoking allowed |
+
+Tags are rendered as color-coded badges in VenueCard, VenueModal, and VenueDetailPane components using the `renderTags()` function from `js/utils/tags.js`.
 
 ## Key Technical Patterns
 
@@ -182,6 +208,26 @@ on(Events.VENUE_SELECTED, (venue) => showDetails(venue));
 4. `render()` - Inject template into container
 5. `afterRender()` - Attach event listeners
 6. `destroy()` - Cleanup subscriptions and listeners
+
+### Immersive Map Mode
+The map view uses a full-screen immersive mode with floating controls:
+
+**How it works:**
+- `app.js` adds `body.view--map` class when map view is active
+- CSS in `views.css` hides header/footer/nav and makes map fill viewport
+- MapView renders floating controls inside its template
+- VenueModal checks `getState('view') === 'map'` and skips opening
+
+**Floating UI elements:**
+- `.map-controls` - Left side, contains dedicated venue toggle button
+- `.map-view-switcher` - Right side, Calendar/A-Z buttons to exit
+- `.map-venue-card` - Floating card for venue details (replaces modal)
+
+**User interactions:**
+- Click marker → floating card appears, map pans to marker
+- Click map background → card dismisses
+- Press Escape → closes card (if open) or exits to Calendar view
+- Click "Details" → exits to Calendar and opens full modal
 
 ## CSS Conventions
 
@@ -273,10 +319,11 @@ The test page includes a date picker to check which venues appear on any date an
 ### Implemented
 - [x] Weekly calendar view with 7-day schedule
 - [x] Alphabetical A-Z venue listing
-- [x] Interactive map with Leaflet.js
+- [x] Interactive map with Leaflet.js (immersive full-screen mode)
 - [x] Venue detail modal (mobile) and side pane (desktop)
 - [x] Dedicated venue filter
 - [x] Week navigation (prev/next/today)
+- [x] Venue tagging system with color-coded badges
 - [x] Karaoke bingo game
 - [x] Venue submission form
 - [x] Venue editor tool
@@ -285,6 +332,7 @@ The test page includes a date picker to check which venues appear on any date an
 - [x] Debug mode for schedule troubleshooting (?debug=1)
 
 ### Potential Future Enhancements
+- [ ] Filter venues by tags (UI for tag-based filtering)
 - [ ] Search/filter by host, city, or neighborhood
 - [ ] User favorites (localStorage)
 - [ ] Share venue links
@@ -295,6 +343,18 @@ The test page includes a date picker to check which venues appear on any date an
 ## Project History
 
 ### Recent Changes
+- **2025-01**: Added immersive full-screen map mode
+  - Map takes 100% viewport, hides header/footer/navigation
+  - Floating controls: view switcher (top-right), dedicated filter toggle (top-left)
+  - Floating venue card replaces modal (slide-in animation)
+  - Escape key support: closes card first, then exits map view
+  - Body class `view--map` controls immersive styling
+  - CSS in `css/views.css` (immersive map section)
+- **2025-01**: Added venue tagging system with color-coded badges
+  - Tag definitions in `js/data.js` (tagDefinitions object)
+  - Tag rendering utility in `js/utils/tags.js`
+  - Tags display in VenueCard, VenueModal, and VenueDetailPane
+  - CSS styles in `css/components.css` (.venue-tags, .venue-tag)
 - **2025-01**: Added test suite (`tests/index.html`) for schedule verification
 - **2025-01**: Added debug mode with visual overlay (`?debug=1`)
 - **2025-01**: Created `js/utils/debug.js` for debug utilities

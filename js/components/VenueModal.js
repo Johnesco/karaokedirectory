@@ -8,6 +8,7 @@ import { escapeHtml } from '../utils/string.js';
 import { formatTimeRange } from '../utils/date.js';
 import { buildMapUrl, buildDirectionsUrl, createSocialLinks, formatAddress } from '../utils/url.js';
 import { on, emit, Events } from '../core/events.js';
+import { getState } from '../core/state.js';
 import { renderTags } from '../utils/tags.js';
 
 export class VenueModal extends Component {
@@ -190,6 +191,12 @@ export class VenueModal extends Component {
         if (window.innerWidth >= 1400) {
             return;
         }
+
+        // Don't open modal in map view (immersive mode handles its own venue display)
+        if (getState('view') === 'map') {
+            return;
+        }
+
         this.setState({ venue, isOpen: true });
         document.body.style.overflow = 'hidden';
         emit(Events.MODAL_OPEN, venue);

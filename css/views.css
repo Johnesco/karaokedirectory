@@ -438,3 +438,245 @@
         font-size: var(--font-size-lg);
     }
 }
+
+/* ============================================
+   IMMERSIVE MAP MODE
+   Activated when body has .view--map class
+   ============================================ */
+
+/* Hide chrome elements in map view */
+body.view--map .site-header,
+body.view--map .site-footer,
+body.view--map .navigation-container {
+    display: none;
+}
+
+/* Full-screen map container */
+body.view--map .main-content {
+    max-width: none;
+    padding: 0;
+    margin: 0;
+    min-height: 100vh;
+}
+
+body.view--map .map-view {
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: var(--z-sticky);
+}
+
+body.view--map .map-view__container {
+    height: 100%;
+    width: 100%;
+    border-radius: 0;
+}
+
+/* Hide the info bar in immersive mode */
+body.view--map .map-view__info {
+    display: none;
+}
+
+/* Hide the two-pane layout detail pane */
+body.view--map .app-layout__detail {
+    display: none !important;
+}
+
+/* Floating Controls (left side, offset to avoid Leaflet zoom buttons) */
+.map-controls {
+    position: fixed;
+    top: var(--spacing-md);
+    left: 60px; /* Offset to avoid Leaflet's +/- zoom controls */
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    z-index: 1000; /* Above Leaflet controls (typically 800-999) */
+}
+
+.map-controls__btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-lg);
+    transition: background var(--transition-fast), transform var(--transition-fast);
+    border: 1px solid var(--border-color);
+}
+
+.map-controls__btn:hover {
+    background: var(--color-gray-700);
+    transform: scale(1.02);
+}
+
+.map-controls__btn--text {
+    width: auto;
+    height: auto;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--border-radius-lg);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.map-controls__btn--active {
+    background: var(--color-primary);
+    color: var(--color-white);
+    border-color: var(--color-primary);
+}
+
+/* Floating view switcher (right side) */
+.map-view-switcher {
+    position: fixed;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    display: flex;
+    gap: var(--spacing-xs);
+    z-index: 1000; /* Above Leaflet controls (typically 800-999) */
+    background: var(--bg-card);
+    padding: var(--spacing-xs);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
+}
+
+.map-view-switcher__btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--border-radius);
+    background: transparent;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    transition: all var(--transition-fast);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+
+.map-view-switcher__btn:hover {
+    background: var(--color-gray-700);
+    color: var(--text-primary);
+}
+
+/* Floating Venue Detail Card */
+.map-venue-card {
+    position: fixed;
+    bottom: var(--spacing-lg);
+    left: var(--spacing-lg);
+    right: var(--spacing-lg);
+    max-width: 400px;
+    background: var(--bg-card);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg);
+    z-index: 1000; /* Above Leaflet controls (typically 800-999) */
+    padding: var(--spacing-md);
+    border: 1px solid var(--border-color);
+    transform: translateY(calc(100% + var(--spacing-lg)));
+    opacity: 0;
+    transition: transform var(--transition), opacity var(--transition);
+    pointer-events: none;
+}
+
+.map-venue-card--visible {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.map-venue-card__close {
+    position: absolute;
+    top: var(--spacing-sm);
+    right: var(--spacing-sm);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    transition: all var(--transition-fast);
+}
+
+.map-venue-card__close:hover {
+    background: var(--color-gray-700);
+    color: var(--text-primary);
+}
+
+.map-venue-card__header {
+    padding-right: var(--spacing-xl);
+    margin-bottom: var(--spacing-sm);
+}
+
+.map-venue-card__title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    margin: 0 0 var(--spacing-xs);
+}
+
+.map-venue-card__badge {
+    display: inline-block;
+    background: var(--color-secondary);
+    color: var(--color-white);
+    font-size: var(--font-size-xs);
+    padding: 2px 8px;
+    border-radius: var(--border-radius-sm);
+}
+
+.map-venue-card__schedule {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.map-venue-card__actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--border-color);
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .map-venue-card {
+        left: var(--spacing-sm);
+        right: var(--spacing-sm);
+        bottom: var(--spacing-sm);
+        max-width: none;
+    }
+
+    .map-view-switcher__btn span {
+        display: none;
+    }
+
+    .map-controls {
+        top: var(--spacing-sm);
+        left: 50px; /* Offset to avoid Leaflet's +/- zoom controls */
+    }
+
+    .map-view-switcher {
+        top: var(--spacing-sm);
+        right: var(--spacing-sm);
+    }
+}
+
+/* Desktop: Position card on the right side */
+@media (min-width: 1024px) {
+    .map-venue-card {
+        left: auto;
+        right: var(--spacing-lg);
+        bottom: auto;
+        top: 50%;
+        transform: translateX(calc(100% + var(--spacing-lg))) translateY(-50%);
+        max-width: 350px;
+    }
+
+    .map-venue-card--visible {
+        transform: translateX(0) translateY(-50%);
+    }
+}

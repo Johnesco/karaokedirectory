@@ -6,8 +6,9 @@ A mobile-friendly web application for discovering karaoke venues in and around A
 
 - **Weekly Calendar View** — See which venues have karaoke each night across a 7-day schedule
 - **Alphabetical Listing** — Browse all 59+ venues sorted A-Z
-- **Interactive Map** — Find venues near you with an OpenStreetMap-powered map
+- **Interactive Map** — Full-screen immersive map with floating controls and venue cards
 - **Venue Details** — View addresses, schedules, host/KJ info, and social media links
+- **Venue Tags** — Color-coded badges showing venue characteristics (LGBTQ+, 21+, Dive Bar, etc.)
 - **Quick Directions** — One-tap access to Google Maps navigation
 - **Dedicated Venue Filter** — Toggle to show only dedicated karaoke bars
 - **Karaoke Bingo** — A fun bingo card game with karaoke-themed scenarios
@@ -84,12 +85,14 @@ Know a karaoke spot that's missing? You can:
 {
   id: "venue-name",
   name: "Venue Name",
+  active: true,  // Optional: set to false to hide venue (default: true)
   address: "123 Main St, Austin, TX 78701",
   coordinates: { lat: 30.2672, lng: -97.7431 },
   schedule: [
     { day: "Friday", startTime: "9:00 PM", endTime: "1:00 AM" }
   ],
   dedicated: false,
+  tags: ["lgbtq", "21+"],  // Optional: venue characteristics
   host: { name: "DJ Name", company: "Company" },
   social: {
     website: "https://example.com",
@@ -98,6 +101,22 @@ Know a karaoke spot that's missing? You can:
   }
 }
 ```
+
+### Available Tags
+
+Tags are defined in `js/data.js` with custom colors:
+
+| Tag ID | Display Label | Description |
+|--------|---------------|-------------|
+| `lgbtq` | LGBTQ+ | LGBTQ+ friendly venue |
+| `dive` | Dive Bar | Dive bar atmosphere |
+| `sports-bar` | Sports Bar | Sports bar venue |
+| `country-bar` | Country Bar | Country/western bar |
+| `21+` | 21+ | 21 and over only |
+| `18+` | 18+ | 18 and over only |
+| `all-ages` | All Ages | No age restriction |
+| `family-friendly` | Family | Family-friendly venue |
+| `smoking-inside` | Smoking Inside | Indoor smoking allowed |
 
 ## Contributing
 

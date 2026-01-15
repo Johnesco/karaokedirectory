@@ -16,7 +16,7 @@ const karaokeData = {
       "textColor": "#fff"
     },
     "country-bar": {
-      "label": "Country",
+      "label": "Country Bar",
       "color": "#ff9800",
       "textColor": "#fff"
     },
@@ -41,8 +41,8 @@ const karaokeData = {
       "textColor": "#fff"
     },
     "smoking-inside": {
-      "label": "Smoking OK",
-      "color": "#757575",
+      "label": "Smoking Inside",
+      "color": "#e90707",
       "textColor": "#fff"
     }
   },
@@ -1278,6 +1278,7 @@ const karaokeData = {
       "id": "meridian-buda",
       "name": "Meridian Buda",
       "dedicated": false,
+      "active": false,
       "address": {
         "street": "200 N. Main St.",
         "city": "Buda",

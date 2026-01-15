@@ -2,19 +2,24 @@
  * MapView
  * Interactive map showing venue locations
  * Uses Leaflet.js for mapping
+ * Supports immersive full-screen mode with floating controls
  */
 
 import { Component } from '../components/Component.js';
-import { getState, subscribe } from '../core/state.js';
+import { getState, setState, subscribe } from '../core/state.js';
 import { emit, on, Events } from '../core/events.js';
 import { getVenuesWithCoordinates, getAllVenues } from '../services/venues.js';
 import { escapeHtml } from '../utils/string.js';
 import { formatTimeRange } from '../utils/date.js';
+import { buildDirectionsUrl } from '../utils/url.js';
+import { renderTags } from '../utils/tags.js';
 
 export class MapView extends Component {
     init() {
         this.map = null;
         this.markers = [];
+        this.selectedVenue = null;
+        this._escHandler = null;
 
         this.subscribe(subscribe('showDedicated', () => this.updateMarkers()));
         this.subscribe(on(Events.FILTER_CHANGED, () => this.updateMarkers()));
@@ -23,6 +28,7 @@ export class MapView extends Component {
     template() {
         const venuesWithCoords = getVenuesWithCoordinates();
         const totalVenues = getAllVenues().length;
+        const showDedicated = getState('showDedicated');
 
         return `
             <div class="map-view">
@@ -38,6 +44,34 @@ export class MapView extends Component {
                         ` : ''}
                     </p>
                 </div>
+
+                <!-- Floating Controls (left side) -->
+                <div class="map-controls">
+                    <button
+                        class="map-controls__btn map-controls__btn--text ${showDedicated ? 'map-controls__btn--active' : ''}"
+                        data-action="toggle-dedicated"
+                        type="button"
+                    >
+                        ${showDedicated ? 'Hide Dedicated' : 'Show Dedicated'}
+                    </button>
+                </div>
+
+                <!-- View Switcher (right side) -->
+                <div class="map-view-switcher">
+                    <button class="map-view-switcher__btn" data-view="weekly" type="button">
+                        <i class="fa-regular fa-calendar"></i>
+                        <span>Calendar</span>
+                    </button>
+                    <button class="map-view-switcher__btn" data-view="alphabetical" type="button">
+                        <i class="fa-solid fa-list"></i>
+                        <span>A-Z</span>
+                    </button>
+                </div>
+
+                <!-- Floating Venue Card -->
+                <div class="map-venue-card" id="map-venue-card">
+                    <!-- Content populated dynamically -->
+                </div>
             </div>
         `;
     }
@@ -47,6 +81,55 @@ export class MapView extends Component {
         this.loadLeaflet().then(() => {
             this.initMap();
         });
+
+        // View switcher buttons
+        this.delegate('click', '[data-view]', (e, target) => {
+            const view = target.dataset.view;
+            setState({ view });
+            emit(Events.VIEW_CHANGED, view);
+        });
+
+        // Dedicated toggle
+        this.delegate('click', '[data-action="toggle-dedicated"]', () => {
+            const showDedicated = !getState('showDedicated');
+            setState({ showDedicated });
+            emit(Events.FILTER_CHANGED, { showDedicated });
+            this.render(); // Re-render to update button state
+        });
+
+        // Close venue card
+        this.delegate('click', '[data-action="close-card"]', () => {
+            this.hideVenueCard();
+        });
+
+        // View details button - switch to weekly and open modal
+        this.delegate('click', '[data-action="view-details"]', () => {
+            const venue = this.selectedVenue;
+            if (!venue) return;
+
+            // Switch to weekly view
+            setState({ view: 'weekly' });
+            emit(Events.VIEW_CHANGED, 'weekly');
+
+            // Small delay to let view render, then select venue
+            setTimeout(() => {
+                emit(Events.VENUE_SELECTED, venue);
+            }, 100);
+        });
+
+        // Escape key to exit map view or close card
+        this._escHandler = (e) => {
+            if (e.key === 'Escape') {
+                if (this.selectedVenue) {
+                    this.hideVenueCard();
+                } else {
+                    // Exit to weekly view
+                    setState({ view: 'weekly' });
+                    emit(Events.VIEW_CHANGED, 'weekly');
+                }
+            }
+        };
+        document.addEventListener('keydown', this._escHandler);
     }
 
     async loadLeaflet() {
@@ -90,6 +173,11 @@ export class MapView extends Component {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(this.map);
 
+        // Close venue card when clicking on map (not on marker)
+        this.map.on('click', () => {
+            this.hideVenueCard();
+        });
+
         this.updateMarkers();
     }
 
@@ -111,8 +199,16 @@ export class MapView extends Component {
         // Add markers
         venues.forEach(venue => {
             const marker = L.marker([venue.coordinates.lat, venue.coordinates.lng])
-                .addTo(this.map)
-                .bindPopup(this.createPopup(venue));
+                .addTo(this.map);
+
+            // Click marker to show floating card (not popup)
+            marker.on('click', (e) => {
+                L.DomEvent.stopPropagation(e);
+                this.showVenueCard(venue);
+
+                // Pan map to center on marker with offset for card visibility
+                this.map.panTo([venue.coordinates.lat, venue.coordinates.lng]);
+            });
 
             this.markers.push(marker);
         });
@@ -124,25 +220,63 @@ export class MapView extends Component {
         }
     }
 
-    createPopup(venue) {
+    showVenueCard(venue) {
+        this.selectedVenue = venue;
+        const cardEl = this.$('#map-venue-card');
+        if (!cardEl || !venue) return;
+
+        // Build schedule HTML
         const scheduleHtml = venue.schedule.map(s => {
             const day = s.day.charAt(0).toUpperCase() + s.day.slice(1);
+            const freq = s.frequency === 'every' ? '' : s.frequency.charAt(0).toUpperCase() + s.frequency.slice(1) + ' ';
             const time = formatTimeRange(s.startTime, s.endTime);
-            return `<div>${day}: ${time}</div>`;
+            return `<div>${freq}${day}: ${time}</div>`;
         }).join('');
 
-        return `
-            <div class="map-popup">
-                <h3 class="map-popup__name">${escapeHtml(venue.name)}</h3>
-                <div class="map-popup__schedule">${scheduleHtml}</div>
-                <button class="map-popup__details btn btn--small" onclick="window.showVenueDetails('${venue.id}')">
-                    View Details
+        // Build directions URL
+        const directionsUrl = buildDirectionsUrl(venue.address, venue.name);
+
+        // Build tags HTML
+        const tagsHtml = venue.tags ? renderTags(venue.tags) : '';
+
+        cardEl.innerHTML = `
+            <button class="map-venue-card__close" data-action="close-card" type="button" aria-label="Close">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="map-venue-card__header">
+                <h3 class="map-venue-card__title">${escapeHtml(venue.name)}</h3>
+                ${venue.dedicated ? '<span class="map-venue-card__badge">Dedicated</span>' : ''}
+                ${tagsHtml}
+            </div>
+            <div class="map-venue-card__schedule">${scheduleHtml}</div>
+            <div class="map-venue-card__actions">
+                <a href="${directionsUrl}" target="_blank" rel="noopener noreferrer" class="btn btn--secondary btn--small">
+                    <i class="fa-solid fa-diamond-turn-right"></i> Directions
+                </a>
+                <button class="btn btn--primary btn--small" data-action="view-details" type="button">
+                    <i class="fa-solid fa-info-circle"></i> Details
                 </button>
             </div>
         `;
+
+        cardEl.classList.add('map-venue-card--visible');
+    }
+
+    hideVenueCard() {
+        this.selectedVenue = null;
+        const cardEl = this.$('#map-venue-card');
+        if (cardEl) {
+            cardEl.classList.remove('map-venue-card--visible');
+        }
     }
 
     onDestroy() {
+        // Remove escape key handler
+        if (this._escHandler) {
+            document.removeEventListener('keydown', this._escHandler);
+        }
+
+        // Clean up map
         if (this.map) {
             this.map.remove();
             this.map = null;

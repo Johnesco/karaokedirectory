@@ -112,6 +112,7 @@ karaokedirectory/
 │   └── utils/          # Helper functions
 │       ├── date.js     # Date formatting
 │       ├── string.js   # Text manipulation
+│       ├── tags.js     # Venue tag rendering
 │       └── url.js      # URL building
 │
 └── assets/             # Images and static files
@@ -300,7 +301,9 @@ karaokedirectory/
             <ul>
                 <li><strong>id</strong> - A unique identifier (like "the-common-interest"). Used to reference venues in code.</li>
                 <li><strong>name</strong> - The display name of the venue.</li>
+                <li><strong>active</strong> - Optional boolean (default true). Set to false to hide the venue from all pages.</li>
                 <li><strong>dedicated</strong> - A boolean (true/false) indicating if it's a dedicated karaoke venue (karaoke every day).</li>
+                <li><strong>tags</strong> - An optional array of tag IDs (like ["lgbtq", "21+"]) indicating venue characteristics.</li>
                 <li><strong>address</strong> - An object containing street, city, state, and zip.</li>
                 <li><strong>schedule</strong> - An array of schedule entries, each with frequency (every, first, second, etc.), day, start time, and end time.</li>
                 <li><strong>host</strong> - Information about the karaoke host/KJ.</li>
@@ -334,6 +337,55 @@ karaokedirectory/
             </ul>
 
             <p>For "first", "second", etc., it calculates which occurrence of that weekday in the month the date falls on. For "last", it checks if there's another occurrence of that weekday later in the same month.</p>
+
+            <h3>The Tagging System</h3>
+
+            <p>Venues can be tagged with characteristics that help users find the right spot. Tags are displayed as color-coded badges on venue cards throughout the app.</p>
+
+            <h4>Tag Definitions</h4>
+
+            <p>At the top of data.js, there's a <span class="code-term">tagDefinitions</span> object that defines all available tags:</p>
+
+            <ul>
+                <li><strong>lgbtq</strong> - LGBTQ+ friendly venues (purple badge)</li>
+                <li><strong>dive</strong> - Dive bar atmosphere (brown badge)</li>
+                <li><strong>sports-bar</strong> - Sports bar venues (green badge)</li>
+                <li><strong>country-bar</strong> - Country/western bars (orange badge)</li>
+                <li><strong>21+</strong> - 21 and over only (red badge)</li>
+                <li><strong>18+</strong> - 18 and over only (yellow badge)</li>
+                <li><strong>all-ages</strong> - No age restriction (blue badge)</li>
+                <li><strong>family-friendly</strong> - Family-friendly venues (light blue badge)</li>
+                <li><strong>smoking-inside</strong> - Indoor smoking allowed (red badge)</li>
+            </ul>
+
+            <p>Each tag definition includes a human-readable label, background color, and text color for proper contrast.</p>
+
+            <h4>Tag Utilities (tags.js)</h4>
+
+            <p>The tags.js utility module handles tag rendering:</p>
+
+            <ul>
+                <li><strong>initTagConfig(definitions)</strong> - Loads tag definitions from data.js during app startup.</li>
+                <li><strong>renderTags(tags)</strong> - Converts an array of tag IDs into styled HTML badges.</li>
+                <li><strong>getTagConfig(tagId)</strong> - Retrieves the configuration (label, colors) for a specific tag.</li>
+            </ul>
+
+            <p>Tags are rendered using inline styles (background color and text color) from the tag configuration, wrapped in <span class="code-term">.venue-tags</span> and <span class="code-term">.venue-tag</span> CSS classes for layout and sizing.</p>
+
+            <h4>Where Tags Appear</h4>
+
+            <p>Tags are displayed in all venue displays throughout the app:</p>
+
+            <ul>
+                <li><strong>VenueCard</strong> - Below the venue name in both compact and full modes</li>
+                <li><strong>VenueModal</strong> - In the modal header on mobile devices</li>
+                <li><strong>VenueDetailPane</strong> - In the side panel on desktop screens</li>
+            </ul>
+
+            <div class="highlight-box">
+                <p><strong>Adding New Tags</strong></p>
+                <p>To add a new tag, simply add it to the <span class="code-term">tagDefinitions</span> object in data.js with a unique ID, label, background color, and text color. The system will automatically make it available throughout the app.</p>
+            </div>
         </section>
 
         <!-- SECTION 6: STATE MANAGEMENT -->
@@ -534,19 +586,37 @@ karaokedirectory/
 
             <p>The "ignore articles" logic is in <span class="code-term">getSortableName()</span> - it moves articles like "The", "A", "An" to the end for sorting purposes. So "The Common Interest" sorts under "C", not "T".</p>
 
-            <h3>MapView</h3>
+            <h3>MapView (Immersive Mode)</h3>
 
-            <p>Displays venues on an interactive map using Leaflet.js:</p>
+            <p>The map view uses an immersive full-screen mode that hides all page chrome (header, footer, navigation) and displays venues on an interactive map using Leaflet.js.</p>
+
+            <h4>How Immersive Mode Works</h4>
 
             <ol>
-                <li><strong>Loads Leaflet library</strong> if not already loaded (CSS and JS)</li>
-                <li><strong>Creates a map</strong> centered on Austin, TX</li>
-                <li><strong>Adds a tile layer</strong> from OpenStreetMap</li>
-                <li><strong>Places markers</strong> for each venue with coordinates</li>
-                <li><strong>Adjusts the view</strong> to fit all markers</li>
+                <li><strong>Body class toggle</strong> - When map view is active, <span class="code-term">app.js</span> adds <span class="code-term">body.view--map</span> class</li>
+                <li><strong>CSS hides chrome</strong> - The class triggers CSS rules that hide header, footer, and navigation</li>
+                <li><strong>Map fills viewport</strong> - The map container becomes fixed position, 100% width and height</li>
+                <li><strong>Floating controls</strong> - View switcher and filter buttons float on top of the map</li>
             </ol>
 
-            <p>Each marker has a popup with the venue name, schedule, and a "View Details" button that emits a VENUE_SELECTED event.</p>
+            <h4>Floating UI Elements</h4>
+
+            <ul>
+                <li><strong>.map-controls</strong> - Top-left button to toggle dedicated venues filter</li>
+                <li><strong>.map-view-switcher</strong> - Top-right buttons to exit to Calendar or A-Z view</li>
+                <li><strong>.map-venue-card</strong> - Floating card that slides in when a marker is clicked</li>
+            </ul>
+
+            <h4>User Interactions</h4>
+
+            <ul>
+                <li><strong>Click marker</strong> - Floating venue card appears with schedule, directions, and details button</li>
+                <li><strong>Click map background</strong> - Dismisses the venue card</li>
+                <li><strong>Press Escape</strong> - Closes card if open, otherwise exits to Calendar view</li>
+                <li><strong>Click "Details"</strong> - Exits map and opens full venue modal in Calendar view</li>
+            </ul>
+
+            <p>The floating venue card replaces the modal overlay, allowing users to see the venue's location on the map while viewing its details.</p>
 
             <div class="warning-box">
                 <p><strong>Note About Map Coordinates</strong></p>
@@ -624,10 +694,10 @@ karaokedirectory/
                 <li>Browser loads data.js, creating the <span class="code-term">karaokeData</span> global variable</li>
                 <li>Browser loads app.js as a module, which imports its dependencies</li>
                 <li>When DOM is ready, app.js calls <span class="code-term">init()</span></li>
-                <li><span class="code-term">init()</span> calls <span class="code-term">loadData()</span>, which passes venue data to <span class="code-term">initVenues()</span></li>
+                <li><span class="code-term">init()</span> calls <span class="code-term">loadData()</span>, which initializes tag configuration and venue data</li>
                 <li><span class="code-term">init()</span> creates Navigation, VenueModal, and VenueDetailPane components</li>
                 <li><span class="code-term">init()</span> calls <span class="code-term">renderView('weekly')</span>, which creates and renders WeeklyView</li>
-                <li>WeeklyView generates DayCards for the current week, which generate VenueCards</li>
+                <li>WeeklyView generates DayCards for the current week, which generate VenueCards (with tags)</li>
                 <li>WeeklyView scrolls to today's card</li>
             </ol>
 

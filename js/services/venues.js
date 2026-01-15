@@ -9,6 +9,24 @@ import { getSortableName, containsIgnoreCase } from '../utils/string.js';
 let venues = [];
 
 /**
+ * Check if a venue is active
+ * Venues without an 'active' property are considered active (default true)
+ * @param {Object} venue - Venue object
+ * @returns {boolean} True if venue is active
+ */
+function isVenueActive(venue) {
+    return venue.active !== false;
+}
+
+/**
+ * Get only active venues (filters out inactive ones)
+ * @returns {Object[]} Active venues only
+ */
+function getActiveVenues() {
+    return venues.filter(isVenueActive);
+}
+
+/**
  * Initialize venues from data
  * @param {Object} data - Karaoke data object
  */
@@ -20,24 +38,28 @@ export function initVenues(data) {
     }
 
     venues = data.listings;
-    console.log(`Loaded ${venues.length} venues`);
+    const activeCount = getActiveVenues().length;
+    const inactiveCount = venues.length - activeCount;
+    console.log(`Loaded ${venues.length} venues (${activeCount} active, ${inactiveCount} inactive)`);
 }
 
 /**
- * Get all venues
- * @returns {Object[]} All venues
+ * Get all active venues
+ * @returns {Object[]} All active venues
  */
 export function getAllVenues() {
-    return venues;
+    return getActiveVenues();
 }
 
 /**
- * Get venue by ID
+ * Get venue by ID (only returns active venues)
  * @param {string} id - Venue ID
  * @returns {Object|null} Venue or null
  */
 export function getVenueById(id) {
-    return venues.find(v => v.id === id) || null;
+    const venue = venues.find(v => v.id === id);
+    // Only return if venue exists and is active
+    return venue && isVenueActive(venue) ? venue : null;
 }
 
 /**
@@ -49,7 +71,7 @@ export function getVenueById(id) {
 export function getVenuesForDate(date, options = {}) {
     const { includeDedicated = true } = options;
 
-    return venues.filter(venue => {
+    return getActiveVenues().filter(venue => {
         // Check dedicated filter
         if (!includeDedicated && venue.dedicated) {
             return false;
@@ -79,7 +101,7 @@ export function getVenuesForDate(date, options = {}) {
 export function getVenuesSorted(options = {}) {
     const { includeDedicated = true } = options;
 
-    let result = venues;
+    let result = getActiveVenues();
 
     if (!includeDedicated) {
         result = result.filter(v => !v.dedicated);
@@ -106,7 +128,7 @@ export function searchVenues(query, options = {}) {
     const q = query.toLowerCase().trim();
     const { includeDedicated = true } = options;
 
-    return venues.filter(venue => {
+    return getActiveVenues().filter(venue => {
         if (!includeDedicated && venue.dedicated) {
             return false;
         }
@@ -154,7 +176,7 @@ export function filterVenues(filters = {}) {
         date = null           // Specific date
     } = filters;
 
-    let result = venues;
+    let result = getActiveVenues();
 
     // Filter by dedicated
     if (dedicated !== null) {
@@ -212,31 +234,31 @@ export function filterVenues(filters = {}) {
 }
 
 /**
- * Get unique cities from venues
+ * Get unique cities from active venues
  * @returns {string[]} Sorted list of cities
  */
 export function getCities() {
-    const cities = new Set(venues.map(v => v.address.city).filter(Boolean));
+    const cities = new Set(getActiveVenues().map(v => v.address.city).filter(Boolean));
     return [...cities].sort();
 }
 
 /**
- * Get unique neighborhoods from venues
+ * Get unique neighborhoods from active venues
  * @returns {string[]} Sorted list of neighborhoods
  */
 export function getNeighborhoods() {
     const neighborhoods = new Set(
-        venues.map(v => v.address.neighborhood).filter(Boolean)
+        getActiveVenues().map(v => v.address.neighborhood).filter(Boolean)
     );
     return [...neighborhoods].sort();
 }
 
 /**
- * Get venues with coordinates (for map view)
- * @returns {Object[]} Venues with valid coordinates
+ * Get active venues with coordinates (for map view)
+ * @returns {Object[]} Active venues with valid coordinates
  */
 export function getVenuesWithCoordinates() {
-    return venues.filter(v => v.coordinates?.lat && v.coordinates?.lng);
+    return getActiveVenues().filter(v => v.coordinates?.lat && v.coordinates?.lng);
 }
 
 export { venues };

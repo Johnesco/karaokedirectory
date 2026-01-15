@@ -387,6 +387,11 @@
     opacity: 1;
 }
 
+/* Hide FAB buttons in immersive map mode */
+body.view--map .fab-group {
+    display: none;
+}
+
 /* Responsive grid utilities */
 .grid {
     display: grid;
