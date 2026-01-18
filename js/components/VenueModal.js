@@ -9,7 +9,7 @@ import { buildMapUrl, buildDirectionsUrl, createSocialLinks, formatAddress } fro
 import { on, emit, Events } from '../core/events.js';
 import { getState } from '../core/state.js';
 import { renderTags } from '../utils/tags.js';
-import { renderScheduleTable, renderDateRange, renderHostSection, renderDedicatedBadge } from '../utils/render.js';
+import { renderScheduleTable, renderDateRange, renderHostSection } from '../utils/render.js';
 
 export class VenueModal extends Component {
     init() {
@@ -47,9 +47,8 @@ export class VenueModal extends Component {
                         <h2 id="venue-modal-title" class="venue-modal__title">
                             ${escapeHtml(venue.name)}
                         </h2>
-                        ${renderDedicatedBadge(venue.dedicated, 'venue-modal', { fullText: true })}
                         ${venue.eventName ? `<p class="venue-modal__event-name">${escapeHtml(venue.eventName)}</p>` : ''}
-                        ${renderTags(venue.tags)}
+                        ${renderTags(venue.tags, { dedicated: venue.dedicated })}
                     </header>
 
                     <section class="venue-modal__section">

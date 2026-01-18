@@ -13,7 +13,6 @@ import { escapeHtml } from '../utils/string.js';
 import { formatScheduleEntry } from '../utils/date.js';
 import { buildDirectionsUrl } from '../utils/url.js';
 import { renderTags } from '../utils/tags.js';
-import { renderDedicatedBadge } from '../utils/render.js';
 
 export class MapView extends Component {
     init() {
@@ -235,8 +234,8 @@ export class MapView extends Component {
         // Build directions URL
         const directionsUrl = buildDirectionsUrl(venue.address, venue.name);
 
-        // Build tags HTML
-        const tagsHtml = venue.tags ? renderTags(venue.tags) : '';
+        // Build tags HTML (includes dedicated tag if applicable)
+        const tagsHtml = renderTags(venue.tags, { dedicated: venue.dedicated });
 
         cardEl.innerHTML = `
             <button class="map-venue-card__close" data-action="close-card" type="button" aria-label="Close">
@@ -244,7 +243,6 @@ export class MapView extends Component {
             </button>
             <div class="map-venue-card__header">
                 <h3 class="map-venue-card__title">${escapeHtml(venue.name)}</h3>
-                ${renderDedicatedBadge(venue.dedicated, 'map-venue-card')}
                 ${tagsHtml}
             </div>
             <div class="map-venue-card__schedule">${scheduleHtml}</div>

@@ -8,7 +8,7 @@ import { escapeHtml } from '../utils/string.js';
 import { buildMapUrl, buildDirectionsUrl, createSocialLinks, formatAddress } from '../utils/url.js';
 import { on, emit, Events } from '../core/events.js';
 import { renderTags } from '../utils/tags.js';
-import { renderScheduleTable, renderDateRange, renderHostSection, renderDedicatedBadge } from '../utils/render.js';
+import { renderScheduleTable, renderDateRange, renderHostSection } from '../utils/render.js';
 
 export class VenueDetailPane extends Component {
     init() {
@@ -39,9 +39,8 @@ export class VenueDetailPane extends Component {
                     <h2 class="detail-pane__title">
                         ${escapeHtml(venue.name)}
                     </h2>
-                    ${renderDedicatedBadge(venue.dedicated, 'detail-pane', { fullText: true })}
                     ${venue.eventName ? `<p class="detail-pane__event-name">${escapeHtml(venue.eventName)}</p>` : ''}
-                    ${renderTags(venue.tags)}
+                    ${renderTags(venue.tags, { dedicated: venue.dedicated })}
                 </header>
 
                 <section class="detail-pane__section">

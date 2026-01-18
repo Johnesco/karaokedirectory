@@ -10,7 +10,7 @@ import { buildMapUrl, createSocialLinks, formatAddress } from '../utils/url.js';
 import { emit, Events } from '../core/events.js';
 import { isDebugMode, getDebugHtml } from '../utils/debug.js';
 import { renderTags } from '../utils/tags.js';
-import { formatHostDisplay, renderDedicatedBadge } from '../utils/render.js';
+import { formatHostDisplay } from '../utils/render.js';
 
 export class VenueCard extends Component {
     /**
@@ -61,9 +61,7 @@ export class VenueCard extends Component {
                             ${escapeHtml(venue.name)}
                         </button>
                     </h3>
-                    ${renderDedicatedBadge(venue.dedicated, 'venue-card')}
                 </div>
-                ${renderTags(venue.tags)}
                 ${showSchedule && timeDisplay ? `
                     <div class="venue-card__time">
                         <i class="fa-regular fa-clock"></i> ${timeDisplay}
@@ -81,6 +79,7 @@ export class VenueCard extends Component {
                         Presented by ${escapeHtml(hostDisplay)}
                     </div>
                 ` : ''}
+                ${renderTags(venue.tags, { dedicated: venue.dedicated })}
             </div>
         `;
     }
@@ -99,9 +98,7 @@ export class VenueCard extends Component {
                             ${escapeHtml(venue.name)}
                         </button>
                     </h3>
-                    ${renderDedicatedBadge(venue.dedicated, 'venue-card')}
                 </div>
-                ${renderTags(venue.tags)}
 
                 <div class="venue-card__address">
                     <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" class="venue-card__map-link">
@@ -129,6 +126,7 @@ export class VenueCard extends Component {
                         ${socialLinksHtml}
                     </div>
                 ` : ''}
+                ${renderTags(venue.tags, { dedicated: venue.dedicated })}
             </div>
         `;
     }

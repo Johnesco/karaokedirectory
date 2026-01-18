@@ -18,12 +18,19 @@ export function initTagConfig(definitions) {
 /**
  * Render tags as HTML badges
  * @param {string[]} tags - Array of tag IDs
+ * @param {Object} options - Render options
+ * @param {boolean} options.dedicated - Whether to include the dedicated tag
  * @returns {string} HTML string of tag badges
  */
-export function renderTags(tags) {
-    if (!tags || tags.length === 0) return '';
+export function renderTags(tags, options = {}) {
+    const { dedicated = false } = options;
 
-    const badges = tags.map(tag => {
+    // Build the full tag list, prepending 'dedicated' if applicable
+    const allTags = dedicated ? ['dedicated', ...(tags || [])] : (tags || []);
+
+    if (allTags.length === 0) return '';
+
+    const badges = allTags.map(tag => {
         const config = tagConfig[tag];
         if (!config) return '';
 

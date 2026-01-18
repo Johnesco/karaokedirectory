@@ -162,6 +162,7 @@ Tags are defined in `tagDefinitions` at the top of `js/data.js`. Each tag has:
 Available tags:
 | Tag ID | Label | Description |
 |--------|-------|-------------|
+| `dedicated` | Dedicated | Dedicated karaoke venue (auto-added when `dedicated: true`) |
 | `lgbtq` | LGBTQ+ | LGBTQ+ friendly venue |
 | `dive` | Dive Bar | Dive bar atmosphere |
 | `sports-bar` | Sports Bar | Sports bar venue |
@@ -171,6 +172,14 @@ Available tags:
 | `all-ages` | All Ages | No age restriction |
 | `family-friendly` | Family | Family-friendly venue |
 | `smoking-inside` | Smoking Inside | Indoor smoking allowed |
+| `restaurant` | Restaurant | Primarily a restaurant with karaoke |
+| `outdoor` | Outdoor | Significant outdoor/patio space |
+| `live-band-karaoke` | Live Band | Live band karaoke venue |
+| `billiards` | Billiards | Pool hall / billiards focus |
+| `brewery` | Brewery | Brewery or distillery |
+| `games` | Games | Arcade, bowling, entertainment center |
+| `craft-cocktails` | Craft Cocktails | Upscale craft cocktail bar |
+| `neighborhood` | Neighborhood | Casual neighborhood bar |
 
 Tags are rendered as color-coded badges in VenueCard, VenueModal, and VenueDetailPane components using the `renderTags()` function from `js/utils/tags.js`.
 
