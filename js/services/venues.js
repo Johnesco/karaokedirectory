@@ -1,6 +1,17 @@
 /**
  * Venue data service
- * Handles loading, filtering, sorting, and querying venue data
+ * Handles loading, filtering, sorting, and querying venue data.
+ *
+ * Key exports:
+ * - initVenues(data): Initialize venue data from data.js
+ * - getAllVenues(): Get all active venues
+ * - getVenueById(id): Get single venue by ID
+ * - getVenuesForDate(date, options): Get venues with karaoke on a specific date
+ * - getVenuesSorted(options): Get all venues sorted alphabetically
+ * - getVenuesWithCoordinates(options): Get venues with map coordinates
+ * - venueMatchesSearch(venue, query): Check if venue matches search query
+ *
+ * Search matches against: name, city, neighborhood, host, company, tags (ID and label)
  */
 
 import { scheduleMatchesDate, isDateInRange } from '../utils/date.js';

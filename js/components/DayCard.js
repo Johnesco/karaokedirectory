@@ -1,6 +1,15 @@
 /**
  * DayCard Component
- * Displays venues for a specific day
+ * Displays venues for a specific day in the weekly calendar view.
+ *
+ * Applies CSS state classes based on date and content:
+ * - .day-card--today: Current day (purple border highlight)
+ * - .day-card--past: Days before today (collapsed by default, click to expand)
+ * - .day-card--empty: No venues match current filters/search (collapsed to header-only)
+ *
+ * Filtering:
+ * - Respects showDedicated state for dedicated venue filter
+ * - Respects searchQuery state for search filtering
  */
 
 import { Component } from './Component.js';

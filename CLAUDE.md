@@ -75,8 +75,8 @@ karaokedirectory/
 │   │
 │   ├── components/
 │   │   ├── Component.js   # Base component class
-│   │   ├── Navigation.js  # View tabs, week nav, filters
-│   │   ├── DayCard.js     # Daily schedule display
+│   │   ├── Navigation.js  # View tabs, week nav, search, filters
+│   │   ├── DayCard.js     # Daily schedule display (supports search filtering)
 │   │   ├── VenueCard.js   # Venue listing item
 │   │   ├── VenueModal.js  # Mobile venue detail popup
 │   │   └── VenueDetailPane.js  # Desktop venue detail sidebar
@@ -87,7 +87,7 @@ karaokedirectory/
 │   │   └── MapView.js         # Leaflet.js map view
 │   │
 │   ├── services/
-│   │   └── venues.js      # Venue data operations
+│   │   └── venues.js      # Venue data operations, search, filtering
 │   │
 │   └── utils/
 │       ├── date.js        # Date formatting, schedule matching
@@ -238,6 +238,42 @@ The map view uses a full-screen immersive mode with floating controls:
 - Press Escape → closes card (if open) or exits to Calendar view
 - Click "Details" → exits to Calendar and opens full modal
 
+### Search Feature
+The app includes a global search bar that filters venues across all views:
+
+**How it works:**
+- Search input in Navigation component updates `searchQuery` state
+- All views listen for `FILTER_CHANGED` events and re-render
+- `venues.js` provides `venueMatchesSearch()` for filtering logic
+- Search does not cause Navigation re-render (preserves input focus)
+
+**Search matches against:**
+- Venue name
+- City and neighborhood
+- Host name and company
+- Tag IDs (e.g., "lgbtq", "dive") and labels (e.g., "LGBTQ+", "Dive Bar")
+- "dedicated" keyword for dedicated karaoke venues
+
+**UI behavior:**
+- Clear button appears when search has text
+- Empty results show contextual message
+- Day cards with no matching venues collapse to header-only
+
+### Day Card States
+Day cards in the weekly view have multiple visual states controlled by CSS classes:
+
+| Class | Behavior |
+|-------|----------|
+| `.day-card--today` | Purple border highlight for current day |
+| `.day-card--past` | Collapsed (header only), dimmed, click to expand |
+| `.day-card--empty` | Collapsed (header only), dimmed - no venues match filters/search |
+| `.day-card--expanded` | Modifier for past days that have been clicked to expand |
+
+**State combinations:**
+- Past + Empty: Shows collapsed, can still expand but content will be empty
+- Today + Empty: Shows collapsed with purple border (search filtered out all venues)
+- Past days default to collapsed; clicking header toggles expansion
+
 ## CSS Conventions
 
 ### CSS Loading Order (IMPORTANT)
@@ -333,6 +369,8 @@ The test page includes a date picker to check which venues appear on any date an
 - [x] Dedicated venue filter
 - [x] Week navigation (prev/next/today)
 - [x] Venue tagging system with color-coded badges
+- [x] Global search (filters by name, city, host, tags)
+- [x] Collapsible empty day cards (space-efficient when filtering)
 - [x] Karaoke bingo game
 - [x] Venue submission form
 - [x] Venue editor tool
@@ -341,8 +379,7 @@ The test page includes a date picker to check which venues appear on any date an
 - [x] Debug mode for schedule troubleshooting (?debug=1)
 
 ### Potential Future Enhancements
-- [ ] Filter venues by tags (UI for tag-based filtering)
-- [ ] Search/filter by host, city, or neighborhood
+- [ ] Tag-based quick filter buttons (clickable tag chips)
 - [ ] User favorites (localStorage)
 - [ ] Share venue links
 - [ ] PWA offline support
@@ -352,6 +389,21 @@ The test page includes a date picker to check which venues appear on any date an
 ## Project History
 
 ### Recent Changes
+- **2025-01**: Added global search functionality
+  - Search input in Navigation component with clear button
+  - Filters venues by name, city, neighborhood, host, company, and tags
+  - Search by tag ID or label (e.g., "lgbtq" or "LGBTQ+")
+  - All views (Weekly, Alphabetical, Map) respond to search
+  - State managed via `searchQuery` in state.js
+  - CSS in `css/components.css` (.search-input styles)
+- **2025-01**: Added collapsible empty day cards
+  - Days with no venues (due to schedule or search filters) collapse to header-only
+  - Reduces vertical space when searching with few results
+  - CSS class `.day-card--empty` controls collapsed state
+- **2025-01**: Expanded venue tagging system
+  - Added tags: restaurant, outdoor, billiards, brewery, games, craft-cocktails, neighborhood
+  - Integrated "dedicated" badge into tag system (renders via `renderTags()`)
+  - Tags searchable by ID or display label
 - **2025-01**: Added immersive full-screen map mode
   - Map takes 100% viewport, hides header/footer/navigation
   - Floating controls: view switcher (top-right), dedicated filter toggle (top-left)

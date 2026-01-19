@@ -1,6 +1,14 @@
 /**
  * Simple reactive state management
- * No framework, just plain JavaScript
+ * No framework, just plain JavaScript.
+ *
+ * State keys:
+ * - view: Current view ('weekly', 'alphabetical', 'map')
+ * - weekStart: Date for current week in weekly view
+ * - showDedicated: Whether to show dedicated karaoke venues
+ * - searchQuery: Global search filter text
+ * - selectedVenue: Currently selected venue object (for modal/detail pane)
+ * - isLoading: Loading indicator state
  */
 
 const subscribers = new Map();

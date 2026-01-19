@@ -1,8 +1,22 @@
 /**
  * View-specific styles
+ * - Day Card (weekly view calendar days)
+ * - Weekly View layout
+ * - Alphabetical View (A-Z listing)
+ * - Letter Card (alphabetical grouping)
+ * - Map View (standard and immersive modes)
  */
 
-/* Day Card */
+/* ============================================
+   DAY CARD
+   Used in weekly view to display each day's venues.
+
+   State classes:
+   - .day-card--today: Current day highlight
+   - .day-card--past: Collapsed, expandable on click
+   - .day-card--empty: Collapsed, no venues match filters
+   - .day-card--expanded: Past day that's been expanded
+   ============================================ */
 .day-card {
     background: var(--bg-card);
     border-radius: var(--border-radius);
@@ -16,7 +30,21 @@
 }
 
 .day-card--empty {
-    opacity: 0.7;
+    opacity: 0.6;
+}
+
+/* Empty days are collapsed to just header */
+.day-card--empty .day-card__content {
+    display: none;
+}
+
+.day-card--empty .day-card__footer {
+    display: none;
+}
+
+.day-card--empty .day-card__header {
+    border-radius: var(--border-radius);
+    border-bottom: none;
 }
 
 /* Past days - collapsed and dimmed */
@@ -327,6 +355,10 @@
     }
 
     .page--edge-to-edge .day-card--past.day-card--expanded .day-card__header {
+        border-radius: 0 0 50px 0;
+    }
+
+    .page--edge-to-edge .day-card--empty .day-card__header {
         border-radius: 0 0 50px 0;
     }
 

@@ -1,6 +1,8 @@
 /**
  * AlphabeticalView
- * Displays all venues sorted A-Z
+ * Displays all venues sorted A-Z, grouped by first letter.
+ * Responds to showDedicated and search filter changes.
+ * Shows contextual empty message when search yields no results.
  */
 
 import { Component } from '../components/Component.js';

@@ -1,6 +1,15 @@
 /**
  * Navigation Component
- * View toggles, week navigation, and filters
+ * View toggles, week navigation, search input, and filters.
+ *
+ * Features:
+ * - View switcher buttons (Calendar, A-Z, Map, Bingo)
+ * - Week navigation (prev/next/today) - only shown in weekly view
+ * - Global search input with clear button
+ * - Dedicated venue toggle checkbox
+ *
+ * Note: Component does NOT re-render on searchQuery changes to preserve
+ * input focus. Clear button visibility is managed via DOM manipulation.
  */
 
 import { Component } from './Component.js';

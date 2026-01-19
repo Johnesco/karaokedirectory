@@ -7,6 +7,7 @@ A mobile-friendly web application for discovering karaoke venues in and around A
 - **Weekly Calendar View** — See which venues have karaoke each night across a 7-day schedule
 - **Alphabetical Listing** — Browse all 59+ venues sorted A-Z
 - **Interactive Map** — Full-screen immersive map with floating controls and venue cards
+- **Global Search** — Filter venues by name, city, host, or tags across all views
 - **Venue Details** — View addresses, schedules, host/KJ info, and social media links
 - **Venue Tags** — Color-coded badges showing venue characteristics (LGBTQ+, 21+, Dive Bar, etc.)
 - **Quick Directions** — One-tap access to Google Maps navigation
@@ -104,10 +105,11 @@ Know a karaoke spot that's missing? You can:
 
 ### Available Tags
 
-Tags are defined in `js/data.js` with custom colors:
+Tags are defined in `js/data.js` with custom colors. Search works with both tag IDs and display labels.
 
 | Tag ID | Display Label | Description |
 |--------|---------------|-------------|
+| `dedicated` | Dedicated | Dedicated karaoke venue (auto-added) |
 | `lgbtq` | LGBTQ+ | LGBTQ+ friendly venue |
 | `dive` | Dive Bar | Dive bar atmosphere |
 | `sports-bar` | Sports Bar | Sports bar venue |
@@ -117,6 +119,13 @@ Tags are defined in `js/data.js` with custom colors:
 | `all-ages` | All Ages | No age restriction |
 | `family-friendly` | Family | Family-friendly venue |
 | `smoking-inside` | Smoking Inside | Indoor smoking allowed |
+| `restaurant` | Restaurant | Primarily a restaurant |
+| `outdoor` | Outdoor | Significant outdoor/patio space |
+| `billiards` | Billiards | Pool hall / billiards focus |
+| `brewery` | Brewery | Brewery or distillery |
+| `games` | Games | Arcade, bowling, entertainment |
+| `craft-cocktails` | Craft Cocktails | Upscale craft cocktail bar |
+| `neighborhood` | Neighborhood | Casual neighborhood bar |
 
 ## Contributing
 

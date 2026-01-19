@@ -140,7 +140,7 @@
     max-width: 400px;
 }
 
-/* Search Input */
+/* Search Input - Global search in navigation bar */
 .search-input {
     position: relative;
     display: flex;

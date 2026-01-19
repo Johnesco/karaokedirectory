@@ -1,8 +1,8 @@
 /**
  * MapView
- * Interactive map showing venue locations
- * Uses Leaflet.js for mapping
- * Supports immersive full-screen mode with floating controls
+ * Interactive map showing venue locations using Leaflet.js.
+ * Supports immersive full-screen mode with floating controls.
+ * Markers update based on showDedicated and search filter changes.
  */
 
 import { Component } from '../components/Component.js';

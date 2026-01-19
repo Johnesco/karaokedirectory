@@ -1,6 +1,8 @@
 /**
  * WeeklyView
- * Displays 7-day schedule of karaoke venues
+ * Displays 7-day schedule of karaoke venues.
+ * Renders DayCard components for each day in the current week.
+ * Responds to weekStart, showDedicated, and search filter changes.
  */
 
 import { Component } from '../components/Component.js';
