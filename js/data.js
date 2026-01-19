@@ -279,6 +279,34 @@ const karaokeData = {
       }
     },
     {
+      "id": "bungalow",
+      "name": "Bungalow",
+      "tags": ["outdoors"],
+      "dedicated": false,
+      "address": {
+        "street": "83 Rainey St",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78701"
+      },
+      "schedule": [
+        {
+          "frequency": "every",
+          "day": "thursday",
+          "startTime": "21:00",
+          "endTime": "02:00"
+        }
+      ],
+      "host": {
+        "name": "Bee Purrs"
+      },
+      "socials": {
+        "instagram": "https://www.instagram.com/bungalowaustin",
+        "website": "https://www.bungalowaustin.com/",
+        "facebook": "https://www.facebook.com/bungalowatx"
+      }
+    },
+    {
       "id": "the-boat",
       "name": "The Boat",
       "tags": ["sports-bar", "family-friendly", "outdoor"],

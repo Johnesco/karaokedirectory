@@ -188,13 +188,10 @@ export class MapView extends Component {
         this.markers.forEach(marker => marker.remove());
         this.markers = [];
 
-        // Get venues with coordinates
+        // Get venues with coordinates, respecting filters
         const showDedicated = getState('showDedicated');
-        let venues = getVenuesWithCoordinates();
-
-        if (!showDedicated) {
-            venues = venues.filter(v => !v.dedicated);
-        }
+        const searchQuery = getState('searchQuery');
+        const venues = getVenuesWithCoordinates({ includeDedicated: showDedicated, searchQuery });
 
         // Add markers
         venues.forEach(venue => {

@@ -30,7 +30,8 @@ export class DayCard extends Component {
     template() {
         const { date } = this.props;
         const showDedicated = getState('showDedicated');
-        const venues = getVenuesForDate(date, { includeDedicated: showDedicated });
+        const searchQuery = getState('searchQuery');
+        const venues = getVenuesForDate(date, { includeDedicated: showDedicated, searchQuery });
 
         const dayName = getDayDisplayName(date);
         const dateStr = formatDateShort(date);

@@ -624,15 +624,6 @@ body.view--map .app-layout__detail {
     margin: 0 0 var(--spacing-xs);
 }
 
-.map-venue-card__badge {
-    display: inline-block;
-    background: var(--color-secondary);
-    color: var(--color-white);
-    font-size: var(--font-size-xs);
-    padding: 2px 8px;
-    border-radius: var(--border-radius-sm);
-}
-
 .map-venue-card__schedule {
     font-size: var(--font-size-sm);
     color: var(--text-secondary);

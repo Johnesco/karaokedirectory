@@ -19,12 +19,16 @@ export class AlphabeticalView extends Component {
 
     template() {
         const showDedicated = getState('showDedicated');
-        const venues = getVenuesSorted({ includeDedicated: showDedicated });
+        const searchQuery = getState('searchQuery');
+        const venues = getVenuesSorted({ includeDedicated: showDedicated, searchQuery });
 
         if (venues.length === 0) {
+            const hasSearch = searchQuery?.trim();
             return `
                 <div class="alphabetical-view">
-                    <p class="alphabetical-view__empty">No venues found.</p>
+                    <p class="alphabetical-view__empty">
+                        ${hasSearch ? 'No venues match your search.' : 'No venues found.'}
+                    </p>
                 </div>
             `;
         }

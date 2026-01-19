@@ -5,6 +5,7 @@
 
 import { scheduleMatchesDate, isDateInRange } from '../utils/date.js';
 import { getSortableName, containsIgnoreCase } from '../utils/string.js';
+import { getTagConfig } from '../utils/tags.js';
 
 let venues = [];
 
@@ -63,17 +64,57 @@ export function getVenueById(id) {
 }
 
 /**
+ * Check if a venue matches search query
+ * @param {Object} venue - Venue object
+ * @param {string} query - Search query
+ * @returns {boolean} True if venue matches
+ */
+export function venueMatchesSearch(venue, query) {
+    if (!query?.trim()) return true;
+
+    const q = query.toLowerCase().trim();
+
+    // Search in name
+    if (containsIgnoreCase(venue.name, q)) return true;
+
+    // Search in city
+    if (containsIgnoreCase(venue.address.city, q)) return true;
+
+    // Search in neighborhood
+    if (containsIgnoreCase(venue.address.neighborhood, q)) return true;
+
+    // Search in host name
+    if (containsIgnoreCase(venue.host?.name, q)) return true;
+
+    // Search in company
+    if (containsIgnoreCase(venue.host?.company, q)) return true;
+
+    // Search in tags (by ID or label)
+    if (venueMatchesTag(venue, q)) return true;
+
+    // Search for "dedicated" venues
+    if (venueMatchesDedicated(venue, q)) return true;
+
+    return false;
+}
+
+/**
  * Get venues that have karaoke on a specific date
  * @param {Date} date - Date to check
  * @param {Object} options - Filter options
  * @returns {Object[]} Matching venues
  */
 export function getVenuesForDate(date, options = {}) {
-    const { includeDedicated = true } = options;
+    const { includeDedicated = true, searchQuery = '' } = options;
 
     return getActiveVenues().filter(venue => {
         // Check dedicated filter
         if (!includeDedicated && venue.dedicated) {
+            return false;
+        }
+
+        // Check search query
+        if (searchQuery && !venueMatchesSearch(venue, searchQuery)) {
             return false;
         }
 
@@ -99,7 +140,7 @@ export function getVenuesForDate(date, options = {}) {
  * @returns {Object[]} Sorted venues
  */
 export function getVenuesSorted(options = {}) {
-    const { includeDedicated = true } = options;
+    const { includeDedicated = true, searchQuery = '' } = options;
 
     let result = getActiveVenues();
 
@@ -107,11 +148,47 @@ export function getVenuesSorted(options = {}) {
         result = result.filter(v => !v.dedicated);
     }
 
+    if (searchQuery) {
+        result = result.filter(v => venueMatchesSearch(v, searchQuery));
+    }
+
     return [...result].sort((a, b) => {
         const nameA = getSortableName(a.name).toLowerCase();
         const nameB = getSortableName(b.name).toLowerCase();
         return nameA.localeCompare(nameB);
     });
+}
+
+/**
+ * Check if a venue matches a tag by ID or label
+ * @param {Object} venue - Venue object
+ * @param {string} query - Search query (lowercase)
+ * @returns {boolean} True if venue has a matching tag
+ */
+function venueMatchesTag(venue, query) {
+    if (!venue.tags || venue.tags.length === 0) return false;
+
+    return venue.tags.some(tagId => {
+        // Match tag ID (e.g., "lgbtq", "dive")
+        if (tagId.toLowerCase().includes(query)) return true;
+
+        // Match tag label (e.g., "LGBTQ+", "Dive Bar")
+        const tagConfig = getTagConfig(tagId);
+        if (tagConfig && tagConfig.label.toLowerCase().includes(query)) return true;
+
+        return false;
+    });
+}
+
+/**
+ * Check if venue is a dedicated karaoke venue (for search matching)
+ * @param {Object} venue - Venue object
+ * @param {string} query - Search query (lowercase)
+ * @returns {boolean} True if query matches "dedicated" and venue is dedicated
+ */
+function venueMatchesDedicated(venue, query) {
+    if (!venue.dedicated) return false;
+    return 'dedicated'.includes(query) || 'karaoke'.includes(query);
 }
 
 /**
@@ -147,6 +224,12 @@ export function searchVenues(query, options = {}) {
 
         // Search in company
         if (containsIgnoreCase(venue.host?.company, q)) return true;
+
+        // Search in tags (by ID or label)
+        if (venueMatchesTag(venue, q)) return true;
+
+        // Search for "dedicated" venues
+        if (venueMatchesDedicated(venue, q)) return true;
 
         return false;
     }).sort((a, b) => {
@@ -255,10 +338,24 @@ export function getNeighborhoods() {
 
 /**
  * Get active venues with coordinates (for map view)
+ * @param {Object} options - Filter options
  * @returns {Object[]} Active venues with valid coordinates
  */
-export function getVenuesWithCoordinates() {
-    return getActiveVenues().filter(v => v.coordinates?.lat && v.coordinates?.lng);
+export function getVenuesWithCoordinates(options = {}) {
+    const { includeDedicated = true, searchQuery = '' } = options;
+
+    return getActiveVenues().filter(v => {
+        // Must have coordinates
+        if (!v.coordinates?.lat || !v.coordinates?.lng) return false;
+
+        // Check dedicated filter
+        if (!includeDedicated && v.dedicated) return false;
+
+        // Check search query
+        if (searchQuery && !venueMatchesSearch(v, searchQuery)) return false;
+
+        return true;
+    });
 }
 
 export { venues };

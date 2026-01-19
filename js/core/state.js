@@ -17,6 +17,7 @@ const state = {
     view: 'weekly',
     weekStart: new Date(),
     showDedicated: true,
+    searchQuery: '',
     selectedVenue: null,
     isLoading: false
 };

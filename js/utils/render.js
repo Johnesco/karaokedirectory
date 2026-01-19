@@ -96,43 +96,6 @@ export function renderHostSection(host, classPrefix, options = {}) {
 }
 
 /**
- * Render a dedicated venue badge
- * @param {boolean} isDedicated - Whether venue is a dedicated karaoke venue
- * @param {string} classPrefix - CSS class prefix
- * @param {Object} options - Display options
- * @param {boolean} options.fullText - Use full "Dedicated Karaoke Venue" text (default: false)
- * @returns {string} HTML string or empty if not dedicated
- */
-export function renderDedicatedBadge(isDedicated, classPrefix, options = {}) {
-    if (!isDedicated) return '';
-
-    const { fullText = false } = options;
-    const text = fullText ? 'Dedicated Karaoke Venue' : 'Dedicated';
-
-    return `<span class="${classPrefix}__badge">${text}</span>`;
-}
-
-/**
- * Get common venue data prepared for rendering
- * Consolidates repeated data preparation logic
- * @param {Object} venue - Venue object
- * @param {Object} options - Options for data preparation
- * @returns {Object} Prepared data for rendering
- */
-export function prepareVenueData(venue, options = {}) {
-    const { socialSize = 'fa-lg' } = options;
-
-    // Import dynamically to avoid circular dependencies
-    const { buildMapUrl, buildDirectionsUrl, createSocialLinks: createLinks, formatAddress } =
-        import('./url.js').then ? {} : require('./url.js');
-
-    return {
-        // These can be computed in the component since they need url.js imports
-        // This function is primarily for documentation of the pattern
-    };
-}
-
-/**
  * Render a compact host display line (for venue cards)
  * Shows "Presented by [name]" format
  * @param {Object} host - Host object with name and/or company

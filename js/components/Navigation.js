@@ -14,6 +14,7 @@ export class Navigation extends Component {
         this.subscribe(subscribe('view', () => this.render()));
         this.subscribe(subscribe('weekStart', () => this.render()));
         this.subscribe(subscribe('showDedicated', () => this.render()));
+        // Don't re-render on searchQuery change to avoid losing focus
     }
 
     template() {
@@ -77,6 +78,24 @@ export class Navigation extends Component {
                     </div>
                 ` : ''}
 
+                <div class="navigation__search">
+                    <div class="search-input">
+                        <i class="fa-solid fa-magnifying-glass search-input__icon"></i>
+                        <input
+                            type="text"
+                            class="search-input__field"
+                            placeholder="Search venues, tags, hosts..."
+                            data-search="query"
+                            value="${getState('searchQuery') || ''}"
+                        >
+                        ${getState('searchQuery') ? `
+                            <button class="search-input__clear" data-search="clear" type="button" title="Clear search">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+
                 <div class="navigation__filters">
                     <label class="navigation__toggle">
                         <input
@@ -121,6 +140,45 @@ export class Navigation extends Component {
         this.delegate('change', '[data-filter="dedicated"]', (e, target) => {
             setState({ showDedicated: target.checked });
             emit(Events.FILTER_CHANGED, { showDedicated: target.checked });
+        });
+
+        // Search input
+        this.delegate('input', '[data-search="query"]', (e, target) => {
+            const query = target.value;
+            setState({ searchQuery: query });
+            emit(Events.FILTER_CHANGED, { searchQuery: query });
+
+            // Update clear button visibility without full re-render
+            const clearBtn = this.container.querySelector('[data-search="clear"]');
+            if (query && !clearBtn) {
+                const searchInput = this.container.querySelector('.search-input');
+                if (searchInput) {
+                    const btn = document.createElement('button');
+                    btn.className = 'search-input__clear';
+                    btn.setAttribute('data-search', 'clear');
+                    btn.setAttribute('type', 'button');
+                    btn.setAttribute('title', 'Clear search');
+                    btn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                    searchInput.appendChild(btn);
+                }
+            } else if (!query && clearBtn) {
+                clearBtn.remove();
+            }
+        });
+
+        // Search clear button
+        this.delegate('click', '[data-search="clear"]', () => {
+            const input = this.container.querySelector('[data-search="query"]');
+            if (input) {
+                input.value = '';
+                input.focus();
+            }
+            setState({ searchQuery: '' });
+            emit(Events.FILTER_CHANGED, { searchQuery: '' });
+
+            // Remove clear button
+            const clearBtn = this.container.querySelector('[data-search="clear"]');
+            if (clearBtn) clearBtn.remove();
         });
     }
 }
