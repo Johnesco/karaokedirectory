@@ -95,7 +95,9 @@ const karaokeData = {
     {
       "id": "the-alcove-cantina",
       "name": "The Alcove Cantina",
-      "tags": ["restaurant"],
+      "tags": [
+        "restaurant"
+      ],
       "dedicated": false,
       "address": {
         "street": "119 E Main Street",
@@ -128,7 +130,9 @@ const karaokeData = {
     {
       "id": "the-austin-eagle",
       "name": "The Austin Eagle",
-      "tags": ["lgbtq"],
+      "tags": [
+        "lgbtq"
+      ],
       "dedicated": false,
       "address": {
         "street": "8201 Cross Park",
@@ -164,7 +168,9 @@ const karaokeData = {
     {
       "id": "bar-louie",
       "name": "Bar Louie",
-      "tags": ["sports-bar"],
+      "tags": [
+        "sports-bar"
+      ],
       "dedicated": false,
       "address": {
         "street": "270 Bass Pro Dr",
@@ -192,7 +198,9 @@ const karaokeData = {
     {
       "id": "big-easy-saloon",
       "name": "Big Easy Saloon",
-      "tags": ["neighborhood"],
+      "tags": [
+        "neighborhood"
+      ],
       "dedicated": false,
       "address": {
         "street": "15601 Vision Dr.",
@@ -224,7 +232,9 @@ const karaokeData = {
     {
       "id": "big-shotz-neighborhood-bar",
       "name": "Big Shotz Neighborhood Bar",
-      "tags": ["neighborhood"],
+      "tags": [
+        "neighborhood"
+      ],
       "dedicated": false,
       "address": {
         "street": "399 W Louis Henna Blvd",
@@ -250,7 +260,9 @@ const karaokeData = {
     {
       "id": "blindside-lounge",
       "name": "Blindside Lounge",
-      "tags": ["craft-cocktails"],
+      "tags": [
+        "craft-cocktails"
+      ],
       "dedicated": false,
       "address": {
         "street": "211 6th St",
@@ -281,7 +293,9 @@ const karaokeData = {
     {
       "id": "bungalow",
       "name": "Bungalow",
-      "tags": ["outdoors"],
+      "tags": [
+        "outdoors"
+      ],
       "dedicated": false,
       "address": {
         "street": "83 Rainey St",
@@ -304,12 +318,20 @@ const karaokeData = {
         "instagram": "https://www.instagram.com/bungalowaustin",
         "website": "https://www.bungalowaustin.com/",
         "facebook": "https://www.facebook.com/bungalowatx"
+      },
+      "coordinates": {
+        "lat": 30.259578736096,
+        "lng": -97.738417833649
       }
     },
     {
       "id": "the-boat",
       "name": "The Boat",
-      "tags": ["sports-bar", "family-friendly", "outdoor"],
+      "tags": [
+        "sports-bar",
+        "family-friendly",
+        "outdoor"
+      ],
       "dedicated": false,
       "address": {
         "street": "10931 Stonelake Blvd",
@@ -342,7 +364,9 @@ const karaokeData = {
     {
       "id": "bodhis-bodacious-hideaway",
       "name": "Bodhi's Bodacious Hideaway",
-      "tags": ["neighborhood"],
+      "tags": [
+        "neighborhood"
+      ],
       "dedicated": false,
       "address": {
         "street": "10402 Menchaca Rd, Unit D",
@@ -375,7 +399,10 @@ const karaokeData = {
     {
       "id": "boomerz",
       "name": "Boomerz",
-      "tags": ["billiards", "neighborhood"],
+      "tags": [
+        "billiards",
+        "neighborhood"
+      ],
       "dedicated": false,
       "address": {
         "street": "6148 West US Highway 290",
@@ -408,7 +435,9 @@ const karaokeData = {
     {
       "id": "buddys-place",
       "name": "Buddy's Place",
-      "tags": ["dive"],
+      "tags": [
+        "dive"
+      ],
       "dedicated": false,
       "address": {
         "street": "8619 Burnet Road",
@@ -437,7 +466,9 @@ const karaokeData = {
     {
       "id": "canary-roost",
       "name": "Canary Roost",
-      "tags": ["dive"],
+      "tags": [
+        "dive"
+      ],
       "dedicated": true,
       "address": {
         "street": "11900 Metric Blvd",
@@ -504,7 +535,9 @@ const karaokeData = {
     {
       "id": "captain-quacks-soundspace",
       "name": "Captain Quack's Soundspace",
-      "tags": ["all-ages"],
+      "tags": [
+        "all-ages"
+      ],
       "dedicated": false,
       "address": {
         "street": "5326 Menchaca Road",
@@ -572,7 +605,9 @@ const karaokeData = {
     {
       "id": "cjs-sports-bar",
       "name": "CJ's Sports Bar",
-      "tags": ["sports-bar"],
+      "tags": [
+        "sports-bar"
+      ],
       "dedicated": false,
       "address": {
         "street": "1010 N Austin Ave",
@@ -610,7 +645,9 @@ const karaokeData = {
     {
       "id": "the-common-interest",
       "name": "The Common Interest",
-      "tags": ["craft-cocktails"],
+      "tags": [
+        "craft-cocktails"
+      ],
       "dedicated": true,
       "address": {
         "street": "8440 Burnet Rd",
@@ -676,7 +713,9 @@ const karaokeData = {
     {
       "id": "dog-n-bone-pub",
       "name": "Dog 'n' Bone Pub",
-      "tags": ["neighborhood"],
+      "tags": [
+        "neighborhood"
+      ],
       "dedicated": false,
       "address": {
         "street": "310 Old Fitzhugh Rd.",
@@ -708,7 +747,9 @@ const karaokeData = {
     {
       "id": "egos",
       "name": "Ego's",
-      "tags": ["dive"],
+      "tags": [
+        "dive"
+      ],
       "dedicated": true,
       "address": {
         "street": "510 S Congress Ave",
@@ -774,7 +815,10 @@ const karaokeData = {
     {
       "id": "the-fieldhouse-at-the-crossover",
       "name": "The Fieldhouse at the Crossover",
-      "tags": ["sports-bar", "family-friendly"],
+      "tags": [
+        "sports-bar",
+        "family-friendly"
+      ],
       "dedicated": false,
       "address": {
         "street": "1717 Scottsdale Dr Suite 160",
@@ -806,7 +850,10 @@ const karaokeData = {
     {
       "id": "film-alley",
       "name": "Film Alley",
-      "tags": ["games", "family-friendly"],
+      "tags": [
+        "games",
+        "family-friendly"
+      ],
       "dedicated": false,
       "address": {
         "street": "420 Wolf Ranch Parkway",
@@ -841,7 +888,9 @@ const karaokeData = {
     {
       "id": "firewater-sports-bar",
       "name": "Firewater Sports Bar",
-      "tags": ["sports-bar"],
+      "tags": [
+        "sports-bar"
+      ],
       "dedicated": false,
       "address": {
         "street": "13010 W Parmer Ln STE 300",
@@ -870,7 +919,9 @@ const karaokeData = {
     {
       "id": "gnar-bar",
       "name": "Gnar Bar",
-      "tags": ["neighborhood"],
+      "tags": [
+        "neighborhood"
+      ],
       "dedicated": false,
       "address": {
         "street": "219 E 6th Street",
@@ -900,7 +951,10 @@ const karaokeData = {
     {
       "id": "hard-count-kitchen-and-cocktails",
       "name": "Hard Count Kitchen & Cocktails",
-      "tags": ["restaurant", "sports-bar"],
+      "tags": [
+        "restaurant",
+        "sports-bar"
+      ],
       "dedicated": false,
       "address": {
         "street": "1500 Rivery Blvd Suite 2105",
@@ -932,7 +986,10 @@ const karaokeData = {
     {
       "id": "the-hive",
       "name": "The Hive",
-      "tags": ["family-friendly", "outdoor"],
+      "tags": [
+        "family-friendly",
+        "outdoor"
+      ],
       "dedicated": false,
       "address": {
         "street": "10542 Menchaca Road",
@@ -971,7 +1028,9 @@ const karaokeData = {
     {
       "id": "hudson-tavern-xpider",
       "name": "Hudson Tavern",
-      "tags": ["neighborhood"],
+      "tags": [
+        "neighborhood"
+      ],
       "dedicated": false,
       "address": {
         "street": "5000 Hudson Bend Rd Suite D",
@@ -1002,7 +1061,9 @@ const karaokeData = {
     {
       "id": "hudson-tavern-lynum",
       "name": "Hudson Tavern",
-      "tags": ["neighborhood"],
+      "tags": [
+        "neighborhood"
+      ],
       "dedicated": false,
       "address": {
         "street": "5000 Hudson Bend Rd Suite D",
@@ -1031,7 +1092,9 @@ const karaokeData = {
     {
       "id": "the-iron-bear",
       "name": "The Iron Bear",
-      "tags": ["lgbtq"],
+      "tags": [
+        "lgbtq"
+      ],
       "dedicated": false,
       "address": {
         "street": "301 West. 6th St.",
@@ -1069,7 +1132,10 @@ const karaokeData = {
     {
       "id": "jackalope-south-shore",
       "name": "Jackalope South Shore (Showpony Lounge)",
-      "tags": ["dive", "outdoor"],
+      "tags": [
+        "dive",
+        "outdoor"
+      ],
       "dedicated": false,
       "address": {
         "street": "1523 Tinnin Ford Rd",
@@ -1145,7 +1211,9 @@ const karaokeData = {
     {
       "id": "last-call",
       "name": "Last Call",
-      "tags": ["neighborhood"],
+      "tags": [
+        "neighborhood"
+      ],
       "dedicated": false,
       "address": {
         "street": "1615 Grand Ave Pkwy",
@@ -1171,7 +1239,10 @@ const karaokeData = {
     {
       "id": "lone-star-bar",
       "name": "Lone Star Bar",
-      "tags": ["neighborhood", "outdoor"],
+      "tags": [
+        "neighborhood",
+        "outdoor"
+      ],
       "dedicated": false,
       "address": {
         "street": "403 FM 685",
@@ -1202,7 +1273,9 @@ const karaokeData = {
     {
       "id": "lt-corner-pub",
       "name": "LT Corner Pub",
-      "tags": ["sports-bar"],
+      "tags": [
+        "sports-bar"
+      ],
       "dedicated": false,
       "address": {
         "street": "1310 RR 620 S Ste B12",
@@ -1235,7 +1308,10 @@ const karaokeData = {
     {
       "id": "lucky-rabbit",
       "name": "Lucky Rabbit",
-      "tags": ["outdoor", "family-friendly"],
+      "tags": [
+        "outdoor",
+        "family-friendly"
+      ],
       "dedicated": false,
       "address": {
         "street": "18626 RM 1431",
@@ -1266,7 +1342,9 @@ const karaokeData = {
     {
       "id": "main-street-bar-round-rock",
       "name": "Main Street Bar",
-      "tags": ["neighborhood"],
+      "tags": [
+        "neighborhood"
+      ],
       "dedicated": false,
       "address": {
         "street": "101 E Main St",
@@ -1292,7 +1370,9 @@ const karaokeData = {
     {
       "id": "manchaca-springs-saloon",
       "name": "Manchaca Springs Saloon",
-      "tags": ["neighborhood"],
+      "tags": [
+        "neighborhood"
+      ],
       "dedicated": false,
       "address": {
         "street": "737 Farm to Market 1626",
@@ -1323,7 +1403,9 @@ const karaokeData = {
     {
       "id": "la-marea",
       "name": "La Marea",
-      "tags": ["restaurant"],
+      "tags": [
+        "restaurant"
+      ],
       "dedicated": false,
       "address": {
         "street": "116 E Parsons St",
@@ -1359,7 +1441,10 @@ const karaokeData = {
     {
       "id": "marios-seafood",
       "name": "Mario's Seafood",
-      "tags": ["restaurant", "sports-bar"],
+      "tags": [
+        "restaurant",
+        "sports-bar"
+      ],
       "dedicated": false,
       "address": {
         "street": "7522 N I-35 Frontage Rd Bld. C",
@@ -1387,7 +1472,9 @@ const karaokeData = {
     {
       "id": "meridian-buda",
       "name": "Meridian Buda",
-      "tags": ["all-ages"],
+      "tags": [
+        "all-ages"
+      ],
       "dedicated": false,
       "active": false,
       "dateRange": {
@@ -1422,7 +1509,9 @@ const karaokeData = {
     {
       "id": "the-mill",
       "name": "The Mill",
-      "tags": ["neighborhood"],
+      "tags": [
+        "neighborhood"
+      ],
       "dedicated": false,
       "address": {
         "street": "9112 Anderson Mill Rd suite b 100",
@@ -1450,7 +1539,9 @@ const karaokeData = {
     {
       "id": "millies-on-main",
       "name": "Millie's on Main",
-      "tags": ["family-friendly"],
+      "tags": [
+        "family-friendly"
+      ],
       "dedicated": false,
       "address": {
         "street": "212 N Main St",
@@ -1481,7 +1572,9 @@ const karaokeData = {
     {
       "id": "moontower-saloon",
       "name": "Moontower Saloon",
-      "tags": ["outdoor"],
+      "tags": [
+        "outdoor"
+      ],
       "dedicated": false,
       "address": {
         "street": "10212 Menchaca Rd",
@@ -1515,7 +1608,9 @@ const karaokeData = {
     {
       "id": "oak-hill-social",
       "name": "Oak Hill Social",
-      "tags": ["neighborhood"],
+      "tags": [
+        "neighborhood"
+      ],
       "dedicated": false,
       "address": {
         "street": "8600 US-290",
@@ -1548,7 +1643,9 @@ const karaokeData = {
     {
       "id": "pfluttos-tavern-2",
       "name": "Pflutto's Tavern #2",
-      "tags": ["neighborhood"],
+      "tags": [
+        "neighborhood"
+      ],
       "dedicated": false,
       "address": {
         "street": "101 Limmer Loop",
@@ -1578,7 +1675,9 @@ const karaokeData = {
     {
       "id": "punch-bowl-social-domain",
       "name": "Punch Bowl Social (Domain)",
-      "tags": ["games"],
+      "tags": [
+        "games"
+      ],
       "dedicated": false,
       "address": {
         "street": "11310 Domain Dr. STE 100",
@@ -1612,7 +1711,9 @@ const karaokeData = {
     {
       "id": "rabbit-hole-cedarpark",
       "name": "Rabbit Hole (Cedar Park)",
-      "tags": ["craft-cocktails"],
+      "tags": [
+        "craft-cocktails"
+      ],
       "dedicated": false,
       "address": {
         "street": "13920 Ronald Reagan Blvd STE 202",
@@ -1642,7 +1743,9 @@ const karaokeData = {
     {
       "id": "rabbit-hole-leander",
       "name": "Rabbit Hole (Leander)",
-      "tags": ["craft-cocktails"],
+      "tags": [
+        "craft-cocktails"
+      ],
       "dedicated": false,
       "address": {
         "street": "2082 US HWY 183 SUITE 145",
@@ -1674,7 +1777,9 @@ const karaokeData = {
     {
       "id": "raggedy-annes-bar-grill",
       "name": "Raggedy Anne's Bar & Grill",
-      "tags": ["neighborhood"],
+      "tags": [
+        "neighborhood"
+      ],
       "active": true,
       "dedicated": false,
       "address": {
@@ -1706,7 +1811,9 @@ const karaokeData = {
     {
       "id": "railhouse-bar",
       "name": "Railhouse Bar",
-      "tags": ["neighborhood"],
+      "tags": [
+        "neighborhood"
+      ],
       "dedicated": false,
       "address": {
         "street": "107 E Center St",
@@ -1739,7 +1846,9 @@ const karaokeData = {
     {
       "id": "randys-ice-house",
       "name": "Randy's Ice House",
-      "tags": ["sports-bar"],
+      "tags": [
+        "sports-bar"
+      ],
       "dedicated": false,
       "address": {
         "street": "1321 W 2nd St",
@@ -1777,7 +1886,9 @@ const karaokeData = {
     {
       "id": "red-rooters-pub-and-grub",
       "name": "Red Rooster's Pub and Grub",
-      "tags": ["dive"],
+      "tags": [
+        "dive"
+      ],
       "dedicated": true,
       "address": {
         "street": "109 E Pecan St",
@@ -1842,7 +1953,9 @@ const karaokeData = {
     {
       "id": "round-rock-tavern",
       "name": "Round Rock Tavern",
-      "tags": ["neighborhood"],
+      "tags": [
+        "neighborhood"
+      ],
       "dedicated": false,
       "address": {
         "street": "113 West Main Street",
@@ -1886,7 +1999,10 @@ const karaokeData = {
     {
       "id": "shooters-austin",
       "name": "Shooters (Austin)",
-      "tags": ["billiards", "sports-bar"],
+      "tags": [
+        "billiards",
+        "sports-bar"
+      ],
       "dedicated": false,
       "address": {
         "street": "11416 Ranch Rd 620 N",
@@ -1919,7 +2035,11 @@ const karaokeData = {
     {
       "id": "shooters-cedar-park",
       "name": "Shooters (Cedar Park)",
-      "tags": ["billiards", "sports-bar", "smoking-inside"],
+      "tags": [
+        "billiards",
+        "sports-bar",
+        "smoking-inside"
+      ],
       "dedicated": false,
       "address": {
         "street": "601 E Whitestone Blvd",
@@ -1952,7 +2072,9 @@ const karaokeData = {
     {
       "id": "spirit-of-texas",
       "name": "Spirit of Texas Brewstillery",
-      "tags": ["brewery"],
+      "tags": [
+        "brewery"
+      ],
       "dedicated": false,
       "address": {
         "street": "1715 Dalshank St.",
@@ -1989,7 +2111,9 @@ const karaokeData = {
     {
       "id": "topspin-austin",
       "name": "TopSpin Austin",
-      "tags": ["sports-bar"],
+      "tags": [
+        "sports-bar"
+      ],
       "dedicated": true,
       "address": {
         "street": "1851 S Lakeline Blvd #106",
@@ -2055,7 +2179,10 @@ const karaokeData = {
     {
       "id": "the-usual-local-bar",
       "name": "The Usual Local Bar",
-      "tags": ["craft-cocktails", "sports-bar"],
+      "tags": [
+        "craft-cocktails",
+        "sports-bar"
+      ],
       "dedicated": false,
       "address": {
         "street": "11101 Burnet Rd",
@@ -2086,7 +2213,9 @@ const karaokeData = {
     {
       "id": "water-hole-71",
       "name": "Water Hole 71",
-      "tags": ["neighborhood"],
+      "tags": [
+        "neighborhood"
+      ],
       "dedicated": false,
       "address": {
         "street": "5244 E Hwy 71",
@@ -2114,7 +2243,9 @@ const karaokeData = {
     {
       "id": "the-whiskey-girls-saloon",
       "name": "The Whiskey Girls Saloon",
-      "tags": ["21+"],
+      "tags": [
+        "21+"
+      ],
       "dedicated": false,
       "address": {
         "street": "13700 FM 973, Bldg A",
@@ -2174,7 +2305,9 @@ const karaokeData = {
     {
       "id": "wildflower-corks-and-brew",
       "name": "Wildflower Corks & Brew",
-      "tags": ["neighborhood"],
+      "tags": [
+        "neighborhood"
+      ],
       "dedicated": false,
       "address": {
         "street": "108 E. 2nd St.",
@@ -2205,7 +2338,10 @@ const karaokeData = {
     {
       "id": "willies-joint",
       "name": "Willie's Joint",
-      "tags": ["outdoor", "family-friendly"],
+      "tags": [
+        "outdoor",
+        "family-friendly"
+      ],
       "dedicated": false,
       "address": {
         "street": "824 Main St",
