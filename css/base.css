@@ -82,9 +82,9 @@
     --z-modal: 400;
     --z-toast: 500;
 
-    /* Layout heights */
-    --nav-height: 50px;
-    --nav-height-mobile: 149px;
+    /* Layout heights - account for navigation with search bar */
+    --nav-height: 56px;
+    --nav-height-mobile: 200px;
 }
 
 /* Reset */
