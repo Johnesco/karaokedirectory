@@ -291,40 +291,6 @@ const karaokeData = {
       }
     },
     {
-      "id": "bungalow",
-      "name": "Bungalow",
-      "tags": [
-        "outdoors"
-      ],
-      "dedicated": false,
-      "address": {
-        "street": "83 Rainey St",
-        "city": "Austin",
-        "state": "TX",
-        "zip": "78701"
-      },
-      "schedule": [
-        {
-          "frequency": "every",
-          "day": "thursday",
-          "startTime": "21:00",
-          "endTime": "02:00"
-        }
-      ],
-      "host": {
-        "name": "Bee Purrs"
-      },
-      "socials": {
-        "instagram": "https://www.instagram.com/bungalowaustin",
-        "website": "https://www.bungalowaustin.com/",
-        "facebook": "https://www.facebook.com/bungalowatx"
-      },
-      "coordinates": {
-        "lat": 30.259578736096,
-        "lng": -97.738417833649
-      }
-    },
-    {
       "id": "the-boat",
       "name": "The Boat",
       "tags": [
@@ -461,6 +427,40 @@ const karaokeData = {
       "coordinates": {
         "lat": 30.368420126324,
         "lng": -97.727481068614
+      }
+    },
+    {
+      "id": "bungalow",
+      "name": "Bungalow",
+      "tags": [
+        "outdoors"
+      ],
+      "dedicated": false,
+      "address": {
+        "street": "83 Rainey St",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78701"
+      },
+      "schedule": [
+        {
+          "frequency": "every",
+          "day": "thursday",
+          "startTime": "21:00",
+          "endTime": "02:00"
+        }
+      ],
+      "host": {
+        "name": "Bee Purrs"
+      },
+      "socials": {
+        "instagram": "https://www.instagram.com/bungalowaustin",
+        "website": "https://www.bungalowaustin.com/",
+        "facebook": "https://www.facebook.com/bungalowatx"
+      },
+      "coordinates": {
+        "lat": 30.259578736096,
+        "lng": -97.738417833649
       }
     },
     {
@@ -1239,16 +1239,14 @@ const karaokeData = {
     {
       "id": "lone-star-bar",
       "name": "Lone Star Bar",
-      "tags": [
-        "neighborhood",
-        "outdoor"
-      ],
+      "active": true,
       "dedicated": false,
       "address": {
         "street": "403 FM 685",
         "city": "Pflugerville",
         "state": "TX",
-        "zip": "78660"
+        "zip": "78660",
+        "neighborhood": ""
       },
       "schedule": [
         {
@@ -1259,12 +1257,16 @@ const karaokeData = {
         }
       ],
       "host": {
-        "name": "Xpider"
+        "name": "Xpider Cantu"
       },
       "socials": {
-        "facebook": "https://www.facebook.com/LoneStarBarPflugerville/",
-        "website": "https://lonestarbartexas.com/"
+        "website": "https://lonestarbartexas.com/",
+        "facebook": "https://www.facebook.com/LoneStarBarPflugerville/"
       },
+      "tags": [
+        "outdoor",
+        "neighborhood"
+      ],
       "coordinates": {
         "lat": 30.439171606086,
         "lng": -97.612214318795
@@ -1337,6 +1339,39 @@ const karaokeData = {
       "coordinates": {
         "lat": 30.4943848,
         "lng": -97.9250839
+      }
+    },
+    {
+      "id": "maggie-maes",
+      "name": "Maggie Mae's",
+      "active": true,
+      "dedicated": false,
+      "address": {
+        "street": "323 E 6th St",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78701",
+        "neighborhood": "Downtown"
+      },
+      "schedule": [
+        {
+          "frequency": "every",
+          "day": "thursday",
+          "startTime": "21:00",
+          "endTime": "12:00"
+        }
+      ],
+      "host": {
+        "name": "Xpider Cantu"
+      },
+      "socials": {
+        "website": "https://www.maggiemaesaustin.com/",
+        "facebook": "https://www.facebook.com/MaggieMaesAustin/",
+        "instagram": "https://www.instagram.com/maggiemaesaustin/"
+      },
+      "coordinates": {
+        "lat": 30.2670833,
+        "lng": -97.742311
       }
     },
     {
@@ -2109,6 +2144,37 @@ const karaokeData = {
       }
     },
     {
+      "id": "snuffys-bar-and-grill",
+      "name": "Suffy's Bar & Grill",
+      "active": true,
+      "dedicated": false,
+      "address": {
+        "street": "204 US-79",
+        "city": "Hutto",
+        "state": "TX",
+        "zip": "78634",
+        "neighborhood": "Hutto"
+      },
+      "schedule": [
+        {
+          "frequency": "every",
+          "day": "wednesday",
+          "startTime": "20:00",
+          "endTime": "23:30"
+        }
+      ],
+      "host": {
+        "name": "Xpider Cantu"
+      },
+      "socials": {
+        "facebook": "https://www.facebook.com/snuffys.place/"
+      },
+      "coordinates": {
+        "lat": 30.5431702,
+        "lng": -97.5503295
+      }
+    },
+    {
       "id": "topspin-austin",
       "name": "TopSpin Austin",
       "tags": [
@@ -2208,6 +2274,39 @@ const karaokeData = {
       "coordinates": {
         "lat": 30.395238267297,
         "lng": -97.72031672027
+      }
+    },
+    {
+      "id": "wakesurf-saloon",
+      "name": "Wakesurf Saloon",
+      "active": true,
+      "dedicated": false,
+      "address": {
+        "street": "3519 A Ranch Road N",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78734",
+        "neighborhood": ""
+      },
+      "schedule": [
+        {
+          "frequency": "every",
+          "day": "friday",
+          "startTime": "21:00",
+          "endTime": "01:00"
+        }
+      ],
+      "host": {
+        "name": "Xpider Cantu"
+      },
+      "socials": {
+        "website": "https://wakesurfsaloon.com/",
+        "facebook": "https://www.facebook.com/profile.php?id=61572942390000#",
+        "instagram": "https://www.instagram.com/wakesurf_saloon"
+      },
+      "coordinates": {
+        "lat": 30.3965271,
+        "lng": -97.9338903
       }
     },
     {
