@@ -45,6 +45,21 @@
             <ul id="venue-list" class="venue-list">
                 <!-- Populated by JavaScript -->
             </ul>
+
+            <!-- Tag Definitions Editor -->
+            <div class="sidebar-section sidebar-section--tags">
+                <button type="button" id="btn-toggle-tag-editor" class="sidebar-toggle">
+                    <i class="fa-solid fa-palette"></i> Tag Definitions
+                    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+                </button>
+                <div id="tag-definitions-editor" class="tag-definitions-editor" hidden>
+                    <div id="tag-definitions-list"></div>
+                    <button type="button" id="btn-add-tag-def" class="btn btn--small btn--secondary">
+                        <i class="fa-solid fa-plus"></i> Add Tag
+                    </button>
+                </div>
+            </div>
+
             <div class="sidebar-footer">
                 <span id="venue-count">0 venues</span>
             </div>
@@ -94,6 +109,15 @@
                             </label>
                             <small>Uncheck to hide from listings</small>
                         </div>
+                    </div>
+                </fieldset>
+
+                <!-- Tags -->
+                <fieldset class="form-section">
+                    <legend><i class="fa-solid fa-tags"></i> Tags</legend>
+                    <p class="form-hint" style="margin-top: 0; margin-bottom: var(--spacing-md);">Select tags that describe this venue</p>
+                    <div id="tag-selector" class="tag-selector">
+                        <!-- Populated by JavaScript -->
                     </div>
                 </fieldset>
 
@@ -158,6 +182,18 @@
                     <button type="button" id="btn-add-schedule" class="btn btn--small btn--secondary">
                         <i class="fa-solid fa-plus"></i> Add Schedule
                     </button>
+
+                    <div class="form-row form-row--date-range">
+                        <div class="form-group">
+                            <label for="daterange-start"><i class="fa-solid fa-calendar-plus"></i> Season Start</label>
+                            <input type="date" id="daterange-start" name="dateRange.start">
+                        </div>
+                        <div class="form-group">
+                            <label for="daterange-end"><i class="fa-solid fa-calendar-minus"></i> Season End</label>
+                            <input type="date" id="daterange-end" name="dateRange.end">
+                        </div>
+                    </div>
+                    <small class="form-hint">Optional: For seasonal events or temporary closures (leave empty for regular schedules)</small>
                 </fieldset>
 
                 <!-- Host/KJ Info -->

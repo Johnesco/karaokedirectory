@@ -6,9 +6,11 @@ import { renderVenueCard } from '../js/components/VenueCard.js';
 import { formatTimeRange } from '../js/utils/date.js';
 import { escapeHtml, getSortableName } from '../js/utils/string.js';
 import { buildMapUrl, formatAddress, createSocialLinks } from '../js/utils/url.js';
+import { renderTags, initTagConfig } from '../js/utils/tags.js';
 
 // State
 let venues = [];
+let tagDefinitions = {};
 let selectedVenueId = null;
 let hasUnsavedChanges = false;
 const STORAGE_KEY = 'karaoke-editor-draft';
@@ -22,6 +24,9 @@ const elements = {
     venueForm: document.getElementById('venue-form'),
     noVenueSelected: document.getElementById('no-venue-selected'),
     scheduleList: document.getElementById('schedule-list'),
+    tagSelector: document.getElementById('tag-selector'),
+    tagDefinitionsList: document.getElementById('tag-definitions-list'),
+    tagDefinitionsEditor: document.getElementById('tag-definitions-editor'),
     previewCard: document.getElementById('preview-card'),
     previewModal: document.getElementById('preview-modal'),
     previewJson: document.getElementById('preview-json-content'),
@@ -89,9 +94,13 @@ function init() {
  */
 function loadData() {
     if (typeof karaokeData !== 'undefined') {
-        venues = karaokeData.listings;
+        venues = karaokeData.listings || [];
+        tagDefinitions = karaokeData.tagDefinitions || {};
+        initTagConfig(tagDefinitions);
         renderVenueList();
         updateVenueCount();
+        renderTagSelector();
+        renderTagDefinitionsEditor();
     } else {
         showToast('Failed to load venue data', 'error');
     }
@@ -146,6 +155,12 @@ function setupEventListeners() {
             document.getElementById(`preview-${tab.dataset.tab}`).classList.add('active');
         });
     });
+
+    // Tag definitions editor toggle
+    document.getElementById('btn-toggle-tag-editor').addEventListener('click', toggleTagDefinitionsEditor);
+
+    // Add tag definition button
+    document.getElementById('btn-add-tag-def').addEventListener('click', addTagDefinition);
 
     // Warn before leaving with unsaved changes
     window.addEventListener('beforeunload', (e) => {
@@ -226,6 +241,12 @@ function fillForm(venue) {
     document.getElementById('venue-dedicated').checked = venue.dedicated || false;
     document.getElementById('venue-active').checked = venue.active !== false;
 
+    // Tags - check the appropriate checkboxes
+    const venueTags = venue.tags || [];
+    elements.tagSelector.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        checkbox.checked = venueTags.includes(checkbox.value);
+    });
+
     // Address
     document.getElementById('address-street').value = venue.address?.street || '';
     document.getElementById('address-city').value = venue.address?.city || '';
@@ -252,6 +273,10 @@ function fillForm(venue) {
 
     // Schedule
     renderScheduleList(venue.schedule || []);
+
+    // Date Range
+    document.getElementById('daterange-start').value = venue.dateRange?.start || '';
+    document.getElementById('daterange-end').value = venue.dateRange?.end || '';
 }
 
 /**
@@ -306,6 +331,12 @@ function addScheduleRow() {
 function getFormData() {
     const form = elements.venueForm;
 
+    // Get selected tags
+    const tags = [];
+    elements.tagSelector.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+        tags.push(checkbox.value);
+    });
+
     // Get schedule data
     const schedules = [];
     elements.scheduleList.querySelectorAll('.schedule-item').forEach(item => {
@@ -341,6 +372,14 @@ function getFormData() {
         lng: parseFloat(lngValue)
     } : null;
 
+    // Get date range
+    const dateRangeStart = document.getElementById('daterange-start').value;
+    const dateRangeEnd = document.getElementById('daterange-end').value;
+    const dateRange = (dateRangeStart || dateRangeEnd) ? {
+        start: dateRangeStart || undefined,
+        end: dateRangeEnd || undefined
+    } : null;
+
     const result = {
         id: document.getElementById('venue-id').value.trim(),
         name: document.getElementById('venue-name').value.trim(),
@@ -358,9 +397,19 @@ function getFormData() {
         socials: Object.keys(socials).length ? socials : undefined
     };
 
+    // Include tags if any are selected
+    if (tags.length > 0) {
+        result.tags = tags;
+    }
+
     // Include coordinates if they exist
     if (coordinates) {
         result.coordinates = coordinates;
+    }
+
+    // Include date range if set
+    if (dateRange) {
+        result.dateRange = dateRange;
     }
 
     return result;
@@ -457,8 +506,10 @@ function createNewVenue() {
         name: '',
         active: true,
         dedicated: false,
+        tags: [],
         address: { street: '', city: '', state: 'TX', zip: '', neighborhood: '' },
         schedule: [],
+        dateRange: null,
         host: null,
         socials: {}
     });
@@ -494,12 +545,19 @@ function updatePreview() {
 function renderModalPreview(venue) {
     const addressHtml = formatAddress(venue.address);
     const socialLinksHtml = venue.socials ? createSocialLinks(venue.socials) : '';
+    const tagsHtml = renderTags(venue.tags, { dedicated: venue.dedicated });
 
     return `
         <div class="venue-modal-preview">
             <h3>${escapeHtml(venue.name)}</h3>
-            ${venue.dedicated ? '<span class="venue-card__badge">Dedicated</span>' : ''}
+            ${tagsHtml}
             <p><i class="fa-solid fa-location-dot"></i> ${addressHtml}</p>
+            ${venue.dateRange ? `
+                <div class="daterange-preview">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <strong>Season:</strong> ${venue.dateRange.start || '?'} to ${venue.dateRange.end || '?'}
+                </div>
+            ` : ''}
             ${venue.schedule.length ? `
                 <div class="schedule-preview">
                     <strong>Schedule:</strong>
@@ -544,7 +602,10 @@ function copyJson() {
         return nameA.localeCompare(nameB);
     });
 
-    const output = { listings: sortedVenues };
+    const output = {
+        tagDefinitions: tagDefinitions,
+        listings: sortedVenues
+    };
     const json = JSON.stringify(output, null, 2);
 
     navigator.clipboard.writeText(`const karaokeData = ${json};`).then(() => {
@@ -561,6 +622,7 @@ function saveDraft() {
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify({
             venues,
+            tagDefinitions,
             selectedVenueId,
             timestamp: new Date().toISOString()
         }));
@@ -581,8 +643,14 @@ function loadDraft() {
             const draftDate = new Date(data.timestamp).toLocaleString();
             if (confirm(`Found a saved draft from ${draftDate}. Load it?`)) {
                 venues = data.venues;
+                if (data.tagDefinitions) {
+                    tagDefinitions = data.tagDefinitions;
+                    initTagConfig(tagDefinitions);
+                }
                 renderVenueList();
                 updateVenueCount();
+                renderTagSelector();
+                renderTagDefinitionsEditor();
                 if (data.selectedVenueId) {
                     selectVenue(data.selectedVenueId);
                 }
@@ -609,6 +677,172 @@ function showToast(message, type = 'info') {
     setTimeout(() => {
         toast.remove();
     }, 4000);
+}
+
+/**
+ * Render tag selector checkboxes
+ */
+function renderTagSelector() {
+    if (!elements.tagSelector) return;
+
+    const tagIds = Object.keys(tagDefinitions).filter(id => id !== 'dedicated');
+
+    elements.tagSelector.innerHTML = tagIds.map(tagId => {
+        const tag = tagDefinitions[tagId];
+        return `
+            <label class="tag-chip" style="--tag-color: ${tag.color}; --tag-text: ${tag.textColor};">
+                <input type="checkbox" name="tags" value="${escapeHtml(tagId)}">
+                <span class="tag-chip__label">${escapeHtml(tag.label)}</span>
+            </label>
+        `;
+    }).join('');
+
+    // Add change listeners for preview updates
+    elements.tagSelector.querySelectorAll('input').forEach(input => {
+        input.addEventListener('change', () => {
+            hasUnsavedChanges = true;
+            updatePreview();
+            markVenueUnsaved();
+        });
+    });
+}
+
+/**
+ * Toggle tag definitions editor visibility
+ */
+function toggleTagDefinitionsEditor() {
+    const editor = elements.tagDefinitionsEditor;
+    const btn = document.getElementById('btn-toggle-tag-editor');
+    const icon = btn.querySelector('.toggle-icon');
+
+    const isHidden = editor.hidden;
+    editor.hidden = !isHidden;
+    icon.classList.toggle('fa-chevron-down', !isHidden);
+    icon.classList.toggle('fa-chevron-up', isHidden);
+}
+
+/**
+ * Render tag definitions editor
+ */
+function renderTagDefinitionsEditor() {
+    if (!elements.tagDefinitionsList) return;
+
+    const tagIds = Object.keys(tagDefinitions);
+
+    elements.tagDefinitionsList.innerHTML = tagIds.map(tagId => {
+        const tag = tagDefinitions[tagId];
+        return `
+            <div class="tag-def-row" data-tag-id="${escapeHtml(tagId)}">
+                <input type="text" class="tag-def-id" value="${escapeHtml(tagId)}" readonly title="Tag ID (read-only)">
+                <input type="text" class="tag-def-label" value="${escapeHtml(tag.label)}" placeholder="Label" title="Display label">
+                <input type="color" class="tag-def-color" value="${tag.color}" title="Background color">
+                <input type="color" class="tag-def-text" value="${tag.textColor}" title="Text color">
+                <button type="button" class="btn btn--icon btn-remove-tag-def" title="Remove tag">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+        `;
+    }).join('');
+
+    // Add event listeners
+    elements.tagDefinitionsList.querySelectorAll('.tag-def-row').forEach(row => {
+        const tagId = row.dataset.tagId;
+
+        // Label change
+        row.querySelector('.tag-def-label').addEventListener('change', (e) => {
+            updateTagDefinition(tagId, 'label', e.target.value);
+        });
+
+        // Color change
+        row.querySelector('.tag-def-color').addEventListener('change', (e) => {
+            updateTagDefinition(tagId, 'color', e.target.value);
+        });
+
+        // Text color change
+        row.querySelector('.tag-def-text').addEventListener('change', (e) => {
+            updateTagDefinition(tagId, 'textColor', e.target.value);
+        });
+
+        // Remove button
+        row.querySelector('.btn-remove-tag-def').addEventListener('click', () => {
+            removeTagDefinition(tagId);
+        });
+    });
+}
+
+/**
+ * Add a new tag definition
+ */
+function addTagDefinition() {
+    const tagId = prompt('Enter tag ID (lowercase, hyphens allowed):');
+    if (!tagId) return;
+
+    const cleanId = tagId.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+
+    if (tagDefinitions[cleanId]) {
+        showToast('A tag with this ID already exists', 'error');
+        return;
+    }
+
+    tagDefinitions[cleanId] = {
+        label: cleanId.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+        color: '#607d8b',
+        textColor: '#fff'
+    };
+
+    initTagConfig(tagDefinitions);
+    renderTagDefinitionsEditor();
+    renderTagSelector();
+    hasUnsavedChanges = true;
+    showToast(`Tag "${cleanId}" added`, 'success');
+}
+
+/**
+ * Update a tag definition property
+ */
+function updateTagDefinition(tagId, property, value) {
+    if (!tagDefinitions[tagId]) return;
+
+    tagDefinitions[tagId][property] = value;
+    initTagConfig(tagDefinitions);
+    renderTagSelector();
+    hasUnsavedChanges = true;
+
+    // Re-check the tags that were selected before re-render
+    if (selectedVenueId) {
+        const venue = venues.find(v => v.id === selectedVenueId);
+        if (venue && venue.tags) {
+            elements.tagSelector.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = venue.tags.includes(checkbox.value);
+            });
+        }
+    }
+
+    updatePreview();
+}
+
+/**
+ * Remove a tag definition
+ */
+function removeTagDefinition(tagId) {
+    if (!confirm(`Delete tag "${tagId}"? This will remove it from all venues.`)) return;
+
+    delete tagDefinitions[tagId];
+
+    // Remove from all venues
+    venues.forEach(venue => {
+        if (venue.tags) {
+            venue.tags = venue.tags.filter(t => t !== tagId);
+            if (venue.tags.length === 0) delete venue.tags;
+        }
+    });
+
+    initTagConfig(tagDefinitions);
+    renderTagDefinitionsEditor();
+    renderTagSelector();
+    hasUnsavedChanges = true;
+    updatePreview();
+    showToast(`Tag "${tagId}" removed`, 'success');
 }
 
 // Initialize
