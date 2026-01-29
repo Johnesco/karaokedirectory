@@ -90,6 +90,24 @@ export class AlphabeticalView extends Component {
     }
 
     afterRender() {
+        // Measure A-Z index height and expose as CSS variable so
+        // letter-card headers can stick below it on all screen sizes.
+        if (this._indexObserver) {
+            this._indexObserver.disconnect();
+        }
+
+        const indexEl = this.$('.alphabetical-view__index');
+        const viewEl = this.$('.alphabetical-view');
+        if (indexEl && viewEl) {
+            const updateHeight = () => {
+                viewEl.style.setProperty('--az-index-height', `${indexEl.offsetHeight}px`);
+            };
+            updateHeight();
+
+            this._indexObserver = new ResizeObserver(updateHeight);
+            this._indexObserver.observe(indexEl);
+        }
+
         // Event delegation for venue card clicks (whole card is clickable)
         this.delegate('click', '.venue-card', (e, target) => {
             // Don't trigger modal if clicking on a link (like address)
@@ -104,5 +122,12 @@ export class AlphabeticalView extends Component {
                 emit(Events.VENUE_SELECTED, venue);
             }
         });
+    }
+
+    onDestroy() {
+        if (this._indexObserver) {
+            this._indexObserver.disconnect();
+            this._indexObserver = null;
+        }
     }
 }

@@ -266,7 +266,7 @@
     border-radius: var(--border-radius);
     display: flex;
     flex-direction: column;
-    scroll-margin-top: calc(var(--nav-height) + 80px);
+    scroll-margin-top: calc(var(--nav-height) + var(--az-index-height, 50px));
 }
 
 .letter-card__header {
@@ -279,7 +279,7 @@
     border-radius: var(--border-radius) var(--border-radius) 50px 0;
     position: -webkit-sticky;
     position: sticky;
-    top: var(--nav-height);
+    top: calc(var(--nav-height) + var(--az-index-height, 50px));
     z-index: 50;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
@@ -334,11 +334,7 @@
     .letter-card__header {
         position: -webkit-sticky;
         position: sticky;
-        top: var(--nav-height);
-    }
-
-    .alphabetical-view__index {
-        position: static;
+        top: calc(var(--nav-height) + var(--az-index-height, 50px));
     }
 
     /* Edge-to-edge cards only on index page */
