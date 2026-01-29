@@ -124,14 +124,17 @@ export class MapView extends Component {
             const venue = this.selectedVenue;
             if (!venue) return;
 
-            // Switch to weekly view
-            setState({ view: 'weekly' });
-            emit(Events.VIEW_CHANGED, 'weekly');
-
-            // Small delay to let view render, then select venue
+            // Defer the view switch so this component isn't destroyed
+            // while its own click handler is still on the call stack
             setTimeout(() => {
-                emit(Events.VENUE_SELECTED, venue);
-            }, 100);
+                setState({ view: 'weekly' });
+                emit(Events.VIEW_CHANGED, 'weekly');
+
+                // Wait for the weekly view to finish rendering, then show venue details
+                requestAnimationFrame(() => {
+                    emit(Events.VENUE_SELECTED, venue);
+                });
+            }, 0);
         });
 
         // Escape key to exit map view or close card
