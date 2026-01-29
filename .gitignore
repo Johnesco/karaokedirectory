@@ -3,3 +3,28 @@ js/data.js.backup
 # Claude Code temp files
 tmpclaude-*
 .claude/
+
+# Dependencies
+node_modules/
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+e2e/unit/schedule-matching.spec.js
+e2e/e2e/weekly-view.spec.js
+e2e/helpers/evaluate-utils.js
+e2e/unit/date-utils.spec.js
+e2e/unit/time-format.spec.js
+e2e/unit/venue-service.spec.js
+e2e/e2e/map-view.spec.js
+e2e/e2e/search.spec.js
+e2e/e2e/venue-modal.spec.js
+e2e/e2e/view-switching.spec.js
+e2e/e2e/week-navigation.spec.js
+e2e/e2e/alphabetical-view.spec.js
+e2e/e2e/dedicated-filter.spec.js
+package-lock.json
+package.json
+playwright.config.js
