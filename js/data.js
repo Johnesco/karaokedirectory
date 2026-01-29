@@ -1029,6 +1029,7 @@ const karaokeData = {
     {
       "id": "hudson-tavern-xpider",
       "name": "Hudson Tavern",
+      "active": false,
       "tags": [
         "neighborhood"
       ],

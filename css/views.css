@@ -514,6 +514,15 @@
     line-height: 48px;
 }
 
+/* Cluster hover tooltip listing venue names */
+.map-cluster-tooltip {
+    text-align: left;
+    line-height: 1.5;
+    font-size: var(--font-size-sm, 0.875rem);
+    max-width: 260px;
+    white-space: nowrap;
+}
+
 /* Slow down cluster expand / spiderfy animations */
 .marker-cluster-animated .leaflet-marker-icon,
 .marker-cluster-animated .leaflet-marker-shadow {

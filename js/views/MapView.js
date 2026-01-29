@@ -274,12 +274,40 @@ export class MapView extends Component {
             this.map.flyToBounds(bounds, { duration: 0.8 });
         });
 
+        // Cluster hover tooltip listing all venues
+        this.clusterGroup.on('clustermouseover', (e) => {
+            const childMarkers = e.layer.getAllChildMarkers();
+            const names = childMarkers
+                .map(m => m.venueData ? escapeHtml(m.venueData.name) : '')
+                .filter(Boolean)
+                .sort();
+
+            const maxDisplay = 12;
+            let content = names.slice(0, maxDisplay).join('<br>');
+            if (names.length > maxDisplay) {
+                content += `<br><em>and ${names.length - maxDisplay} more\u2026</em>`;
+            }
+
+            e.layer.bindTooltip(content, {
+                direction: 'top',
+                className: 'map-cluster-tooltip',
+                offset: L.point(0, -20)
+            }).openTooltip();
+        });
+
+        this.clusterGroup.on('clustermouseout', (e) => {
+            e.layer.unbindTooltip();
+        });
+
         // Add markers to cluster group
         venues.forEach(venue => {
             const marker = L.marker(
                 [venue.coordinates.lat, venue.coordinates.lng],
                 { icon: this.createMarkerIcon(false) }
             );
+
+            // Store venue data on marker for cluster tooltip access
+            marker.venueData = venue;
 
             // Hover tooltip showing venue name
             marker.bindTooltip(escapeHtml(venue.name), {
