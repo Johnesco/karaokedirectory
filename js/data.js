@@ -626,7 +626,8 @@ const karaokeData = {
       "date": "2026-01-29",
       "startTime": "21:00",
       "endTime": "00:00",
-      "eventName": "Karaoke Underground @ Cheer Up!"
+      "eventName": "Karaoke Underground @ Cheer Up!",
+      "eventUrl": "https://www.facebook.com/share/1CPcw6gNjC/"
     }
   ],
   "host": {

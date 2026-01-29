@@ -5,7 +5,7 @@
 
 import { escapeHtml } from './string.js';
 import { formatScheduleEntry, formatDateRangeText } from './date.js';
-import { createSocialLinks } from './url.js';
+import { createSocialLinks, sanitizeUrl } from './url.js';
 
 /**
  * Render a schedule table for venue details
@@ -27,9 +27,13 @@ export function renderScheduleTable(schedule, classPrefix) {
             ? `${formatted.frequencyPrefix} — ${formatted.day}`
             : `${formatted.frequencyPrefix}${formatted.day}`;
 
+        const eventLink = entry.eventUrl
+            ? ` <a href="${escapeHtml(sanitizeUrl(entry.eventUrl) || '')}" target="_blank" rel="noopener noreferrer" class="schedule-event-link" title="Event page"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>`
+            : '';
+
         return `
             <tr>
-                <td>${dayLabel}</td>
+                <td>${dayLabel}${eventLink}</td>
                 <td>${formatted.time}</td>
                 ${entry.note ? `<td class="schedule-note">${escapeHtml(entry.note)}</td>` : '<td></td>'}
             </tr>

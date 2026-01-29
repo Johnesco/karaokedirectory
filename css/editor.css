@@ -346,6 +346,11 @@
     min-width: 140px;
 }
 
+.schedule-item .schedule-event-url {
+    flex: 1;
+    min-width: 160px;
+}
+
 .schedule-item input[type="time"] {
     width: 110px;
 }
@@ -741,6 +746,7 @@
     .schedule-item .schedule-day,
     .schedule-item .schedule-date,
     .schedule-item .schedule-event-name,
+    .schedule-item .schedule-event-url,
     .schedule-item input[type="time"] {
         width: 100%;
     }

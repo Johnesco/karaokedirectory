@@ -304,6 +304,7 @@ function createScheduleRowHtml(schedule = {}, index = 0) {
             <input type="text" name="schedule[${index}].eventName" class="schedule-event-name" value="${escapeHtml(schedule.eventName || '')}" ${isOnce ? '' : 'hidden'} placeholder="Event name (optional)">
             <input type="time" name="schedule[${index}].startTime" value="${schedule.startTime || '21:00'}">
             <input type="time" name="schedule[${index}].endTime" value="${schedule.endTime || ''}">
+            <input type="url" name="schedule[${index}].eventUrl" class="schedule-event-url" value="${escapeHtml(schedule.eventUrl || '')}" placeholder="Event URL (optional)">
             <button type="button" class="btn btn--icon btn-remove-schedule" title="Remove">
                 <i class="fa-solid fa-trash"></i>
             </button>
@@ -361,6 +362,8 @@ function getFormData() {
         const startTime = item.querySelector('[name*="startTime"]').value;
         const endTime = item.querySelector('[name*="endTime"]').value || null;
 
+        const eventUrl = item.querySelector('[name*="eventUrl"]').value.trim();
+
         if (frequency === 'once') {
             const entry = {
                 frequency,
@@ -370,10 +373,12 @@ function getFormData() {
             };
             const eventName = item.querySelector('[name*="eventName"]').value.trim();
             if (eventName) entry.eventName = eventName;
+            if (eventUrl) entry.eventUrl = eventUrl;
             schedules.push(entry);
         } else {
-            const day = item.querySelector('[name*=".day"]').value;
-            schedules.push({ frequency, day, startTime, endTime });
+            const entry = { frequency, day: item.querySelector('[name*=".day"]').value, startTime, endTime };
+            if (eventUrl) entry.eventUrl = eventUrl;
+            schedules.push(entry);
         }
     });
 

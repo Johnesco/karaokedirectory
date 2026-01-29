@@ -6,7 +6,7 @@
 import { Component } from './Component.js';
 import { escapeHtml } from '../utils/string.js';
 import { formatTimeRange, formatScheduleEntry, scheduleMatchesDate } from '../utils/date.js';
-import { buildMapUrl, createSocialLinks, formatAddress } from '../utils/url.js';
+import { buildMapUrl, createSocialLinks, formatAddress, sanitizeUrl } from '../utils/url.js';
 import { emit, Events } from '../core/events.js';
 import { isDebugMode, getDebugHtml } from '../utils/debug.js';
 import { renderTags } from '../utils/tags.js';
@@ -72,10 +72,11 @@ export class VenueCard extends Component {
                         </button>
                     </h3>
                 </div>
-                ${eventName ? `<div class="venue-card__event-name"><i class="fa-solid fa-star"></i> ${escapeHtml(eventName)}</div>` : ''}
+                ${eventName ? `<div class="venue-card__event-name"><i class="fa-solid fa-star"></i> ${schedule?.eventUrl ? `<a href="${escapeHtml(sanitizeUrl(schedule.eventUrl) || '')}" target="_blank" rel="noopener noreferrer" class="venue-card__event-link">${escapeHtml(eventName)} <i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : escapeHtml(eventName)}</div>` : ''}
                 ${showSchedule && timeDisplay ? `
                     <div class="venue-card__time">
                         <i class="fa-regular fa-clock"></i> ${timeDisplay}
+                        ${!eventName && schedule?.eventUrl ? `<a href="${escapeHtml(sanitizeUrl(schedule.eventUrl) || '')}" target="_blank" rel="noopener noreferrer" class="venue-card__event-link" title="Event page"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : ''}
                         ${schedule?.note ? `<span class="venue-card__note">${escapeHtml(schedule.note)}</span>` : ''}
                     </div>
                 ` : ''}
@@ -155,9 +156,11 @@ export class VenueCard extends Component {
                 ? `${formatted.frequencyPrefix} — ${formatted.day}`
                 : `${formatted.frequencyPrefix}${formatted.day}`;
 
+            const eventLink = entry.eventUrl ? `<a href="${escapeHtml(sanitizeUrl(entry.eventUrl) || '')}" target="_blank" rel="noopener noreferrer" class="venue-card__event-link" title="Event page"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : '';
+
             return `
                 <li class="venue-card__schedule-item">
-                    <span class="venue-card__schedule-day">${dayLabel}</span>
+                    <span class="venue-card__schedule-day">${dayLabel}${eventLink}</span>
                     <span class="venue-card__schedule-time">${formatted.time}</span>
                     ${entry.note ? `<span class="venue-card__schedule-note">${escapeHtml(entry.note)}</span>` : ''}
                 </li>
