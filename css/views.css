@@ -442,6 +442,84 @@
     margin-top: var(--spacing-sm);
 }
 
+/* Custom Map Markers */
+.map-marker {
+    background: transparent;
+}
+
+.map-marker__pin {
+    width: 30px;
+    height: 40px;
+    position: relative;
+}
+
+.map-marker__pin::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 24px;
+    background: var(--color-primary, #6366f1);
+    border: 3px solid #fff;
+    border-radius: 50% 50% 50% 0;
+    transform: translateX(-50%) rotate(-45deg);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.map-marker__pin::after {
+    content: '';
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 8px;
+    background: #fff;
+    border-radius: 50%;
+}
+
+/* Selected marker - red/coral color */
+.map-marker--selected .map-marker__pin::before {
+    background: #e53935;
+    transform: translateX(-50%) rotate(-45deg) scale(1.15);
+    box-shadow: 0 3px 10px rgba(229, 57, 53, 0.4);
+}
+
+/* Map Cluster Icons - override MarkerCluster defaults with app theme */
+.map-cluster {
+    border-radius: 50%;
+    background: var(--color-primary, #6366f1);
+    color: #fff;
+    font-weight: 700;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
+    border: 3px solid rgba(255, 255, 255, 0.8);
+}
+
+.map-cluster--small {
+    font-size: var(--font-size-sm, 0.875rem);
+    line-height: 36px;
+}
+
+.map-cluster--medium {
+    font-size: var(--font-size-base, 1rem);
+    line-height: 42px;
+}
+
+.map-cluster--large {
+    font-size: var(--font-size-lg, 1.125rem);
+    line-height: 48px;
+}
+
+/* Slow down cluster expand / spiderfy animations */
+.marker-cluster-animated .leaflet-marker-icon,
+.marker-cluster-animated .leaflet-marker-shadow {
+    transition: transform 0.6s ease-out, opacity 0.6s ease-out;
+}
+
 @media (max-width: 768px) {
     .map-view__container {
         height: 400px;

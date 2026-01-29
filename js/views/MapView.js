@@ -18,11 +18,28 @@ export class MapView extends Component {
     init() {
         this.map = null;
         this.markers = [];
+        this.markerMap = new Map(); // Map venue ID to marker
+        this.clusterGroup = null;
         this.selectedVenue = null;
+        this.selectedMarker = null;
         this._escHandler = null;
 
         this.subscribe(subscribe('showDedicated', () => this.updateMarkers()));
         this.subscribe(on(Events.FILTER_CHANGED, () => this.updateMarkers()));
+    }
+
+    /**
+     * Create a custom marker icon
+     * @param {boolean} isSelected - Whether the marker is selected
+     */
+    createMarkerIcon(isSelected = false) {
+        return L.divIcon({
+            className: `map-marker ${isSelected ? 'map-marker--selected' : ''}`,
+            html: `<div class="map-marker__pin"></div>`,
+            iconSize: [30, 40],
+            iconAnchor: [15, 40],
+            popupAnchor: [0, -40]
+        });
     }
 
     template() {
@@ -133,30 +150,50 @@ export class MapView extends Component {
     }
 
     async loadLeaflet() {
-        // Check if Leaflet is already loaded
-        if (window.L) return;
-
-        // Load CSS
-        if (!document.querySelector('link[href*="leaflet"]')) {
-            const css = document.createElement('link');
-            css.rel = 'stylesheet';
-            css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-            document.head.appendChild(css);
-        }
-
-        // Load JS
-        return new Promise((resolve, reject) => {
-            if (window.L) {
-                resolve();
-                return;
+        // Load Leaflet if not already loaded
+        if (!window.L) {
+            // Load Leaflet CSS
+            if (!document.querySelector('link[href*="leaflet.css"]')) {
+                const css = document.createElement('link');
+                css.rel = 'stylesheet';
+                css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+                document.head.appendChild(css);
             }
 
-            const script = document.createElement('script');
-            script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-            script.onload = resolve;
-            script.onerror = reject;
-            document.body.appendChild(script);
-        });
+            // Load Leaflet JS
+            await new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+                script.onload = resolve;
+                script.onerror = reject;
+                document.body.appendChild(script);
+            });
+        }
+
+        // Load MarkerCluster plugin if not already loaded
+        if (!window.L.MarkerClusterGroup) {
+            // Load MarkerCluster CSS files
+            if (!document.querySelector('link[href*="MarkerCluster.css"]')) {
+                const clusterCss = document.createElement('link');
+                clusterCss.rel = 'stylesheet';
+                clusterCss.href = 'https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css';
+                document.head.appendChild(clusterCss);
+
+                const clusterDefaultCss = document.createElement('link');
+                clusterDefaultCss.rel = 'stylesheet';
+                clusterDefaultCss.href = 'https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css';
+                document.head.appendChild(clusterDefaultCss);
+            }
+
+            // Load MarkerCluster JS
+            await new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js';
+                script.onload = resolve;
+                script.onerror = reject;
+                document.body.appendChild(script);
+            });
+        }
     }
 
     initMap() {
@@ -181,34 +218,91 @@ export class MapView extends Component {
         this.updateMarkers();
     }
 
+    /**
+     * Create a custom cluster icon styled to match the app's purple theme
+     * @param {object} cluster - MarkerCluster cluster object
+     */
+    createClusterIcon(cluster) {
+        const count = cluster.getChildCount();
+        let sizeClass = 'map-cluster--small';
+        let size = 36;
+        if (count >= 20) {
+            sizeClass = 'map-cluster--large';
+            size = 48;
+        } else if (count >= 10) {
+            sizeClass = 'map-cluster--medium';
+            size = 42;
+        }
+
+        return L.divIcon({
+            html: `<span>${count}</span>`,
+            className: `map-cluster ${sizeClass}`,
+            iconSize: L.point(size, size)
+        });
+    }
+
     updateMarkers() {
         if (!this.map) return;
 
-        // Clear existing markers
-        this.markers.forEach(marker => marker.remove());
+        // Clear existing cluster group / markers
+        if (this.clusterGroup) {
+            this.clusterGroup.clearLayers();
+            this.map.removeLayer(this.clusterGroup);
+        }
         this.markers = [];
+        this.markerMap.clear();
+        this.selectedMarker = null;
 
         // Get venues with coordinates, respecting filters
         const showDedicated = getState('showDedicated');
         const searchQuery = getState('searchQuery');
         const venues = getVenuesWithCoordinates({ includeDedicated: showDedicated, searchQuery });
 
-        // Add markers
+        // Create cluster group
+        this.clusterGroup = L.markerClusterGroup({
+            spiderfyOnMaxZoom: true,
+            showCoverageOnHover: false,
+            zoomToBoundsOnClick: false,
+            maxClusterRadius: 40,
+            iconCreateFunction: (cluster) => this.createClusterIcon(cluster)
+        });
+
+        // Slow zoom when clicking a cluster
+        this.clusterGroup.on('clusterclick', (e) => {
+            const bounds = e.layer.getBounds().pad(0.1);
+            this.map.flyToBounds(bounds, { duration: 0.8 });
+        });
+
+        // Add markers to cluster group
         venues.forEach(venue => {
-            const marker = L.marker([venue.coordinates.lat, venue.coordinates.lng])
-                .addTo(this.map);
+            const marker = L.marker(
+                [venue.coordinates.lat, venue.coordinates.lng],
+                { icon: this.createMarkerIcon(false) }
+            );
+
+            // Hover tooltip showing venue name
+            marker.bindTooltip(escapeHtml(venue.name), {
+                direction: 'top',
+                offset: L.point(0, -35)
+            });
+
+            // Store reference to marker by venue ID
+            this.markerMap.set(venue.id, marker);
 
             // Click marker to show floating card (not popup)
             marker.on('click', (e) => {
                 L.DomEvent.stopPropagation(e);
-                this.showVenueCard(venue);
+                this.showVenueCard(venue, marker);
 
                 // Pan map to center on marker with offset for card visibility
                 this.map.panTo([venue.coordinates.lat, venue.coordinates.lng]);
             });
 
             this.markers.push(marker);
+            this.clusterGroup.addLayer(marker);
         });
+
+        this.map.addLayer(this.clusterGroup);
 
         // Fit bounds if we have markers
         if (this.markers.length > 0) {
@@ -217,8 +311,21 @@ export class MapView extends Component {
         }
     }
 
-    showVenueCard(venue) {
+    showVenueCard(venue, marker) {
+        // Reset previously selected marker
+        if (this.selectedMarker) {
+            this.selectedMarker.setIcon(this.createMarkerIcon(false));
+        }
+
+        // Set new selected marker
         this.selectedVenue = venue;
+        this.selectedMarker = marker;
+
+        // Highlight the selected marker
+        if (marker) {
+            marker.setIcon(this.createMarkerIcon(true));
+        }
+
         const cardEl = this.$('#map-venue-card');
         if (!cardEl || !venue) return;
 
@@ -257,6 +364,12 @@ export class MapView extends Component {
     }
 
     hideVenueCard() {
+        // Reset the selected marker's icon
+        if (this.selectedMarker) {
+            this.selectedMarker.setIcon(this.createMarkerIcon(false));
+            this.selectedMarker = null;
+        }
+
         this.selectedVenue = null;
         const cardEl = this.$('#map-venue-card');
         if (cardEl) {
@@ -268,6 +381,15 @@ export class MapView extends Component {
         // Remove escape key handler
         if (this._escHandler) {
             document.removeEventListener('keydown', this._escHandler);
+        }
+
+        // Clean up cluster group
+        if (this.clusterGroup) {
+            this.clusterGroup.clearLayers();
+            if (this.map) {
+                this.map.removeLayer(this.clusterGroup);
+            }
+            this.clusterGroup = null;
         }
 
         // Clean up map

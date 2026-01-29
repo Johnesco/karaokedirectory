@@ -77,8 +77,14 @@ async function init() {
         renderView(view);
     });
 
+    // Determine initial view from ?view= query parameter, falling back to 'weekly'
+    const validViews = ['weekly', 'alphabetical', 'map'];
+    const urlParams = new URLSearchParams(window.location.search);
+    const viewParam = urlParams.get('view');
+    const initialView = validViews.includes(viewParam) ? viewParam : 'weekly';
+
     // Render initial view directly (setState won't trigger if value unchanged)
-    renderView('weekly');
+    renderView(initialView);
 
     // Expose helper for map popups
     window.showVenueDetails = (venueId) => {
