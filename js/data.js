@@ -263,6 +263,41 @@ const karaokeData = {
       }
     },
     {
+      "id": "black-sparrow-music-parlor",
+      "name": "Black Sparrow Music Parlor",
+      "active": true,
+      "dedicated": false,
+      "address": {
+        "street": "113 W 2nd St",
+        "city": "Taylor",
+        "state": "TX",
+        "zip": "76574",
+        "neighborhood": ""
+      },
+      "schedule": [
+        {
+          "frequency": "once",
+          "date": "2026-02-05",
+          "startTime": "21:00",
+          "endTime": "00:00",
+          "eventName": "Nineties Indie Karaoke w Karaoke Underground!",
+          "eventUrl": "https://www.facebook.com/share/1GGYVEVcUv/"
+        }
+      ],
+      "host": {
+        "company": "Karaoke Underground"
+      },
+      "socials": {
+        "website": "https://www.blacksparrowmusicparlor.com/",
+        "facebook": "https://www.facebook.com/blacksparrowmusicparlor/",
+        "instagram": "https://www.instagram.com/blacksparrowmusicparlor/?hl=en"
+      },
+      "coordinates": {
+        "lat": 30.5683291,
+        "lng": -97.4104282
+      }
+    },
+    {
       "id": "blindside-lounge",
       "name": "Blindside Lounge",
       "active": false,
