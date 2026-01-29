@@ -117,6 +117,14 @@ export function getWeekStart(date) {
 export function scheduleMatchesDate(schedule, date) {
     const { frequency, day } = schedule;
 
+    // One-time special event: compare exact date string
+    if (frequency === 'once') {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return schedule.date === `${y}-${m}-${d}`;
+    }
+
     // Check if day of week matches
     if (getDayName(date) !== day.toLowerCase()) {
         return false;
@@ -227,6 +235,15 @@ export function isDateInRange(date, startDate, endDate) {
  */
 export function formatScheduleEntry(entry, options = {}) {
     const { showEvery = true } = options;
+
+    // One-time special event
+    if (entry.frequency === 'once') {
+        const dateObj = new Date(entry.date + 'T12:00:00');
+        const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        const time = formatTimeRange(entry.startTime, entry.endTime);
+        const label = entry.eventName ? `${entry.eventName} — ${dateStr}` : `Special Event — ${dateStr}`;
+        return { day: dateStr, frequencyPrefix: entry.eventName || 'Special Event', time, fullText: `${label}: ${time}` };
+    }
 
     // Capitalize day name
     const day = entry.day.charAt(0).toUpperCase() + entry.day.slice(1);

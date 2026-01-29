@@ -65,6 +65,21 @@ export function getVenueDebugInfo(venue, date) {
     const matchingSchedules = [];
 
     for (const sched of venue.schedule) {
+        // Handle one-time special events
+        if (sched.frequency === 'once') {
+            if (scheduleMatchesDate(sched, date)) {
+                matchingSchedules.push({
+                    frequency: sched.frequency,
+                    day: sched.date,
+                    startTime: sched.startTime,
+                    endTime: sched.endTime,
+                    note: sched.note,
+                    eventName: sched.eventName
+                });
+            }
+            continue;
+        }
+
         const schedDay = sched.day.toLowerCase();
         if (schedDay !== dayName) continue;
 
@@ -91,7 +106,9 @@ export function getVenueDebugInfo(venue, date) {
     const primary = matchingSchedules[0];
     let matchReason;
 
-    if (primary.frequency === 'every') {
+    if (primary.frequency === 'once') {
+        matchReason = primary.eventName || 'Special Event';
+    } else if (primary.frequency === 'every') {
         matchReason = `Every ${capitalize(primary.day)}`;
     } else {
         matchReason = `${capitalize(primary.frequency)} ${capitalize(primary.day)}`;

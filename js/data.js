@@ -89,6 +89,11 @@ const karaokeData = {
       "label": "Neighborhood Bar",
       "color": "#9e9e9e",
       "textColor": "#fff"
+    },
+    "special-event": {
+      "label": "Special Event",
+      "color": "#e91e63",
+      "textColor": "#ffffff"
     }
   },
   "listings": [
@@ -603,6 +608,50 @@ const karaokeData = {
         "lng": -97.54671731632
       }
     },
+    {
+  "id": "cheer-up-charlies",
+  "name": "Cheer Up Charlie's",
+  "active": true,
+  "dedicated": false,
+  "address": {
+    "street": "900 Red River St.",
+    "city": "Austin",
+    "state": "TX",
+    "zip": "78701",
+    "neighborhood": "Downtown"
+  },
+  "schedule": [
+    {
+      "frequency": "once",
+      "date": "2026-01-29",
+      "startTime": "21:00",
+      "endTime": "00:00",
+      "eventName": "Karaoke Underground @ Cheer Up!"
+    }
+  ],
+  "host": {
+    "company": "Karaoke Underground",
+    "website": "https://karaokeunderground.com/"
+  },
+  "socials": {
+    "website": "https://cheerupcharlies.com/",
+    "facebook": "https://www.facebook.com/cheerupcharlies",
+    "instagram": "https://www.instagram.com/cheerupcharlies/"
+  },
+  "tags": [
+    "lgbtq",
+    "dive",
+    "21+"
+  ],
+  "coordinates": {
+    "lat": 30.2696106,
+    "lng": -97.736358
+  },
+  "dateRange": {
+    "start": "2026-01-29",
+    "end": "2026-01-30"
+  }
+},
     {
       "id": "cjs-sports-bar",
       "name": "CJ's Sports Bar",

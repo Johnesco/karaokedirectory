@@ -20,12 +20,17 @@ export function renderScheduleTable(schedule, classPrefix) {
     }
 
     const rows = schedule.map(entry => {
-        const { day, frequencyPrefix, time } = formatScheduleEntry(entry, { showEvery: true });
+        const formatted = formatScheduleEntry(entry, { showEvery: true });
+
+        // For one-time events, show event name/label and date together
+        const dayLabel = entry.frequency === 'once'
+            ? `${formatted.frequencyPrefix} — ${formatted.day}`
+            : `${formatted.frequencyPrefix}${formatted.day}`;
 
         return `
             <tr>
-                <td>${frequencyPrefix}${day}</td>
-                <td>${time}</td>
+                <td>${dayLabel}</td>
+                <td>${formatted.time}</td>
                 ${entry.note ? `<td class="schedule-note">${escapeHtml(entry.note)}</td>` : '<td></td>'}
             </tr>
         `;

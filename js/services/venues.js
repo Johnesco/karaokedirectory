@@ -139,6 +139,13 @@ export function getVenuesForDate(date, options = {}) {
         // Check if any schedule matches this date
         return venue.schedule.some(sched => scheduleMatchesDate(sched, date));
     }).sort((a, b) => {
+        // Special events sort to top
+        const aSpecial = a.schedule?.some(s => s.frequency === 'once' && scheduleMatchesDate(s, date));
+        const bSpecial = b.schedule?.some(s => s.frequency === 'once' && scheduleMatchesDate(s, date));
+        if (aSpecial && !bSpecial) return -1;
+        if (!aSpecial && bSpecial) return 1;
+
+        // Then alphabetical
         const nameA = getSortableName(a.name).toLowerCase();
         const nameB = getSortableName(b.name).toLowerCase();
         return nameA.localeCompare(nameB);

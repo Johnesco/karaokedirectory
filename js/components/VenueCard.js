@@ -5,7 +5,7 @@
 
 import { Component } from './Component.js';
 import { escapeHtml } from '../utils/string.js';
-import { formatTimeRange, formatScheduleEntry } from '../utils/date.js';
+import { formatTimeRange, formatScheduleEntry, scheduleMatchesDate } from '../utils/date.js';
 import { buildMapUrl, createSocialLinks, formatAddress } from '../utils/url.js';
 import { emit, Events } from '../core/events.js';
 import { isDebugMode, getDebugHtml } from '../utils/debug.js';
@@ -42,6 +42,16 @@ export class VenueCard extends Component {
             ? formatTimeRange(schedule.startTime, schedule.endTime)
             : '';
 
+        // Detect special event
+        const isSpecialEvent = schedule?.frequency === 'once';
+        const cardClass = isSpecialEvent ? 'venue-card venue-card--compact venue-card--special-event' : 'venue-card venue-card--compact';
+        const eventName = isSpecialEvent ? (schedule.eventName || 'Special Event') : null;
+
+        // Build tag list, injecting 'special-event' tag for one-time events
+        const tags = isSpecialEvent
+            ? ['special-event', ...(venue.tags || [])]
+            : venue.tags;
+
         // Build full address string and map URL
         const fullAddress = formatAddress(venue.address);
         const mapsUrl = buildMapUrl(venue.address, venue.name);
@@ -53,7 +63,7 @@ export class VenueCard extends Component {
         const debugHtml = getDebugHtml(venue, date);
 
         return `
-            <div class="venue-card venue-card--compact" data-venue-id="${escapeHtml(venue.id)}">
+            <div class="${cardClass}" data-venue-id="${escapeHtml(venue.id)}">
                 ${debugHtml}
                 <div class="venue-card__header">
                     <h3 class="venue-card__name">
@@ -62,6 +72,7 @@ export class VenueCard extends Component {
                         </button>
                     </h3>
                 </div>
+                ${eventName ? `<div class="venue-card__event-name"><i class="fa-solid fa-star"></i> ${escapeHtml(eventName)}</div>` : ''}
                 ${showSchedule && timeDisplay ? `
                     <div class="venue-card__time">
                         <i class="fa-regular fa-clock"></i> ${timeDisplay}
@@ -79,7 +90,7 @@ export class VenueCard extends Component {
                         Presented by ${escapeHtml(hostDisplay)}
                     </div>
                 ` : ''}
-                ${renderTags(venue.tags, { dedicated: venue.dedicated })}
+                ${renderTags(tags, { dedicated: venue.dedicated })}
             </div>
         `;
     }
@@ -137,12 +148,17 @@ export class VenueCard extends Component {
         }
 
         const items = schedule.map(entry => {
-            const { day, frequencyPrefix, time } = formatScheduleEntry(entry, { showEvery: false });
+            const formatted = formatScheduleEntry(entry, { showEvery: false });
+
+            // For one-time events, show the frequencyPrefix (event name) and day (date)
+            const dayLabel = entry.frequency === 'once'
+                ? `${formatted.frequencyPrefix} — ${formatted.day}`
+                : `${formatted.frequencyPrefix}${formatted.day}`;
 
             return `
                 <li class="venue-card__schedule-item">
-                    <span class="venue-card__schedule-day">${frequencyPrefix}${day}</span>
-                    <span class="venue-card__schedule-time">${time}</span>
+                    <span class="venue-card__schedule-day">${dayLabel}</span>
+                    <span class="venue-card__schedule-time">${formatted.time}</span>
                     ${entry.note ? `<span class="venue-card__schedule-note">${escapeHtml(entry.note)}</span>` : ''}
                 </li>
             `;
@@ -154,6 +170,13 @@ export class VenueCard extends Component {
     getScheduleForDate(venue, date) {
         if (!date || !venue.schedule) return venue.schedule?.[0] || null;
 
+        // Check for one-time event on this exact date first
+        const onceEntry = venue.schedule.find(s =>
+            s.frequency === 'once' && scheduleMatchesDate(s, date)
+        );
+        if (onceEntry) return onceEntry;
+
+        // Fall back to recurring match
         const dayName = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
         return venue.schedule.find(s => s.day === dayName) || venue.schedule[0];
     }

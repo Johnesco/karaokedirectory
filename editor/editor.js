@@ -288,17 +288,20 @@ function renderScheduleList(schedules) {
 }
 
 function createScheduleRowHtml(schedule = {}, index = 0) {
-    const frequencies = ['every', 'first', 'second', 'third', 'fourth', 'last'];
+    const frequencies = ['every', 'first', 'second', 'third', 'fourth', 'last', 'once'];
     const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const isOnce = schedule.frequency === 'once';
 
     return `
-        <div class="schedule-item" data-index="${index}">
-            <select name="schedule[${index}].frequency">
+        <div class="schedule-item ${isOnce ? 'schedule-item--once' : ''}" data-index="${index}">
+            <select name="schedule[${index}].frequency" class="schedule-frequency">
                 ${frequencies.map(f => `<option value="${f}" ${schedule.frequency === f ? 'selected' : ''}>${f.charAt(0).toUpperCase() + f.slice(1)}</option>`).join('')}
             </select>
-            <select name="schedule[${index}].day">
+            <select name="schedule[${index}].day" class="schedule-day" ${isOnce ? 'hidden' : ''}>
                 ${days.map(d => `<option value="${d}" ${schedule.day === d ? 'selected' : ''}>${d.charAt(0).toUpperCase() + d.slice(1)}</option>`).join('')}
             </select>
+            <input type="date" name="schedule[${index}].date" class="schedule-date" value="${schedule.date || ''}" ${isOnce ? '' : 'hidden'} placeholder="Date">
+            <input type="text" name="schedule[${index}].eventName" class="schedule-event-name" value="${escapeHtml(schedule.eventName || '')}" ${isOnce ? '' : 'hidden'} placeholder="Event name (optional)">
             <input type="time" name="schedule[${index}].startTime" value="${schedule.startTime || '21:00'}">
             <input type="time" name="schedule[${index}].endTime" value="${schedule.endTime || ''}">
             <button type="button" class="btn btn--icon btn-remove-schedule" title="Remove">
@@ -312,6 +315,20 @@ function attachScheduleListeners() {
     elements.scheduleList.querySelectorAll('.btn-remove-schedule').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.target.closest('.schedule-item').remove();
+            hasUnsavedChanges = true;
+            updatePreview();
+        });
+    });
+
+    // Toggle day/date/eventName visibility when frequency changes
+    elements.scheduleList.querySelectorAll('.schedule-frequency').forEach(select => {
+        select.addEventListener('change', (e) => {
+            const row = e.target.closest('.schedule-item');
+            const isOnce = e.target.value === 'once';
+            row.classList.toggle('schedule-item--once', isOnce);
+            row.querySelector('.schedule-day').hidden = isOnce;
+            row.querySelector('.schedule-date').hidden = !isOnce;
+            row.querySelector('.schedule-event-name').hidden = !isOnce;
             hasUnsavedChanges = true;
             updatePreview();
         });
@@ -341,10 +358,23 @@ function getFormData() {
     const schedules = [];
     elements.scheduleList.querySelectorAll('.schedule-item').forEach(item => {
         const frequency = item.querySelector('[name*="frequency"]').value;
-        const day = item.querySelector('[name*="day"]').value;
         const startTime = item.querySelector('[name*="startTime"]').value;
         const endTime = item.querySelector('[name*="endTime"]').value || null;
-        schedules.push({ frequency, day, startTime, endTime });
+
+        if (frequency === 'once') {
+            const entry = {
+                frequency,
+                date: item.querySelector('[name*=".date"]').value,
+                startTime,
+                endTime
+            };
+            const eventName = item.querySelector('[name*="eventName"]').value.trim();
+            if (eventName) entry.eventName = eventName;
+            schedules.push(entry);
+        } else {
+            const day = item.querySelector('[name*=".day"]').value;
+            schedules.push({ frequency, day, startTime, endTime });
+        }
     });
 
     // Build socials object (only non-empty values)
@@ -561,9 +591,13 @@ function renderModalPreview(venue) {
             ${venue.schedule.length ? `
                 <div class="schedule-preview">
                     <strong>Schedule:</strong>
-                    ${venue.schedule.map(s =>
-                        `<div>${s.frequency.charAt(0).toUpperCase() + s.frequency.slice(1)} ${s.day.charAt(0).toUpperCase() + s.day.slice(1)}: ${formatTimeRange(s.startTime, s.endTime)}</div>`
-                    ).join('')}
+                    ${venue.schedule.map(s => {
+                        if (s.frequency === 'once') {
+                            const label = s.eventName || 'Special Event';
+                            return `<div>${escapeHtml(label)} — ${s.date}: ${formatTimeRange(s.startTime, s.endTime)}</div>`;
+                        }
+                        return `<div>${s.frequency.charAt(0).toUpperCase() + s.frequency.slice(1)} ${s.day.charAt(0).toUpperCase() + s.day.slice(1)}: ${formatTimeRange(s.startTime, s.endTime)}</div>`;
+                    }).join('')}
                 </div>
             ` : ''}
             ${venue.host ? `

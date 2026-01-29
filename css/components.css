@@ -608,6 +608,27 @@
     }
 }
 
+/* Special Event card accent */
+.venue-card--special-event {
+    border-left: 4px solid #e91e63;
+    background: linear-gradient(135deg, rgba(233, 30, 99, 0.05), transparent);
+}
+
+.venue-card__event-name {
+    font-size: var(--font-size-sm);
+    color: #e91e63;
+    font-weight: 600;
+    margin-top: 2px;
+    margin-bottom: var(--spacing-xs);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.venue-card__event-name i {
+    font-size: var(--font-size-xs);
+}
+
 /* Venue Card Selected State */
 .venue-card--selected {
     border-left: 3px solid var(--color-primary);

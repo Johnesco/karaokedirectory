@@ -322,14 +322,32 @@
 }
 
 .schedule-item {
-    display: grid;
-    grid-template-columns: 120px 120px 1fr 1fr auto;
+    display: flex;
+    flex-wrap: wrap;
     gap: var(--spacing-sm);
     align-items: start;
     padding: var(--spacing-md);
     background: var(--color-gray-700);
     border-radius: var(--border-radius-sm);
     margin-bottom: var(--spacing-sm);
+}
+
+.schedule-item .schedule-frequency,
+.schedule-item .schedule-day {
+    width: 120px;
+}
+
+.schedule-item .schedule-date {
+    width: 150px;
+}
+
+.schedule-item .schedule-event-name {
+    flex: 1;
+    min-width: 140px;
+}
+
+.schedule-item input[type="time"] {
+    width: 110px;
 }
 
 .schedule-item select,
@@ -716,6 +734,14 @@
     }
 
     .schedule-item {
-        grid-template-columns: 1fr 1fr;
+        flex-direction: column;
+    }
+
+    .schedule-item .schedule-frequency,
+    .schedule-item .schedule-day,
+    .schedule-item .schedule-date,
+    .schedule-item .schedule-event-name,
+    .schedule-item input[type="time"] {
+        width: 100%;
     }
 }
