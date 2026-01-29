@@ -322,19 +322,19 @@
 
 @media (max-width: 768px) {
     .day-card {
-        scroll-margin-top: var(--nav-height-mobile);
+        scroll-margin-top: var(--nav-height);
     }
 
     .day-card__header {
         position: -webkit-sticky;
         position: sticky;
-        top: var(--nav-height-mobile);
+        top: var(--nav-height);
     }
 
     .letter-card__header {
         position: -webkit-sticky;
         position: sticky;
-        top: var(--nav-height-mobile);
+        top: var(--nav-height);
     }
 
     .alphabetical-view__index {

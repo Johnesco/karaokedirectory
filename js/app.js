@@ -43,6 +43,17 @@ async function init() {
     navigation = new Navigation('#navigation');
     navigation.render();
 
+    // Dynamically track navigation height so sticky headers sit right below it
+    const navContainer = document.querySelector('.navigation-container');
+    if (navContainer) {
+        const updateNavHeight = () => {
+            const h = navContainer.getBoundingClientRect().height;
+            document.documentElement.style.setProperty('--nav-height', `${h}px`);
+        };
+        updateNavHeight();
+        new ResizeObserver(updateNavHeight).observe(navContainer);
+    }
+
     // Initialize modal (for mobile/tablet, hidden by default)
     venueModal = new VenueModal('#venue-modal');
     venueModal.render();

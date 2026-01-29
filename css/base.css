@@ -82,9 +82,8 @@
     --z-modal: 400;
     --z-toast: 500;
 
-    /* Layout heights - account for navigation with search bar */
+    /* Layout heights - initial fallback; dynamically updated by app.js ResizeObserver */
     --nav-height: 56px;
-    --nav-height-mobile: 200px;
 }
 
 /* Reset */
