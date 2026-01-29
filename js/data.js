@@ -260,6 +260,7 @@ const karaokeData = {
     {
       "id": "blindside-lounge",
       "name": "Blindside Lounge",
+      "active": false,
       "tags": [
         "craft-cocktails"
       ],
@@ -279,7 +280,7 @@ const karaokeData = {
         }
       ],
       "host": {
-        "name": "Xpider"
+        "name": ""
       },
       "socials": {
         "instagram": "https://www.instagram.com/blindsidelounge",

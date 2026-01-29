@@ -11,8 +11,9 @@ import { emit, on, Events } from '../core/events.js';
 import { getVenuesWithCoordinates, getAllVenues } from '../services/venues.js';
 import { escapeHtml } from '../utils/string.js';
 import { formatScheduleEntry } from '../utils/date.js';
-import { buildDirectionsUrl } from '../utils/url.js';
+import { buildDirectionsUrl, buildMapUrl, formatAddress, createSocialLinks } from '../utils/url.js';
 import { renderTags } from '../utils/tags.js';
+import { renderScheduleTable, renderDateRange, renderHostSection } from '../utils/render.js';
 
 export class MapView extends Component {
     init() {
@@ -119,22 +120,18 @@ export class MapView extends Component {
             this.hideVenueCard();
         });
 
-        // View details button - switch to weekly and open modal
+        // Expand card to show full venue details
         this.delegate('click', '[data-action="view-details"]', () => {
-            const venue = this.selectedVenue;
-            if (!venue) return;
+            if (this.selectedVenue) {
+                this.showVenueDetails(this.selectedVenue);
+            }
+        });
 
-            // Defer the view switch so this component isn't destroyed
-            // while its own click handler is still on the call stack
-            setTimeout(() => {
-                setState({ view: 'weekly' });
-                emit(Events.VIEW_CHANGED, 'weekly');
-
-                // Wait for the weekly view to finish rendering, then show venue details
-                requestAnimationFrame(() => {
-                    emit(Events.VENUE_SELECTED, venue);
-                });
-            }, 0);
+        // Collapse back to compact summary
+        this.delegate('click', '[data-action="back-to-summary"]', () => {
+            if (this.selectedVenue) {
+                this.showVenueCard(this.selectedVenue, this.selectedMarker);
+            }
         });
 
         // Escape key to exit map view or close card
@@ -364,7 +361,70 @@ export class MapView extends Component {
             </div>
         `;
 
+        cardEl.classList.remove('map-venue-card--expanded');
         cardEl.classList.add('map-venue-card--visible');
+    }
+
+    showVenueDetails(venue) {
+        const cardEl = this.$('#map-venue-card');
+        if (!cardEl || !venue) return;
+
+        const addressHtml = formatAddress(venue.address);
+        const mapUrl = buildMapUrl(venue.address, venue.name);
+        const directionsUrl = buildDirectionsUrl(venue.address, venue.name);
+        const socialLinksHtml = createSocialLinks(venue.socials, { size: 'fa-lg' });
+        const tagsHtml = renderTags(venue.tags, { dedicated: venue.dedicated });
+
+        cardEl.innerHTML = `
+            <button class="map-venue-card__close" data-action="close-card" type="button" aria-label="Close">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="map-venue-card__header map-venue-card__header--detail">
+                <button class="map-venue-card__back" data-action="back-to-summary" type="button" aria-label="Back to summary">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <h3 class="map-venue-card__title">${escapeHtml(venue.name)}</h3>
+            </div>
+            ${tagsHtml}
+            <div class="map-venue-card__detail-content">
+                <section class="map-venue-card__section">
+                    <h4><i class="fa-solid fa-location-dot"></i> Location</h4>
+                    <address class="map-venue-card__address">${addressHtml}</address>
+                    <div class="map-venue-card__map-links">
+                        <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" class="btn btn--secondary btn--small">
+                            <i class="fa-solid fa-map"></i> Map
+                        </a>
+                        <a href="${directionsUrl}" target="_blank" rel="noopener noreferrer" class="btn btn--secondary btn--small">
+                            <i class="fa-solid fa-diamond-turn-right"></i> Directions
+                        </a>
+                    </div>
+                </section>
+
+                <section class="map-venue-card__section">
+                    <h4><i class="fa-regular fa-calendar"></i> Schedule</h4>
+                    ${renderScheduleTable(venue.schedule, 'map-venue-card')}
+                    ${renderDateRange(venue.dateRange, 'map-venue-card')}
+                </section>
+
+                ${renderHostSection(venue.host, 'map-venue-card', { socialSize: '' })}
+
+                ${socialLinksHtml ? `
+                    <section class="map-venue-card__section">
+                        <h4><i class="fa-solid fa-share-nodes"></i> Venue Social Media</h4>
+                        <div class="map-venue-card__socials">${socialLinksHtml}</div>
+                    </section>
+                ` : ''}
+
+                ${venue.phone ? `
+                    <section class="map-venue-card__section">
+                        <h4><i class="fa-solid fa-phone"></i> Contact</h4>
+                        <a href="tel:${venue.phone}" class="map-venue-card__phone">${escapeHtml(venue.phone)}</a>
+                    </section>
+                ` : ''}
+            </div>
+        `;
+
+        cardEl.classList.add('map-venue-card--expanded');
     }
 
     hideVenueCard() {
@@ -378,6 +438,7 @@ export class MapView extends Component {
         const cardEl = this.$('#map-venue-card');
         if (cardEl) {
             cardEl.classList.remove('map-venue-card--visible');
+            cardEl.classList.remove('map-venue-card--expanded');
         }
     }
 

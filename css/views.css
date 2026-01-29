@@ -747,6 +747,166 @@ body.view--map .app-layout__detail {
     border-top: 1px solid var(--border-color);
 }
 
+/* Expanded card (full venue details) */
+.map-venue-card--expanded {
+    overflow-y: auto;
+    max-height: 70vh;
+}
+
+.map-venue-card__back {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    transition: all var(--transition-fast);
+    flex-shrink: 0;
+}
+
+.map-venue-card__back:hover {
+    background: var(--color-gray-700);
+    color: var(--text-primary);
+}
+
+.map-venue-card__header--detail {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.map-venue-card__detail-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-sm);
+}
+
+.map-venue-card__section {
+    border-top: 1px solid var(--border-color);
+    padding-top: var(--spacing-sm);
+}
+
+.map-venue-card__section h4 {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    margin: 0 0 var(--spacing-xs);
+    color: var(--text-secondary);
+}
+
+.map-venue-card__section h4 i {
+    margin-right: var(--spacing-xs);
+    color: var(--color-primary);
+}
+
+.map-venue-card__section h3 {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    margin: 0 0 var(--spacing-xs);
+    color: var(--text-secondary);
+}
+
+.map-venue-card__section h3 i {
+    margin-right: var(--spacing-xs);
+    color: var(--color-primary);
+}
+
+.map-venue-card__address {
+    font-style: normal;
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.map-venue-card__map-links {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-xs);
+}
+
+.map-venue-card__schedule-table {
+    width: 100%;
+    font-size: var(--font-size-sm);
+    border-collapse: collapse;
+}
+
+.map-venue-card__schedule-table th,
+.map-venue-card__schedule-table td {
+    text-align: left;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.map-venue-card__schedule-table th {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.map-venue-card__schedule-table td {
+    color: var(--text-primary);
+}
+
+.map-venue-card__date-range {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin: var(--spacing-xs) 0 0;
+}
+
+.map-venue-card__date-range i {
+    margin-right: var(--spacing-xs);
+    color: var(--color-primary);
+}
+
+.map-venue-card__host {
+    font-size: var(--font-size-sm);
+}
+
+.map-venue-card__host-name {
+    font-weight: 600;
+    margin: 0 0 2px;
+}
+
+.map-venue-card__host-company {
+    color: var(--text-secondary);
+    margin: 0 0 var(--spacing-xs);
+}
+
+.map-venue-card__host-website {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    color: var(--color-primary);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-xs);
+}
+
+.map-venue-card__socials-label {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    margin: var(--spacing-xs) 0 2px;
+}
+
+.map-venue-card__host-socials {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.map-venue-card__socials {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.map-venue-card__phone {
+    color: var(--color-primary);
+    font-size: var(--font-size-sm);
+}
+
 /* Mobile adjustments */
 @media (max-width: 768px) {
     .map-venue-card {
@@ -784,5 +944,14 @@ body.view--map .app-layout__detail {
 
     .map-venue-card--visible {
         transform: translateX(0) translateY(-50%);
+    }
+
+    .map-venue-card--expanded {
+        max-height: 80vh;
+    }
+
+    .map-venue-card--expanded.map-venue-card--visible {
+        top: var(--spacing-lg);
+        transform: translateX(0) translateY(0);
     }
 }
