@@ -573,6 +573,51 @@ const karaokeData = {
       }
     },
     {
+      "id": "cheer-up-charlies",
+      "name": "Cheer Up Charlie's",
+      "active": true,
+      "dedicated": false,
+      "address": {
+        "street": "900 Red River St.",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78701",
+        "neighborhood": "Downtown"
+      },
+      "schedule": [
+        {
+          "frequency": "once",
+          "date": "2026-01-29",
+          "startTime": "21:00",
+          "endTime": "00:00",
+          "eventName": "Karaoke Underground @ Cheer Up!",
+          "eventUrl": "https://www.facebook.com/share/1CPcw6gNjC/"
+        }
+      ],
+      "host": {
+        "company": "Karaoke Underground",
+        "website": "https://karaokeunderground.com/"
+      },
+      "socials": {
+        "website": "https://cheerupcharlies.com/",
+        "facebook": "https://www.facebook.com/cheerupcharlies",
+        "instagram": "https://www.instagram.com/cheerupcharlies/"
+      },
+      "tags": [
+        "lgbtq",
+        "dive",
+        "21+"
+      ],
+      "coordinates": {
+        "lat": 30.2696106,
+        "lng": -97.736358
+      },
+      "dateRange": {
+        "start": "2026-01-29",
+        "end": "2026-01-30"
+      }
+    },
+    {
       "id": "cheerz",
       "name": "Cheerz",
       "tags": [
@@ -608,51 +653,6 @@ const karaokeData = {
         "lng": -97.54671731632
       }
     },
-    {
-  "id": "cheer-up-charlies",
-  "name": "Cheer Up Charlie's",
-  "active": true,
-  "dedicated": false,
-  "address": {
-    "street": "900 Red River St.",
-    "city": "Austin",
-    "state": "TX",
-    "zip": "78701",
-    "neighborhood": "Downtown"
-  },
-  "schedule": [
-    {
-      "frequency": "once",
-      "date": "2026-01-29",
-      "startTime": "21:00",
-      "endTime": "00:00",
-      "eventName": "Karaoke Underground @ Cheer Up!",
-      "eventUrl": "https://www.facebook.com/share/1CPcw6gNjC/"
-    }
-  ],
-  "host": {
-    "company": "Karaoke Underground",
-    "website": "https://karaokeunderground.com/"
-  },
-  "socials": {
-    "website": "https://cheerupcharlies.com/",
-    "facebook": "https://www.facebook.com/cheerupcharlies",
-    "instagram": "https://www.instagram.com/cheerupcharlies/"
-  },
-  "tags": [
-    "lgbtq",
-    "dive",
-    "21+"
-  ],
-  "coordinates": {
-    "lat": 30.2696106,
-    "lng": -97.736358
-  },
-  "dateRange": {
-    "start": "2026-01-29",
-    "end": "2026-01-30"
-  }
-},
     {
       "id": "cjs-sports-bar",
       "name": "CJ's Sports Bar",
@@ -1032,6 +1032,40 @@ const karaokeData = {
       "coordinates": {
         "lat": 30.649202770037,
         "lng": -97.687912262317
+      }
+    },
+    {
+      "id": "the-highball",
+      "name": "The Highball",
+      "active": true,
+      "dedicated": false,
+      "address": {
+        "street": "1120 S Lamar Blvd",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78704",
+        "neighborhood": ""
+      },
+      "schedule": [
+        {
+          "frequency": "once",
+          "date": "2026-02-28",
+          "startTime": "21:00",
+          "endTime": "02:00",
+          "eventName": "Karaoke with Xpider @ Highball!"
+        }
+      ],
+      "host": {
+        "name": "Xpider Cantu",
+        "website": "https://www.xpidermagic.com/karaoke"
+      },
+      "socials": {
+        "website": "https://drafthouse.com/austin/theater-bar/south-lamar",
+        "instagram": "https://www.instagram.com/highballaustin/?hl=en"
+      },
+      "coordinates": {
+        "lat": 30.2560666,
+        "lng": -97.7633276
       }
     },
     {
@@ -2389,6 +2423,67 @@ const karaokeData = {
       "coordinates": {
         "lat": 30.185721312196,
         "lng": -97.551510335946
+      }
+    },
+    {
+      "id": "the-water-tank",
+      "name": "The Water Tank",
+      "active": true,
+      "dedicated": false,
+      "address": {
+        "street": "7309 McNeil Dr",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78729",
+        "neighborhood": ""
+      },
+      "schedule": [
+        {
+          "frequency": "every",
+          "day": "wednesday",
+          "startTime": "20:00",
+          "endTime": "00:00"
+        },
+        {
+          "frequency": "every",
+          "day": "thursday",
+          "startTime": "20:00",
+          "endTime": "00:00"
+        },
+        {
+          "frequency": "every",
+          "day": "friday",
+          "startTime": "20:00",
+          "endTime": "01:00"
+        },
+        {
+          "frequency": "every",
+          "day": "saturday",
+          "startTime": "21:00",
+          "endTime": "01:30"
+        },
+        {
+          "frequency": "every",
+          "day": "sunday",
+          "startTime": "17:03",
+          "endTime": "21:00"
+        }
+      ],
+      "host": {
+        "company": "Stryke3 Karaoke",
+        "website": "https://www.austinkaraokeshows.com/"
+      },
+      "socials": {
+        "website": "https://www.austinwatertank.com/",
+        "facebook": "https://www.facebook.com/Thewatertankaustin",
+        "instagram": "https://www.instagram.com/the_water_tank/"
+      },
+      "tags": [
+        "outdoor"
+      ],
+      "coordinates": {
+        "lat": 30.359899,
+        "lng": -97.7440311
       }
     },
     {
