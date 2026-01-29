@@ -264,6 +264,7 @@ export class MapView extends Component {
             showCoverageOnHover: false,
             zoomToBoundsOnClick: false,
             maxClusterRadius: 40,
+            disableClusteringAtZoom: 17,
             iconCreateFunction: (cluster) => this.createClusterIcon(cluster)
         });
 
