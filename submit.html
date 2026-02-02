@@ -164,6 +164,97 @@
                 </fieldset>
 
                 <fieldset class="form-section">
+                    <legend><i class="fa-solid fa-tags"></i> Venue Tags</legend>
+                    <div class="form-row">
+                        <div class="form-group form-group--full">
+                            <label>Select all that apply</label>
+                            <small>Help users know what to expect at this venue</small>
+                        </div>
+                    </div>
+                    <div class="tag-checkbox-grid">
+                        <label class="tag-checkbox-option">
+                            <input type="checkbox" name="tag-lgbtq" value="lgbtq">
+                            <span class="tag-badge" style="background:#e040fb;color:#fff">LGBTQ+</span>
+                        </label>
+                        <label class="tag-checkbox-option">
+                            <input type="checkbox" name="tag-dive" value="dive">
+                            <span class="tag-badge" style="background:#8d6e63;color:#fff">Dive Bar</span>
+                        </label>
+                        <label class="tag-checkbox-option">
+                            <input type="checkbox" name="tag-sports-bar" value="sports-bar">
+                            <span class="tag-badge" style="background:#4caf50;color:#fff">Sports Bar</span>
+                        </label>
+                        <label class="tag-checkbox-option">
+                            <input type="checkbox" name="tag-country-bar" value="country-bar">
+                            <span class="tag-badge" style="background:#ff9800;color:#fff">Country Bar</span>
+                        </label>
+                        <label class="tag-checkbox-option">
+                            <input type="checkbox" name="tag-restaurant" value="restaurant">
+                            <span class="tag-badge" style="background:#795548;color:#fff">Restaurant</span>
+                        </label>
+                        <label class="tag-checkbox-option">
+                            <input type="checkbox" name="tag-brewery" value="brewery">
+                            <span class="tag-badge" style="background:#ff5722;color:#fff">Brewery</span>
+                        </label>
+                        <label class="tag-checkbox-option">
+                            <input type="checkbox" name="tag-craft-cocktails" value="craft-cocktails">
+                            <span class="tag-badge" style="background:#e91e63;color:#fff">Craft Cocktails</span>
+                        </label>
+                        <label class="tag-checkbox-option">
+                            <input type="checkbox" name="tag-neighborhood" value="neighborhood">
+                            <span class="tag-badge" style="background:#9e9e9e;color:#fff">Neighborhood Bar</span>
+                        </label>
+                        <label class="tag-checkbox-option">
+                            <input type="checkbox" name="tag-live-band-karaoke" value="live-band-karaoke">
+                            <span class="tag-badge" style="background:#9c27b0;color:#fff">Live Band Karaoke</span>
+                        </label>
+                        <label class="tag-checkbox-option">
+                            <input type="checkbox" name="tag-outdoor" value="outdoor">
+                            <span class="tag-badge" style="background:#4caf50;color:#fff">Outdoor / Patio</span>
+                        </label>
+                        <label class="tag-checkbox-option">
+                            <input type="checkbox" name="tag-games" value="games">
+                            <span class="tag-badge" style="background:#00bcd4;color:#fff">Games / Arcade</span>
+                        </label>
+                        <label class="tag-checkbox-option">
+                            <input type="checkbox" name="tag-billiards" value="billiards">
+                            <span class="tag-badge" style="background:#607d8b;color:#fff">Billiards</span>
+                        </label>
+                        <label class="tag-checkbox-option">
+                            <input type="checkbox" name="tag-smoking-inside" value="smoking-inside">
+                            <span class="tag-badge" style="background:#e90707;color:#fff">Smoking Inside</span>
+                        </label>
+                    </div>
+                    <div class="form-row" style="margin-top: var(--spacing-md);">
+                        <div class="form-group form-group--full">
+                            <label>Age Restriction</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="age-restriction" value="" checked>
+                                    <span>Not sure</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="age-restriction" value="21+">
+                                    <span>21+</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="age-restriction" value="18+">
+                                    <span>18+</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="age-restriction" value="all-ages">
+                                    <span>All Ages</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="age-restriction" value="family-friendly">
+                                    <span>Family Friendly</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset class="form-section">
                     <legend><i class="fa-solid fa-location-dot"></i> Address</legend>
                     <div class="form-row">
                         <div class="form-group form-group--full">
@@ -199,6 +290,7 @@
                                     <option value="second">Second</option>
                                     <option value="third">Third</option>
                                     <option value="fourth">Fourth</option>
+                                    <option value="last">Last</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -617,6 +709,7 @@
                         <option value="second">Second</option>
                         <option value="third">Third</option>
                         <option value="fourth">Fourth</option>
+                        <option value="last">Last</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -694,11 +787,27 @@
                 }
             });
 
+            // Collect tags
+            const tags = [];
+            const tagNames = [
+                'lgbtq', 'dive', 'sports-bar', 'country-bar', 'restaurant',
+                'brewery', 'craft-cocktails', 'neighborhood', 'live-band-karaoke',
+                'outdoor', 'games', 'billiards', 'smoking-inside'
+            ];
+            tagNames.forEach(tag => {
+                if (formData.get(`tag-${tag}`)) tags.push(tag);
+            });
+
+            // Age restriction as tag
+            const ageRestriction = formData.get('age-restriction');
+            if (ageRestriction) tags.push(ageRestriction);
+
             // Build venue object in standard format
             const venue = {
                 id: generateVenueId(venueName),
                 name: venueName,
                 dedicated: formData.get('dedicated') ? true : false,
+                tags: tags.length > 0 ? tags : undefined,
                 address: {
                     street: formData.get('street')?.trim() || '',
                     city: formData.get('city')?.trim() || 'Austin',
@@ -707,6 +816,9 @@
                 },
                 schedule: schedule
             };
+
+            // Remove undefined tags field from JSON output
+            if (!venue.tags) delete venue.tags;
 
             // Optional: Host info
             const hostName = formData.get('host-name')?.trim();

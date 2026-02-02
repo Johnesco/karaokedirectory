@@ -350,6 +350,48 @@
     border: 1px solid var(--border-color);
 }
 
+/* Tag checkbox grid */
+.tag-checkbox-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+}
+
+.tag-checkbox-option {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    cursor: pointer;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+    background: var(--bg-secondary);
+    border: 2px solid transparent;
+    transition: all var(--transition-fast);
+}
+
+.tag-checkbox-option:hover {
+    border-color: var(--border-color);
+}
+
+.tag-checkbox-option:has(input:checked) {
+    border-color: var(--color-primary);
+}
+
+.tag-checkbox-option input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--color-primary);
+}
+
+.tag-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
 /* Mobile: small gaps */
 @media (max-width: 768px) {
     .submit-form {

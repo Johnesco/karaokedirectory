@@ -2226,6 +2226,37 @@ const karaokeData = {
       }
     },
     {
+      "id": "snuffys-bar-and-grill",
+      "name": "Snuffy's Bar & Grill",
+      "active": true,
+      "dedicated": false,
+      "address": {
+        "street": "204 US-79",
+        "city": "Hutto",
+        "state": "TX",
+        "zip": "78634",
+        "neighborhood": "Hutto"
+      },
+      "schedule": [
+        {
+          "frequency": "every",
+          "day": "wednesday",
+          "startTime": "20:00",
+          "endTime": "23:30"
+        }
+      ],
+      "host": {
+        "name": "Xpider Cantu"
+      },
+      "socials": {
+        "facebook": "https://www.facebook.com/snuffys.place/"
+      },
+      "coordinates": {
+        "lat": 30.5431702,
+        "lng": -97.5503295
+      }
+    },
+    {
       "id": "spirit-of-texas",
       "name": "Spirit of Texas Brewstillery",
       "tags": [
@@ -2265,34 +2296,47 @@ const karaokeData = {
       }
     },
     {
-      "id": "snuffys-bar-and-grill",
-      "name": "Suffy's Bar & Grill",
+      "id": "the-stardust-club",
+      "name": "The Stardust Club",
       "active": true,
       "dedicated": false,
       "address": {
-        "street": "204 US-79",
-        "city": "Hutto",
+        "street": "11940 Menchaca Rd. Suite 114",
+        "city": "Austin",
         "state": "TX",
-        "zip": "78634",
-        "neighborhood": "Hutto"
+        "zip": "78748",
+        "neighborhood": ""
       },
       "schedule": [
         {
           "frequency": "every",
+          "day": "monday",
+          "startTime": "21:00",
+          "endTime": "01:00"
+        },
+        {
+          "frequency": "every",
           "day": "wednesday",
-          "startTime": "20:00",
-          "endTime": "23:30"
+          "startTime": "21:00",
+          "endTime": "01:00"
         }
       ],
       "host": {
-        "name": "Xpider Cantu"
+        "company": "By Request Karaoke",
+        "website": "https://www.facebook.com/brkaraoke"
       },
       "socials": {
-        "facebook": "https://www.facebook.com/snuffys.place/"
+        "website": "https://thestardustclub.com/",
+        "facebook": "https://www.facebook.com/brkaraoke",
+        "instagram": "https://www.instagram.com/stardust11532025/"
       },
+      "tags": [
+        "21+",
+        "neighborhood"
+      ],
       "coordinates": {
-        "lat": 30.5431702,
-        "lng": -97.5503295
+        "lat": 30.1456356,
+        "lng": -97.8343512
       }
     },
     {
