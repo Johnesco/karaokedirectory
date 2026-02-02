@@ -1072,24 +1072,16 @@
             submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
 
             try {
-                const response = await fetch(APPS_SCRIPT_URL, {
+                // mode: 'no-cors' is required because Apps Script returns a 302
+                // redirect whose chain doesn't carry CORS headers. The response
+                // body is opaque (unreadable), but the POST still reaches the
+                // server and gets processed. A non-throwing fetch = success.
+                await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
+                    mode: 'no-cors',
                     headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify(payload)
                 });
-
-                // Try to parse JSON response; Apps Script may return opaque response
-                let result;
-                try {
-                    result = await response.json();
-                } catch {
-                    // If we can't parse JSON but got here, treat as success
-                    result = { status: 'ok' };
-                }
-
-                if (result.status === 'error') {
-                    throw new Error(result.message || 'Submission failed');
-                }
 
                 // Success
                 saveSubmission();
