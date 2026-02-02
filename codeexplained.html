@@ -75,19 +75,24 @@ karaokedirectory/
 ├── index.html          # Main page - the entry point users see
 ├── about.html          # About page
 ├── bingo.html          # Karaoke bingo game
-├── editor.html         # Venue data editor
+├── editor.html         # Venue data editor with geocoding
 ├── submit.html         # Venue submission form
 ├── codeexplained.html  # This documentation page
 │
 ├── css/                # All styling files
 │   ├── base.css        # Variables, reset, typography
 │   ├── layout.css      # Page structure, header, footer
-│   ├── components.css  # Reusable UI components
-│   └── views.css       # View-specific styles
+│   ├── components.css  # Reusable UI components (cards, modals, search)
+│   ├── views.css       # View-specific styles (weekly, map, etc.)
+│   ├── bingo.css       # Bingo game styles
+│   ├── editor.css      # Editor page styles
+│   ├── submit.css      # Submission form styles
+│   └── docs.css        # Documentation page styles
 │
 ├── js/                 # All JavaScript files
 │   ├── app.js          # Main application entry point
-│   ├── data.js         # Venue database
+│   ├── data.js         # Venue database (69+ venues)
+│   ├── bingo.js        # Bingo game logic
 │   │
 │   ├── core/           # Core application systems
 │   │   ├── state.js    # State management (stores app data)
@@ -95,10 +100,10 @@ karaokedirectory/
 │   │
 │   ├── components/     # Reusable UI pieces
 │   │   ├── Component.js     # Base component class
-│   │   ├── Navigation.js    # Navigation tabs
+│   │   ├── Navigation.js    # View tabs, search bar, filters
 │   │   ├── VenueCard.js     # Venue display card
-│   │   ├── VenueModal.js    # Popup venue details
-│   │   ├── VenueDetailPane.js # Side panel details
+│   │   ├── VenueModal.js    # Popup venue details (mobile)
+│   │   ├── VenueDetailPane.js # Side panel details (desktop)
 │   │   └── DayCard.js       # Day schedule card
 │   │
 │   ├── views/          # Full-page views
@@ -107,15 +112,29 @@ karaokedirectory/
 │   │   └── MapView.js         # Interactive map
 │   │
 │   ├── services/       # Data handling
-│   │   └── venues.js   # Venue data operations
+│   │   └── venues.js   # Venue data operations, search, filtering
 │   │
 │   └── utils/          # Helper functions
-│       ├── date.js     # Date formatting
-│       ├── string.js   # Text manipulation
-│       ├── tags.js     # Venue tag rendering
-│       └── url.js      # URL building
+│       ├── date.js     # Date formatting, schedule matching
+│       ├── debug.js    # Debug mode utilities (?debug=1)
+│       ├── render.js   # Shared rendering (schedule tables, host sections)
+│       ├── string.js   # Text manipulation, escaping
+│       ├── tags.js     # Venue tag rendering and configuration
+│       ├── url.js      # URL building, sanitization
+│       └── validation.js # Form input validation
 │
-└── assets/             # Images and static files
+├── editor/             # Editor tool
+│   └── editor.js       # Editor logic with geocode support
+│
+├── tests/              # Test suite
+│   ├── index.html      # Visual test runner with date tester
+│   └── schedule-tests.js # Schedule matching tests
+│
+├── scripts/            # Developer tools
+│   ├── geocode-venues.js   # Batch geocode venues (Node.js)
+│   └── validate-data.js    # Validate venue data integrity
+│
+└── assets/images/      # Static images
             </div>
 
             <div class="highlight-box">
@@ -304,11 +323,12 @@ karaokedirectory/
                 <li><strong>active</strong> - Optional boolean (default true). Set to false to hide the venue from all pages.</li>
                 <li><strong>dedicated</strong> - A boolean (true/false) indicating if it's a dedicated karaoke venue (karaoke every day).</li>
                 <li><strong>tags</strong> - An optional array of tag IDs (like ["lgbtq", "21+"]) indicating venue characteristics.</li>
-                <li><strong>address</strong> - An object containing street, city, state, and zip.</li>
-                <li><strong>schedule</strong> - An array of schedule entries, each with frequency (every, first, second, etc.), day, start time, and end time.</li>
-                <li><strong>host</strong> - Information about the karaoke host/KJ.</li>
-                <li><strong>socials</strong> - Links to social media profiles.</li>
-                <li><strong>coordinates</strong> - Latitude and longitude for the map.</li>
+                <li><strong>address</strong> - An object containing street, city, state, zip, and optional neighborhood.</li>
+                <li><strong>coordinates</strong> - Latitude and longitude for the map. Can be auto-filled using the editor's geocode button.</li>
+                <li><strong>schedule</strong> - An array of schedule entries. Recurring entries have frequency (every, first, second, third, fourth, last), day, start time, and end time. One-time entries use frequency "once" with a specific date, optional event name, and optional event URL.</li>
+                <li><strong>dateRange</strong> - Optional start and end dates for seasonal or temporary venues. Venues only appear within their active range.</li>
+                <li><strong>host</strong> - Information about the karaoke host/KJ, including name, company, and optional website.</li>
+                <li><strong>socials</strong> - Links to social media profiles (website, Facebook, Instagram, Twitter/X, TikTok, YouTube).</li>
             </ul>
 
             <h3>The Venues Service (venues.js)</h3>
@@ -319,9 +339,9 @@ karaokedirectory/
                 <li><strong>initVenues(data)</strong> - Loads the venue data into the service.</li>
                 <li><strong>getAllVenues()</strong> - Returns all venues.</li>
                 <li><strong>getVenueById(id)</strong> - Finds a specific venue by its ID.</li>
-                <li><strong>getVenuesForDate(date)</strong> - Returns venues that have karaoke on a specific date.</li>
+                <li><strong>getVenuesForDate(date)</strong> - Returns venues that have karaoke on a specific date (handles recurring, ordinal, "once", and date range logic).</li>
                 <li><strong>getVenuesSorted()</strong> - Returns all venues sorted alphabetically.</li>
-                <li><strong>searchVenues(query)</strong> - Searches venues by name, city, or host.</li>
+                <li><strong>venueMatchesSearch(venue, query)</strong> - Checks if a venue matches a search string against name, city, neighborhood, host, company, tag IDs, and tag labels.</li>
                 <li><strong>filterVenues(filters)</strong> - Filters venues by multiple criteria.</li>
             </ul>
 
@@ -334,9 +354,11 @@ karaokedirectory/
             <ul>
                 <li>The day of the week (Monday, Tuesday, etc.)</li>
                 <li>The frequency (every week, first Saturday, second Thursday, last Friday, etc.)</li>
+                <li>One-time events with frequency "once" that match a specific date</li>
+                <li>Date ranges — venues with a <span class="code-term">dateRange</span> only appear within their active start/end dates</li>
             </ul>
 
-            <p>For "first", "second", etc., it calculates which occurrence of that weekday in the month the date falls on. For "last", it checks if there's another occurrence of that weekday later in the same month.</p>
+            <p>For "first", "second", etc., it calculates which occurrence of that weekday in the month the date falls on. For "last", it checks if there's another occurrence of that weekday later in the same month. For "once" events, it simply compares the schedule's date field against the target date.</p>
 
             <h3>The Tagging System</h3>
 
@@ -347,6 +369,7 @@ karaokedirectory/
             <p>At the top of data.js, there's a <span class="code-term">tagDefinitions</span> object that defines all available tags:</p>
 
             <ul>
+                <li><strong>dedicated</strong> - Dedicated karaoke venue (auto-added when venue is marked dedicated)</li>
                 <li><strong>lgbtq</strong> - LGBTQ+ friendly venues (purple badge)</li>
                 <li><strong>dive</strong> - Dive bar atmosphere (brown badge)</li>
                 <li><strong>sports-bar</strong> - Sports bar venues (green badge)</li>
@@ -356,6 +379,15 @@ karaokedirectory/
                 <li><strong>all-ages</strong> - No age restriction (blue badge)</li>
                 <li><strong>family-friendly</strong> - Family-friendly venues (light blue badge)</li>
                 <li><strong>smoking-inside</strong> - Indoor smoking allowed (red badge)</li>
+                <li><strong>restaurant</strong> - Primarily a restaurant with karaoke</li>
+                <li><strong>outdoor</strong> - Significant outdoor/patio space</li>
+                <li><strong>live-band-karaoke</strong> - Live band karaoke venue</li>
+                <li><strong>billiards</strong> - Pool hall / billiards focus</li>
+                <li><strong>brewery</strong> - Brewery or distillery</li>
+                <li><strong>games</strong> - Arcade, bowling, entertainment center</li>
+                <li><strong>craft-cocktails</strong> - Upscale craft cocktail bar</li>
+                <li><strong>neighborhood</strong> - Casual neighborhood bar</li>
+                <li><strong>special-event</strong> - One-time special karaoke events</li>
             </ul>
 
             <p>Each tag definition includes a human-readable label, background color, and text color for proper contrast.</p>
@@ -409,6 +441,7 @@ karaokedirectory/
                 <li><strong>view</strong> - Current view ('weekly', 'alphabetical', or 'map').</li>
                 <li><strong>weekStart</strong> - The date of the currently displayed week's Sunday.</li>
                 <li><strong>showDedicated</strong> - Whether to include dedicated venues.</li>
+                <li><strong>searchQuery</strong> - The current search text for filtering venues across all views.</li>
                 <li><strong>selectedVenue</strong> - The currently selected venue (for detail view).</li>
                 <li><strong>isLoading</strong> - Whether data is currently loading.</li>
             </ul>
@@ -535,10 +568,10 @@ karaokedirectory/
             <h3>Specific Components</h3>
 
             <h4>Navigation</h4>
-            <p>Renders the view tabs (Calendar, A-Z, Map), week navigation arrows, and the "Show dedicated venues" toggle. Subscribes to view and weekStart state to update when these change.</p>
+            <p>Renders the view tabs (Calendar, A-Z, Map), week navigation arrows, a global search bar with clear button, and the "Show dedicated venues" toggle. The search bar filters venues across all views by name, city, neighborhood, host, company, and tags. Subscribes to view and weekStart state to update when these change. Notably, search query changes do not cause a full Navigation re-render, which preserves keyboard focus in the search input.</p>
 
             <h4>VenueCard</h4>
-            <p>Displays a venue in either "compact" mode (for day cards) or "full" mode (for alphabetical view). Handles click events to select the venue.</p>
+            <p>Displays a venue in either "compact" mode (for day cards) or "full" mode (for alphabetical view). Shows venue name, time, location, color-coded tags, host info, and special event indicators. Handles click events to select the venue. Event URLs are rendered as external links.</p>
 
             <h4>VenueModal</h4>
             <p>A full-screen popup for venue details on mobile. Listens for VENUE_SELECTED events and opens. Handles closing via button click, backdrop click, or Escape key.</p>
@@ -547,7 +580,7 @@ karaokedirectory/
             <p>A sticky side panel for venue details on desktop (1200px+ screens). Similar to VenueModal but displayed inline instead of as an overlay.</p>
 
             <h4>DayCard</h4>
-            <p>Shows all venues for a specific day. Displays the day name, date, "Today" badge if applicable, and a list of VenueCards. Past days are collapsed by default.</p>
+            <p>Shows all venues for a specific day. Displays the day name, date, "Today" badge if applicable, venue count, and a list of VenueCards. Past days are collapsed by default but can be expanded by clicking the header. Days with no venues after search/filter are collapsed with a <span class="code-term">.day-card--empty</span> class. Special events sort to the top of the day's listings.</p>
         </section>
 
         <!-- SECTION 9: VIEWS -->
@@ -644,7 +677,9 @@ karaokedirectory/
                 <li><strong>getWeekStart(date)</strong> - Returns the Sunday of that week</li>
                 <li><strong>formatTime12(time24)</strong> - Converts "21:00" to "9:00 PM"</li>
                 <li><strong>formatTimeRange(start, end)</strong> - Formats as "9:00 PM - 2:00 AM"</li>
-                <li><strong>scheduleMatchesDate(schedule, date)</strong> - Checks if a schedule entry applies to a date</li>
+                <li><strong>formatScheduleEntry(entry)</strong> - Formats a schedule entry for display (handles all frequency types including "once")</li>
+                <li><strong>formatDateRangeText(dateRange)</strong> - Formats a date range as human-readable text</li>
+                <li><strong>scheduleMatchesDate(schedule, date)</strong> - Checks if a schedule entry applies to a date (supports recurring, ordinal, "once", and date ranges)</li>
             </ul>
 
             <h3>String Utilities (string.js)</h3>
@@ -674,6 +709,21 @@ karaokedirectory/
                 <li><strong>formatAddress(address)</strong> - Formats address object as string</li>
             </ul>
 
+            <h3>Render Utilities (render.js)</h3>
+
+            <p>Shared rendering functions used by both VenueModal and VenueDetailPane to avoid code duplication:</p>
+
+            <ul>
+                <li><strong>renderScheduleTable(schedule, classPrefix)</strong> - Generates an HTML table showing all schedule entries, with special handling for "once" events and event URL links</li>
+                <li><strong>renderDateRange(dateRange, classPrefix)</strong> - Renders a date range notice with calendar icon</li>
+                <li><strong>renderHostSection(host, classPrefix)</strong> - Renders the host/KJ section with name, company, website link, and social media</li>
+                <li><strong>formatHostDisplay(host)</strong> - Returns a compact "Name (Company)" string for venue cards</li>
+            </ul>
+
+            <h3>Debug Utilities (debug.js)</h3>
+
+            <p>Development tools activated by adding <span class="code-term">?debug=1</span> to the URL or setting <span class="code-term">localStorage.setItem('debug', '1')</span>. When enabled, venue cards display the reason they appear on a given date (e.g., "Every Friday", "First Saturday"), and a "Debug Mode" indicator appears in the corner of the page.</p>
+
             <div class="highlight-box">
                 <p><strong>Why Escape HTML?</strong></p>
                 <p>If venue data contained <span class="code-term">&lt;script&gt;alert('hacked')&lt;/script&gt;</span> and we rendered it directly, that script would execute. The <span class="code-term">escapeHtml()</span> function converts < to &amp;lt; and > to &amp;gt; so it displays as text instead of executing. Always escape user-provided content!</p>
@@ -691,13 +741,13 @@ karaokedirectory/
             <ol>
                 <li>Browser loads index.html and parses the HTML structure</li>
                 <li>Browser loads CSS files and applies styles</li>
-                <li>Browser loads data.js, creating the <span class="code-term">karaokeData</span> global variable</li>
+                <li>Browser loads data.js, creating the <span class="code-term">karaokeData</span> global variable with tag definitions and venue listings</li>
                 <li>Browser loads app.js as a module, which imports its dependencies</li>
                 <li>When DOM is ready, app.js calls <span class="code-term">init()</span></li>
-                <li><span class="code-term">init()</span> calls <span class="code-term">loadData()</span>, which initializes tag configuration and venue data</li>
-                <li><span class="code-term">init()</span> creates Navigation, VenueModal, and VenueDetailPane components</li>
+                <li><span class="code-term">init()</span> calls <span class="code-term">loadData()</span>, which initializes tag configuration and venue data in the service layer</li>
+                <li><span class="code-term">init()</span> creates Navigation (with search bar and filters), VenueModal, and VenueDetailPane components</li>
                 <li><span class="code-term">init()</span> calls <span class="code-term">renderView('weekly')</span>, which creates and renders WeeklyView</li>
-                <li>WeeklyView generates DayCards for the current week, which generate VenueCards (with tags)</li>
+                <li>WeeklyView generates DayCards for the current week, which generate VenueCards (with tags, schedule info, and host details)</li>
                 <li>WeeklyView scrolls to today's card</li>
             </ol>
 

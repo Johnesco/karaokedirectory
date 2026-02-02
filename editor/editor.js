@@ -884,5 +884,62 @@ function removeTagDefinition(tagId) {
     showToast(`Tag "${tagId}" removed`, 'success');
 }
 
+/**
+ * Geocode address using US Census Geocoder API
+ */
+async function geocodeAddress() {
+    const street = document.getElementById('address-street').value.trim();
+    const city = document.getElementById('address-city').value.trim();
+    const state = document.getElementById('address-state').value.trim();
+    const zip = document.getElementById('address-zip').value.trim();
+    const statusEl = document.getElementById('geocode-status');
+    const btn = document.getElementById('btn-geocode');
+
+    if (!street || !city) {
+        statusEl.textContent = 'Street and city are required';
+        statusEl.style.color = 'var(--color-error)';
+        return;
+    }
+
+    const address = `${street}, ${city}, ${state} ${zip}`.trim();
+    const url = `https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?address=${encodeURIComponent(address)}&benchmark=Public_AR_Current&format=json`;
+
+    btn.disabled = true;
+    statusEl.textContent = 'Looking up coordinates...';
+    statusEl.style.color = 'var(--text-muted)';
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+
+        const matches = data.result?.addressMatches;
+        if (!matches || matches.length === 0) {
+            statusEl.textContent = 'No matches found for this address';
+            statusEl.style.color = 'var(--color-warning)';
+            return;
+        }
+
+        const coords = matches[0].coordinates;
+        document.getElementById('coord-lat').value = coords.y;
+        document.getElementById('coord-lng').value = coords.x;
+
+        hasUnsavedChanges = true;
+        updatePreview();
+        markVenueUnsaved();
+
+        statusEl.textContent = `Found: ${coords.y.toFixed(6)}, ${coords.x.toFixed(6)}`;
+        statusEl.style.color = 'var(--color-success)';
+    } catch (err) {
+        statusEl.textContent = `Geocoding failed: ${err.message}`;
+        statusEl.style.color = 'var(--color-error)';
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+// Expose to global scope for onclick handler
+window.geocodeAddress = geocodeAddress;
+
 // Initialize
 init();

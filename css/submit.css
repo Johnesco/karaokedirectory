@@ -392,6 +392,50 @@
     white-space: nowrap;
 }
 
+/* Error variant of success message (for fallback display) */
+.success-message--error {
+    background: var(--color-warning);
+    color: var(--color-black);
+}
+
+.success-message--error strong {
+    color: var(--color-black);
+}
+
+/* Fallback options row (email + copy buttons) */
+.fallback-options {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: center;
+    margin-top: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+/* Copy-paste fallback area */
+.copy-fallback {
+    margin-top: var(--spacing-md);
+    text-align: left;
+}
+
+.copy-fallback__label {
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+}
+
+.copy-fallback__text {
+    width: 100%;
+    min-height: 160px;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-family: monospace;
+    font-size: var(--font-size-sm);
+    resize: vertical;
+    margin-bottom: var(--spacing-sm);
+}
+
 /* Mobile: small gaps */
 @media (max-width: 768px) {
     .submit-form {

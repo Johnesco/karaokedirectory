@@ -169,7 +169,12 @@
                                    placeholder="-97.741235" pattern="-?\d+\.?\d*">
                         </div>
                     </div>
-                    <small class="form-hint">Coordinates for map view. Run <code>node scripts/geocode-venues.js</code> to auto-fill from address.</small>
+                    <div class="geocode-row">
+                        <button type="button" id="btn-geocode" class="btn btn--small btn--secondary" onclick="geocodeAddress()">
+                            <i class="fa-solid fa-location-crosshairs"></i> Geocode Address
+                        </button>
+                        <small id="geocode-status" class="form-hint">Looks up coordinates from the address fields above</small>
+                    </div>
                 </fieldset>
 
                 <!-- Schedule -->

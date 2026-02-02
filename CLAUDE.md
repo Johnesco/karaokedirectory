@@ -33,7 +33,7 @@
 - Event bus for component communication (`js/core/events.js`)
 
 ### 5. Data-Driven
-- All venue data in `js/data.js` (currently 59+ venues)
+- All venue data in `js/data.js` (currently 69+ venues)
 - Service layer abstracts data access (`js/services/venues.js`)
 - Schedule matching logic handles complex recurrence patterns
 
@@ -92,6 +92,7 @@ karaokedirectory/
 │   └── utils/
 │       ├── date.js        # Date formatting, schedule matching
 │       ├── debug.js       # Debug mode utilities
+│       ├── render.js      # Shared rendering (schedule table, host section, date range)
 │       ├── string.js      # Text manipulation, escaping
 │       ├── tags.js        # Venue tag rendering and configuration
 │       ├── url.js         # URL building, sanitization
@@ -124,7 +125,8 @@ When adding or modifying venues in `js/data.js`, follow this structure:
     street: "123 Main St",
     city: "Austin",
     state: "TX",
-    zip: "78701"
+    zip: "78701",
+    neighborhood: "Downtown"  // Optional: helps with search filtering
   },
   coordinates: {              // Optional, for map view
     lat: 30.2672,
@@ -135,18 +137,34 @@ When adding or modifying venues in `js/data.js`, follow this structure:
       frequency: "every",     // "every", "first", "second", "third", "fourth", "last"
       day: "Friday",          // Full day name, capitalized
       startTime: "21:00",     // 24-hour format
-      endTime: "01:00"        // Can cross midnight
+      endTime: "01:00",       // Can cross midnight
+      eventUrl: "https://..." // Optional: link to event page
+    },
+    {
+      frequency: "once",      // One-time special event
+      date: "2026-03-15",     // Specific date (YYYY-MM-DD)
+      startTime: "20:00",
+      endTime: "23:00",
+      eventName: "Event Name", // Optional: display name for the event
+      eventUrl: "https://..."  // Optional: link to event page
     }
   ],
+  dateRange: {                // Optional: for seasonal venues
+    start: "2026-06-01",      // Venue only appears within this range
+    end: "2026-08-31"
+  },
   host: {                     // Optional
     name: "KJ Name",
-    company: "Company Name"
+    company: "Company Name",
+    website: "https://..."    // Optional: host/KJ website
   },
   socials: {                  // All optional
     website: "https://...",
     facebook: "https://facebook.com/...",
     instagram: "https://instagram.com/...",
-    twitter: "https://twitter.com/..."
+    twitter: "https://twitter.com/...",
+    tiktok: "https://tiktok.com/...",
+    youtube: "https://youtube.com/..."
   }
 }
 ```
@@ -179,7 +197,8 @@ Available tags:
 | `brewery` | Brewery | Brewery or distillery |
 | `games` | Games | Arcade, bowling, entertainment center |
 | `craft-cocktails` | Craft Cocktails | Upscale craft cocktail bar |
-| `neighborhood` | Neighborhood | Casual neighborhood bar |
+| `neighborhood` | Neighborhood Bar | Casual neighborhood bar |
+| `special-event` | Special Event | One-time special karaoke events |
 
 Tags are rendered as color-coded badges in VenueCard, VenueModal, and VenueDetailPane components using the `renderTags()` function from `js/utils/tags.js`.
 
@@ -253,6 +272,7 @@ The app includes a global search bar that filters venues across all views:
 - Host name and company
 - Tag IDs (e.g., "lgbtq", "dive") and labels (e.g., "LGBTQ+", "Dive Bar")
 - "dedicated" keyword for dedicated karaoke venues
+- Event names (for special one-time events)
 
 **UI behavior:**
 - Clear button appears when search has text
@@ -322,10 +342,10 @@ Use these semantic elements consistently:
 ## Common Development Tasks
 
 ### Adding a New Venue
-1. Edit `js/data.js`
+1. Edit `js/data.js` (or use the venue editor at `editor.html`)
 2. Add venue object to `listings` array
 3. Run `scripts/validate-data.js` to check format
-4. Optionally add coordinates via `scripts/geocode-venues.js`
+4. Add coordinates using the "Geocode Address" button in the editor, or via `scripts/geocode-venues.js` (Node.js batch)
 
 ### Adding a New View
 1. Create `js/views/NewView.js` extending Component
@@ -368,15 +388,19 @@ The test page includes a date picker to check which venues appear on any date an
 - [x] Venue detail modal (mobile) and side pane (desktop)
 - [x] Dedicated venue filter
 - [x] Week navigation (prev/next/today)
-- [x] Venue tagging system with color-coded badges
-- [x] Global search (filters by name, city, host, tags)
+- [x] Venue tagging system with 19 color-coded badges
+- [x] Global search (filters by name, city, neighborhood, host, tags)
 - [x] Collapsible empty day cards (space-efficient when filtering)
+- [x] Special events support (one-time events with dates and event links)
+- [x] Seasonal/date range support for temporary venues
 - [x] Karaoke bingo game
 - [x] Venue submission form
-- [x] Venue editor tool
+- [x] Venue editor tool with live preview and tag management
+- [x] Address geocoding in editor (US Census Geocoder API)
 - [x] Comprehensive code documentation (codeexplained.html)
 - [x] Test suite for schedule verification (tests/index.html)
 - [x] Debug mode for schedule troubleshooting (?debug=1)
+- [x] Shared rendering utilities (render.js) for schedule tables, host sections, date ranges
 
 ### Potential Future Enhancements
 - [ ] Tag-based quick filter buttons (clickable tag chips)
@@ -389,6 +413,41 @@ The test page includes a date picker to check which venues appear on any date an
 ## Project History
 
 ### Recent Changes
+- **2026-02**: Added geocode button to venue editor
+  - Replaced Node.js script hint with in-browser "Geocode Address" button
+  - Uses US Census Geocoder API (free, public, CORS-enabled)
+  - Reads address fields, populates lat/lng, shows status feedback
+  - Function `geocodeAddress()` in `editor/editor.js`, exposed to global scope
+  - CSS `.geocode-row` in `css/editor.css`
+- **2025**: Added special events support ("once" frequency)
+  - Schedule entries with `frequency: "once"` for one-time events
+  - `date` field for specific dates, `eventName` for display label
+  - `eventUrl` field for linking to event pages (works on all frequencies)
+  - `special-event` tag added to tagDefinitions
+  - Special events sort to top of daily listings in WeeklyView
+  - Editor supports all "once" fields (date picker, event name, event URL)
+- **2025**: Added date range support for seasonal venues
+  - `dateRange` field with `start` and `end` date strings
+  - Venues only appear within their active date range
+  - Editor includes season start/end date inputs
+  - `formatDateRangeText()` in date.js, `renderDateRange()` in render.js
+- **2025**: Added shared rendering utilities (`js/utils/render.js`)
+  - `renderScheduleTable()` for venue detail schedule display
+  - `renderHostSection()` for host/KJ display with website and socials
+  - `renderDateRange()` for date range notices
+  - `formatHostDisplay()` for compact host lines in cards
+  - Used by VenueModal and VenueDetailPane
+- **2025**: Added TikTok and YouTube social platform support
+  - `socials.tiktok` and `socials.youtube` fields in venue data
+  - Editor form fields for both platforms
+  - Icons rendered via `createSocialLinks()` in url.js
+- **2025**: Added host website field
+  - `host.website` field for KJ/host personal website
+  - Displayed in venue detail views and editor
+- **2025**: Added tag definitions editor in venue editor
+  - Add, modify, and remove tag definitions in sidebar
+  - Color pickers for background and text colors
+  - Changes propagate to tag selector and preview
 - **2025-01**: Added global search functionality
   - Search input in Navigation component with clear button
   - Filters venues by name, city, neighborhood, host, company, and tags
@@ -468,5 +527,5 @@ The test page includes a date picker to check which venues appear on any date an
 
 ---
 
-*Last updated: January 2025*
+*Last updated: February 2026*
 *Maintained by: Project contributors and Claude Code sessions*

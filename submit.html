@@ -458,7 +458,7 @@
 
                 <div class="form-actions">
                     <button type="submit" class="btn btn--primary btn--large" id="submit-btn">
-                        <i class="fa-solid fa-paper-plane"></i> Generate Email
+                        <i class="fa-solid fa-paper-plane"></i> Submit Venue
                     </button>
                     <button type="button" class="btn btn--secondary btn--large" onclick="previewJSON()">
                         <i class="fa-solid fa-eye"></i> Preview JSON
@@ -521,6 +521,9 @@
 
         // Email configuration
         const EMAIL_ADDRESS = 'karaokedirectoryatx@gmail.com'; // Change this to your email
+
+        // Google Apps Script web app URL (replace after deploying Code.gs)
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyC6_0vlIncIjXHsNz_JFbuxyOoSmBJmRaxAJjQ3Mwf4uJfXj_rMa4BC-Z9g8CsOSlC/exec';
 
         let scheduleCount = 1;
 
@@ -1051,6 +1054,118 @@
             return body;
         }
 
+        // ---- API Submission with Fallback ----
+
+        // Escape text for safe insertion into innerHTML-created textarea
+        function escapeHtmlForTextarea(text) {
+            return text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        // Submit data to Google Apps Script backend with mailto fallback
+        async function submitToAPI(payload, emailSubject, emailBody, submitBtn) {
+            const originalHTML = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
+
+            try {
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify(payload)
+                });
+
+                // Try to parse JSON response; Apps Script may return opaque response
+                let result;
+                try {
+                    result = await response.json();
+                } catch {
+                    // If we can't parse JSON but got here, treat as success
+                    result = { status: 'ok' };
+                }
+
+                if (result.status === 'error') {
+                    throw new Error(result.message || 'Submission failed');
+                }
+
+                // Success
+                saveSubmission();
+                checkRateLimit();
+
+                const successEl = document.getElementById('success-message');
+                successEl.className = 'success-message';
+                successEl.innerHTML = `
+                    <i class="fa-solid fa-check-circle"></i>
+                    <strong>Submission received!</strong><br>
+                    Thank you — we'll review your submission and update the directory.
+                `;
+                successEl.style.display = 'block';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            } catch (err) {
+                // Show fallback options
+                const mailtoLink = `mailto:${EMAIL_ADDRESS}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+                const escapedBody = escapeHtmlForTextarea(emailBody);
+
+                const successEl = document.getElementById('success-message');
+                successEl.className = 'success-message success-message--error';
+                successEl.innerHTML = `
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <strong>Couldn't reach the server.</strong><br>
+                    No worries — you can still submit using one of these options:
+                    <div class="fallback-options">
+                        <a href="${mailtoLink}" class="btn btn--secondary">
+                            <i class="fa-solid fa-envelope"></i> Open in Email App
+                        </a>
+                        <button type="button" class="btn btn--secondary" onclick="showCopyFallback()">
+                            <i class="fa-solid fa-copy"></i> Copy to Clipboard
+                        </button>
+                    </div>
+                    <div id="copy-fallback" class="copy-fallback" style="display: none;">
+                        <p class="copy-fallback__label">Copy the text below and email it to <strong>${EMAIL_ADDRESS}</strong>:</p>
+                        <textarea class="copy-fallback__text" readonly>${escapedBody}</textarea>
+                        <button type="button" class="btn btn--primary" onclick="copyFallbackText()">
+                            <i class="fa-solid fa-copy"></i> Copy Text
+                        </button>
+                    </div>
+                `;
+                successEl.style.display = 'block';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalHTML;
+            }
+        }
+
+        // Show the copy-paste fallback area
+        function showCopyFallback() {
+            const el = document.getElementById('copy-fallback');
+            if (el) el.style.display = 'block';
+        }
+
+        // Copy fallback textarea contents to clipboard
+        function copyFallbackText() {
+            const textarea = document.querySelector('.copy-fallback__text');
+            if (!textarea) return;
+            navigator.clipboard.writeText(textarea.value)
+                .then(() => {
+                    const btn = textarea.nextElementSibling;
+                    if (btn) {
+                        const original = btn.innerHTML;
+                        btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+                        setTimeout(() => { btn.innerHTML = original; }, 2000);
+                    }
+                })
+                .catch(() => {
+                    textarea.select();
+                    alert('Please press Ctrl+C / Cmd+C to copy the selected text.');
+                });
+        }
+
         // Report form submission
         document.getElementById('report-form').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -1068,31 +1183,18 @@
             const data = collectReportData();
             const emailBody = formatReportEmailBody(data);
             const subject = `Issue Report: ${data.venueName}`;
+            const submitBtn = document.getElementById('report-submit-btn');
 
-            // Create mailto link
-            const mailtoLink = `mailto:${EMAIL_ADDRESS}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+            const payload = {
+                type: 'report',
+                venueName: data.venueName,
+                issues: data.issues,
+                details: data.details,
+                contact: data.contact,
+                emailBody: emailBody
+            };
 
-            // Record submission for rate limiting
-            saveSubmission();
-
-            // Open email client
-            window.location.href = mailtoLink;
-
-            // Show success message
-            const successEl = document.getElementById('success-message');
-            successEl.innerHTML = `
-                <i class="fa-solid fa-check-circle"></i>
-                <strong>Report prepared!</strong><br>
-                Your email client should open with the issue report. If it doesn't,
-                <a href="${mailtoLink}" style="color: white; text-decoration: underline;">click here</a>.
-            `;
-            successEl.style.display = 'block';
-
-            // Update rate limit display
-            checkRateLimit();
-
-            // Scroll to top to show message
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            submitToAPI(payload, subject, emailBody, submitBtn);
         });
 
         // Form submission
@@ -1119,31 +1221,20 @@
 
             const emailBody = formatEmailBody(data);
             const subject = `New Venue Submission: ${data.venue.name}`;
+            const submitBtn = document.getElementById('submit-btn');
 
-            // Create mailto link
-            const mailtoLink = `mailto:${EMAIL_ADDRESS}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+            const payload = {
+                type: 'venue',
+                venue: data.venue,
+                notes: data.notes,
+                submitterName: data.submitterName,
+                submitterType: data.submitterType,
+                contactMethods: data.contactMethods,
+                honeypot: document.getElementById('website_url').value,
+                emailBody: emailBody
+            };
 
-            // Record submission for rate limiting
-            saveSubmission();
-
-            // Open email client
-            window.location.href = mailtoLink;
-
-            // Show success message
-            const successEl = document.getElementById('success-message');
-            successEl.innerHTML = `
-                <i class="fa-solid fa-check-circle"></i>
-                <strong>Email prepared!</strong><br>
-                Your email client should open with the venue details. If it doesn't,
-                <a href="${mailtoLink}" style="color: white; text-decoration: underline;">click here</a>.
-            `;
-            successEl.style.display = 'block';
-
-            // Update rate limit display
-            checkRateLimit();
-
-            // Scroll to top to show message
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            submitToAPI(payload, subject, emailBody, submitBtn);
         });
     </script>
 </body>

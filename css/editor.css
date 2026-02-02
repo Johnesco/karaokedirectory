@@ -677,6 +677,22 @@
     width: 100%;
 }
 
+/* Geocode Row */
+.geocode-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+}
+
+.geocode-row .form-hint {
+    margin-top: 0;
+}
+
+.geocode-row .btn--small {
+    white-space: nowrap;
+}
+
 /* Date Range Row */
 .form-row--date-range {
     margin-top: var(--spacing-lg);

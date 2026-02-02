@@ -14,8 +14,11 @@
   HOW THIS APP WORKS:
   1. Browser loads this HTML file
   2. CSS files style the page
-  3. JavaScript (app.js) fetches venue data and renders the views
-  4. Users can browse venues by day, alphabetically, or on a map
+  3. JavaScript (app.js) loads venue data (69+ venues) and renders the views
+  4. Users can browse venues by day, alphabetically, or on a full-screen map
+  5. Global search filters venues by name, city, neighborhood, host, or tags
+  6. Venue tags (19 types) provide color-coded badges for venue characteristics
+  7. Special events and seasonal venues are supported via "once" frequency and date ranges
 
   ============================================================================
 -->
@@ -225,10 +228,11 @@
         <div class="app-layout__list">
             <!--
               Navigation Container
-              JavaScript (Navigation.js component) will inject the tab buttons here:
-              - Weekly View
-              - A-Z View
-              - Map View
+              JavaScript (Navigation.js component) will inject:
+              - View tabs: Weekly Calendar, A-Z, Map
+              - Week navigation arrows (prev/next/today) for weekly view
+              - Global search bar with clear button
+              - Dedicated venue filter toggle
 
               WHY EMPTY?
               This is a common SPA pattern - HTML provides structure,
@@ -246,9 +250,12 @@
                 <!--
                   MAIN CONTENT AREA
                   JavaScript renders different "views" here based on user selection:
-                  - WeeklyView: Shows venues organized by day of the week
-                  - AlphabeticalView: Shows venues A-Z
-                  - MapView: Shows venues on an interactive map
+                  - WeeklyView: Shows venues organized by day of the week (with collapsible
+                    past/empty days, special events sorting to top, search filtering)
+                  - AlphabeticalView: Shows venues A-Z grouped by first letter with jump index
+                  - MapView: Full-screen immersive map with floating controls and venue cards
+
+                  All views respond to search queries and the dedicated venue filter.
 
                   <main> is semantic HTML indicating the primary content area.
                   There should only be ONE <main> per page.
@@ -410,7 +417,8 @@
 
     <!--
       Venue Database
-      This file contains all the karaoke venue information as a JavaScript object.
+      This file contains all the karaoke venue information (69+ venues) as a
+      JavaScript object, along with tag definitions (19 tag types).
       It's loaded as a regular script (not a module) so it creates a global variable.
     -->
     <script src="js/data.js"></script>
@@ -423,7 +431,11 @@
       - Automatic strict mode
       - Module-level scope (variables don't leak to global)
 
-      app.js imports other modules and initializes the application.
+      app.js imports other modules and initializes the application:
+      - Loads venue data and tag configuration
+      - Creates Navigation (with search/filters), VenueModal, and VenueDetailPane
+      - Renders the default weekly view
+      - Manages view switching and immersive map mode (body.view--map class)
     -->
     <script type="module" src="js/app.js"></script>
 
