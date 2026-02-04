@@ -113,7 +113,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "19:30",
           "endTime": "00:00"
         }
@@ -148,13 +148,13 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "sunday",
+          "day": "Sunday",
           "startTime": "20:00",
           "endTime": "00:00"
         },
         {
           "frequency": "every",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "20:00",
           "endTime": "00:00"
         }
@@ -186,7 +186,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "19:00",
           "endTime": "22:00"
         }
@@ -216,7 +216,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "sunday",
+          "day": "Sunday",
           "startTime": "20:30",
           "endTime": "00:30"
         }
@@ -250,7 +250,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "friday",
+          "day": "Friday",
           "startTime": "21:30",
           "endTime": "01:30"
         }
@@ -314,7 +314,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "21:00",
           "endTime": "02:00"
         }
@@ -349,7 +349,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "tuesday",
+          "day": "Tuesday",
           "startTime": "21:00",
           "endTime": "00:00"
         }
@@ -384,7 +384,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "tuesday",
+          "day": "Tuesday",
           "startTime": "21:00",
           "endTime": "00:00"
         }
@@ -420,7 +420,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "thursday",
+          "day": "Thursday",
           "startTime": "21:00",
           "endTime": "01:30"
         }
@@ -455,7 +455,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "sunday",
+          "day": "Sunday",
           "startTime": "19:30",
           "endTime": "23:30"
         }
@@ -486,7 +486,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "thursday",
+          "day": "Thursday",
           "startTime": "21:00",
           "endTime": "02:00"
         }
@@ -520,43 +520,43 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "sunday",
+          "day": "Sunday",
           "startTime": "20:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "monday",
+          "day": "Monday",
           "startTime": "20:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "tuesday",
+          "day": "Tuesday",
           "startTime": "20:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "20:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "thursday",
+          "day": "Thursday",
           "startTime": "20:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "friday",
+          "day": "Friday",
           "startTime": "20:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "saturday",
+          "day": "Saturday",
           "startTime": "20:00",
           "endTime": "02:00"
         }
@@ -589,7 +589,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "first",
-          "day": "saturday",
+          "day": "Saturday",
           "startTime": "20:00",
           "endTime": "23:00"
         }
@@ -668,13 +668,13 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "friday",
+          "day": "Friday",
           "startTime": "21:00",
           "endTime": "01:00"
         },
         {
           "frequency": "every",
-          "day": "saturday",
+          "day": "Saturday",
           "startTime": "21:00",
           "endTime": "01:00"
         }
@@ -704,19 +704,19 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "18:30",
           "endTime": "22:30"
         },
         {
           "frequency": "second",
-          "day": "friday",
+          "day": "Friday",
           "startTime": "19:00",
           "endTime": "23:00"
         },
         {
           "frequency": "fourth",
-          "day": "friday",
+          "day": "Friday",
           "startTime": "19:00",
           "endTime": "23:00"
         }
@@ -744,43 +744,43 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "sunday",
+          "day": "Sunday",
           "startTime": "20:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "monday",
+          "day": "Monday",
           "startTime": "20:00",
           "endTime": "01:00"
         },
         {
           "frequency": "every",
-          "day": "tuesday",
+          "day": "Tuesday",
           "startTime": "20:00",
           "endTime": "01:00"
         },
         {
           "frequency": "every",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "20:00",
           "endTime": "01:00"
         },
         {
           "frequency": "every",
-          "day": "thursday",
+          "day": "Thursday",
           "startTime": "20:00",
           "endTime": "01:00"
         },
         {
           "frequency": "every",
-          "day": "friday",
+          "day": "Friday",
           "startTime": "19:00",
           "endTime": "01:00"
         },
         {
           "frequency": "every",
-          "day": "saturday",
+          "day": "Saturday",
           "startTime": "20:00",
           "endTime": "02:00"
         }
@@ -812,7 +812,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "19:00",
           "endTime": "22:00"
         }
@@ -846,43 +846,43 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "sunday",
+          "day": "Sunday",
           "startTime": "20:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "monday",
+          "day": "Monday",
           "startTime": "20:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "tuesday",
+          "day": "Tuesday",
           "startTime": "20:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "20:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "thursday",
+          "day": "Thursday",
           "startTime": "20:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "friday",
+          "day": "Friday",
           "startTime": "20:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "saturday",
+          "day": "Saturday",
           "startTime": "20:00",
           "endTime": "02:00"
         }
@@ -915,7 +915,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "19:00",
           "endTime": "22:00"
         }
@@ -950,13 +950,13 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "second",
-          "day": "thursday",
+          "day": "Thursday",
           "startTime": "18:30",
           "endTime": null
         },
         {
           "frequency": "fourth",
-          "day": "thursday",
+          "day": "Thursday",
           "startTime": "18:30",
           "endTime": "22:30"
         }
@@ -987,7 +987,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "tuesday",
+          "day": "Tuesday",
           "startTime": "20:00",
           "endTime": "23:00"
         }
@@ -1018,7 +1018,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "sunday",
+          "day": "Sunday",
           "startTime": "21:00",
           "endTime": "02:00"
         }
@@ -1051,7 +1051,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "saturday",
+          "day": "Saturday",
           "startTime": "21:00",
           "endTime": "00:00"
         }
@@ -1120,13 +1120,13 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "second",
-          "day": "saturday",
+          "day": "Saturday",
           "startTime": "19:00",
           "endTime": "22:00"
         },
         {
           "frequency": "fourth",
-          "day": "saturday",
+          "day": "Saturday",
           "startTime": "19:00",
           "endTime": "22:00"
         }
@@ -1162,7 +1162,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "friday",
+          "day": "Friday",
           "startTime": "21:00",
           "endTime": "01:00"
         }
@@ -1195,7 +1195,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "19:00",
           "endTime": "23:00"
         }
@@ -1226,13 +1226,13 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "sunday",
+          "day": "Sunday",
           "startTime": "21:00",
           "endTime": "01:00"
         },
         {
           "frequency": "every",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "21:00",
           "endTime": "01:00"
         }
@@ -1267,19 +1267,19 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "thursday",
+          "day": "Thursday",
           "startTime": "21:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "friday",
+          "day": "Friday",
           "startTime": "21:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "sunday",
+          "day": "Sunday",
           "startTime": "21:00",
           "endTime": "02:00"
         }
@@ -1311,7 +1311,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "first",
-          "day": "saturday",
+          "day": "Saturday",
           "startTime": "20:00",
           "endTime": "01:00"
         }
@@ -1345,7 +1345,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "saturday",
+          "day": "Saturday",
           "startTime": "21:00",
           "endTime": "01:00"
         }
@@ -1372,7 +1372,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "saturday",
+          "day": "Saturday",
           "startTime": "21:00",
           "endTime": "01:00"
         }
@@ -1409,7 +1409,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "21:00",
           "endTime": "01:00"
         }
@@ -1445,7 +1445,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "19:00",
           "endTime": "23:00"
         }
@@ -1477,7 +1477,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "thursday",
+          "day": "Thursday",
           "startTime": "21:00",
           "endTime": "12:00"
         }
@@ -1511,7 +1511,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "thursday",
+          "day": "Thursday",
           "startTime": "21:00",
           "endTime": "01:00"
         }
@@ -1539,7 +1539,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "sunday",
+          "day": "Sunday",
           "startTime": "19:00",
           "endTime": "23:00"
         }
@@ -1572,13 +1572,13 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "friday",
+          "day": "Friday",
           "startTime": "20:00",
           "endTime": "00:00"
         },
         {
           "frequency": "every",
-          "day": "saturday",
+          "day": "Saturday",
           "startTime": "20:00",
           "endTime": "00:00"
         }
@@ -1611,7 +1611,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "thursday",
+          "day": "Thursday",
           "startTime": "21:00",
           "endTime": null
         }
@@ -1646,7 +1646,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "18:00",
           "endTime": "21:00"
         }
@@ -1678,7 +1678,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "tuesday",
+          "day": "Tuesday",
           "startTime": "20:00",
           "endTime": "23:30"
         }
@@ -1708,7 +1708,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "thursday",
+          "day": "Thursday",
           "startTime": "18:00",
           "endTime": "21:00"
         }
@@ -1741,7 +1741,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "thursday",
+          "day": "Thursday",
           "startTime": "20:00",
           "endTime": "23:00"
         }
@@ -1777,7 +1777,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "19:00",
           "endTime": "23:30"
         }
@@ -1812,7 +1812,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "19:00",
           "endTime": "23:00"
         }
@@ -1844,7 +1844,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "friday",
+          "day": "Friday",
           "startTime": "21:00",
           "endTime": "00:00"
         }
@@ -1880,7 +1880,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "21:00",
           "endTime": "23:00"
         }
@@ -1912,7 +1912,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "thursday",
+          "day": "Thursday",
           "startTime": "21:00",
           "endTime": "23:00"
         }
@@ -1948,7 +1948,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "friday",
+          "day": "Friday",
           "startTime": "22:00",
           "endTime": "02:00"
         }
@@ -1980,7 +1980,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "20:00",
           "endTime": null
         }
@@ -2015,13 +2015,13 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "thursday",
+          "day": "Thursday",
           "startTime": "20:00",
           "endTime": "23:00"
         },
         {
           "frequency": "every",
-          "day": "saturday",
+          "day": "Saturday",
           "startTime": "20:00",
           "endTime": "23:00"
         }
@@ -2055,43 +2055,43 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "sunday",
+          "day": "Sunday",
           "startTime": "21:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "monday",
+          "day": "Monday",
           "startTime": "21:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "tuesday",
+          "day": "Tuesday",
           "startTime": "21:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "21:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "thursday",
+          "day": "Thursday",
           "startTime": "21:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "friday",
+          "day": "Friday",
           "startTime": "21:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "saturday",
+          "day": "Saturday",
           "startTime": "21:00",
           "endTime": "02:00"
         }
@@ -2122,19 +2122,19 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "monday",
+          "day": "Monday",
           "startTime": "21:00",
           "endTime": "01:00"
         },
         {
           "frequency": "every",
-          "day": "tuesday",
+          "day": "Tuesday",
           "startTime": "21:00",
           "endTime": "01:00"
         },
         {
           "frequency": "every",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "19:00",
           "endTime": "22:00"
         }
@@ -2169,7 +2169,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "22:00",
           "endTime": "01:00"
         }
@@ -2206,7 +2206,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "friday",
+          "day": "Friday",
           "startTime": "20:00",
           "endTime": null
         }
@@ -2240,7 +2240,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "20:00",
           "endTime": "23:30"
         }
@@ -2272,13 +2272,13 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "first",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "19:00",
           "endTime": "21:00"
         },
         {
           "frequency": "third",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "19:00",
           "endTime": "21:00"
         }
@@ -2310,13 +2310,13 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "monday",
+          "day": "Monday",
           "startTime": "21:00",
           "endTime": "01:00"
         },
         {
           "frequency": "every",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "21:00",
           "endTime": "01:00"
         }
@@ -2355,43 +2355,43 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "sunday",
+          "day": "Sunday",
           "startTime": "21:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "monday",
+          "day": "Monday",
           "startTime": "21:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "tuesday",
+          "day": "Tuesday",
           "startTime": "21:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "21:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "thursday",
+          "day": "Thursday",
           "startTime": "21:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "friday",
+          "day": "Friday",
           "startTime": "21:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "saturday",
+          "day": "Saturday",
           "startTime": "21:00",
           "endTime": "02:00"
         }
@@ -2424,7 +2424,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "monday",
+          "day": "Monday",
           "startTime": "20:00",
           "endTime": "23:00"
         }
@@ -2456,7 +2456,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "friday",
+          "day": "Friday",
           "startTime": "21:00",
           "endTime": "01:00"
         }
@@ -2490,7 +2490,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "friday",
+          "day": "Friday",
           "startTime": "21:30",
           "endTime": "01:30"
         }
@@ -2519,31 +2519,31 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "20:00",
           "endTime": "00:00"
         },
         {
           "frequency": "every",
-          "day": "thursday",
+          "day": "Thursday",
           "startTime": "20:00",
           "endTime": "00:00"
         },
         {
           "frequency": "every",
-          "day": "friday",
+          "day": "Friday",
           "startTime": "20:00",
           "endTime": "01:00"
         },
         {
           "frequency": "every",
-          "day": "saturday",
+          "day": "Saturday",
           "startTime": "21:00",
           "endTime": "01:30"
         },
         {
           "frequency": "every",
-          "day": "sunday",
+          "day": "Sunday",
           "startTime": "17:03",
           "endTime": "21:00"
         }
@@ -2581,7 +2581,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "tuesday",
+          "day": "Tuesday",
           "startTime": "20:00",
           "endTime": "23:00"
         }
@@ -2615,7 +2615,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "20:00",
           "endTime": "23:00"
         }
@@ -2643,7 +2643,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "thursday",
+          "day": "Thursday",
           "startTime": "19:00",
           "endTime": "23:00"
         }
@@ -2677,7 +2677,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "friday",
+          "day": "Friday",
           "startTime": "20:00",
           "endTime": null
         }

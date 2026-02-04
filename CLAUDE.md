@@ -19,8 +19,8 @@
 
 ### 2. Mobile-First Responsive Design
 - Base styles target mobile devices
-- Media queries enhance for larger screens (768px, 1024px, 1200px breakpoints)
-- Modal for venue details on mobile, side pane on desktop (1200px+)
+- Media queries enhance for larger screens (768px, 1024px, 1400px breakpoints)
+- Modal for venue details on mobile, side pane on desktop (1400px+)
 
 ### 3. Separation of Concerns
 - **HTML:** Structure only (`index.html`, `about.html`, etc.)
@@ -107,6 +107,9 @@ karaokedirectory/
 │
 ├── assets/images/         # Static images
 │
+├── docs/
+│   └── functional-spec.md # Functional Specification (authoritative)
+│
 └── _deprecated/           # Archived old code (do not use)
 ```
 
@@ -164,7 +167,8 @@ When adding or modifying venues in `js/data.js`, follow this structure:
     instagram: "https://instagram.com/...",
     twitter: "https://twitter.com/...",
     tiktok: "https://tiktok.com/...",
-    youtube: "https://youtube.com/..."
+    youtube: "https://youtube.com/...",
+    bluesky: "https://bsky.app/..."
   }
 }
 ```
@@ -485,7 +489,7 @@ The test page includes a date picker to check which venues appear on any date an
 - **2024**: Added Raggedy Anne's venue
 - **2024**: Added comprehensive documentation to index.html
 - **2024**: Created codeexplained.html documentation page
-- **2024**: Implemented dual-pane layout for 1200px+ screens
+- **2024**: Implemented dual-pane layout for 1400px+ screens
 - **2024**: Various style updates and corner refinements
 
 ### Architecture Decisions
@@ -497,20 +501,51 @@ The test page includes a date picker to check which venues appear on any date an
 
 ## Instructions for Claude
 
-### When Making Changes
-1. **Read before editing** - Always read files before modifying them
-2. **Follow existing patterns** - Match the coding style already in use
-3. **Keep it simple** - This project intentionally avoids over-engineering
-4. **Test responsively** - Changes should work on mobile and desktop
-5. **Update documentation** - If you add features, update this file and README.md
+### Documentation-First Workflow (MANDATORY)
 
-### Maintaining This Document
-**UPDATE THIS FILE** when you:
+The **Functional Specification** (`docs/functional-spec.md` — to be created) is the authoritative record of all application features, behavior, and data formats. It is the single source of truth for what this application does.
+
+**Before ANY change** (feature, bug fix, refactor, data update), the very first step is:
+
+1. **Identify documentation impact** - Determine which sections of the Functional Specification (and other docs) describe the area being changed. Read those sections before writing any code.
+2. **Flag discrepancies** - If existing code already differs from what the documentation says, stop and flag the mismatch for validation before proceeding. Do not silently "fix" documentation to match code or vice versa without explicit confirmation.
+3. **Plan documentation updates** - Before implementing, note what documentation must be created or updated to reflect the change. Include this in any plan or summary presented to the user.
+4. **Implement the change** - Write the code.
+5. **Update documentation** - Update the Functional Specification, CLAUDE.md, README.md, and any other affected docs so they accurately reflect the new state. This is not optional — a change is not complete until its documentation is current.
+6. **Verify consistency** - After updating, confirm that the documentation and code are in agreement. Any remaining gaps must be called out explicitly.
+
+**Key rules:**
+- A change without a corresponding documentation update is considered **incomplete**
+- Documentation updates are part of the definition of done, not a follow-up task
+- When in doubt about whether docs need updating, they do
+- The Functional Specification is the primary document; CLAUDE.md and README.md are secondary but must stay consistent with it
+
+### When Making Changes
+1. **Documentation first** - Follow the Documentation-First Workflow above before all else
+2. **Read before editing** - Always read files before modifying them
+3. **Follow existing patterns** - Match the coding style already in use
+4. **Keep it simple** - This project intentionally avoids over-engineering
+5. **Test responsively** - Changes should work on mobile and desktop
+
+### Maintaining Documentation
+**UPDATE the Functional Specification** (`docs/functional-spec.md`) when you:
+- Add, modify, or remove any feature
+- Fix a bug that changes observable behavior
+- Change data formats or venue fields
+- Alter UI behavior, states, or interactions
+- Modify search, filtering, or navigation logic
+
+**UPDATE CLAUDE.md** when you:
 - Add new features or pages
 - Change the file structure
 - Modify architectural patterns
 - Add new venue data fields
 - Make significant design decisions
+
+**UPDATE README.md** when changes affect:
+- Public-facing feature descriptions
+- Setup or usage instructions
+- Project overview or screenshots
 
 ### Security Considerations
 - Always use `escapeHtml()` when rendering user-provided content
@@ -520,6 +555,7 @@ The test page includes a date picker to check which venues appear on any date an
 
 ## Related Documentation
 
+- `docs/functional-spec.md` - **Functional Specification (authoritative)** — Complete record of all features, behavior, and data formats. Must be updated with every change.
 - `README.md` - Public-facing project documentation
 - `codeexplained.html` - Interactive beginner's guide to the codebase
 - Inline comments in `index.html` - Extensive HTML documentation

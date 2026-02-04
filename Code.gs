@@ -12,7 +12,7 @@
  * 6. Copy the deployed URL into APPS_SCRIPT_URL in submit.html
  */
 
-const NOTIFICATION_EMAIL = 'karaokedirectoryatx@gmail.com';
+const NOTIFICATION_EMAIL = 'karaokedirectoryatx@gmail.com,letmeshowyou@gmail.com';
 
 // ---- HTTP Handlers ----
 
