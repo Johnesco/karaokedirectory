@@ -573,7 +573,7 @@ A one-time event matches if the `schedule.date` string (YYYY-MM-DD) equals the f
 For recurring events, matching follows two steps:
 
 **Step 1 — Day of week check:**
-The day-of-week of the target date must match `schedule.day` (case-insensitive). If it doesn't, the schedule does not match.
+The day-of-week of the target date must match `schedule.day`. Comparison is **case-insensitive** (e.g., "Friday" and "friday" both match). If the day doesn't match, the schedule does not match.
 
 **Step 2 — Frequency check:**
 
@@ -1024,6 +1024,7 @@ Pub/sub event bus for component communication.
 | 2026-02 | 1.0 | Initial Functional Specification created from codebase audit | Claude Code |
 | 2026-02 | 1.0.1 | Resolved 3 discrepancies: breakpoint 1200px→1400px, added bluesky social, standardized day name casing | Claude Code |
 | 2026-02 | 1.0.2 | Added Docsify documentation portal (`docs/index.html`). Updated Section 1 pages table. | Claude Code |
+| 2026-02 | 1.0.3 | Fixed case-sensitivity bug in day name matching for VenueCard and editor. Added `.toLowerCase()` to comparisons. | Claude Code |
 
 ---
 

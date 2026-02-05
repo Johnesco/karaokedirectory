@@ -2136,7 +2136,7 @@ const karaokeData = {
           "frequency": "every",
           "day": "Wednesday",
           "startTime": "20:00",
-          "endTime": "00:00"
+          "endTime": "24:00"
         }
       ],
       "host": {

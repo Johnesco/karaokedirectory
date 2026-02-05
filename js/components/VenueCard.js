@@ -181,7 +181,7 @@ export class VenueCard extends Component {
 
         // Fall back to recurring match
         const dayName = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-        return venue.schedule.find(s => s.day === dayName) || venue.schedule[0];
+        return venue.schedule.find(s => s.day?.toLowerCase() === dayName) || venue.schedule[0];
     }
 
     afterRender() {
