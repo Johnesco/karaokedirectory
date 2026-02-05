@@ -108,7 +108,10 @@ karaokedirectory/
 ├── assets/images/         # Static images
 │
 ├── docs/
-│   └── functional-spec.md # Functional Specification (authoritative)
+│   ├── index.html         # Docsify documentation viewer
+│   ├── functional-spec.md # Functional Specification (authoritative)
+│   ├── _sidebar.md        # Docsify sidebar navigation
+│   └── .nojekyll          # GitHub Pages underscore file support
 │
 └── _deprecated/           # Archived old code (do not use)
 ```

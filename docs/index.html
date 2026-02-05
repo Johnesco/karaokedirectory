@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Austin Karaoke Directory — Documentation</title>
+    <meta name="description" content="Functional specification and documentation for the Austin Karaoke Directory project.">
+    <!-- Docsify theme -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple-dark.css">
+    <style>
+        /* Override Docsify theme to match project design tokens */
+        :root {
+            /* Base */
+            --base-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --base-font-size: 16px;
+            --base-line-height: 1.6;
+
+            /* Theme colors - matched to project base.css */
+            --theme-color: #6366f1;
+
+            /* Sidebar */
+            --sidebar-background: #1f2937;
+            --sidebar-border-color: #374151;
+            --sidebar-name-color: #d8c4ff;
+            --sidebar-name-font-size: 1.25rem;
+            --sidebar-nav-link-color: #9ca3af;
+            --sidebar-nav-link-color--active: #d8c4ff;
+            --sidebar-nav-link-font-weight--active: 600;
+            --sidebar-nav-link-border-color--active: #6366f1;
+            --sidebar-nav-pagelink-padding: 0.25em 0;
+            --sidebar-width: 280px;
+
+            /* Content */
+            --content-max-width: 900px;
+
+            /* Cover */
+            --cover-background-color: #111827;
+
+            /* Headings */
+            --heading-color: #d8c4ff;
+            --heading-h1-font-size: 2rem;
+            --heading-h2-font-size: 1.5rem;
+            --heading-h2-border-color: #374151;
+            --heading-h3-font-size: 1.25rem;
+
+            /* Code */
+            --code-font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+            --code-inline-background: rgba(99, 102, 241, 0.15);
+            --code-inline-color: #818cf8;
+            --code-block-background: #1f2937;
+            --code-block-border-radius: 8px;
+
+            /* Links */
+            --link-color: #818cf8;
+            --link-color--hover: #d8c4ff;
+
+            /* Tables */
+            --table-head-background: rgba(99, 102, 241, 0.1);
+            --table-head-color: #d8c4ff;
+            --table-row-even-background: rgba(31, 41, 55, 0.5);
+            --table-cell-border-color: #374151;
+
+            /* Blockquotes */
+            --blockquote-border-color: #6366f1;
+            --blockquote-background: rgba(99, 102, 241, 0.05);
+
+            /* Notice / tip blocks */
+            --notice-tip-border-color: #10b981;
+            --notice-important-border-color: #f59e0b;
+
+            /* Search plugin */
+            --search-background: #1f2937;
+            --search-input-background-color: #374151;
+            --search-input-color: #d8c4ff;
+            --search-input-placeholder-color: #6b7280;
+            --search-result-keyword-color: #ec4899;
+        }
+
+        /* Additional custom styles */
+        body {
+            background: #111827;
+            color: #d1d5db;
+        }
+
+        /* Sidebar heading */
+        .sidebar .app-name-link {
+            letter-spacing: 0.02em;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111827;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4b5563;
+        }
+
+        /* Back to site link in sidebar */
+        .sidebar-nav > ul:first-child::before {
+            content: '';
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-to-site {
+            display: inline-block;
+            padding: 0.4em 0.8em;
+            margin: 0.5rem 0 1rem;
+            font-size: 0.85rem;
+            color: #9ca3af;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid #374151;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all 200ms ease;
+        }
+        .back-to-site:hover {
+            color: #d8c4ff;
+            border-color: #6366f1;
+            background: rgba(99, 102, 241, 0.2);
+        }
+
+        /* Status badge in header blockquote */
+        .markdown-section blockquote:first-child {
+            border-left-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    <script>
+        window.$docsify = {
+            name: 'Karaoke Directory Docs',
+            repo: false,
+            loadSidebar: true,
+            subMaxLevel: 3,
+            auto2top: true,
+            homepage: 'functional-spec.md',
+            search: {
+                maxAge: 86400000,
+                paths: 'auto',
+                placeholder: 'Search documentation...',
+                noData: 'No results found',
+                depth: 3
+            },
+            pagination: {
+                previousText: 'Previous',
+                nextText: 'Next',
+                crossChapter: true
+            }
+        };
+    </script>
+    <!-- Docsify core -->
+    <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
+    <!-- Search plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
+</body>
+</html>

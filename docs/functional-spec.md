@@ -64,7 +64,8 @@ Karaoke enthusiasts looking for venues, schedules, and event details in the grea
 | Bingo | `bingo.html` | Karaoke bingo game |
 | Submit | `submit.html` | Venue submission and issue reporting |
 | Editor | `editor.html` | Venue data editing tool |
-| Docs | `codeexplained.html` | Interactive code documentation |
+| Docs | `codeexplained.html` | Interactive code documentation (beginner-oriented) |
+| Spec viewer | `docs/index.html` | Docsify-powered documentation portal (renders this spec) |
 | Tests | `tests/index.html` | Schedule matching test suite |
 
 ---
@@ -1047,6 +1048,8 @@ Pub/sub event bus for component communication.
 | Date | Version | Change | Author |
 |------|---------|--------|--------|
 | 2026-02 | 1.0 | Initial Functional Specification created from codebase audit | Claude Code |
+| 2026-02 | 1.0.1 | Resolved 3 discrepancies: breakpoint 1200px→1400px, added bluesky social, standardized day name casing | Claude Code |
+| 2026-02 | 1.0.2 | Added Docsify documentation portal (`docs/index.html`). Updated Section 1 pages table. | Claude Code |
 
 ---
 
