@@ -10,32 +10,6 @@
 
 ---
 
-## Table of Contents
-
-1. [Overview](#1-overview)
-2. [Weekly Calendar View](#2-weekly-calendar-view)
-3. [Alphabetical View](#3-alphabetical-view)
-4. [Map View](#4-map-view)
-5. [Navigation and Controls](#5-navigation-and-controls)
-6. [Venue Cards](#6-venue-cards)
-7. [Venue Detail (Mobile Modal)](#7-venue-detail-mobile-modal)
-8. [Venue Detail (Desktop Pane)](#8-venue-detail-desktop-pane)
-9. [Search](#9-search)
-10. [Filtering](#10-filtering)
-11. [Venue Data Model](#11-venue-data-model)
-12. [Tag System](#12-tag-system)
-13. [Schedule Matching](#13-schedule-matching)
-14. [Karaoke Bingo Game](#14-karaoke-bingo-game)
-15. [Venue Submission Form](#15-venue-submission-form)
-16. [Venue Editor](#16-venue-editor)
-17. [About Page](#17-about-page)
-18. [Debug Mode](#18-debug-mode)
-19. [Responsive Design](#19-responsive-design)
-20. [Security](#20-security)
-21. [State Management and Events](#21-state-management-and-events)
-22. [Known Discrepancies](#22-known-discrepancies)
-23. [Change Log](#23-change-log)
-
 ---
 
 ## 1 Overview
@@ -273,11 +247,11 @@ Only visible when `view === 'weekly'`:
 
 ### Search Input
 
-Always visible. See [Section 9: Search](#9-search) for full behavior.
+Always visible. See Section 9 (Search) for full behavior.
 
 ### Dedicated Venue Filter
 
-Always visible. See [Section 10: Filtering](#10-filtering) for full behavior.
+Always visible. See Section 10 (Filtering) for full behavior.
 
 ### Navigation Height Tracking
 
