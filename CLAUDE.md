@@ -420,6 +420,14 @@ The test page includes a date picker to check which venues appear on any date an
 ## Project History
 
 ### Recent Changes
+- **2026-02**: Created Functional Specification and documentation portal
+  - `docs/functional-spec.md` — authoritative spec covering all 23 feature areas
+  - `docs/index.html` — Docsify-powered viewer (CDN, no build step, dark theme)
+  - Custom slugify in Docsify config to match GitHub heading ID algorithm
+  - Sidebar navigation via `_sidebar.md`, full-text search plugin
+  - Documentation-First Workflow added to CLAUDE.md (mandatory for all changes)
+  - Resolved 3 doc-code discrepancies: breakpoint 1200→1400px, added bluesky social, standardized day name casing
+  - Added Related Documentation section to `codeexplained.html`
 - **2026-02**: Added geocode button to venue editor
   - Replaced Node.js script hint with in-browser "Geocode Address" button
   - Uses US Census Geocoder API (free, public, CORS-enabled)
@@ -501,12 +509,14 @@ The test page includes a date picker to check which venues appear on any date an
 3. **Custom state management** instead of Redux for simplicity
 4. **Leaflet.js** for maps (open source, no API key required)
 5. **Font Awesome CDN** for icons (easy updates, no local assets)
+6. **Docsify** for documentation portal (CDN-loaded, no build step, renders markdown directly)
+7. **Documentation-First Workflow** — Functional Specification is the single source of truth; every change must update it
 
 ## Instructions for Claude
 
 ### Documentation-First Workflow (MANDATORY)
 
-The **Functional Specification** (`docs/functional-spec.md` — to be created) is the authoritative record of all application features, behavior, and data formats. It is the single source of truth for what this application does.
+The **Functional Specification** (`docs/functional-spec.md`) is the authoritative record of all application features, behavior, and data formats. It is the single source of truth for what this application does.
 
 **Before ANY change** (feature, bug fix, refactor, data update), the very first step is:
 
