@@ -16,10 +16,10 @@
 2. [Weekly Calendar View](#2-weekly-calendar-view)
 3. [Alphabetical View](#3-alphabetical-view)
 4. [Map View](#4-map-view)
-5. [Navigation & Controls](#5-navigation--controls)
+5. [Navigation and Controls](#5-navigation-and-controls)
 6. [Venue Cards](#6-venue-cards)
-7. [Venue Detail — Mobile Modal](#7-venue-detail--mobile-modal)
-8. [Venue Detail — Desktop Pane](#8-venue-detail--desktop-pane)
+7. [Venue Detail (Mobile Modal)](#7-venue-detail-mobile-modal)
+8. [Venue Detail (Desktop Pane)](#8-venue-detail-desktop-pane)
 9. [Search](#9-search)
 10. [Filtering](#10-filtering)
 11. [Venue Data Model](#11-venue-data-model)
@@ -32,13 +32,13 @@
 18. [Debug Mode](#18-debug-mode)
 19. [Responsive Design](#19-responsive-design)
 20. [Security](#20-security)
-21. [State Management & Events](#21-state-management--events)
+21. [State Management and Events](#21-state-management-and-events)
 22. [Known Discrepancies](#22-known-discrepancies)
 23. [Change Log](#23-change-log)
 
 ---
 
-## 1. Overview
+## 1 Overview
 
 ### Purpose
 
@@ -70,7 +70,7 @@ Karaoke enthusiasts looking for venues, schedules, and event details in the grea
 
 ---
 
-## 2. Weekly Calendar View
+## 2 Weekly Calendar View
 
 **File:** `js/views/WeeklyView.js`
 
@@ -130,7 +130,7 @@ When viewing the current week, the page scrolls to today's day card after render
 
 ---
 
-## 3. Alphabetical View
+## 3 Alphabetical View
 
 **File:** `js/views/AlphabeticalView.js`
 
@@ -167,7 +167,7 @@ If no venues match the current search/filter, displays "No venues match your sea
 
 ---
 
-## 4. Map View
+## 4 Map View
 
 **File:** `js/views/MapView.js`
 
@@ -245,7 +245,7 @@ Displays "X of Y venues have map coordinates" at the bottom. If some venues lack
 
 ---
 
-## 5. Navigation & Controls
+## 5 Navigation and Controls
 
 **File:** `js/components/Navigation.js`
 
@@ -285,7 +285,7 @@ The navigation bar's height is tracked by a `ResizeObserver` and stored as CSS v
 
 ---
 
-## 6. Venue Cards
+## 6 Venue Cards
 
 **File:** `js/components/VenueCard.js`
 
@@ -325,7 +325,7 @@ When debug mode is enabled (`?debug=1`), compact cards show the schedule match r
 
 ---
 
-## 7. Venue Detail — Mobile Modal
+## 7 Venue Detail (Mobile Modal)
 
 **File:** `js/components/VenueModal.js`
 
@@ -368,7 +368,7 @@ When the modal is open, `document.body.style.overflow = 'hidden'` prevents backg
 
 ---
 
-## 8. Venue Detail — Desktop Pane
+## 8 Venue Detail (Desktop Pane)
 
 **File:** `js/components/VenueDetailPane.js`
 
@@ -394,7 +394,7 @@ When no venue is selected, shows a microphone icon and the text: "Select a venue
 
 ---
 
-## 9. Search
+## 9 Search
 
 The app includes a global search bar that filters venues across all views.
 
@@ -433,7 +433,7 @@ The Navigation component does **not** re-render when search changes, to preserve
 
 ---
 
-## 10. Filtering
+## 10 Filtering
 
 ### Dedicated Venue Filter
 
@@ -455,7 +455,7 @@ Venues with a `dateRange` field only appear when the current date falls within `
 
 ---
 
-## 11. Venue Data Model
+## 11 Venue Data Model
 
 **File:** `js/data.js`
 
@@ -533,7 +533,7 @@ The `getSortableName()` utility strips leading articles for sorting purposes. "T
 
 ---
 
-## 12. Tag System
+## 12 Tag System
 
 **Files:** `js/data.js` (definitions), `js/utils/tags.js` (rendering)
 
@@ -582,7 +582,7 @@ Tags are searchable by both their ID and label. Searching "dive" or "Dive Bar" w
 
 ---
 
-## 13. Schedule Matching
+## 13 Schedule Matching
 
 **File:** `js/utils/date.js` — `scheduleMatchesDate(schedule, date)`
 
@@ -636,7 +636,7 @@ Separate from schedule matching. If a venue has `dateRange`, it only appears whe
 
 ---
 
-## 14. Karaoke Bingo Game
+## 14 Karaoke Bingo Game
 
 **Files:** `bingo.html`, `js/bingo.js`, `css/bingo.css`
 
@@ -699,7 +699,7 @@ Automatically restored on page load.
 
 ---
 
-## 15. Venue Submission Form
+## 15 Venue Submission Form
 
 **File:** `submit.html`
 
@@ -774,7 +774,7 @@ Submit button posts to the same Google Apps Script endpoint.
 
 ---
 
-## 16. Venue Editor
+## 16 Venue Editor
 
 **Files:** `editor.html`, `editor/editor.js`, `css/editor.css`
 
@@ -872,7 +872,7 @@ Collapsible sidebar section for managing the tag system itself:
 
 ---
 
-## 17. About Page
+## 17 About Page
 
 **File:** `about.html`
 
@@ -894,7 +894,7 @@ Static informational page.
 
 ---
 
-## 18. Debug Mode
+## 18 Debug Mode
 
 **File:** `js/utils/debug.js`
 
@@ -919,7 +919,7 @@ Static informational page.
 
 ---
 
-## 19. Responsive Design
+## 19 Responsive Design
 
 ### Breakpoints
 
@@ -950,7 +950,7 @@ Map view is always immersive (full viewport) regardless of screen size, with its
 
 ---
 
-## 20. Security
+## 20 Security
 
 ### XSS Prevention
 
@@ -976,7 +976,7 @@ Submission form limits to 3 submissions per hour per browser via `localStorage`.
 
 ---
 
-## 21. State Management & Events
+## 21 State Management and Events
 
 ### State (`js/core/state.js`)
 
@@ -1031,7 +1031,7 @@ Pub/sub event bus for component communication.
 
 ---
 
-## 22. Known Discrepancies
+## 22 Known Discrepancies
 
 > Items listed here represent differences found between existing documentation and code during the initial spec creation. Each must be validated and resolved.
 
@@ -1043,7 +1043,7 @@ Pub/sub event bus for component communication.
 
 ---
 
-## 23. Change Log
+## 23 Change Log
 
 | Date | Version | Change | Author |
 |------|---------|--------|--------|

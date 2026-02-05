@@ -144,6 +144,17 @@
             subMaxLevel: 3,
             auto2top: true,
             homepage: 'functional-spec.md',
+            // Custom slugify to match GitHub's heading ID algorithm.
+            // Docsify's default prefixes underscore on numeric-starting IDs,
+            // which breaks anchor links that also need to work on GitHub.
+            slugify: function(str) {
+                return str
+                    .toLowerCase()
+                    .trim()
+                    .replace(/<[^>]+>/g, '')
+                    .replace(/[^a-z0-9\s-]/g, '')
+                    .replace(/\s+/g, '-');
+            },
             search: {
                 maxAge: 86400000,
                 paths: 'auto',
