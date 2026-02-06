@@ -270,6 +270,7 @@ function fillForm(venue) {
     document.getElementById('social-twitter').value = venue.socials?.twitter || '';
     document.getElementById('social-tiktok').value = venue.socials?.tiktok || '';
     document.getElementById('social-youtube').value = venue.socials?.youtube || '';
+    document.getElementById('social-bluesky').value = venue.socials?.bluesky || '';
 
     // Schedule
     renderScheduleList(venue.schedule || []);
@@ -384,7 +385,7 @@ function getFormData() {
 
     // Build socials object (only non-empty values)
     const socials = {};
-    ['website', 'facebook', 'instagram', 'twitter', 'tiktok', 'youtube'].forEach(platform => {
+    ['website', 'facebook', 'instagram', 'twitter', 'tiktok', 'youtube', 'bluesky'].forEach(platform => {
         const value = document.getElementById(`social-${platform}`).value.trim();
         if (value) socials[platform] = value;
     });

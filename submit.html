@@ -276,6 +276,13 @@
                             <input type="text" id="zip" name="zip" pattern="\d{5}(-\d{4})?" placeholder="78701">
                         </div>
                     </div>
+                    <div class="form-row">
+                        <div class="form-group form-group--full">
+                            <label for="neighborhood">Neighborhood</label>
+                            <input type="text" id="neighborhood" name="neighborhood" placeholder="e.g., Downtown, East Austin, Round Rock">
+                            <small>Optional - helps with filtering</small>
+                        </div>
+                    </div>
                 </fieldset>
 
                 <fieldset class="form-section">
@@ -361,6 +368,22 @@
                         <div class="form-group">
                             <label for="venue-twitter"><i class="fa-brands fa-x-twitter"></i> X/Twitter</label>
                             <input type="url" id="venue-twitter" name="venue-twitter" placeholder="https://x.com/...">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="venue-tiktok"><i class="fa-brands fa-tiktok"></i> TikTok</label>
+                            <input type="url" id="venue-tiktok" name="venue-tiktok" placeholder="https://tiktok.com/...">
+                        </div>
+                        <div class="form-group">
+                            <label for="venue-youtube"><i class="fa-brands fa-youtube"></i> YouTube</label>
+                            <input type="url" id="venue-youtube" name="venue-youtube" placeholder="https://youtube.com/...">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="venue-bluesky"><i class="fa-solid fa-cloud"></i> Bluesky</label>
+                            <input type="url" id="venue-bluesky" name="venue-bluesky" placeholder="https://bsky.app/...">
                         </div>
                     </div>
                 </fieldset>
@@ -815,7 +838,8 @@
                     street: formData.get('street')?.trim() || '',
                     city: formData.get('city')?.trim() || 'Austin',
                     state: formData.get('state')?.trim() || 'TX',
-                    zip: formData.get('zip')?.trim() || ''
+                    zip: formData.get('zip')?.trim() || '',
+                    neighborhood: formData.get('neighborhood')?.trim() || ''
                 },
                 schedule: schedule
             };
@@ -840,13 +864,19 @@
             const venueFacebook = formData.get('venue-facebook')?.trim();
             const venueInstagram = formData.get('venue-instagram')?.trim();
             const venueTwitter = formData.get('venue-twitter')?.trim();
+            const venueTiktok = formData.get('venue-tiktok')?.trim();
+            const venueYoutube = formData.get('venue-youtube')?.trim();
+            const venueBluesky = formData.get('venue-bluesky')?.trim();
 
-            if (venueWebsite || venueFacebook || venueInstagram || venueTwitter) {
+            if (venueWebsite || venueFacebook || venueInstagram || venueTwitter || venueTiktok || venueYoutube || venueBluesky) {
                 venue.socials = {};
                 if (venueWebsite) venue.socials.website = venueWebsite;
                 if (venueFacebook) venue.socials.facebook = venueFacebook;
                 if (venueInstagram) venue.socials.instagram = venueInstagram;
                 if (venueTwitter) venue.socials.twitter = venueTwitter;
+                if (venueTiktok) venue.socials.tiktok = venueTiktok;
+                if (venueYoutube) venue.socials.youtube = venueYoutube;
+                if (venueBluesky) venue.socials.bluesky = venueBluesky;
             }
 
             // Collect metadata

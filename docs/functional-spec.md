@@ -693,6 +693,7 @@ Two-tab form: "New Venue" and "Report Issue."
 | Address | City | Yes | Default: "Austin" |
 | Address | State | No | Default: "TX" |
 | Address | ZIP | No | Pattern validation (5 or 5+4 digits) |
+| Address | Neighborhood | No | Optional, helps with filtering |
 | Schedule | Frequency | Yes | Select: every, first, second, third, fourth, last |
 | Schedule | Day | Yes | Select: Sunday–Saturday |
 | Schedule | Start time | Yes | Default: 21:00 |
@@ -700,7 +701,7 @@ Two-tab form: "New Venue" and "Report Issue."
 | Host | Host Name | No | |
 | Host | Company | No | |
 | Host | Website | No | URL |
-| Socials | Website, Facebook, Instagram, Twitter | No | URL fields |
+| Socials | Website, Facebook, Instagram, Twitter, TikTok, YouTube, Bluesky | No | URL fields (7 platforms) |
 | Notes | Additional notes | No | Textarea |
 | Submitter | Type | Yes | Radio: "Just a fan" (default) or "I'm the KJ/Host" |
 | Submitter | Name | Conditional | Required if KJ/Host |
@@ -1026,6 +1027,9 @@ Pub/sub event bus for component communication.
 | 2026-02 | 1.0.5 | Spec audit: Added live site URL, updated venue count to 70, fixed 2 lowercase "thursday" entries in data.js, removed unimplemented event name search from Section 9, added phone field to schema. | Claude Code |
 | 2026-02 | 1.0.6 | Taiga #6: Added documentation links to about.html ("For Developers" section) and footer. Updated Section 17. | Claude Code |
 | 2026-02 | 1.0.7 | Taiga #20: Fixed day name casing in submit.html - dropdown values now capitalized ("Sunday" not "sunday"). | Claude Code |
+| 2026-02 | 1.0.8 | Taiga #16: Added Bluesky field to editor.html and submit.html. Updated editor.js to read/write bluesky. | Claude Code |
+| 2026-02 | 1.0.9 | Taiga #17: Added TikTok and YouTube fields to submit.html. Updated collectFormData(). Section 15 now lists all 7 social platforms. | Claude Code |
+| 2026-02 | 1.0.10 | Taiga #18: Added Neighborhood field to submit.html Address section. Updated collectFormData() and Section 15. | Claude Code |
 
 ---
 
