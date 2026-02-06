@@ -1025,6 +1025,7 @@ Pub/sub event bus for component communication.
 | 2026-02 | 1.0.4 | Removed references to non-existent test suite (`tests/index.html`) from all documentation. | Claude Code |
 | 2026-02 | 1.0.5 | Spec audit: Added live site URL, updated venue count to 70, fixed 2 lowercase "thursday" entries in data.js, removed unimplemented event name search from Section 9, added phone field to schema. | Claude Code |
 | 2026-02 | 1.0.6 | Taiga #6: Added documentation links to about.html ("For Developers" section) and footer. Updated Section 17. | Claude Code |
+| 2026-02 | 1.0.7 | Taiga #20: Fixed day name casing in submit.html - dropdown values now capitalized ("Sunday" not "sunday"). | Claude Code |
 
 ---
 
