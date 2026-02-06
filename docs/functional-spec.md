@@ -6,7 +6,7 @@
 **Version:** 1.0
 **Last updated:** February 2026
 **Application:** Austin Karaoke Directory
-**Live site:** [Add deployment URL]
+**Live site:** https://www.karaokedirectory.com
 
 ---
 
@@ -26,7 +26,7 @@ Karaoke enthusiasts looking for venues, schedules, and event details in the grea
 
 - **Vanilla JavaScript only** — no frameworks, no build step
 - **Mobile-first responsive design** — base styles target mobile, enhanced for larger screens
-- **Data-driven** — all venue data in a single JavaScript file (`js/data.js`), currently 69 venues
+- **Data-driven** — all venue data in a single JavaScript file (`js/data.js`), currently 70 venues
 - **Component-based** — lightweight custom `Component` base class with state management and event bus
 
 ### Pages
@@ -40,7 +40,6 @@ Karaoke enthusiasts looking for venues, schedules, and event details in the grea
 | Editor | `editor.html` | Venue data editing tool |
 | Docs | `codeexplained.html` | Interactive code documentation (beginner-oriented) |
 | Spec viewer | `docs/index.html` | Docsify-powered documentation portal (renders this spec) |
-| Tests | `tests/index.html` | Schedule matching test suite |
 
 ---
 
@@ -393,7 +392,6 @@ Search is case-insensitive substring matching. A venue matches if the query appe
 | Tag ID | "lgbtq" | Venues tagged `lgbtq` |
 | Tag label | "Dive Bar" | Venues tagged `dive` (label: "Dive Bar") |
 | "dedicated" or "karaoke" keywords | "dedicated" | Venues with `dedicated: true` |
-| Event name | "birthday" | Special events with "birthday" in event name |
 
 ### Search Behavior by View
 
@@ -490,12 +488,14 @@ All venue data is stored in a single JavaScript file as `const karaokeData = { t
     socials.tiktok      string        OPTIONAL
     socials.youtube     string        OPTIONAL
     socials.bluesky     string        OPTIONAL
+
+  phone                 string        OPTIONAL  Venue phone number (displayed in detail views)
 }
 ```
 
 ### Venue Count
 
-As of February 2026: **69 venues** in the listings array.
+As of February 2026: **70 venues** in the listings array.
 
 ### Active/Inactive
 
@@ -854,11 +854,16 @@ Static informational page.
 
 ### Sections
 
-1. **About Us** — Mission statement, current venue count (69+), disclaimer to verify with venues
+1. **About Us** — Mission statement, disclaimer to verify with venues
 2. **What You Can Do** — Seven feature highlights with icons (weekly calendar, A-Z listing, interactive map, search, venue tags, special events, karaoke bingo)
 3. **Submit a Venue** — Link to `submit.html`
 4. **Submit Feedback** — Link to Google Form
-5. **Contact Us** — Social links: Facebook Group, Instagram (@karaokedirectory)
+5. **For Developers** — Links to Functional Specification (`docs/index.html`) and Code Explained (`codeexplained.html`)
+6. **Contact Us** — Social links: Facebook Group, Instagram (@karaokedirectory)
+
+### Footer
+
+Includes a "Documentation" link to `docs/index.html`.
 
 ### Header
 
@@ -882,14 +887,6 @@ Static informational page.
 - **Debug indicator** — "Debug Mode" badge in the top-right corner
 - **Venue cards** — show schedule match reason (e.g., "Every Friday", "First Saturday", "Once: 2026-03-15")
 - **Hover info** — detailed match information on card hover
-
-### Test Suite
-
-`tests/index.html` provides:
-- Automated schedule matching tests (`scheduleMatchesDate()`)
-- Date utility tests (week calculations, formatting)
-- Venue filtering and sorting tests
-- Interactive date picker to check which venues appear on any date and why
 
 ---
 
@@ -1013,7 +1010,7 @@ Pub/sub event bus for component communication.
 |---|------|-------|------------|--------|
 | 1 | Detail pane breakpoint | CLAUDE.md said "1200px+", code uses 1400px | CLAUDE.md updated to 1400px | **Resolved 2026-02** |
 | 2 | Social platforms | `url.js` supports bluesky but it was missing from CLAUDE.md venue schema | Added `bluesky` to socials in CLAUDE.md and functional spec | **Resolved 2026-02** |
-| 3 | Day name casing | Data file used lowercase day names ("friday"), docs showed capitalized ("Friday") | All 115 day entries in `data.js` standardized to initial capital ("Friday"). Matching code uses `.toLowerCase()` so no breakage. | **Resolved 2026-02** |
+| 3 | Day name casing | Data file used lowercase day names ("friday"), docs showed capitalized ("Friday") | All day entries in `data.js` standardized to initial capital ("Friday"). Matching code uses `.toLowerCase()` so no breakage. Two missed entries fixed in v1.0.5. | **Resolved 2026-02** |
 
 ---
 
@@ -1025,6 +1022,9 @@ Pub/sub event bus for component communication.
 | 2026-02 | 1.0.1 | Resolved 3 discrepancies: breakpoint 1200px→1400px, added bluesky social, standardized day name casing | Claude Code |
 | 2026-02 | 1.0.2 | Added Docsify documentation portal (`docs/index.html`). Updated Section 1 pages table. | Claude Code |
 | 2026-02 | 1.0.3 | Fixed case-sensitivity bug in day name matching for VenueCard and editor. Added `.toLowerCase()` to comparisons. | Claude Code |
+| 2026-02 | 1.0.4 | Removed references to non-existent test suite (`tests/index.html`) from all documentation. | Claude Code |
+| 2026-02 | 1.0.5 | Spec audit: Added live site URL, updated venue count to 70, fixed 2 lowercase "thursday" entries in data.js, removed unimplemented event name search from Section 9, added phone field to schema. | Claude Code |
+| 2026-02 | 1.0.6 | Taiga #6: Added documentation links to about.html ("For Developers" section) and footer. Updated Section 17. | Claude Code |
 
 ---
 

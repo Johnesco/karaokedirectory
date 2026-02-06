@@ -84,9 +84,6 @@ Deploy to any static hosting service (GitHub Pages, Netlify, Vercel, etc.) — j
 │   └── utils/          # Utilities (date, string, tags, url, render, debug, validation)
 ├── editor/
 │   └── editor.js       # Venue editor functionality
-├── tests/              # Browser-based test suite
-│   ├── index.html      # Visual test runner with date tester
-│   └── schedule-tests.js
 ├── scripts/            # Developer tools
 │   ├── geocode-venues.js   # Batch geocode venues (Node.js)
 │   └── validate-data.js    # Validate venue data integrity
@@ -198,10 +195,9 @@ The editor tool (`editor.html`) provides a full GUI for managing venue data:
 - **Live preview** with Card, Modal, and JSON tabs
 - **JSON export** (Copy to Clipboard) and **draft saving** (localStorage)
 
-## Testing & Debug
+## Debug Mode
 
-- **Test Suite**: Open `tests/index.html` for schedule verification tests and an interactive date tester
-- **Debug Mode**: Append `?debug=1` to the URL to see schedule match reasons on venue cards
+Append `?debug=1` to the URL to see schedule match reasons on venue cards.
 
 ## Contributing
 

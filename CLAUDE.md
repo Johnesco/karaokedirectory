@@ -50,10 +50,6 @@ karaokedirectory/
 ├── editor.html            # Venue data editor tool
 ├── codeexplained.html     # Interactive code documentation
 │
-├── tests/                 # Test suite (not linked from site)
-│   ├── index.html         # Visual test runner
-│   └── schedule-tests.js  # Schedule matching tests
-│
 ├── css/
 │   ├── base.css           # CSS variables, reset, typography (ALWAYS FIRST)
 │   ├── layout.css         # Header, nav, footer, page structure
@@ -367,12 +363,6 @@ Use these semantic elements consistently:
 
 ## Testing
 
-### Test Suite
-Open `tests/index.html` in a browser to run the test suite. Tests cover:
-- Schedule matching logic (`scheduleMatchesDate()`)
-- Date utilities (week calculations, formatting)
-- Venue filtering and sorting
-
 ### Debug Mode
 Enable debug mode to see why venues appear on specific dates:
 1. Add `?debug=1` to the URL (e.g., `index.html?debug=1`)
@@ -382,9 +372,6 @@ When enabled:
 - A "Debug Mode" indicator appears in the top-right corner
 - Venue cards show their schedule match reason (e.g., "Every Friday", "First Saturday")
 - Hover over cards for detailed match info
-
-### Interactive Date Tester
-The test page includes a date picker to check which venues appear on any date and why.
 
 ## Current Feature Status
 
@@ -405,7 +392,6 @@ The test page includes a date picker to check which venues appear on any date an
 - [x] Venue editor tool with live preview and tag management
 - [x] Address geocoding in editor (US Census Geocoder API)
 - [x] Comprehensive code documentation (codeexplained.html)
-- [x] Test suite for schedule verification (tests/index.html)
 - [x] Debug mode for schedule troubleshooting (?debug=1)
 - [x] Shared rendering utilities (render.js) for schedule tables, host sections, date ranges
 
@@ -490,7 +476,6 @@ The test page includes a date picker to check which venues appear on any date an
   - Tag rendering utility in `js/utils/tags.js`
   - Tags display in VenueCard, VenueModal, and VenueDetailPane
   - CSS styles in `css/components.css` (.venue-tags, .venue-tag)
-- **2025-01**: Added test suite (`tests/index.html`) for schedule verification
 - **2025-01**: Added debug mode with visual overlay (`?debug=1`)
 - **2025-01**: Created `js/utils/debug.js` for debug utilities
 - **2025-01**: Standardized CSS loading across all pages for consistency
@@ -565,6 +550,47 @@ The **Functional Specification** (`docs/functional-spec.md`) is the authoritativ
 - Use `sanitizeUrl()` for any URLs before rendering
 - Never store API keys or secrets in code
 - Validate all form inputs
+
+## Taiga Integration
+
+This project uses Taiga for issue tracking (free tier - no API/import). Follow these conventions to keep code and issues in sync.
+
+### Commit Messages
+
+Reference Taiga issues in commits:
+```
+Taiga #123: Brief description
+```
+
+- Use the issue reference number from Taiga UI (e.g., `#15`)
+- Multiple issues: `Taiga #123, #124: Description`
+- Partial work: `Taiga #123 (partial): Description`
+
+### Code Comments
+
+Reference Taiga issues in code when the connection isn't obvious:
+```javascript
+// Taiga #123: Exclude venues closed on the viewing date
+if (isDateExcluded(venue, date)) { ... }
+```
+
+Use sparingly - only for non-obvious code tied to specific issues.
+
+### Taiga Issue Updates
+
+When working on an issue, add to the Taiga description or comments:
+- **Related files:** List primary files being modified
+- **Related commits:** Add commit hashes when work is done
+
+### Workflow Checklist
+
+**When starting work:**
+1. Note the Taiga issue reference number
+2. Include `Taiga #<ref>` in all related commits
+
+**When completing work:**
+1. Update Taiga issue with related files and commits
+2. Move issue to appropriate status in Taiga
 
 ## Related Documentation
 
