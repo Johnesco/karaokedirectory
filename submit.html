@@ -291,16 +291,17 @@
                         <div class="schedule-entry" data-index="0">
                             <div class="form-group">
                                 <label>Frequency</label>
-                                <select name="frequency-0">
+                                <select name="frequency-0" onchange="toggleScheduleFields(this)">
                                     <option value="every">Every</option>
                                     <option value="first">First</option>
                                     <option value="second">Second</option>
                                     <option value="third">Third</option>
                                     <option value="fourth">Fourth</option>
                                     <option value="last">Last</option>
+                                    <option value="once">One-Time Event</option>
                                 </select>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group schedule-day-group">
                                 <label>Day <span class="required">*</span></label>
                                 <select name="day-0" required>
                                     <option value="">Select day...</option>
@@ -313,6 +314,14 @@
                                     <option value="Saturday">Saturday</option>
                                 </select>
                             </div>
+                            <div class="form-group schedule-date-group" style="display: none;">
+                                <label>Date <span class="required">*</span></label>
+                                <input type="date" name="date-0">
+                            </div>
+                            <div class="form-group schedule-event-name-group" style="display: none;">
+                                <label>Event Name</label>
+                                <input type="text" name="eventName-0" placeholder="e.g., Birthday Bash">
+                            </div>
                             <div class="form-group">
                                 <label>Start Time</label>
                                 <input type="time" name="startTime-0" value="21:00">
@@ -320,6 +329,10 @@
                             <div class="form-group">
                                 <label>End Time</label>
                                 <input type="time" name="endTime-0" value="01:00">
+                            </div>
+                            <div class="form-group schedule-event-url-group">
+                                <label>Event URL</label>
+                                <input type="url" name="eventUrl-0" placeholder="https://...">
                             </div>
                         </div>
                     </div>
@@ -729,16 +742,17 @@
             entry.innerHTML = `
                 <div class="form-group">
                     <label>Frequency</label>
-                    <select name="frequency-${scheduleCount}">
+                    <select name="frequency-${scheduleCount}" onchange="toggleScheduleFields(this)">
                         <option value="every">Every</option>
                         <option value="first">First</option>
                         <option value="second">Second</option>
                         <option value="third">Third</option>
                         <option value="fourth">Fourth</option>
                         <option value="last">Last</option>
+                        <option value="once">One-Time Event</option>
                     </select>
                 </div>
-                <div class="form-group">
+                <div class="form-group schedule-day-group">
                     <label>Day</label>
                     <select name="day-${scheduleCount}">
                         <option value="">Select day...</option>
@@ -751,6 +765,14 @@
                         <option value="Saturday">Saturday</option>
                     </select>
                 </div>
+                <div class="form-group schedule-date-group" style="display: none;">
+                    <label>Date</label>
+                    <input type="date" name="date-${scheduleCount}">
+                </div>
+                <div class="form-group schedule-event-name-group" style="display: none;">
+                    <label>Event Name</label>
+                    <input type="text" name="eventName-${scheduleCount}" placeholder="e.g., Birthday Bash">
+                </div>
                 <div class="form-group">
                     <label>Start Time</label>
                     <input type="time" name="startTime-${scheduleCount}" value="21:00">
@@ -759,6 +781,10 @@
                     <label>End Time</label>
                     <input type="time" name="endTime-${scheduleCount}" value="01:00">
                 </div>
+                <div class="form-group schedule-event-url-group">
+                    <label>Event URL</label>
+                    <input type="url" name="eventUrl-${scheduleCount}" placeholder="https://...">
+                </div>
                 <button type="button" class="remove-schedule-btn" onclick="removeScheduleEntry(this)">
                     <i class="fa-solid fa-trash"></i> Remove
                 </button>
@@ -766,6 +792,26 @@
 
             container.appendChild(entry);
             scheduleCount++;
+        }
+
+        // Toggle schedule fields based on frequency selection
+        function toggleScheduleFields(select) {
+            const entry = select.closest('.schedule-entry');
+            const isOnce = select.value === 'once';
+
+            const dayGroup = entry.querySelector('.schedule-day-group');
+            const dateGroup = entry.querySelector('.schedule-date-group');
+            const eventNameGroup = entry.querySelector('.schedule-event-name-group');
+
+            if (dayGroup) dayGroup.style.display = isOnce ? 'none' : '';
+            if (dateGroup) dateGroup.style.display = isOnce ? '' : 'none';
+            if (eventNameGroup) eventNameGroup.style.display = isOnce ? '' : 'none';
+
+            // Update required attribute on day/date fields
+            const daySelect = entry.querySelector('[name^="day-"]');
+            const dateInput = entry.querySelector('[name^="date-"]');
+            if (daySelect) daySelect.required = !isOnce;
+            if (dateInput) dateInput.required = isOnce;
         }
 
         function removeScheduleEntry(btn) {
@@ -800,16 +846,35 @@
                 const index = entry.dataset.index;
                 const frequency = formData.get(`frequency-${index}`);
                 const day = formData.get(`day-${index}`);
+                const date = formData.get(`date-${index}`);
+                const eventName = formData.get(`eventName-${index}`)?.trim();
+                const eventUrl = formData.get(`eventUrl-${index}`)?.trim();
                 const startTime = formData.get(`startTime-${index}`) || '21:00';
                 const endTime = formData.get(`endTime-${index}`) || '01:00';
 
-                if (day) {
-                    schedule.push({
+                if (frequency === 'once') {
+                    // One-time event - use date instead of day
+                    if (date) {
+                        const scheduleEntry = {
+                            frequency: 'once',
+                            date: date,
+                            startTime: startTime,
+                            endTime: endTime
+                        };
+                        if (eventName) scheduleEntry.eventName = eventName;
+                        if (eventUrl) scheduleEntry.eventUrl = eventUrl;
+                        schedule.push(scheduleEntry);
+                    }
+                } else if (day) {
+                    // Recurring event
+                    const scheduleEntry = {
                         frequency: frequency,
                         day: day,
                         startTime: startTime,
                         endTime: endTime
-                    });
+                    };
+                    if (eventUrl) scheduleEntry.eventUrl = eventUrl;
+                    schedule.push(scheduleEntry);
                 }
             });
 

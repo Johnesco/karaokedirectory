@@ -694,10 +694,13 @@ Two-tab form: "New Venue" and "Report Issue."
 | Address | State | No | Default: "TX" |
 | Address | ZIP | No | Pattern validation (5 or 5+4 digits) |
 | Address | Neighborhood | No | Optional, helps with filtering |
-| Schedule | Frequency | Yes | Select: every, first, second, third, fourth, last |
-| Schedule | Day | Yes | Select: Sunday–Saturday |
+| Schedule | Frequency | Yes | Select: every, first, second, third, fourth, last, once (One-Time Event) |
+| Schedule | Day | Conditional | Select: Sunday–Saturday (shown for recurring events) |
+| Schedule | Date | Conditional | Date picker (shown for one-time events) |
+| Schedule | Event Name | No | Text (shown for one-time events) |
 | Schedule | Start time | Yes | Default: 21:00 |
 | Schedule | End time | Yes | Default: 01:00 |
+| Schedule | Event URL | No | URL (shown for all frequencies) |
 | Host | Host Name | No | |
 | Host | Company | No | |
 | Host | Website | No | URL |
@@ -709,6 +712,7 @@ Two-tab form: "New Venue" and "Report Issue."
 
 - Schedule entries are dynamic — "Add Another Day" button creates additional entries
 - Each schedule entry has a remove button
+- Selecting "One-Time Event" frequency shows Date and Event Name fields, hides Day field
 
 #### Bot Protection
 
@@ -1030,6 +1034,7 @@ Pub/sub event bus for component communication.
 | 2026-02 | 1.0.8 | Taiga #16: Added Bluesky field to editor.html and submit.html. Updated editor.js to read/write bluesky. | Claude Code |
 | 2026-02 | 1.0.9 | Taiga #17: Added TikTok and YouTube fields to submit.html. Updated collectFormData(). Section 15 now lists all 7 social platforms. | Claude Code |
 | 2026-02 | 1.0.10 | Taiga #18: Added Neighborhood field to submit.html Address section. Updated collectFormData() and Section 15. | Claude Code |
+| 2026-02 | 1.0.11 | Taiga #19: Added special event support to submit.html. "Once" frequency with date/eventName/eventUrl fields. Updated Section 15. | Claude Code |
 
 ---
 
