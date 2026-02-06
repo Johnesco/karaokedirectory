@@ -899,6 +899,44 @@ const karaokeData = {
       }
     },
     {
+      "id": "feral-housewife-wine",
+      "name": "Feral Housewife Wine",
+      "active": true,
+      "dedicated": false,
+      "address": {
+        "street": "11190 Circle Dr,  building 2, Suite 208",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78736",
+        "neighborhood": ""
+      },
+      "schedule": [
+        {
+          "frequency": "first",
+          "day": "Thursday",
+          "startTime": "19:00",
+          "endTime": "22:00"
+        },
+        {
+          "frequency": "third",
+          "day": "Thursday",
+          "startTime": "19:00",
+          "endTime": "22:00"
+        }
+      ],
+      "host": {
+        "name": "KJ Armando and Paola"
+      },
+      "socials": {
+        "website": "https://www.feralhousewifewine.com/",
+        "instagram": "https://www.instagram.com/feralhousewifewine/"
+      },
+      "coordinates": {
+        "lat": 30.2243696,
+        "lng": -97.953755
+      }
+    },
+    {
       "id": "the-fieldhouse-at-the-crossover",
       "name": "The Fieldhouse at the Crossover",
       "tags": [
