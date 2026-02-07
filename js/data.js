@@ -797,6 +797,37 @@ const karaokeData = {
       }
     },
     {
+      "id": "coyote-ugly",
+      "name": "Coyote Ugly",
+      "active": true,
+      "dedicated": false,
+      "address": {
+        "street": "501 E 6th St",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78701",
+        "neighborhood": ""
+      },
+      "schedule": [
+        {
+          "frequency": "every",
+          "day": "tuesday",
+          "startTime": "20:00",
+          "endTime": "23:00"
+        }
+      ],
+      "host": {
+        "name": "Xpider Cantu"
+      },
+      "socials": {
+        "website": "https://www.coyoteuglysaloon.com/austin/"
+      },
+      "coordinates": {
+        "lat": 30.2665199,
+        "lng": -97.7382387
+      }
+    },
+    {
       "id": "dog-n-bone-pub",
       "name": "Dog 'n' Bone Pub",
       "tags": [
