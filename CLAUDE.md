@@ -428,6 +428,18 @@ When enabled:
 ## Project History
 
 ### Recent Changes
+- **2026-02**: Added frequency labels to venue cards and dedup notice to search sections (#16)
+  - Compact venue cards now show frequency + day before time: "Every Friday · 9:00 PM - 1:00 AM"
+  - Uses `formatScheduleEntry()` from `js/utils/date.js` with `showEvery: true`
+  - Frequency label wrapped in `.venue-card__frequency` span (muted color via CSS)
+  - Skipped for `frequency: "once"` events (they already have event name line)
+  - Extended search sections with deduplication now show "Plus X recurring venues already shown above"
+  - `countVenuesInRange()` in `SearchSection.js` tracks `dedupedCount` alongside `count`
+  - Dedup notice styled as `.search-section__dedup-notice` (muted, centered, italic)
+- **2026-02**: Fixed submit form schedule section overflow on desktop (#15)
+  - `.schedule-entry` grid columns changed from `1fr` to `minmax(0, 1fr)` to prevent content overflow
+  - Added `min-width: 0` on schedule form groups and `overflow: hidden` on `.submit-form` and `.form-section`
+  - Schedule inputs constrained with `width: 100%` and `box-sizing: border-box`
 - **2026-02**: Migrated project management from Taiga to GitHub Issues + Projects
   - All work items tracked as GitHub Issues with labels, milestones, and Projects board
   - Issue templates (`.github/ISSUE_TEMPLATE/`) enforce documentation-first workflow
@@ -532,31 +544,35 @@ When enabled:
 4. **Leaflet.js** for maps (open source, no API key required)
 5. **Font Awesome CDN** for icons (easy updates, no local assets)
 6. **Docsify** for documentation portal (CDN-loaded, no build step, renders markdown directly)
-7. **Documentation-First Workflow** — Functional Specification is the single source of truth; every change must update it
+7. **Ticket-First, Documentation-Aware Workflow** — Every change starts as a GitHub Issue; Functional Specification is the single source of truth; every change must update it
 
 ## Instructions for Claude
 
-### Documentation-First Workflow (MANDATORY)
+### Ticket-First, Documentation-Aware Workflow (MANDATORY)
+
+Every software change — feature, bug fix, refactor, or data update — follows this sequence. No step may be skipped.
 
 The **Functional Specification** (`docs/functional-spec.md`) is the authoritative record of all application features, behavior, and data formats. It is the single source of truth for what this application does.
 
-**Before ANY change** (feature, bug fix, refactor, data update), the very first step is:
+**Before ANY change**, follow these steps in order:
 
-1. **Identify documentation impact** - Determine which sections of the Functional Specification (and other docs) describe the area being changed. Read those sections before writing any code.
-2. **Flag discrepancies** - If existing code already differs from what the documentation says, stop and flag the mismatch for validation before proceeding. Do not silently "fix" documentation to match code or vice versa without explicit confirmation.
-3. **Plan documentation updates** - Before implementing, note what documentation must be created or updated to reflect the change. Include this in any plan or summary presented to the user.
-4. **Implement the change** - Write the code.
-5. **Update documentation** - Update the Functional Specification, CLAUDE.md, README.md, and any other affected docs so they accurately reflect the new state. This is not optional — a change is not complete until its documentation is current.
-6. **Verify consistency** - After updating, confirm that the documentation and code are in agreement. Any remaining gaps must be called out explicitly.
+1. **Capture as a ticket** - Create a GitHub Issue describing the change before any other work begins. Include a clear title, relevant labels, acceptance criteria, and an associated **milestone**. Add the issue to the GitHub Projects board with a default status of **Backlog**. Every issue must belong to an existing milestone by the time it ships; if no existing milestone fits, create a new one. No code is written without a ticket.
+2. **Review documentation for affected areas** - Read the sections of the Functional Specification (and other docs like CLAUDE.md, README.md) that describe the area being changed. Identify what exists, what will be impacted, and note any discrepancies.
+3. **Flag discrepancies** - If existing code already differs from what the documentation says, stop and flag the mismatch for validation before proceeding. Do not silently "fix" documentation to match code or vice versa without explicit confirmation.
+4. **Refine the ticket** - Based on the documentation review, update the GitHub Issue with additional context, affected doc sections, and a plan for documentation updates. The ticket should reflect the full scope of work including doc changes.
+5. **Implement the change** - Write the code. Reference the ticket number (`#XX`) in commits.
+6. **Update all documentation** - Update the Functional Specification, CLAUDE.md, README.md, and any other affected docs so they accurately reflect the new state. This is not optional — a change is not complete until its documentation is current.
+7. **Verify consistency** - After updating, confirm that the documentation and code are in agreement. Any remaining gaps must be called out explicitly.
 
 **Key rules:**
+- No code without a ticket — every change starts as a GitHub Issue
 - A change without a corresponding documentation update is considered **incomplete**
 - Documentation updates are part of the definition of done, not a follow-up task
 - When in doubt about whether docs need updating, they do
 - The Functional Specification is the primary document; CLAUDE.md and README.md are secondary but must stay consistent with it
 
 ### When Making Changes
-1. **Documentation first** - Follow the Documentation-First Workflow above before all else
+1. **Ticket first** - Follow the Ticket-First, Documentation-Aware Workflow above before all else
 2. **Read before editing** - Always read files before modifying them
 3. **Follow existing patterns** - Match the coding style already in use
 4. **Keep it simple** - This project intentionally avoids over-engineering
@@ -596,19 +612,57 @@ All work is tracked in **GitHub Issues** with a **GitHub Projects** kanban board
 
 - **Issues** = All work items (features, bugs, docs, chores)
 - **Labels** = Type (`feature`, `bug`, `docs`, `chore`) + Area (`area:frontend`, `area:data`, etc.) + Priority (`priority:high`, `priority:low`)
-- **Milestones** = Feature groups (replace Taiga epics)
+- **Milestones** = Major feature areas aligned to Functional Spec sections (replace Taiga epics). Every issue must have a milestone by the time it ships. If no existing milestone fits, create a new one.
 - **Projects board** = Visual kanban for tracking status
+
+### Milestones
+
+| Milestone | Spec Sections | Description |
+|-----------|---------------|-------------|
+| Documentation Portal | — | Documentation site navigation and landing pages |
+| Exclusion Dates | — (future) | Venue closure/exclusion dates feature |
+| Form Parity | 15 | Bring submit form to parity with editor |
+| Weekly Calendar View | 2, 13 | Weekly schedule grid, day cards, schedule matching |
+| Alphabetical View | 3 | A-Z venue listing |
+| Map View | 4 | Interactive Leaflet map, immersive mode |
+| Search & Filtering | 9, 10 | Global search, extended search, dedicated filter |
+| Venue Cards & Detail | 6, 7, 8 | Compact/full cards, mobile modal, desktop pane |
+| Navigation & Layout | 5, 19 | Nav controls, responsive design, week navigation |
+| Venue Data & Tags | 11, 12 | Data model, tag system |
+| Venue Editor | 16 | Editor tool with live preview and geocoding |
+| Karaoke Bingo | 14 | Bingo game |
+| About & Infrastructure | 17, 18, 20, 21 | About page, debug mode, security, state management |
 
 ### Board Columns
 
-| Column | What's Here | Auto-transition |
-|--------|-------------|-----------------|
-| **Backlog** | Not yet started | On item added |
-| **Refining** | Defining scope and requirements | — |
-| **Ready** | Ready to work on | — |
-| **In Progress** | Actively being worked on | When PR linked |
-| **Verify** | Testing and review | — |
-| **Done** | Complete | On PR merge / issue close |
+| Column | What's Here |
+|--------|-------------|
+| **Backlog** | Not yet started |
+| **Refining** | Defining scope and requirements |
+| **Ready** | Ready to work on |
+| **In Progress** | Actively being worked on |
+| **Verify** | Testing and review |
+| **Done** | Complete |
+
+### Board Automations (GitHub Projects Workflows)
+
+These transitions are handled automatically by GitHub Projects:
+
+| Trigger | Sets Status To |
+|---------|---------------|
+| Item added to project | **Backlog** |
+| Item reopened | **In Progress** |
+| Item closed | **Done** |
+| Pull request merged | **Done** |
+
+These transitions are **manual** and must be set by Claude or the developer during the workflow:
+
+| Transition | When to Move |
+|------------|-------------|
+| Backlog → Refining | When scoping/discussing the issue |
+| Refining → Ready | When acceptance criteria are finalized |
+| Ready → In Progress | When coding begins |
+| In Progress → Verify | When code is complete, awaiting testing |
 
 ### Before Coding
 - `gh issue list` — pick an issue from the board

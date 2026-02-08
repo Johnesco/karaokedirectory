@@ -271,7 +271,7 @@ Used in: Weekly Calendar day cards, Map floating card summary.
 Displays:
 - **Venue name** — clickable button
 - **Special event indicator** — star icon + event name (for `frequency: "once"` events). If `eventUrl` is set, event name is a link. Adds `.venue-card--special-event` class and injects `special-event` tag.
-- **Time range** — clock icon + "9:00 PM - 1:00 AM" format. If `eventUrl` is set (and not already shown as special event link), shows arrow link icon.
+- **Frequency + time** — clock icon + frequency label + time range. Format: "Every Friday · 9:00 PM - 1:00 AM" or "First Saturday · 9:00 PM - 1:00 AM". Frequency label is wrapped in `.venue-card__frequency` span with muted color. Skipped for `frequency: "once"` events (they already have event name line). If `eventUrl` is set (and not already shown as special event link), shows arrow link icon.
 - **Address** — location icon + full address as Google Maps link
 - **Host** — "Presented by [host display]" (compact format: company name, or name if no company)
 - **Tags** — color-coded badge list
@@ -427,6 +427,8 @@ When a search query is active in Weekly Calendar view, additional sections appea
 - Track venue IDs in a `Set` as sections render in order
 - "This Week" and "Next Week": add all matching venue IDs to set, show all
 - "Later in [Month]" and "[Next Month]": skip venues already in set, then add new ones
+- When deduplication removes venues, a notice appears at the bottom of the section: "Plus X recurring venues already shown above" (styled as `.search-section__dedup-notice` — muted, centered, italic)
+- The notice only appears in sections with `deduplicate: true` and only when at least one venue was hidden
 
 This prevents the same weekly-recurring venue from appearing multiple times when searching.
 
@@ -821,7 +823,7 @@ All fields from the venue data model are editable:
   - Start/end time inputs
   - Event URL
 - **Host:** Name, Company, Website
-- **Socials:** Website, Facebook, Instagram, Twitter, TikTok, YouTube
+- **Socials:** Website, Facebook, Instagram, Twitter, TikTok, YouTube, Bluesky
 - **Date Range:** Start and end dates for seasonal venues
 
 ### Geocoding
