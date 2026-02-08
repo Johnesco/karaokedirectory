@@ -1215,6 +1215,76 @@ const karaokeData = {
       }
     },
     {
+      "id": "homers-neighborhood-bar",
+      "name": "Homer's Neighborhood Bar",
+      "active": true,
+      "dedicated": true,
+      "address": {
+        "street": "1779 Wells Branch Pkwy",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78728",
+        "neighborhood": ""
+      },
+      "schedule": [
+        {
+          "frequency": "every",
+          "day": "sunday",
+          "startTime": "21:00",
+          "endTime": "02:00"
+        },
+        {
+          "frequency": "every",
+          "day": "monday",
+          "startTime": "21:00",
+          "endTime": "02:00"
+        },
+        {
+          "frequency": "every",
+          "day": "tuesday",
+          "startTime": "21:00",
+          "endTime": "02:00"
+        },
+        {
+          "frequency": "every",
+          "day": "wednesday",
+          "startTime": "21:00",
+          "endTime": "02:00"
+        },
+        {
+          "frequency": "every",
+          "day": "thursday",
+          "startTime": "21:00",
+          "endTime": "02:00"
+        },
+        {
+          "frequency": "every",
+          "day": "friday",
+          "startTime": "21:00",
+          "endTime": "02:00"
+        },
+        {
+          "frequency": "every",
+          "day": "saturday",
+          "startTime": "21:00",
+          "endTime": "02:00"
+        }
+      ],
+      "host": null,
+      "socials": {
+        "website": "https://homersneighborhoodbar.com/",
+        "facebook": "https://www.facebook.com/HomersBarandgrill1/",
+        "instagram": "https://www.instagram.com/explore/locations/5405941/homers-neighborhood-bar/"
+      },
+      "tags": [
+        "smoking-inside"
+      ],
+      "coordinates": {
+        "lat": 30.4349156,
+        "lng": -97.6746487
+      }
+    },
+    {
       "id": "hudson-tavern-xpider",
       "name": "Hudson Tavern",
       "active": false,
