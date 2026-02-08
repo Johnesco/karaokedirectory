@@ -7,10 +7,11 @@
 
 import { Component } from '../components/Component.js';
 import { renderDayCard } from '../components/DayCard.js';
+import { renderSearchSection, attachSearchSectionListeners } from '../components/SearchSection.js';
 import { getState, subscribe } from '../core/state.js';
 import { on, emit, Events } from '../core/events.js';
-import { getWeekDates, getWeekStart } from '../utils/date.js';
-import { getVenueById } from '../services/venues.js';
+import { getWeekDates, getWeekStart, getNextWeekRange, getThisMonthRange, getNextMonthRange, getMonthName } from '../utils/date.js';
+import { getVenueById, getVenuesForDate } from '../services/venues.js';
 
 export class WeeklyView extends Component {
     init() {
@@ -24,19 +25,90 @@ export class WeeklyView extends Component {
 
     template() {
         const weekStart = getState('weekStart');
-        const dates = getWeekDates(getWeekStart(weekStart));
+        const searchQuery = getState('searchQuery');
+        const currentWeekStart = getWeekStart(weekStart);
+        const dates = getWeekDates(currentWeekStart);
+
+        // Render current week
+        const currentWeekHtml = dates.map(date => `
+            <div class="weekly-view__day">
+                ${renderDayCard(date)}
+            </div>
+        `).join('');
+
+        // Extended search sections (only when search is active)
+        let extendedSectionsHtml = '';
+        if (searchQuery?.trim()) {
+            extendedSectionsHtml = this.renderExtendedSearchSections(currentWeekStart, dates);
+        }
 
         return `
             <div class="weekly-view">
                 <div class="weekly-view__grid">
-                    ${dates.map(date => `
-                        <div class="weekly-view__day">
-                            ${renderDayCard(date)}
-                        </div>
-                    `).join('')}
+                    ${currentWeekHtml}
                 </div>
+                ${extendedSectionsHtml}
             </div>
         `;
+    }
+
+    /**
+     * Render extended search sections (Next Week, This Month, Next Month)
+     * @param {Date} currentWeekStart - Start of current week
+     * @param {Date[]} currentWeekDates - Dates in current week
+     * @returns {string} HTML for extended sections
+     */
+    renderExtendedSearchSections(currentWeekStart, currentWeekDates) {
+        const today = new Date();
+        const showDedicated = getState('showDedicated');
+        const searchQuery = getState('searchQuery');
+        const seenVenues = new Set();
+
+        // Collect venue IDs from current week (no deduplication for current week)
+        currentWeekDates.forEach(date => {
+            const venues = getVenuesForDate(date, { includeDedicated: showDedicated, searchQuery });
+            venues.forEach(v => seenVenues.add(v.id));
+        });
+
+        const sections = [];
+
+        // Next Week section
+        const nextWeekRange = getNextWeekRange(currentWeekStart);
+        sections.push(renderSearchSection({
+            title: 'Next Week',
+            startDate: nextWeekRange.start,
+            endDate: nextWeekRange.end,
+            seenVenues,
+            deduplicate: false // Show all matches in Next Week
+        }));
+
+        // This Month section (after next week, within current month)
+        const thisMonthRange = getThisMonthRange(nextWeekRange.end);
+        if (thisMonthRange) {
+            const monthName = getMonthName(thisMonthRange.start);
+            sections.push(renderSearchSection({
+                title: `Later in ${monthName}`,
+                startDate: thisMonthRange.start,
+                endDate: thisMonthRange.end,
+                seenVenues,
+                deduplicate: true // Skip venues already shown
+            }));
+        }
+
+        // Next Month section
+        const nextMonthRange = getNextMonthRange(today, 60);
+        if (nextMonthRange) {
+            const monthName = getMonthName(nextMonthRange.start);
+            sections.push(renderSearchSection({
+                title: monthName,
+                startDate: nextMonthRange.start,
+                endDate: nextMonthRange.end,
+                seenVenues,
+                deduplicate: true // Skip venues already shown
+            }));
+        }
+
+        return sections.filter(s => s).join('');
     }
 
     afterRender() {
@@ -62,6 +134,11 @@ export class WeeklyView extends Component {
                 emit(Events.VENUE_SELECTED, venue);
             }
         });
+
+        // Attach search section toggle listeners
+        if (this.container) {
+            attachSearchSectionListeners(this.container);
+        }
 
         // Auto-scroll to today if viewing current week
         this.scrollToToday();

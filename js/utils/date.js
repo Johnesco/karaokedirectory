@@ -286,4 +286,107 @@ export function formatDateRangeText(dateRange) {
     return '';
 }
 
+/**
+ * Get date range for next week (7 days after current week ends)
+ * @param {Date} weekStart - Start of current week (Sunday)
+ * @returns {{ start: Date, end: Date }} Start and end dates for next week
+ */
+export function getNextWeekRange(weekStart) {
+    const start = new Date(weekStart);
+    start.setDate(start.getDate() + 7); // Start of next week
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(start);
+    end.setDate(end.getDate() + 6); // End of next week
+    end.setHours(23, 59, 59, 999);
+
+    return { start, end };
+}
+
+/**
+ * Get date range for remaining days in current month after a given date
+ * @param {Date} afterDate - Start searching after this date
+ * @returns {{ start: Date, end: Date } | null} Start and end dates, or null if no days remaining
+ */
+export function getThisMonthRange(afterDate) {
+    const start = new Date(afterDate);
+    start.setDate(start.getDate() + 1); // Day after the given date
+    start.setHours(0, 0, 0, 0);
+
+    // End of current month
+    const end = new Date(start.getFullYear(), start.getMonth() + 1, 0);
+    end.setHours(23, 59, 59, 999);
+
+    // If start is past end of month, no days remaining
+    if (start > end) {
+        return null;
+    }
+
+    return { start, end };
+}
+
+/**
+ * Get date range for next calendar month (capped at maxDays from today)
+ * @param {Date} today - Reference date (today)
+ * @param {number} maxDays - Maximum days to look ahead (default 60)
+ * @returns {{ start: Date, end: Date } | null} Start and end dates, or null if beyond maxDays
+ */
+export function getNextMonthRange(today, maxDays = 60) {
+    // Start of next month
+    const start = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+    start.setHours(0, 0, 0, 0);
+
+    // End of next month
+    const end = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+    end.setHours(23, 59, 59, 999);
+
+    // Calculate max date based on maxDays
+    const maxDate = new Date(today);
+    maxDate.setDate(maxDate.getDate() + maxDays);
+    maxDate.setHours(23, 59, 59, 999);
+
+    // If start is beyond maxDays, skip this section
+    if (start > maxDate) {
+        return null;
+    }
+
+    // Cap end date at maxDays
+    if (end > maxDate) {
+        return { start, end: maxDate };
+    }
+
+    return { start, end };
+}
+
+/**
+ * Get array of dates between start and end (inclusive)
+ * @param {Date} startDate - Start date
+ * @param {Date} endDate - End date
+ * @returns {Date[]} Array of dates
+ */
+export function getDateRange(startDate, endDate) {
+    const dates = [];
+    const current = new Date(startDate);
+    current.setHours(0, 0, 0, 0);
+
+    const end = new Date(endDate);
+    end.setHours(0, 0, 0, 0);
+
+    while (current <= end) {
+        dates.push(new Date(current));
+        current.setDate(current.getDate() + 1);
+    }
+
+    return dates;
+}
+
+/**
+ * Format month name from date
+ * @param {Date} date - Date to format
+ * @returns {string} Month name (e.g., "February")
+ */
+export function getMonthName(date) {
+    return date.toLocaleDateString('en-US', { month: 'long' });
+}
+
 export { WEEKDAYS, WEEKDAY_NAMES, ORDINALS };

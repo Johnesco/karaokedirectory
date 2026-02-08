@@ -203,6 +203,83 @@
     gap: var(--spacing-md);
 }
 
+/* ============================================
+   SEARCH SECTIONS
+   Extended search results beyond current week.
+   Collapsible sections with day cards.
+   ============================================ */
+.search-section {
+    margin-top: var(--spacing-xl);
+}
+
+.search-section__header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: var(--color-gray-800);
+    border-radius: var(--border-radius);
+    margin-bottom: var(--spacing-md);
+    cursor: pointer;
+}
+
+.search-section__header:hover {
+    background: var(--color-gray-700);
+}
+
+.search-section__title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.search-section__count {
+    background: var(--color-primary);
+    color: var(--color-white);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: var(--border-radius-sm);
+}
+
+.search-section__toggle {
+    margin-left: auto;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    background: transparent;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    transition: transform var(--transition-fast), background var(--transition-fast);
+    cursor: pointer;
+}
+
+.search-section__toggle:hover {
+    background: var(--color-gray-600);
+    color: var(--text-primary);
+}
+
+.search-section__toggle--expanded {
+    transform: rotate(180deg);
+}
+
+.search-section__content {
+    transition: opacity var(--transition-normal);
+}
+
+/* Collapsed state */
+.search-section--collapsed .search-section__content {
+    display: none;
+}
+
+.search-section--collapsed .search-section__toggle {
+    transform: rotate(0deg);
+}
+
 /* Alphabetical View */
 .alphabetical-view {
     padding: var(--spacing-md) 0;

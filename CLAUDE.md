@@ -41,6 +41,10 @@
 
 ```
 karaokedirectory/
+├── .github/
+│   └── ISSUE_TEMPLATE/
+│       ├── feature.yml    # Feature/user story issue template
+│       └── bug.yml        # Bug report issue template
 ├── CLAUDE.md              # THIS FILE - Claude project memory
 ├── README.md              # Public documentation
 ├── index.html             # Main SPA (heavily commented)
@@ -73,6 +77,7 @@ karaokedirectory/
 │   │   ├── Component.js   # Base component class
 │   │   ├── Navigation.js  # View tabs, week nav, search, filters
 │   │   ├── DayCard.js     # Daily schedule display (supports search filtering)
+│   │   ├── SearchSection.js  # Extended search results sections
 │   │   ├── VenueCard.js   # Venue listing item
 │   │   ├── VenueModal.js  # Mobile venue detail popup
 │   │   └── VenueDetailPane.js  # Desktop venue detail sidebar
@@ -281,6 +286,23 @@ The app includes a global search bar that filters venues across all views:
 - Clear button appears when search has text
 - Empty results show contextual message
 - Day cards with no matching venues collapse to header-only
+- Extended search sections appear below current week (Next Week, This Month, Next Month)
+
+### Extended Search Sections
+When search is active in Weekly view, additional sections show results beyond the current week:
+
+**How it works:**
+- `SearchSection` component (`js/components/SearchSection.js`) renders collapsible day card sections
+- Date range helpers in `js/utils/date.js`: `getNextWeekRange()`, `getThisMonthRange()`, `getNextMonthRange()`
+- Sections: "Next Week", "Later in [Month]", "[Next Month]" (up to 60 days)
+- Deduplication: "This Week" and "Next Week" show all matches; later sections skip already-seen venues
+- Collapse state persists in `localStorage` (`searchSection_{title}_collapsed`)
+
+**CSS classes:**
+- `.search-section` - Container for extended section
+- `.search-section__header` - Clickable header with title, count badge, toggle button
+- `.search-section__content` - Day cards container
+- `.search-section--collapsed` - Hides content when collapsed
 
 ### Day Card States
 Day cards in the weekly view have multiple visual states controlled by CSS classes:
@@ -406,6 +428,21 @@ When enabled:
 ## Project History
 
 ### Recent Changes
+- **2026-02**: Migrated project management from Taiga to GitHub Issues + Projects
+  - All work items tracked as GitHub Issues with labels, milestones, and Projects board
+  - Issue templates (`.github/ISSUE_TEMPLATE/`) enforce documentation-first workflow
+  - 12 labels: 4 type (`feature`, `bug`, `docs`, `chore`), 7 area, 2 priority
+  - 3 milestones: Documentation Portal, Exclusion Dates, Form Parity
+  - Projects board with 6 columns: Backlog, Refining, Ready, In Progress, Verify, Done
+  - Commit convention changed from `Taiga #XX` to `#XX` (GitHub issue numbers)
+  - `Fixes #XX` in PR body auto-closes issues on merge
+- **2026-02**: Added extended search results in Weekly view
+  - New `SearchSection` component (`js/components/SearchSection.js`)
+  - Shows "Next Week", "Later in [Month]", and "[Next Month]" sections when searching
+  - Date range helpers in `js/utils/date.js`: `getNextWeekRange()`, `getThisMonthRange()`, `getNextMonthRange()`, `getDateRange()`, `getMonthName()`
+  - Collapsible sections with localStorage persistence
+  - Deduplication: recurring venues only shown once across sections
+  - CSS styles for `.search-section` in `css/views.css`
 - **2026-02**: Created Functional Specification and documentation portal
   - `docs/functional-spec.md` — authoritative spec covering all 23 feature areas
   - `docs/index.html` — Docsify-powered viewer (CDN, no build step, dark theme)
@@ -551,46 +588,59 @@ The **Functional Specification** (`docs/functional-spec.md`) is the authoritativ
 - Never store API keys or secrets in code
 - Validate all form inputs
 
-## Taiga Integration
+## Development Workflow
 
-This project uses Taiga for issue tracking (free tier - no API/import). Follow these conventions to keep code and issues in sync.
+### GitHub Issues & Projects
 
-### Commit Messages
+All work is tracked in **GitHub Issues** with a **GitHub Projects** kanban board.
 
-Reference Taiga issues in commits:
+- **Issues** = All work items (features, bugs, docs, chores)
+- **Labels** = Type (`feature`, `bug`, `docs`, `chore`) + Area (`area:frontend`, `area:data`, etc.) + Priority (`priority:high`, `priority:low`)
+- **Milestones** = Feature groups (replace Taiga epics)
+- **Projects board** = Visual kanban for tracking status
+
+### Board Columns
+
+| Column | What's Here | Auto-transition |
+|--------|-------------|-----------------|
+| **Backlog** | Not yet started | On item added |
+| **Refining** | Defining scope and requirements | — |
+| **Ready** | Ready to work on | — |
+| **In Progress** | Actively being worked on | When PR linked |
+| **Verify** | Testing and review | — |
+| **Done** | Complete | On PR merge / issue close |
+
+### Before Coding
+- `gh issue list` — pick an issue from the board
+- Read the issue description and acceptance criteria
+- Check if Functional Spec describes this area
+
+### While Coding
+- Follow existing patterns in the codebase
+- Reference `#XX` in commits (where XX is the GitHub issue number)
+
+### After Coding
+- Create PR with `Fixes #XX` in body (auto-closes issue on merge)
+- Update Functional Spec and CLAUDE.md as needed
+- Merge → issue auto-closes → board card moves to Done
+
+### Commit Convention
+
 ```
-Taiga #123: Brief description
+#XX: description
 ```
 
-- Use the issue reference number from Taiga UI (e.g., `#15`)
-- Multiple issues: `Taiga #123, #124: Description`
-- Partial work: `Taiga #123 (partial): Description`
+Use `Fixes #XX` in PR body for auto-close.
 
-### Code Comments
+### Idea to Ship Cycle
 
-Reference Taiga issues in code when the connection isn't obvious:
-```javascript
-// Taiga #123: Exclude venues closed on the viewing date
-if (isDateExcluded(venue, date)) { ... }
-```
-
-Use sparingly - only for non-obvious code tied to specific issues.
-
-### Taiga Issue Updates
-
-When working on an issue, add to the Taiga description or comments:
-- **Related files:** List primary files being modified
-- **Related commits:** Add commit hashes when work is done
-
-### Workflow Checklist
-
-**When starting work:**
-1. Note the Taiga issue reference number
-2. Include `Taiga #<ref>` in all related commits
-
-**When completing work:**
-1. Update Taiga issue with related files and commits
-2. Move issue to appropriate status in Taiga
+| Phase | What Happens |
+|-------|--------------|
+| **Capture** | `gh issue create` (Claude or you) |
+| **Refine** | Discussion in issue comments, spec it out |
+| **Build** | PR with `Fixes #XX`, Claude creates branch + PR |
+| **Verify** | PR includes spec updates (template checklist) |
+| **Ship** | Merge PR → issue auto-closes → board updates |
 
 ## Related Documentation
 

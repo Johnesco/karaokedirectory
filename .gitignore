@@ -1,5 +1,11 @@
 js/data.js.backup
 
+# Taiga export archive
+taigaexport/
+
+# Windows artifacts
+nul
+
 # Claude Code temp files
 tmpclaude-*
 .claude/

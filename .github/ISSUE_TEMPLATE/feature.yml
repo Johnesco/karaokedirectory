@@ -1,0 +1,32 @@
+name: Feature / User Story
+description: New functionality or enhancement
+labels: ["feature"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What should happen? User story format preferred.
+    validations:
+      required: true
+  - type: textarea
+    id: current-state
+    attributes:
+      label: Current State
+      description: What exists today? Which files are involved?
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      value: |
+        - [ ] Feature implemented
+        - [ ] Functional Spec updated (`docs/functional-spec.md`)
+        - [ ] CLAUDE.md updated (if architecture changed)
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Complexity
+      options:
+        - Low
+        - Medium
+        - High

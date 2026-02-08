@@ -26,7 +26,7 @@ Karaoke enthusiasts looking for venues, schedules, and event details in the grea
 
 - **Vanilla JavaScript only** — no frameworks, no build step
 - **Mobile-first responsive design** — base styles target mobile, enhanced for larger screens
-- **Data-driven** — all venue data in a single JavaScript file (`js/data.js`), currently 70 venues
+- **Data-driven** — all venue data in a single JavaScript file (`js/data.js`), currently 71 venues
 - **Component-based** — lightweight custom `Component` base class with state management and event bus
 
 ### Pages
@@ -395,9 +395,40 @@ Search is case-insensitive substring matching. A venue matches if the query appe
 
 ### Search Behavior by View
 
-- **Weekly:** Day cards with no matching venues collapse to `.day-card--empty`. Days with matches show only matching venues.
+- **Weekly:** Day cards with no matching venues collapse to `.day-card--empty`. Days with matches show only matching venues. Extended search sections appear below current week (see below).
 - **Alphabetical:** Letter groups only show matching venues. Letters with no matches disappear. Empty results show "No venues match your search."
 - **Map:** Only matching venues with coordinates appear as markers.
+
+### Extended Search Results (Weekly View Only)
+
+When a search query is active in Weekly Calendar view, additional sections appear below the current week showing venues that match the search on future dates. This helps users find venues beyond the current 7-day window.
+
+#### Sections
+
+| Section | Date Range | Deduplication |
+|---------|------------|---------------|
+| **This Week** | Current 7-day view | None — shows all matches |
+| **Next Week** | Full 7 days following this week | None — shows all matches |
+| **Later in [Month]** | Days after next week through end of current month | First occurrence only (skip if seen above) |
+| **[Next Month]** | Following calendar month (capped at 60 days from today) | First occurrence only (skip if seen above) |
+
+#### Behavior
+
+- Sections only appear when `searchQuery` is non-empty
+- Each section has a header showing title and venue count badge
+- Sections are collapsible — click header to toggle
+- Collapse state persists in `localStorage` (key: `searchSection_{title-slug}_collapsed`)
+- Empty sections (no matches in date range) are not rendered
+- Day cards within sections use same format as current week
+- Maximum lookahead is 60 days from today
+
+#### Deduplication Logic
+
+- Track venue IDs in a `Set` as sections render in order
+- "This Week" and "Next Week": add all matching venue IDs to set, show all
+- "Later in [Month]" and "[Next Month]": skip venues already in set, then add new ones
+
+This prevents the same weekly-recurring venue from appearing multiple times when searching.
 
 ### Preservation of Input Focus
 
@@ -495,7 +526,7 @@ All venue data is stored in a single JavaScript file as `const karaokeData = { t
 
 ### Venue Count
 
-As of February 2026: **70 venues** in the listings array.
+As of February 2026: **71 venues** in the listings array.
 
 ### Active/Inactive
 
@@ -1035,6 +1066,8 @@ Pub/sub event bus for component communication.
 | 2026-02 | 1.0.9 | Taiga #17: Added TikTok and YouTube fields to submit.html. Updated collectFormData(). Section 15 now lists all 7 social platforms. | Claude Code |
 | 2026-02 | 1.0.10 | Taiga #18: Added Neighborhood field to submit.html Address section. Updated collectFormData() and Section 15. | Claude Code |
 | 2026-02 | 1.0.11 | Taiga #19: Added special event support to submit.html. "Once" frequency with date/eventName/eventUrl fields. Updated Section 15. | Claude Code |
+| 2026-02 | 1.0.12 | Added extended search results in Weekly view. When searching, shows Next Week, This Month, and Next Month sections with collapsible day cards. Updated Section 9. | Claude Code |
+| 2026-02 | 1.0.13 | Migrated project management from Taiga to GitHub Issues + Projects. All work items now tracked as GitHub Issues with labels, milestones, and a Projects kanban board. Issue templates enforce documentation-first workflow. Commit convention changed from `Taiga #XX` to `#XX` (GitHub issue numbers). | Claude Code |
 
 ---
 
