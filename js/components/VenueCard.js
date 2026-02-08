@@ -47,6 +47,13 @@ export class VenueCard extends Component {
         const cardClass = isSpecialEvent ? 'venue-card venue-card--compact venue-card--special-event' : 'venue-card venue-card--compact';
         const eventName = isSpecialEvent ? (schedule.eventName || 'Special Event') : null;
 
+        // Build frequency label for non-once events (e.g., "Every Friday", "First Saturday")
+        let frequencyLabel = '';
+        if (schedule && !isSpecialEvent) {
+            const formatted = formatScheduleEntry(schedule, { showEvery: true });
+            frequencyLabel = `${formatted.frequencyPrefix}${formatted.day}`;
+        }
+
         // Build tag list, injecting 'special-event' tag for one-time events
         const tags = isSpecialEvent
             ? ['special-event', ...(venue.tags || [])]
@@ -75,7 +82,7 @@ export class VenueCard extends Component {
                 ${eventName ? `<div class="venue-card__event-name"><i class="fa-solid fa-star"></i> ${schedule?.eventUrl ? `<a href="${escapeHtml(sanitizeUrl(schedule.eventUrl) || '')}" target="_blank" rel="noopener noreferrer" class="venue-card__event-link">${escapeHtml(eventName)} <i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : escapeHtml(eventName)}</div>` : ''}
                 ${showSchedule && timeDisplay ? `
                     <div class="venue-card__time">
-                        <i class="fa-regular fa-clock"></i> ${timeDisplay}
+                        <i class="fa-regular fa-clock"></i> ${frequencyLabel ? `<span class="venue-card__frequency">${escapeHtml(frequencyLabel)}</span> &middot; ` : ''}${timeDisplay}
                         ${!eventName && schedule?.eventUrl ? `<a href="${escapeHtml(sanitizeUrl(schedule.eventUrl) || '')}" target="_blank" rel="noopener noreferrer" class="venue-card__event-link" title="Event page"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : ''}
                         ${schedule?.note ? `<span class="venue-card__note">${escapeHtml(schedule.note)}</span>` : ''}
                     </div>

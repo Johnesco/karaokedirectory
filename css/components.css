@@ -260,6 +260,10 @@
     color: var(--color-primary-light);
 }
 
+.venue-card__frequency {
+    color: var(--text-secondary);
+}
+
 .venue-card__note {
     font-style: italic;
     opacity: 0.8;

@@ -50,7 +50,7 @@ function toggleCollapsed(title) {
  * @param {Date} endDate - Range end
  * @param {Set} seenVenues - Set of venue IDs already displayed
  * @param {boolean} deduplicate - Whether to skip already-seen venues
- * @returns {{ count: number, venuesByDate: Map }} Venue count and map of date -> venues
+ * @returns {{ count: number, dedupedCount: number, venuesByDate: Map }} Venue count, deduped count, and map of date -> venues
  */
 function countVenuesInRange(startDate, endDate, seenVenues, deduplicate = true) {
     const dates = getDateRange(startDate, endDate);
@@ -58,9 +58,19 @@ function countVenuesInRange(startDate, endDate, seenVenues, deduplicate = true) 
     const searchQuery = getState('searchQuery');
     const venuesByDate = new Map();
     const uniqueVenues = new Set();
+    const dedupedVenues = new Set();
 
     dates.forEach(date => {
         const venues = getVenuesForDate(date, { includeDedicated: showDedicated, searchQuery });
+
+        if (deduplicate) {
+            venues.forEach(v => {
+                if (seenVenues.has(v.id)) {
+                    dedupedVenues.add(v.id);
+                }
+            });
+        }
+
         const filteredVenues = deduplicate
             ? venues.filter(v => !seenVenues.has(v.id))
             : venues;
@@ -71,7 +81,7 @@ function countVenuesInRange(startDate, endDate, seenVenues, deduplicate = true) 
         }
     });
 
-    return { count: uniqueVenues.size, venuesByDate };
+    return { count: uniqueVenues.size, dedupedCount: dedupedVenues.size, venuesByDate };
 }
 
 /**
@@ -85,7 +95,7 @@ function countVenuesInRange(startDate, endDate, seenVenues, deduplicate = true) 
  * @returns {string} HTML string, or empty string if no venues
  */
 export function renderSearchSection({ title, startDate, endDate, seenVenues, deduplicate = true }) {
-    const { count, venuesByDate } = countVenuesInRange(startDate, endDate, seenVenues, deduplicate);
+    const { count, dedupedCount, venuesByDate } = countVenuesInRange(startDate, endDate, seenVenues, deduplicate);
 
     // No venues in this range
     if (count === 0) {
@@ -110,6 +120,14 @@ export function renderSearchSection({ title, startDate, endDate, seenVenues, ded
         `)
         .join('');
 
+    // Dedup notice when recurring venues were hidden
+    const dedupNotice = (deduplicate && dedupedCount > 0)
+        ? `<p class="search-section__dedup-notice">
+                <i class="fa-solid fa-circle-info"></i>
+                Plus ${dedupedCount} recurring venue${dedupedCount !== 1 ? 's' : ''} already shown above
+           </p>`
+        : '';
+
     return `
         <section class="search-section ${collapsedClass}" data-section-title="${title}">
             <header class="search-section__header">
@@ -120,9 +138,8 @@ export function renderSearchSection({ title, startDate, endDate, seenVenues, ded
                 </button>
             </header>
             <div class="search-section__content">
-                <div class="weekly-view__grid">
-                    ${dayCardsHtml}
-                </div>
+                ${dayCardsHtml ? `<div class="weekly-view__grid">${dayCardsHtml}</div>` : ''}
+                ${dedupNotice}
             </div>
         </section>
     `;
