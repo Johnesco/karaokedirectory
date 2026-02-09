@@ -508,7 +508,7 @@ const karaokeData = {
       "id": "canary-roost",
       "name": "Canary Roost",
       "tags": [
-        "dive"
+        "lgbtq","dive"
       ],
       "dedicated": true,
       "address": {
@@ -800,6 +800,10 @@ const karaokeData = {
       "id": "coyote-ugly",
       "name": "Coyote Ugly",
       "active": true,
+      "dateRange": {
+        "start": "2025-12-18",
+        "end": ""
+      },
       "dedicated": false,
       "address": {
         "street": "501 E 6th St",
@@ -1575,6 +1579,7 @@ const karaokeData = {
         "family-friendly"
       ],
       "dedicated": false,
+      "active": false,
       "address": {
         "street": "18626 RM 1431",
         "city": "Jonestown",
@@ -1808,6 +1813,7 @@ const karaokeData = {
         "neighborhood"
       ],
       "dedicated": false,
+      "active": false,
       "address": {
         "street": "9112 Anderson Mill Rd suite b 100",
         "city": "Austin",
@@ -2041,6 +2047,7 @@ const karaokeData = {
       "tags": [
         "craft-cocktails"
       ],
+      "active": false,
       "dedicated": false,
       "address": {
         "street": "2082 US HWY 183 SUITE 145",
