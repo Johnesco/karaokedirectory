@@ -395,7 +395,7 @@ Search is case-insensitive substring matching. A venue matches if the query appe
 
 ### Search Behavior by View
 
-- **Weekly:** Day cards with no matching venues collapse to `.day-card--empty`. Days with matches show only matching venues. Extended search sections appear below current week (see below).
+- **Weekly:** Day cards with no matching venues collapse to `.day-card--empty`. Days with matches show only matching venues. Extended sections appear below current week (see below).
 - **Alphabetical:** Letter groups only show matching venues. Letters with no matches disappear. Empty results show "No venues match your search."
 - **Map:** Only matching venues with coordinates appear as markers.
 
@@ -414,10 +414,10 @@ When a search query is active in Weekly Calendar view, additional sections appea
 
 #### Behavior
 
-- Sections only appear when `searchQuery` is non-empty
+- Sections always appear below the current week (both during search and when browsing)
 - Each section has a header showing title and venue count badge
 - Sections are collapsible — click header to toggle
-- Collapse state persists in `localStorage` (key: `searchSection_{title-slug}_collapsed`)
+- Collapse state persists in `localStorage` (key: `extendedSection_{title-slug}_collapsed`)
 - Empty sections (no matches in date range) are not rendered
 - Day cards within sections use same format as current week
 - Maximum lookahead is 60 days from today
@@ -427,7 +427,7 @@ When a search query is active in Weekly Calendar view, additional sections appea
 - Track venue IDs in a `Set` as sections render in order
 - "This Week" and "Next Week": add all matching venue IDs to set, show all
 - "Later in [Month]" and "[Next Month]": skip venues already in set, then add new ones
-- When deduplication removes venues, a notice appears at the bottom of the section: "Plus X recurring venues already shown above" (styled as `.search-section__dedup-notice` — muted, centered, italic)
+- When deduplication removes venues, a notice appears at the bottom of the section: "Plus X recurring venues already shown above" (styled as `.extended-section__dedup-notice` — muted, centered, italic)
 - The notice only appears in sections with `deduplicate: true` and only when at least one venue was hidden
 
 This prevents the same weekly-recurring venue from appearing multiple times when searching.

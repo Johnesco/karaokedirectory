@@ -204,15 +204,15 @@
 }
 
 /* ============================================
-   SEARCH SECTIONS
-   Extended search results beyond current week.
+   EXTENDED SECTIONS
+   Extended results beyond current week.
    Collapsible sections with day cards.
    ============================================ */
-.search-section {
+.extended-section {
     margin-top: var(--spacing-xl);
 }
 
-.search-section__header {
+.extended-section__header {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
@@ -223,18 +223,18 @@
     cursor: pointer;
 }
 
-.search-section__header:hover {
+.extended-section__header:hover {
     background: var(--color-gray-700);
 }
 
-.search-section__title {
+.extended-section__title {
     font-size: var(--font-size-lg);
     font-weight: 600;
     margin: 0;
     color: var(--text-primary);
 }
 
-.search-section__count {
+.extended-section__count {
     background: var(--color-primary);
     color: var(--color-white);
     font-size: var(--font-size-xs);
@@ -243,7 +243,7 @@
     border-radius: var(--border-radius-sm);
 }
 
-.search-section__toggle {
+.extended-section__toggle {
     margin-left: auto;
     width: 32px;
     height: 32px;
@@ -258,20 +258,20 @@
     cursor: pointer;
 }
 
-.search-section__toggle:hover {
+.extended-section__toggle:hover {
     background: var(--color-gray-600);
     color: var(--text-primary);
 }
 
-.search-section__toggle--expanded {
+.extended-section__toggle--expanded {
     transform: rotate(180deg);
 }
 
-.search-section__content {
+.extended-section__content {
     transition: opacity var(--transition-normal);
 }
 
-.search-section__dedup-notice {
+.extended-section__dedup-notice {
     text-align: center;
     color: var(--text-muted);
     font-size: var(--font-size-sm);
@@ -280,16 +280,16 @@
     padding: 0;
 }
 
-.search-section__dedup-notice i {
+.extended-section__dedup-notice i {
     margin-right: var(--spacing-xs);
 }
 
 /* Collapsed state */
-.search-section--collapsed .search-section__content {
+.extended-section--collapsed .extended-section__content {
     display: none;
 }
 
-.search-section--collapsed .search-section__toggle {
+.extended-section--collapsed .extended-section__toggle {
     transform: rotate(0deg);
 }
 

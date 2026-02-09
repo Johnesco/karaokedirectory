@@ -77,7 +77,7 @@ karaokedirectory/
 │   │   ├── Component.js   # Base component class
 │   │   ├── Navigation.js  # View tabs, week nav, search, filters
 │   │   ├── DayCard.js     # Daily schedule display (supports search filtering)
-│   │   ├── SearchSection.js  # Extended search results sections
+│   │   ├── ExtendedSection.js  # Extended sections (Next Week, Later in Month, Next Month)
 │   │   ├── VenueCard.js   # Venue listing item
 │   │   ├── VenueModal.js  # Mobile venue detail popup
 │   │   └── VenueDetailPane.js  # Desktop venue detail sidebar
@@ -286,23 +286,23 @@ The app includes a global search bar that filters venues across all views:
 - Clear button appears when search has text
 - Empty results show contextual message
 - Day cards with no matching venues collapse to header-only
-- Extended search sections appear below current week (Next Week, This Month, Next Month)
+- Extended sections appear below current week (Next Week, This Month, Next Month)
 
-### Extended Search Sections
-When search is active in Weekly view, additional sections show results beyond the current week:
+### Extended Sections
+The Weekly view always shows extended sections beyond the current week:
 
 **How it works:**
-- `SearchSection` component (`js/components/SearchSection.js`) renders collapsible day card sections
+- `ExtendedSection` component (`js/components/ExtendedSection.js`) renders collapsible day card sections
 - Date range helpers in `js/utils/date.js`: `getNextWeekRange()`, `getThisMonthRange()`, `getNextMonthRange()`
 - Sections: "Next Week", "Later in [Month]", "[Next Month]" (up to 60 days)
 - Deduplication: "This Week" and "Next Week" show all matches; later sections skip already-seen venues
-- Collapse state persists in `localStorage` (`searchSection_{title}_collapsed`)
+- Collapse state persists in `localStorage` (`extendedSection_{title}_collapsed`)
 
 **CSS classes:**
-- `.search-section` - Container for extended section
-- `.search-section__header` - Clickable header with title, count badge, toggle button
-- `.search-section__content` - Day cards container
-- `.search-section--collapsed` - Hides content when collapsed
+- `.extended-section` - Container for extended section
+- `.extended-section__header` - Clickable header with title, count badge, toggle button
+- `.extended-section__content` - Day cards container
+- `.extended-section--collapsed` - Hides content when collapsed
 
 ### Day Card States
 Day cards in the weekly view have multiple visual states controlled by CSS classes:
@@ -434,8 +434,8 @@ When enabled:
   - Frequency label wrapped in `.venue-card__frequency` span (muted color via CSS)
   - Skipped for `frequency: "once"` events (they already have event name line)
   - Extended search sections with deduplication now show "Plus X recurring venues already shown above"
-  - `countVenuesInRange()` in `SearchSection.js` tracks `dedupedCount` alongside `count`
-  - Dedup notice styled as `.search-section__dedup-notice` (muted, centered, italic)
+  - `countVenuesInRange()` in `ExtendedSection.js` tracks `dedupedCount` alongside `count`
+  - Dedup notice styled as `.extended-section__dedup-notice` (muted, centered, italic)
 - **2026-02**: Fixed submit form schedule section overflow on desktop (#15)
   - `.schedule-entry` grid columns changed from `1fr` to `minmax(0, 1fr)` to prevent content overflow
   - Added `min-width: 0` on schedule form groups and `overflow: hidden` on `.submit-form` and `.form-section`
@@ -448,13 +448,13 @@ When enabled:
   - Projects board with 6 columns: Backlog, Refining, Ready, In Progress, Verify, Done
   - Commit convention changed from `Taiga #XX` to `#XX` (GitHub issue numbers)
   - `Fixes #XX` in PR body auto-closes issues on merge
-- **2026-02**: Added extended search results in Weekly view
-  - New `SearchSection` component (`js/components/SearchSection.js`)
-  - Shows "Next Week", "Later in [Month]", and "[Next Month]" sections when searching
+- **2026-02**: Added extended sections in Weekly view
+  - New `ExtendedSection` component (`js/components/ExtendedSection.js`)
+  - Shows "Next Week", "Later in [Month]", and "[Next Month]" sections always (not just during search)
   - Date range helpers in `js/utils/date.js`: `getNextWeekRange()`, `getThisMonthRange()`, `getNextMonthRange()`, `getDateRange()`, `getMonthName()`
   - Collapsible sections with localStorage persistence
   - Deduplication: recurring venues only shown once across sections
-  - CSS styles for `.search-section` in `css/views.css`
+  - CSS styles for `.extended-section` in `css/views.css`
 - **2026-02**: Created Functional Specification and documentation portal
   - `docs/functional-spec.md` — authoritative spec covering all 23 feature areas
   - `docs/index.html` — Docsify-powered viewer (CDN, no build step, dark theme)

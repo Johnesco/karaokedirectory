@@ -7,7 +7,7 @@
 
 import { Component } from '../components/Component.js';
 import { renderDayCard } from '../components/DayCard.js';
-import { renderSearchSection, attachSearchSectionListeners } from '../components/SearchSection.js';
+import { renderExtendedSection, attachExtendedSectionListeners } from '../components/ExtendedSection.js';
 import { getState, subscribe } from '../core/state.js';
 import { on, emit, Events } from '../core/events.js';
 import { getWeekDates, getWeekStart, getNextWeekRange, getThisMonthRange, getNextMonthRange, getMonthName } from '../utils/date.js';
@@ -37,7 +37,7 @@ export class WeeklyView extends Component {
         `).join('');
 
         // Extended sections (Next Week, This Month, Next Month)
-        const extendedSectionsHtml = this.renderExtendedSearchSections(currentWeekStart, dates);
+        const extendedSectionsHtml = this.renderExtendedSections(currentWeekStart, dates);
 
         return `
             <div class="weekly-view">
@@ -50,12 +50,12 @@ export class WeeklyView extends Component {
     }
 
     /**
-     * Render extended search sections (Next Week, This Month, Next Month)
+     * Render extended sections (Next Week, This Month, Next Month)
      * @param {Date} currentWeekStart - Start of current week
      * @param {Date[]} currentWeekDates - Dates in current week
      * @returns {string} HTML for extended sections
      */
-    renderExtendedSearchSections(currentWeekStart, currentWeekDates) {
+    renderExtendedSections(currentWeekStart, currentWeekDates) {
         const today = new Date();
         const showDedicated = getState('showDedicated');
         const searchQuery = getState('searchQuery');
@@ -71,7 +71,7 @@ export class WeeklyView extends Component {
 
         // Next Week section
         const nextWeekRange = getNextWeekRange(currentWeekStart);
-        sections.push(renderSearchSection({
+        sections.push(renderExtendedSection({
             title: 'Next Week',
             startDate: nextWeekRange.start,
             endDate: nextWeekRange.end,
@@ -83,7 +83,7 @@ export class WeeklyView extends Component {
         const thisMonthRange = getThisMonthRange(nextWeekRange.end);
         if (thisMonthRange) {
             const monthName = getMonthName(thisMonthRange.start);
-            sections.push(renderSearchSection({
+            sections.push(renderExtendedSection({
                 title: `Later in ${monthName}`,
                 startDate: thisMonthRange.start,
                 endDate: thisMonthRange.end,
@@ -96,7 +96,7 @@ export class WeeklyView extends Component {
         const nextMonthRange = getNextMonthRange(today, 60);
         if (nextMonthRange) {
             const monthName = getMonthName(nextMonthRange.start);
-            sections.push(renderSearchSection({
+            sections.push(renderExtendedSection({
                 title: monthName,
                 startDate: nextMonthRange.start,
                 endDate: nextMonthRange.end,
@@ -132,9 +132,9 @@ export class WeeklyView extends Component {
             }
         });
 
-        // Attach search section toggle listeners
+        // Attach extended section toggle listeners
         if (this.container) {
-            attachSearchSectionListeners(this.container);
+            attachExtendedSectionListeners(this.container);
         }
 
         // Auto-scroll to today if viewing current week

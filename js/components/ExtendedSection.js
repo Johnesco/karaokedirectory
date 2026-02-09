@@ -1,7 +1,7 @@
 /**
- * SearchSection Component
+ * ExtendedSection Component
  * Renders a collapsible section of day cards for a date range.
- * Used to show extended search results beyond the current week.
+ * Used to show extended results beyond the current week.
  *
  * Features:
  * - Section header with title and venue count badge
@@ -22,8 +22,31 @@ import { getState } from '../core/state.js';
  */
 function getStorageKey(title) {
     const slug = title.toLowerCase().replace(/\s+/g, '-');
-    return `searchSection_${slug}_collapsed`;
+    return `extendedSection_${slug}_collapsed`;
 }
+
+/**
+ * Migrate old localStorage keys from searchSection_ to extendedSection_ prefix.
+ * Called once on module load.
+ */
+function migrateStorageKeys() {
+    const keysToMigrate = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('searchSection_')) {
+            keysToMigrate.push(key);
+        }
+    }
+    keysToMigrate.forEach(oldKey => {
+        const newKey = oldKey.replace('searchSection_', 'extendedSection_');
+        const value = localStorage.getItem(oldKey);
+        localStorage.setItem(newKey, value);
+        localStorage.removeItem(oldKey);
+    });
+}
+
+// Run migration on module load
+migrateStorageKeys();
 
 /**
  * Check if section should be collapsed
@@ -85,7 +108,7 @@ function countVenuesInRange(startDate, endDate, seenVenues, deduplicate = true) 
 }
 
 /**
- * Render a search section with day cards
+ * Render an extended section with day cards
  * @param {Object} options - Render options
  * @param {string} options.title - Section title (e.g., "Next Week")
  * @param {Date} options.startDate - Range start date
@@ -94,7 +117,7 @@ function countVenuesInRange(startDate, endDate, seenVenues, deduplicate = true) 
  * @param {boolean} options.deduplicate - Whether to skip already-seen venues (default: true)
  * @returns {string} HTML string, or empty string if no venues
  */
-export function renderSearchSection({ title, startDate, endDate, seenVenues, deduplicate = true }) {
+export function renderExtendedSection({ title, startDate, endDate, seenVenues, deduplicate = true }) {
     const { count, dedupedCount, venuesByDate } = countVenuesInRange(startDate, endDate, seenVenues, deduplicate);
 
     // No venues in this range
@@ -103,8 +126,8 @@ export function renderSearchSection({ title, startDate, endDate, seenVenues, ded
     }
 
     const collapsed = isCollapsed(title);
-    const collapsedClass = collapsed ? 'search-section--collapsed' : '';
-    const chevronClass = collapsed ? '' : 'search-section__toggle--expanded';
+    const collapsedClass = collapsed ? 'extended-section--collapsed' : '';
+    const chevronClass = collapsed ? '' : 'extended-section__toggle--expanded';
 
     // Add venues to seenVenues set
     venuesByDate.forEach(({ venues }) => {
@@ -122,22 +145,22 @@ export function renderSearchSection({ title, startDate, endDate, seenVenues, ded
 
     // Dedup notice when recurring venues were hidden
     const dedupNotice = (deduplicate && dedupedCount > 0)
-        ? `<p class="search-section__dedup-notice">
+        ? `<p class="extended-section__dedup-notice">
                 <i class="fa-solid fa-circle-info"></i>
                 Plus ${dedupedCount} recurring venue${dedupedCount !== 1 ? 's' : ''} already shown above
            </p>`
         : '';
 
     return `
-        <section class="search-section ${collapsedClass}" data-section-title="${title}">
-            <header class="search-section__header">
-                <h3 class="search-section__title">${title}</h3>
-                <span class="search-section__count">${count} venue${count !== 1 ? 's' : ''}</span>
-                <button class="search-section__toggle ${chevronClass}" aria-label="Toggle section">
+        <section class="extended-section ${collapsedClass}" data-section-title="${title}">
+            <header class="extended-section__header">
+                <h3 class="extended-section__title">${title}</h3>
+                <span class="extended-section__count">${count} venue${count !== 1 ? 's' : ''}</span>
+                <button class="extended-section__toggle ${chevronClass}" aria-label="Toggle section">
                     <i class="fa-solid fa-chevron-down"></i>
                 </button>
             </header>
-            <div class="search-section__content">
+            <div class="extended-section__content">
                 ${dayCardsHtml ? `<div class="weekly-view__grid">${dayCardsHtml}</div>` : ''}
                 ${dedupNotice}
             </div>
@@ -146,18 +169,18 @@ export function renderSearchSection({ title, startDate, endDate, seenVenues, ded
 }
 
 /**
- * Attach event listeners for search section toggle buttons
+ * Attach event listeners for extended section toggle buttons
  * @param {HTMLElement} container - Container element
  */
-export function attachSearchSectionListeners(container) {
-    container.querySelectorAll('.search-section__toggle').forEach(button => {
+export function attachExtendedSectionListeners(container) {
+    container.querySelectorAll('.extended-section__toggle').forEach(button => {
         button.addEventListener('click', (e) => {
-            const section = e.target.closest('.search-section');
+            const section = e.target.closest('.extended-section');
             if (section) {
                 const title = section.dataset.sectionTitle;
                 toggleCollapsed(title);
-                section.classList.toggle('search-section--collapsed');
-                button.classList.toggle('search-section__toggle--expanded');
+                section.classList.toggle('extended-section--collapsed');
+                button.classList.toggle('extended-section__toggle--expanded');
             }
         });
     });
