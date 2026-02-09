@@ -36,11 +36,8 @@ export class WeeklyView extends Component {
             </div>
         `).join('');
 
-        // Extended search sections (only when search is active)
-        let extendedSectionsHtml = '';
-        if (searchQuery?.trim()) {
-            extendedSectionsHtml = this.renderExtendedSearchSections(currentWeekStart, dates);
-        }
+        // Extended sections (Next Week, This Month, Next Month)
+        const extendedSectionsHtml = this.renderExtendedSearchSections(currentWeekStart, dates);
 
         return `
             <div class="weekly-view">
