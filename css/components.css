@@ -270,6 +270,22 @@
     margin-left: var(--spacing-sm);
 }
 
+.venue-card__more-nights {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    font-style: italic;
+    margin-bottom: var(--spacing-xs);
+}
+
+.venue-card__more-nights i {
+    width: 16px;
+    text-align: center;
+    color: var(--text-secondary);
+}
+
 .venue-card__host-info {
     display: flex;
     align-items: center;

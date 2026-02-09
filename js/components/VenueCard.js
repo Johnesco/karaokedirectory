@@ -59,6 +59,12 @@ export class VenueCard extends Component {
             ? ['special-event', ...(venue.tags || [])]
             : venue.tags;
 
+        // Count other nights for "+N more nights" indicator
+        const otherNightsCount = (venue.schedule?.length || 1) - 1;
+        const otherNightsText = otherNightsCount > 0
+            ? `+${otherNightsCount} more night${otherNightsCount !== 1 ? 's' : ''}`
+            : '';
+
         // Build full address string and map URL
         const fullAddress = formatAddress(venue.address);
         const mapsUrl = buildMapUrl(venue.address, venue.name);
@@ -85,6 +91,11 @@ export class VenueCard extends Component {
                         <i class="fa-regular fa-clock"></i> ${frequencyLabel ? `<span class="venue-card__frequency">${escapeHtml(frequencyLabel)}</span> &middot; ` : ''}${timeDisplay}
                         ${!eventName && schedule?.eventUrl ? `<a href="${escapeHtml(sanitizeUrl(schedule.eventUrl) || '')}" target="_blank" rel="noopener noreferrer" class="venue-card__event-link" title="Event page"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : ''}
                         ${schedule?.note ? `<span class="venue-card__note">${escapeHtml(schedule.note)}</span>` : ''}
+                    </div>
+                ` : ''}
+                ${showSchedule && otherNightsCount > 0 ? `
+                    <div class="venue-card__more-nights">
+                        <i class="fa-regular fa-calendar-days"></i> ${otherNightsText}
                     </div>
                 ` : ''}
                 <div class="venue-card__location">

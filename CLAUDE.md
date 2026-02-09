@@ -428,6 +428,12 @@ When enabled:
 ## Project History
 
 ### Recent Changes
+- **2026-02**: Added "+N more nights" indicator to compact venue cards (#21)
+  - When a venue has multiple schedule entries, compact cards show "+N more night(s)" below the time line
+  - Count logic: `N = venue.schedule.length - 1` (all other entries including recurring and one-time)
+  - Muted, italic text with calendar-days icon, styled as `.venue-card__more-nights`
+  - Only shown when `showSchedule` is true and N > 0; singular/plural handled
+  - Works in day cards, extended sections, and map floating card
 - **2026-02**: Always-visible extended sections and component rename (#17, #18, #19, #20)
   - Extended sections (Next Week, Later in Month, Next Month) now always visible in Weekly view, not just during search
   - Renamed `SearchSection` component to `ExtendedSection` (file, exports, CSS classes, localStorage keys)
