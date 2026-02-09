@@ -428,6 +428,12 @@ When enabled:
 ## Project History
 
 ### Recent Changes
+- **2026-02**: Always-visible extended sections and component rename (#17, #18, #19, #20)
+  - Extended sections (Next Week, Later in Month, Next Month) now always visible in Weekly view, not just during search
+  - Renamed `SearchSection` component to `ExtendedSection` (file, exports, CSS classes, localStorage keys)
+  - localStorage key migration from `searchSection_*` to `extendedSection_*` on module load
+  - Updated functional spec Section 2 with Extended Sections subsection, rewrote Section 9 reference
+  - Updated README.md Weekly Calendar View feature description
 - **2026-02**: Added frequency labels to venue cards and dedup notice to search sections (#16)
   - Compact venue cards now show frequency + day before time: "Every Friday · 9:00 PM - 1:00 AM"
   - Uses `formatScheduleEntry()` from `js/utils/date.js` with `showEvery: true`
