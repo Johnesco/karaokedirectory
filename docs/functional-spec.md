@@ -101,6 +101,43 @@ When viewing the current week, the page scrolls to today's day card after render
 - Respects the search query — day cards with no matching venues collapse to `.day-card--empty`
 - Re-renders on `FILTER_CHANGED` event
 
+### Extended Sections
+
+Below the current 7-day week, three additional collapsible sections display venues on future dates. These sections are always visible — both when browsing and when searching.
+
+#### Sections
+
+| Section | Date Range | Deduplication |
+|---------|------------|---------------|
+| **Next Week** | Full 7 days following the current week | None — shows all venues |
+| **Later in [Month]** | Days after next week through end of current month | First occurrence only (skip if seen above) |
+| **[Next Month]** | Following calendar month (capped at 60 days from today) | First occurrence only (skip if seen above) |
+
+#### Behavior
+
+- Each section has a header showing title and venue count badge
+- Sections are collapsible — click header to toggle
+- Collapse state persists in `localStorage` (key: `extendedSection_{title-slug}_collapsed`)
+- Empty sections (no venues in date range) are not rendered
+- Day cards within sections use the same format as the current week
+- Maximum lookahead is 60 days from today
+
+#### Deduplication Logic
+
+- Track venue IDs in a `Set` as sections render in order
+- "This Week" and "Next Week": add all venue IDs to set, show all
+- "Later in [Month]" and "[Next Month]": skip venues already in set, then add new ones
+- When deduplication removes venues, a notice appears: "Plus X recurring venues already shown above" (styled as `.extended-section__dedup-notice`)
+- The notice only appears in sections with `deduplicate: true` and only when at least one venue was hidden
+
+This prevents the same weekly-recurring venue from appearing multiple times across sections.
+
+#### Implementation
+
+- Component: `ExtendedSection` (`js/components/ExtendedSection.js`)
+- CSS classes: `.extended-section`, `.extended-section__header`, `.extended-section__content`, `.extended-section--collapsed`, `.extended-section__dedup-notice`
+- WeeklyView method: `renderExtendedSections()`
+
 ---
 
 ## 3 Alphabetical View
@@ -395,42 +432,13 @@ Search is case-insensitive substring matching. A venue matches if the query appe
 
 ### Search Behavior by View
 
-- **Weekly:** Day cards with no matching venues collapse to `.day-card--empty`. Days with matches show only matching venues. Extended sections appear below current week (see below).
+- **Weekly:** Day cards with no matching venues collapse to `.day-card--empty`. Days with matches show only matching venues. Extended sections also filter to show only matching venues (see [Section 2: Extended Sections](#extended-sections)).
 - **Alphabetical:** Letter groups only show matching venues. Letters with no matches disappear. Empty results show "No venues match your search."
 - **Map:** Only matching venues with coordinates appear as markers.
 
-### Extended Search Results (Weekly View Only)
+### Extended Sections and Search
 
-When a search query is active in Weekly Calendar view, additional sections appear below the current week showing venues that match the search on future dates. This helps users find venues beyond the current 7-day window.
-
-#### Sections
-
-| Section | Date Range | Deduplication |
-|---------|------------|---------------|
-| **This Week** | Current 7-day view | None — shows all matches |
-| **Next Week** | Full 7 days following this week | None — shows all matches |
-| **Later in [Month]** | Days after next week through end of current month | First occurrence only (skip if seen above) |
-| **[Next Month]** | Following calendar month (capped at 60 days from today) | First occurrence only (skip if seen above) |
-
-#### Behavior
-
-- Sections always appear below the current week (both during search and when browsing)
-- Each section has a header showing title and venue count badge
-- Sections are collapsible — click header to toggle
-- Collapse state persists in `localStorage` (key: `extendedSection_{title-slug}_collapsed`)
-- Empty sections (no matches in date range) are not rendered
-- Day cards within sections use same format as current week
-- Maximum lookahead is 60 days from today
-
-#### Deduplication Logic
-
-- Track venue IDs in a `Set` as sections render in order
-- "This Week" and "Next Week": add all matching venue IDs to set, show all
-- "Later in [Month]" and "[Next Month]": skip venues already in set, then add new ones
-- When deduplication removes venues, a notice appears at the bottom of the section: "Plus X recurring venues already shown above" (styled as `.extended-section__dedup-notice` — muted, centered, italic)
-- The notice only appears in sections with `deduplicate: true` and only when at least one venue was hidden
-
-This prevents the same weekly-recurring venue from appearing multiple times when searching.
+The Weekly view's extended sections (Next Week, Later in Month, Next Month) are always visible — see [Section 2: Extended Sections](#extended-sections) for full details. When a search query is active, the extended sections filter to show only matching venues, just like the current week's day cards.
 
 ### Preservation of Input Focus
 
@@ -1070,6 +1078,8 @@ Pub/sub event bus for component communication.
 | 2026-02 | 1.0.11 | Taiga #19: Added special event support to submit.html. "Once" frequency with date/eventName/eventUrl fields. Updated Section 15. | Claude Code |
 | 2026-02 | 1.0.12 | Added extended search results in Weekly view. When searching, shows Next Week, This Month, and Next Month sections with collapsible day cards. Updated Section 9. | Claude Code |
 | 2026-02 | 1.0.13 | Migrated project management from Taiga to GitHub Issues + Projects. All work items now tracked as GitHub Issues with labels, milestones, and a Projects kanban board. Issue templates enforce documentation-first workflow. Commit convention changed from `Taiga #XX` to `#XX` (GitHub issue numbers). | Claude Code |
+| 2026-02 | 1.0.14 | #16: Added frequency labels to venue cards ("Every Friday · 9:00 PM – 1:00 AM") and dedup notice to extended sections ("Plus X recurring venues already shown above"). | Claude Code |
+| 2026-02 | 1.0.15 | #17: Extended sections (Next Week, Later in Month, Next Month) now always visible in Weekly view, not just during search. #18: Renamed SearchSection component to ExtendedSection. Updated Section 2 with Extended Sections subsection, rewrote Section 9 to reference it. | Claude Code |
 
 ---
 
