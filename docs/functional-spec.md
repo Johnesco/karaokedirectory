@@ -95,6 +95,8 @@ When expanded, shows:
 
 When viewing the current week, the page scrolls to today's day card after render using `scrollIntoView({ behavior: 'instant', block: 'start' })`.
 
+> **Implementation note:** WeeklyView creates day cards via `renderDayCard()` — a template helper that instantiates a temporary DayCard, calls `template()`, and returns an HTML string (no persistent component instance). Extended sections use `renderExtendedSection()` with a shared `seenVenues` Set passed across all three sections for deduplication. Auto-scroll to today runs in `afterRender()`. See [Architecture: Component Hierarchy](architecture.md#2-component-hierarchy) for the template helper pattern.
+
 ### Filtering
 
 - Respects the "Show dedicated" toggle
@@ -165,6 +167,8 @@ Browse all venues alphabetically, grouped by first letter.
 - The letter index bar sticks to the top during scroll
 - Its height is tracked via `ResizeObserver` and stored as CSS variable `--az-index-height` so letter headings can stick below it
 
+> **Implementation note:** Alphabetical sorting uses `getSortableName()` from `js/utils/string.js`, which strips leading articles ("The", "A", "An", etc.) for sort ordering while preserving the original name for display. The sticky index height is dynamically measured via `ResizeObserver` and written to `--az-index-height` so CSS can position letter group headings below it without hardcoding pixel values.
+
 ### Empty State
 
 If no venues match the current search/filter, displays "No venues match your search." with no letter index.
@@ -197,6 +201,8 @@ When the map view is active:
 - **Default zoom:** 11
 - **Tiles:** OpenStreetMap (free, no API key)
 - **Libraries:** Leaflet 1.9.4 + MarkerClusterGroup (loaded from CDN on first render)
+
+> **Implementation note:** Leaflet and MarkerClusterGroup are loaded lazily — CDN script tags are injected on first map render, not on page load. The custom purple marker icon is created as an `L.divIcon` (CSS-styled div, not an image file). The floating venue card is managed as component-local state within MapView, not via VenueModal — `VenueModal` checks `getState('view') !== 'map'` and skips opening when the map is active.
 
 ### Marker Clustering
 
@@ -334,6 +340,8 @@ When debug mode is enabled (`?debug=1`), compact cards show the schedule match r
 - Clicking links (address, social, event URL) opens the link directly without triggering venue detail
 - In Weekly and Alphabetical views, clicking anywhere on the card (except links) also triggers `VENUE_SELECTED`
 
+> **Implementation note:** Compact cards are rendered via `renderVenueCard()`, which creates a temporary VenueCard instance, calls `template()`, and returns the HTML string — no persistent component instance is kept. Schedule display uses `getScheduleForDate()` which prioritizes `once` entries (special events) over recurring entries for the matching date. Full-mode cards (Alphabetical view) render all schedule entries. The `formatHostDisplay()` function from `js/utils/render.js` generates the compact "Presented by" line.
+
 ---
 
 ## 7 Venue Detail (Mobile Modal)
@@ -348,6 +356,8 @@ The modal opens only when ALL of these conditions are met:
 - A `VENUE_SELECTED` event fires
 - Window width is **less than 1400px**
 - The current view is **not** the map view (map uses its own floating card)
+
+> **Implementation note:** The open guard in VenueModal checks `window.innerWidth < 1400` AND `getState('view') !== 'map'`. Schedule tables, host sections, and date range notices are rendered using shared utilities from `js/utils/render.js` (`renderScheduleTable()`, `renderHostSection()`, `renderDateRange()`) — the same functions used by VenueDetailPane and MapView's expanded card.
 
 ### Content Sections
 
@@ -444,6 +454,8 @@ The Weekly view's extended sections (Next Week, Later in Month, Next Month) are 
 ### Preservation of Input Focus
 
 The Navigation component does **not** re-render when search changes, to preserve keyboard focus in the input field. Only the views re-render.
+
+> **Implementation note:** Navigation updates `searchQuery` state and emits `FILTER_CHANGED` but does NOT subscribe to `searchQuery` — this prevents Navigation from re-rendering (which would destroy and recreate the input element, losing keyboard focus). Views subscribe to `FILTER_CHANGED` via the event bus and independently call `this.render()`. The search matching logic lives in `venueMatchesSearch()` in `js/services/venues.js`, which handles all field matching (name, city, neighborhood, host, company, tags by ID and label, dedicated keyword).
 
 ---
 
@@ -639,6 +651,8 @@ The day-of-week of the target date must match `schedule.day`. Comparison is **ca
 - **Null endTime:** Indicates "until close." Matching is unaffected (endTime is display-only).
 - **Fifth occurrence:** Only possible on dates 29–31. Not every month has a fifth occurrence of every weekday.
 - **Last vs. fourth:** These can overlap (e.g., if the 4th Friday is also the last Friday). A venue scheduled for "last Friday" will match correctly even if it's also the 4th Friday.
+
+> **Implementation note:** `scheduleMatchesDate()` in `js/utils/date.js` performs all matching. Nth-weekday occurrence is computed as `Math.ceil(date.getDate() / 7)` — day 1–7 = first, 8–14 = second, etc. "Last" detection checks if `date + 7 days` crosses the month boundary (`nextWeek.getMonth() !== date.getMonth()`). Day-of-week comparison is case-insensitive via `.toLowerCase()`. See [Patterns: Add a Schedule Frequency](patterns.md#recipe-add-a-schedule-frequency) for the full switch statement.
 
 ### Date Range Filtering
 
@@ -1047,6 +1061,8 @@ Pub/sub event bus for component communication.
 - `emit(event, data)` — fire event to all subscribers (errors caught per-handler)
 - `clear(event?)` — remove listeners for one or all events
 
+> **Implementation note:** State subscriptions in components use the pattern `this.subscribe(subscribe('key', cb))` — the inner `subscribe()` (from state.js) returns an unsubscribe function, and the outer `this.subscribe()` (from Component.js) stores that function in `_subscriptions[]`. On `destroy()`, Component iterates `_subscriptions` and calls each stored function, automatically cleaning up all listeners. There are three state tiers: **global** (state.js `setState`/`subscribe`), **component-local** (`this.setState` on Component base class — triggers re-render and `onStateChange`), and **service-level** (module-scoped variables in venues.js, mutated by `initVenues()`). See [Architecture: State Management](architecture.md#5-state-management) for diagrams.
+
 ---
 
 ## 22 Known Discrepancies
@@ -1082,6 +1098,7 @@ Pub/sub event bus for component communication.
 | 2026-02 | 1.0.14 | #16: Added frequency labels to venue cards ("Every Friday · 9:00 PM – 1:00 AM") and dedup notice to extended sections ("Plus X recurring venues already shown above"). | Claude Code |
 | 2026-02 | 1.0.15 | #17: Extended sections (Next Week, Later in Month, Next Month) now always visible in Weekly view, not just during search. #18: Renamed SearchSection component to ExtendedSection. Updated Section 2 with Extended Sections subsection, rewrote Section 9 to reference it. | Claude Code |
 | 2026-02 | 1.0.16 | #21: Added "+N more night(s)" indicator to compact venue cards. Shows when venue has multiple schedule entries. Updated Section 6. | Claude Code |
+| 2026-02 | 1.0.17 | #22: Added implementation note blockquotes to sections 2, 3, 4, 6, 7, 9, 13, 21. Created `docs/architecture.md` and `docs/patterns.md`. Added Mermaid plugin to Docsify portal. Updated sidebar. | Claude Code |
 
 ---
 

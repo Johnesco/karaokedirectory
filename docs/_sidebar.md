@@ -2,3 +2,5 @@
 
 - **Documentation**
   - [Functional Specification](functional-spec.md)
+  - [Architecture](architecture.md)
+  - [Code Patterns](patterns.md)

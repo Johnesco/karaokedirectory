@@ -167,11 +167,38 @@
                 nextText: 'Next',
                 crossChapter: true
             },
+            markdown: {
+                renderer: {
+                    code: function(code, lang) {
+                        if (lang === 'mermaid') {
+                            return '<div class="mermaid">' + code + '</div>';
+                        }
+                        return this.origin.code.apply(this, arguments);
+                    }
+                }
+            },
         };
     </script>
     <!-- Docsify core -->
     <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
     <!-- Search plugin -->
     <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
+    <!-- Mermaid diagram support -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+        // Re-render mermaid diagrams after Docsify page changes
+        function renderMermaid() {
+            document.querySelectorAll('.mermaid').forEach(function(el) {
+                if (el.getAttribute('data-processed')) return;
+                try { mermaid.run({ nodes: [el] }); } catch(e) { console.warn('Mermaid render error:', e); }
+            });
+        }
+        // Hook into Docsify's page rendering lifecycle
+        window.$docsify = window.$docsify || {};
+        window.$docsify.plugins = (window.$docsify.plugins || []).concat(function(hook) {
+            hook.doneEach(function() { setTimeout(renderMermaid, 100); });
+        });
+    </script>
 </body>
 </html>

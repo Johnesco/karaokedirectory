@@ -428,6 +428,12 @@ When enabled:
 ## Project History
 
 ### Recent Changes
+- **2026-02**: Added technical depth to documentation (#22)
+  - Created `docs/architecture.md` — visual architecture reference with Mermaid.js diagrams (module dependencies, component hierarchy, data flow, event lifecycle, state management, CSS architecture)
+  - Created `docs/patterns.md` — code pattern cookbook with 10 annotated recipes (add venue, add view, add component, add tag, add event, read/write state, add schedule frequency, add social platform, style BEM component, add utility function)
+  - Added 8 implementation note blockquotes to `docs/functional-spec.md` (sections 2, 3, 4, 6, 7, 9, 13, 21)
+  - Added Mermaid.js plugin to Docsify portal (`docs/index.html`)
+  - Updated sidebar navigation (`docs/_sidebar.md`) with links to new documents
 - **2026-02**: Added "+N more nights" indicator to compact venue cards (#21)
   - When a venue has multiple schedule entries, compact cards show "+N more night(s)" below the time line
   - Count logic: `N = venue.schedule.length - 1` (all other entries including recurring and one-time)
@@ -712,6 +718,8 @@ Use `Fixes #XX` in PR body for auto-close.
 ## Related Documentation
 
 - `docs/functional-spec.md` - **Functional Specification (authoritative)** — Complete record of all features, behavior, and data formats. Must be updated with every change.
+- `docs/architecture.md` - **Architecture Reference** — Mermaid.js diagrams covering module dependencies, component hierarchy, data flow, event lifecycle, state management, and CSS architecture.
+- `docs/patterns.md` - **Code Pattern Cookbook** — 10 annotated recipes for common implementation tasks (add venue, add view, add component, add tag, etc.).
 - `README.md` - Public-facing project documentation
 - `codeexplained.html` - Interactive beginner's guide to the codebase
 - Inline comments in `index.html` - Extensive HTML documentation
