@@ -5,7 +5,7 @@ A mobile-friendly web application for discovering karaoke venues in and around A
 ## Features
 
 - **Weekly Calendar View** — See which venues have karaoke each night across a 7-day schedule with week navigation, plus extended sections showing Next Week, This Month, and Next Month
-- **Alphabetical Listing** — Browse all 69+ venues sorted A-Z with letter index for quick jumps
+- **Alphabetical Listing** — Browse all 70+ venues sorted A-Z with letter index for quick jumps
 - **Interactive Map** — Full-screen immersive map with floating controls and venue cards (Leaflet.js)
 - **Global Search** — Filter venues by name, city, neighborhood, host, company, or tags across all views
 - **Venue Details** — View addresses, schedules, host/KJ info, and social media links (mobile modal / desktop side pane)
@@ -75,7 +75,7 @@ Deploy to any static hosting service (GitHub Pages, Netlify, Vercel, etc.) — j
 │   └── docs.css        # Documentation page styles
 ├── js/
 │   ├── app.js          # Application entry point
-│   ├── data.js         # Venue database (69+ venues)
+│   ├── data.js         # Venue database (70+ venues)
 │   ├── bingo.js        # Bingo game logic
 │   ├── core/           # State management & event bus
 │   ├── components/     # UI components (Navigation, DayCard, VenueCard, etc.)

@@ -1108,6 +1108,35 @@ const karaokeData = {
       }
     },
     {
+      "id": "gratas-pizzeria",
+      "name": "Gratas Pizzeria",
+      "tags": ["restaurant"],
+      "dedicated": false,
+      "address": {
+        "street": "2700 S Lamar Blvd",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78745",
+        "neighborhood": "South Austin"
+      },
+      "schedule": [
+        {
+          "frequency": "every",
+          "day": "Thursday",
+          "startTime": "19:00",
+          "endTime": "22:00"
+        }
+      ],
+      "host": {
+        "name": "Marshall Joshua"
+      },
+      "socials": {},
+      "coordinates": {
+        "lat": 30.245358153138,
+        "lng": -97.779937660848
+      }
+    },
+    {
       "id": "hard-count-kitchen-and-cocktails",
       "name": "Hard Count Kitchen & Cocktails",
       "tags": [

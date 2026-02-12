@@ -33,7 +33,7 @@
 - Event bus for component communication (`js/core/events.js`)
 
 ### 5. Data-Driven
-- All venue data in `js/data.js` (currently 69+ venues)
+- All venue data in `js/data.js` (currently 70+ venues)
 - Service layer abstracts data access (`js/services/venues.js`)
 - Schedule matching logic handles complex recurrence patterns
 

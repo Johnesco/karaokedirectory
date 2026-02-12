@@ -26,7 +26,7 @@ Karaoke enthusiasts looking for venues, schedules, and event details in the grea
 
 - **Vanilla JavaScript only** — no frameworks, no build step
 - **Mobile-first responsive design** — base styles target mobile, enhanced for larger screens
-- **Data-driven** — all venue data in a single JavaScript file (`js/data.js`), currently 71 venues
+- **Data-driven** — all venue data in a single JavaScript file (`js/data.js`), currently 73 venues
 - **Component-based** — lightweight custom `Component` base class with state management and event bus
 
 ### Pages
@@ -549,7 +549,7 @@ All venue data is stored in a single JavaScript file as `const karaokeData = { t
 
 ### Venue Count
 
-As of February 2026: **71 venues** in the listings array.
+As of February 2026: **73 venues** in the listings array.
 
 ### Active/Inactive
 
