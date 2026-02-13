@@ -444,7 +444,7 @@ When enabled:
 - [x] Karaoke bingo game
 - [x] Venue submission form
 - [x] Venue editor tool with live preview and tag management
-- [x] Address geocoding in editor (US Census Geocoder API)
+- [x] Address geocoding in editor (Nominatim/OpenStreetMap API)
 - [x] Comprehensive code documentation (codeexplained.html)
 - [x] Debug mode for schedule troubleshooting (?debug=1)
 - [x] Shared rendering utilities (render.js) for schedule tables, host sections, date ranges
@@ -460,6 +460,11 @@ When enabled:
 ## Project History
 
 ### Recent Changes
+- **2026-02**: Fixed geocoding CORS bug in venue editor (#29)
+  - US Census Geocoder API does not support CORS for browser fetch requests
+  - Replaced with Nominatim (OpenStreetMap) Geocoder API (free, CORS-enabled)
+  - Ecosystem-aligned: project already uses Leaflet.js with OpenStreetMap tiles
+  - Node.js batch script (`scripts/geocode-venues.js`) unchanged (not affected by CORS)
 - **2026-02**: Backported sdlc-baseline enhancements (#26)
   - Enhanced `feature.yml`: added Test Plan, Size (replaces Complexity), Documentation Impact fields
   - Enhanced `bug.yml`: added Steps to Reproduce, Severity dropdown, Environment field; expanded DoD
@@ -531,7 +536,7 @@ When enabled:
   - Added Related Documentation section to `codeexplained.html`
 - **2026-02**: Added geocode button to venue editor
   - Replaced Node.js script hint with in-browser "Geocode Address" button
-  - Uses US Census Geocoder API (free, public, CORS-enabled)
+  - Uses Nominatim (OpenStreetMap) Geocoder API (free, public, CORS-enabled)
   - Reads address fields, populates lat/lng, shows status feedback
   - Function `geocodeAddress()` in `editor/editor.js`, exposed to global scope
   - CSS `.geocode-row` in `css/editor.css`

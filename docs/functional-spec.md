@@ -852,7 +852,7 @@ All fields from the venue data model are editable:
 ### Geocoding
 
 "Geocode Address" button in the coordinates section:
-- Uses US Census Geocoder API (free, public, CORS-enabled)
+- Uses Nominatim (OpenStreetMap) Geocoder API (free, public, CORS-enabled)
 - Reads street, city, state, and ZIP from the form
 - Populates latitude and longitude fields on success
 - Shows status: "Looking up...", success with coordinates, or error message

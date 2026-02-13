@@ -191,7 +191,7 @@ The editor tool (`editor.html`) provides a full GUI for managing venue data:
 - **Schedule management** with support for recurring and one-time events
 - **Tag selector** with visual checkboxes
 - **Tag definitions editor** for adding/modifying/removing tags
-- **Address geocoding** via US Census Geocoder API (no API key needed)
+- **Address geocoding** via Nominatim/OpenStreetMap API (no API key needed)
 - **Live preview** with Card, Modal, and JSON tabs
 - **JSON export** (Copy to Clipboard) and **draft saving** (localStorage)
 

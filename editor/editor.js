@@ -886,7 +886,7 @@ function removeTagDefinition(tagId) {
 }
 
 /**
- * Geocode address using US Census Geocoder API
+ * Geocode address using Nominatim (OpenStreetMap) Geocoder API
  */
 async function geocodeAddress() {
     const street = document.getElementById('address-street').value.trim();
@@ -903,33 +903,37 @@ async function geocodeAddress() {
     }
 
     const address = `${street}, ${city}, ${state} ${zip}`.trim();
-    const url = `https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?address=${encodeURIComponent(address)}&benchmark=Public_AR_Current&format=json`;
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1&countrycodes=us`;
 
     btn.disabled = true;
     statusEl.textContent = 'Looking up coordinates...';
     statusEl.style.color = 'var(--text-muted)';
 
     try {
-        const response = await fetch(url);
+        const response = await fetch(url, {
+            headers: {
+                'User-Agent': 'AustinKaraokeDirectory/1.0 (venue editor geocoding)'
+            }
+        });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = await response.json();
 
-        const matches = data.result?.addressMatches;
-        if (!matches || matches.length === 0) {
+        if (!data || data.length === 0) {
             statusEl.textContent = 'No matches found for this address';
             statusEl.style.color = 'var(--color-warning)';
             return;
         }
 
-        const coords = matches[0].coordinates;
-        document.getElementById('coord-lat').value = coords.y;
-        document.getElementById('coord-lng').value = coords.x;
+        const lat = parseFloat(data[0].lat);
+        const lng = parseFloat(data[0].lon);
+        document.getElementById('coord-lat').value = lat;
+        document.getElementById('coord-lng').value = lng;
 
         hasUnsavedChanges = true;
         updatePreview();
         markVenueUnsaved();
 
-        statusEl.textContent = `Found: ${coords.y.toFixed(6)}, ${coords.x.toFixed(6)}`;
+        statusEl.textContent = `Found: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
         statusEl.style.color = 'var(--color-success)';
     } catch (err) {
         statusEl.textContent = `Geocoding failed: ${err.message}`;
