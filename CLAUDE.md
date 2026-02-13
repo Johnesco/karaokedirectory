@@ -37,6 +37,34 @@
 - Service layer abstracts data access (`js/services/venues.js`)
 - Schedule matching logic handles complex recurrence patterns
 
+## Display Philosophy
+
+These principles govern **what** the directory shows and **how** it presents venues — the editorial stance, not the technical architecture.
+
+### 1. Neutral Directory, Not a Review Platform
+No ratings, reviews, rankings, or "best of" lists. Every active venue is presented equally. Alphabetical sort everywhere. No algorithmic or editorial favoritism.
+
+### 2. Facts, Not Opinions
+Show what a venue **is** (dive bar, 21+, LGBTQ+), not what experience you'll have. Tags are descriptive, not prescriptive. No "vibe" or quality descriptors.
+
+### 3. The Week Is the Heartbeat
+Karaoke schedules, hosts, and venues change frequently. Data beyond a month or two is unreliable. The 7-day weekly view is the primary interface, and the extended sections (Next Week, Later in Month, Next Month) provide just enough lookahead for discovery without overpromising accuracy. There is no long-range calendar by design.
+
+### 4. Special Events Are the Exception, Not the Rule
+One-time events sort to the top and get visual prominence (star icon) because they're newsworthy departures from the recurring baseline. Recurring nights are the default; specials are the signal.
+
+### 5. Practical Utility First
+The app is designed for someone on their phone asking "where's karaoke tonight?" Quick search, minimal clicks, fast load, no account required.
+
+### 6. Community-Sourced, Editorially Controlled
+Anyone can submit a venue, but inclusion is curated. The `active` flag allows quiet removal without deleting data. No public archive or "closed" label.
+
+### 7. Intentionally Minimal
+No accounts, favorites, history, social features, or personalization. Every visit starts fresh and equal. Features are only added if they serve the core "find karaoke" use case.
+
+### 8. Transparent About Its Limits
+The about page warns users to verify with the venue. Debug mode exists for schedule logic. The app acknowledges it's best-effort data, not a guaranteed source.
+
 ## File Structure Overview
 
 ```
