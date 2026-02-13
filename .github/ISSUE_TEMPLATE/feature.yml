@@ -6,27 +6,48 @@ body:
     id: description
     attributes:
       label: Description
-      description: What should happen? User story format preferred.
+      description: What should happen? User story format preferred ("As a [user], I want [action] so that [benefit]").
     validations:
       required: true
   - type: textarea
     id: current-state
     attributes:
       label: Current State
-      description: What exists today? Which files are involved?
+      description: What exists today? Which files or systems are involved?
   - type: textarea
     id: acceptance-criteria
     attributes:
       label: Acceptance Criteria
+      description: Specific, testable conditions that must be true when this is done.
       value: |
-        - [ ] Feature implemented
+        - [ ] Feature implemented and working
         - [ ] Functional Spec updated (`docs/functional-spec.md`)
         - [ ] CLAUDE.md updated (if architecture changed)
-  - type: dropdown
-    id: complexity
+        - [ ] README.md updated (if public-facing)
+  - type: textarea
+    id: test-plan
     attributes:
-      label: Complexity
+      label: Test Plan
+      description: How will this be verified? List manual test steps or describe automated test coverage.
+      placeholder: |
+        1. Navigate to...
+        2. Click...
+        3. Verify that...
+  - type: dropdown
+    id: size
+    attributes:
+      label: Size
+      description: Rough effort estimate
       options:
-        - Low
-        - Medium
-        - High
+        - S (< 1 hour)
+        - M (1-4 hours)
+        - L (4+ hours)
+  - type: textarea
+    id: doc-impact
+    attributes:
+      label: Documentation Impact
+      description: Which documentation sections will need updating?
+      placeholder: |
+        - docs/functional-spec.md Section X
+        - CLAUDE.md (file structure, patterns, etc.)
+        - README.md

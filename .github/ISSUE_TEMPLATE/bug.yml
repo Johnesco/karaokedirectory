@@ -6,16 +6,45 @@ body:
     id: description
     attributes:
       label: What's wrong?
+      description: Describe the bug clearly. What did you observe?
     validations:
       required: true
   - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: Exact steps to trigger the bug.
+      value: |
+        1. Go to...
+        2. Click on...
+        3. Observe...
+  - type: textarea
     id: expected
     attributes:
-      label: Expected behavior
+      label: Expected Behavior
+      description: What should happen instead?
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How impactful is this bug?
+      options:
+        - Low — Cosmetic or minor inconvenience
+        - Medium — Feature works but with issues
+        - High — Feature is broken for some users
+        - Critical — System is down or data is at risk
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Browser, OS, device, or any relevant environment details.
+      placeholder: "Chrome 120 on macOS 14, iPhone 15 Safari, etc."
   - type: textarea
     id: done
     attributes:
       label: Definition of Done
       value: |
-        - [ ] Bug fixed
+        - [ ] Bug fixed and verified
+        - [ ] Root cause understood
         - [ ] Functional Spec updated (if behavior changed)
+        - [ ] No regressions introduced
