@@ -902,8 +902,7 @@ async function geocodeAddress() {
         return;
     }
 
-    const address = `${street}, ${city}, ${state} ${zip}`.trim();
-    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1&countrycodes=us`;
+    const url = `https://nominatim.openstreetmap.org/search?street=${encodeURIComponent(street)}&city=${encodeURIComponent(city)}&state=${encodeURIComponent(state)}&postalcode=${encodeURIComponent(zip)}&format=json&limit=1&countrycodes=us`;
 
     btn.disabled = true;
     statusEl.textContent = 'Looking up coordinates...';

@@ -128,8 +128,8 @@ const karaokeData = {
         "website": "https://www.alcovecantina.com/"
       },
       "coordinates": {
-        "lat": 30.508590041975,
-        "lng": -97.678557461551
+        "lat": 30.5086031,
+        "lng": -97.6779341
       }
     },
     {
@@ -166,8 +166,8 @@ const karaokeData = {
         "website": "https://theaustineagle.com/"
       },
       "coordinates": {
-        "lat": 30.333506172814,
-        "lng": -97.668169420107
+        "lat": 30.3310359,
+        "lng": -97.6668989
       }
     },
     {
@@ -196,8 +196,8 @@ const karaokeData = {
         "website": "https://www.barlouie.com/locations/us/tx/round-rock/round-rock"
       },
       "coordinates": {
-        "lat": 30.5698011,
-        "lng": -97.6901666
+        "lat": 30.5699913,
+        "lng": -97.6873605
       }
     },
     {
@@ -230,8 +230,8 @@ const karaokeData = {
         "website": "https://www.bigeasysaloonpflugerville.com/"
       },
       "coordinates": {
-        "lat": 30.449363,
-        "lng": -97.6617298
+        "lat": 30.4492672,
+        "lng": -97.6613393
       }
     },
     {
@@ -258,8 +258,8 @@ const karaokeData = {
       "host": null,
       "socials": null,
       "coordinates": {
-        "lat": 30.478942898013,
-        "lng": -97.684787186765
+        "lat": 30.4790993,
+        "lng": -97.6780171
       }
     },
     {
@@ -293,8 +293,8 @@ const karaokeData = {
         "instagram": "https://www.instagram.com/blacksparrowmusicparlor/?hl=en"
       },
       "coordinates": {
-        "lat": 30.5683291,
-        "lng": -97.4104282
+        "lat": 30.5685887,
+        "lng": -97.4097165
       }
     },
     {
@@ -327,8 +327,8 @@ const karaokeData = {
         "website": "https://blindsidelounge.com/"
       },
       "coordinates": {
-        "lat": 30.268406404771,
-        "lng": -97.744308114958
+        "lat": 30.2683989,
+        "lng": -97.7443749
       }
     },
     {
@@ -364,8 +364,8 @@ const karaokeData = {
         "website": "https://theboatatx.com/"
       },
       "coordinates": {
-        "lat": 30.400044107521,
-        "lng": -97.735557820103
+        "lat": 30.3977236,
+        "lng": -97.7333932
       }
     },
     {
@@ -435,8 +435,8 @@ const karaokeData = {
         "website": "https://boomerzaustin.com/"
       },
       "coordinates": {
-        "lat": 30.235535450326,
-        "lng": -97.857494321857
+        "lat": 30.2347022,
+        "lng": -97.8676067
       }
     },
     {
@@ -466,8 +466,8 @@ const karaokeData = {
         "website": "https://buddysplaceatx.com/"
       },
       "coordinates": {
-        "lat": 30.368420126324,
-        "lng": -97.727481068614
+        "lat": 30.369064,
+        "lng": -97.727213
       }
     },
     {
@@ -500,15 +500,16 @@ const karaokeData = {
         "facebook": "https://www.facebook.com/bungalowatx"
       },
       "coordinates": {
-        "lat": 30.259578736096,
-        "lng": -97.738417833649
+        "lat": 30.2593667,
+        "lng": -97.7383334
       }
     },
     {
       "id": "canary-roost",
       "name": "Canary Roost",
       "tags": [
-        "lgbtq","dive"
+        "lgbtq",
+        "dive"
       ],
       "dedicated": true,
       "address": {
@@ -569,8 +570,8 @@ const karaokeData = {
         "instagram": "https://www.instagram.com/canaryroostatx/"
       },
       "coordinates": {
-        "lat": 30.399172993044,
-        "lng": -97.70406470663
+        "lat": 30.4004068,
+        "lng": -97.7040816
       }
     },
     {
@@ -603,8 +604,8 @@ const karaokeData = {
         "website": "https://soundspaceatx.com/"
       },
       "coordinates": {
-        "lat": 30.21774748789,
-        "lng": -97.796073697988
+        "lat": 30.217802,
+        "lng": -97.796492
       }
     },
     {
@@ -644,8 +645,8 @@ const karaokeData = {
         "21+"
       ],
       "coordinates": {
-        "lat": 30.2696106,
-        "lng": -97.736358
+        "lat": 30.2696323,
+        "lng": -97.7363879
       },
       "dateRange": {
         "start": "2026-01-29",
@@ -684,8 +685,8 @@ const karaokeData = {
       },
       "socials": null,
       "coordinates": {
-        "lat": 30.350817410812,
-        "lng": -97.54671731632
+        "lat": 30.350249,
+        "lng": -97.547128
       }
     },
     {
@@ -724,8 +725,8 @@ const karaokeData = {
       "host": null,
       "socials": null,
       "coordinates": {
-        "lat": 30.651138319145,
-        "lng": -97.675020807298
+        "lat": 30.6524055,
+        "lng": -97.6759384
       }
     },
     {
@@ -792,8 +793,8 @@ const karaokeData = {
         "website": "https://ciaustin.com"
       },
       "coordinates": {
-        "lat": 30.365051671403,
-        "lng": -97.728523950447
+        "lat": 30.366578,
+        "lng": -97.728701
       }
     },
     {
@@ -827,8 +828,8 @@ const karaokeData = {
         "website": "https://www.coyoteuglysaloon.com/austin/"
       },
       "coordinates": {
-        "lat": 30.2665199,
-        "lng": -97.7382387
+        "lat": 30.2664773,
+        "lng": -97.7382017
       }
     },
     {
@@ -861,8 +862,8 @@ const karaokeData = {
         "website": "https://www.dognboneds.com/"
       },
       "coordinates": {
-        "lat": 30.195500168236,
-        "lng": -98.089073552348
+        "lat": 30.1955361,
+        "lng": -98.0890297
       }
     },
     {
@@ -929,8 +930,8 @@ const karaokeData = {
         "twitter": "https://x.com/egos_bar"
       },
       "coordinates": {
-        "lat": 30.256539029913,
-        "lng": -97.74717592511
+        "lat": 30.2565563,
+        "lng": -97.7472017
       }
     },
     {
@@ -1040,8 +1041,8 @@ const karaokeData = {
         "website": "https://georgetown.filmalley.net/"
       },
       "coordinates": {
-        "lat": 30.649118804323,
-        "lng": -97.688596150866
+        "lat": 30.6499156,
+        "lng": -97.6906468
       }
     },
     {
@@ -1103,14 +1104,16 @@ const karaokeData = {
         "website": "https://gnarbaratx.com/"
       },
       "coordinates": {
-        "lat": 30.267560447083,
-        "lng": -97.741235976414
+        "lat": 30.2672029,
+        "lng": -97.740807
       }
     },
     {
       "id": "gratas-pizzeria",
       "name": "Gratas Pizzeria",
-      "tags": ["restaurant"],
+      "tags": [
+        "restaurant"
+      ],
       "dedicated": false,
       "address": {
         "street": "2700 S Lamar Blvd",
@@ -1132,8 +1135,8 @@ const karaokeData = {
       },
       "socials": {},
       "coordinates": {
-        "lat": 30.245358153138,
-        "lng": -97.779937660848
+        "lat": 30.2453635,
+        "lng": -97.7804511
       }
     },
     {
@@ -1201,8 +1204,8 @@ const karaokeData = {
         "instagram": "https://www.instagram.com/highballaustin/?hl=en"
       },
       "coordinates": {
-        "lat": 30.2560666,
-        "lng": -97.7633276
+        "lat": 30.255811,
+        "lng": -97.7636195
       }
     },
     {
@@ -1243,8 +1246,8 @@ const karaokeData = {
         "website": "https://www.hiveaustin.com/"
       },
       "coordinates": {
-        "lat": 30.165550768356,
-        "lng": -97.828347018014
+        "lat": 30.1654073,
+        "lng": -97.8294823
       }
     },
     {
@@ -1313,8 +1316,8 @@ const karaokeData = {
         "smoking-inside"
       ],
       "coordinates": {
-        "lat": 30.4349156,
-        "lng": -97.6746487
+        "lat": 30.4355974,
+        "lng": -97.6738592
       }
     },
     {
@@ -1418,8 +1421,8 @@ const karaokeData = {
         "website": "http://www.theironbear.com/"
       },
       "coordinates": {
-        "lat": 30.26867765836,
-        "lng": -97.745287351529
+        "lat": 30.268541,
+        "lng": -97.745497
       }
     },
     {
@@ -1463,8 +1466,8 @@ const karaokeData = {
         "website": "https://jackalopebar.com/"
       },
       "coordinates": {
-        "lat": 30.241075407773,
-        "lng": -97.726409173363
+        "lat": 30.240441,
+        "lng": -97.7259901
       }
     },
     {
@@ -1497,8 +1500,8 @@ const karaokeData = {
         "website": "http://knomadbar.com/"
       },
       "coordinates": {
-        "lat": 30.312862411654,
-        "lng": -97.704776515518
+        "lat": 30.312516,
+        "lng": -97.704829
       }
     },
     {
@@ -1525,8 +1528,8 @@ const karaokeData = {
       "host": null,
       "socials": null,
       "coordinates": {
-        "lat": 30.456010150261,
-        "lng": -97.659020419193
+        "lat": 30.4565806,
+        "lng": -97.6584215
       }
     },
     {
@@ -1561,8 +1564,8 @@ const karaokeData = {
         "neighborhood"
       ],
       "coordinates": {
-        "lat": 30.439171606086,
-        "lng": -97.612214318795
+        "lat": 30.4391368,
+        "lng": -97.6122018
       }
     },
     {
@@ -1631,8 +1634,8 @@ const karaokeData = {
         "youtube": "https://www.youtube.com/@LuckyRabbitBar"
       },
       "coordinates": {
-        "lat": 30.4943848,
-        "lng": -97.9250839
+        "lat": 30.494479,
+        "lng": -97.924652
       }
     },
     {
@@ -1664,8 +1667,8 @@ const karaokeData = {
         "instagram": "https://www.instagram.com/maggiemaesaustin/"
       },
       "coordinates": {
-        "lat": 30.2670833,
-        "lng": -97.742311
+        "lat": 30.266995,
+        "lng": -97.739622
       }
     },
     {
@@ -1692,8 +1695,8 @@ const karaokeData = {
       "host": null,
       "socials": null,
       "coordinates": {
-        "lat": 30.5085442157,
-        "lng": -97.678727018783
+        "lat": 30.5083907,
+        "lng": -97.6785603
       }
     },
     {
@@ -1763,8 +1766,8 @@ const karaokeData = {
         "website": "https://www.lamarearestaurantseafoodtx.com/"
       },
       "coordinates": {
-        "lat": 30.3409806526,
-        "lng": -97.557495333572
+        "lat": 30.340779,
+        "lng": -97.55695
       }
     },
     {
@@ -1831,8 +1834,8 @@ const karaokeData = {
         "website": "https://www.meridianbuda.com/"
       },
       "coordinates": {
-        "lat": 30.081779690499,
-        "lng": -97.842972984542
+        "lat": 30.0888945,
+        "lng": -97.8209703
       }
     },
     {
@@ -1895,8 +1898,8 @@ const karaokeData = {
         "tiktok": "https://www.tiktok.com/@millies.on.main.e"
       },
       "coordinates": {
-        "lat": 30.34953312623,
-        "lng": -97.37127702619
+        "lat": 30.3498905,
+        "lng": -97.3716843
       }
     },
     {
@@ -1931,8 +1934,8 @@ const karaokeData = {
         "website": "https://moontowersaloon.com/"
       },
       "coordinates": {
-        "lat": 30.169170016597,
-        "lng": -97.825736200148
+        "lat": 30.1691374,
+        "lng": -97.8257863
       }
     },
     {
@@ -1966,8 +1969,8 @@ const karaokeData = {
         "website": "https://www.oakhillsocial.com/"
       },
       "coordinates": {
-        "lat": 30.234548010446,
-        "lng": -97.911149551875
+        "lat": 30.3290494,
+        "lng": -97.6599188
       }
     },
     {
@@ -2170,8 +2173,8 @@ const karaokeData = {
         "website": "https://railhousebar.com/"
       },
       "coordinates": {
-        "lat": 29.988565860046,
-        "lng": -97.875857133986
+        "lat": 29.9872733,
+        "lng": -97.8745635
       }
     },
     {
@@ -2210,8 +2213,8 @@ const karaokeData = {
         "website": "http://www.tayloricehouse.com/"
       },
       "coordinates": {
-        "lat": 30.567831821031,
-        "lng": -97.423696055261
+        "lat": 30.5678187,
+        "lng": -97.4240557
       }
     },
     {
@@ -2277,8 +2280,8 @@ const karaokeData = {
         "website": "https://www.roosteraustin.com/"
       },
       "coordinates": {
-        "lat": 30.439820131343,
-        "lng": -97.620826633357
+        "lat": 30.439534,
+        "lng": -97.620558
       }
     },
     {
@@ -2323,8 +2326,8 @@ const karaokeData = {
         "website": "https://www.roundrocktavern.com/"
       },
       "coordinates": {
-        "lat": 30.508420324178,
-        "lng": -97.679124916654
+        "lat": 30.5081308,
+        "lng": -97.6795613
       }
     },
     {
@@ -2359,8 +2362,8 @@ const karaokeData = {
         "website": "https://shootersbilliards.net/locations/austin"
       },
       "coordinates": {
-        "lat": 30.4537083,
-        "lng": -97.8296554
+        "lat": 30.4010988,
+        "lng": -97.8554004
       }
     },
     {
@@ -2396,8 +2399,8 @@ const karaokeData = {
         "website": "https://shootersbilliards.net/locations/cedar-park"
       },
       "coordinates": {
-        "lat": 30.5227775011,
-        "lng": -97.824634807705
+        "lat": 30.5237954,
+        "lng": -97.8251494
       }
     },
     {
@@ -2427,8 +2430,8 @@ const karaokeData = {
         "facebook": "https://www.facebook.com/snuffys.place/"
       },
       "coordinates": {
-        "lat": 30.5431702,
-        "lng": -97.5503295
+        "lat": 30.5431364,
+        "lng": -97.5477272
       }
     },
     {
@@ -2466,8 +2469,8 @@ const karaokeData = {
         "website": "https://spiritoftx.com/home"
       },
       "coordinates": {
-        "lat": 30.480545587194,
-        "lng": -97.584551992345
+        "lat": 30.4801045,
+        "lng": -97.5842456
       }
     },
     {
@@ -2612,8 +2615,8 @@ const karaokeData = {
         "website": "https://theusualatx.bar/"
       },
       "coordinates": {
-        "lat": 30.395238267297,
-        "lng": -97.72031672027
+        "lat": 30.3956428,
+        "lng": -97.7196429
       }
     },
     {
@@ -2645,8 +2648,8 @@ const karaokeData = {
         "instagram": "https://www.instagram.com/wakesurf_saloon"
       },
       "coordinates": {
-        "lat": 30.3965271,
-        "lng": -97.9338903
+        "lat": 30.3921227,
+        "lng": -97.9102769
       }
     },
     {
@@ -2736,8 +2739,8 @@ const karaokeData = {
         "outdoor"
       ],
       "coordinates": {
-        "lat": 30.359899,
-        "lng": -97.7440311
+        "lat": 30.4350464,
+        "lng": -97.7667828
       }
     },
     {
@@ -2770,8 +2773,8 @@ const karaokeData = {
         "website": "https://whiskeygirlssaloon.com/"
       },
       "coordinates": {
-        "lat": 30.359734880631,
-        "lng": -97.53258881857
+        "lat": 30.3609587,
+        "lng": -97.5332278
       }
     },
     {
@@ -2798,8 +2801,8 @@ const karaokeData = {
       "host": null,
       "socials": null,
       "coordinates": {
-        "lat": 30.43980447779,
-        "lng": -97.620795326256
+        "lat": 30.439478,
+        "lng": -97.620416
       }
     },
     {
@@ -2831,8 +2834,8 @@ const karaokeData = {
         "instagram": "https://www.instagram.com/wildflowertaylortx/"
       },
       "coordinates": {
-        "lat": 30.568646598846,
-        "lng": -97.409323420439
+        "lat": 30.5686256,
+        "lng": -97.4092565
       }
     },
     {
@@ -2867,8 +2870,8 @@ const karaokeData = {
         "website": "https://williesjoint.com/"
       },
       "coordinates": {
-        "lat": 30.085827672343,
-        "lng": -97.837691393518
+        "lat": 30.0866036,
+        "lng": -97.8359963
       }
     }
   ]
