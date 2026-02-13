@@ -46,5 +46,5 @@ body:
       value: |
         - [ ] Bug fixed and verified
         - [ ] Root cause understood
-        - [ ] Functional Spec updated (if behavior changed)
+        - [ ] Functional Spec updated (`docs/functional-spec.md`) (if behavior changed)
         - [ ] No regressions introduced
