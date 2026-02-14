@@ -1488,7 +1488,8 @@ const karaokeData = {
           "frequency": "first",
           "day": "Saturday",
           "startTime": "20:00",
-          "endTime": "01:00"
+          "endTime": "01:00",
+          "eventUrl": "https://www.facebook.com/share/1C5JtudqeC/"
         }
       ],
       "host": {
