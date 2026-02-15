@@ -53,16 +53,19 @@ Karaoke schedules, hosts, and venues change frequently. Data beyond a month or t
 ### 4. Special Events Are the Exception, Not the Rule
 One-time events sort to the top and get visual prominence (star icon) because they're newsworthy departures from the recurring baseline. Recurring nights are the default; specials are the signal.
 
-### 5. Practical Utility First
+### 5. Balance Visibility, Don't Overwhelm
+Daily venues can dominate the calendar and overshadow weekly, bi-weekly, or monthly shows. The calendar view must balance visibility so less frequent events get fair exposure — not buried under a wall of nightly regulars. The Alphabetical and Map views are designed to show everything equally; the calendar view is where editorial balance matters most.
+
+### 6. Practical Utility First
 The app is designed for someone on their phone asking "where's karaoke tonight?" Quick search, minimal clicks, fast load, no account required.
 
-### 6. Community-Sourced, Editorially Controlled
+### 7. Community-Sourced, Editorially Controlled
 Anyone can submit a venue, but inclusion is curated. The `active` flag allows quiet removal without deleting data. No public archive or "closed" label.
 
-### 7. Intentionally Minimal
+### 8. Intentionally Minimal
 No accounts, favorites, history, social features, or personalization. Every visit starts fresh and equal. Features are only added if they serve the core "find karaoke" use case.
 
-### 8. Transparent About Its Limits
+### 9. Transparent About Its Limits
 The about page warns users to verify with the venue. Debug mode exists for schedule logic. The app acknowledges it's best-effort data, not a guaranteed source.
 
 ## File Structure Overview

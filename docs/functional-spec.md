@@ -28,6 +28,7 @@ Karaoke enthusiasts looking for venues, schedules, and event details in the grea
 - **Mobile-first responsive design** — base styles target mobile, enhanced for larger screens
 - **Data-driven** — all venue data in a single JavaScript file (`js/data.js`), currently 73 venues
 - **Component-based** — lightweight custom `Component` base class with state management and event bus
+- **Balanced calendar visibility** — daily venues must not overwhelm less frequent shows in the weekly calendar view; Alphabetical and Map views show everything equally
 
 ### Pages
 
