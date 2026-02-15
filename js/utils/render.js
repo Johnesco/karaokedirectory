@@ -105,6 +105,29 @@ export function renderHostSection(host, classPrefix, options = {}) {
 }
 
 /**
+ * Render schedule context for compact venue cards
+ * Combines the frequency label (e.g., "Every Friday") and "+N more" indicator
+ * into a single output for display after the time.
+ * @param {Object} venue - Venue data object (needs schedule array)
+ * @param {Object|null} schedule - The matched schedule entry for this card
+ * @returns {{ frequencyLabel: string, moreCount: number, moreText: string }} Schedule context parts
+ */
+export function getScheduleContext(venue, schedule) {
+    // Build frequency label for non-once events
+    let frequencyLabel = '';
+    if (schedule && schedule.frequency !== 'once') {
+        const formatted = formatScheduleEntry(schedule, { showEvery: true });
+        frequencyLabel = `${formatted.frequencyPrefix}${formatted.day}`;
+    }
+
+    // Count additional schedule entries
+    const moreCount = (venue.schedule?.length || 1) - 1;
+    const moreText = moreCount > 0 ? `+${moreCount} more` : '';
+
+    return { frequencyLabel, moreCount, moreText };
+}
+
+/**
  * Render a compact host display line (for venue cards)
  * Shows "Presented by [name]" format
  * @param {Object} host - Host object with name and/or company

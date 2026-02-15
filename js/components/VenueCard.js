@@ -10,7 +10,7 @@ import { buildMapUrl, createSocialLinks, formatAddress, sanitizeUrl } from '../u
 import { emit, Events } from '../core/events.js';
 import { isDebugMode, getDebugHtml } from '../utils/debug.js';
 import { renderTags } from '../utils/tags.js';
-import { formatHostDisplay } from '../utils/render.js';
+import { formatHostDisplay, getScheduleContext } from '../utils/render.js';
 
 export class VenueCard extends Component {
     /**
@@ -47,23 +47,13 @@ export class VenueCard extends Component {
         const cardClass = isSpecialEvent ? 'venue-card venue-card--compact venue-card--special-event' : 'venue-card venue-card--compact';
         const eventName = isSpecialEvent ? (schedule.eventName || 'Special Event') : null;
 
-        // Build frequency label for non-once events (e.g., "Every Friday", "First Saturday")
-        let frequencyLabel = '';
-        if (schedule && !isSpecialEvent) {
-            const formatted = formatScheduleEntry(schedule, { showEvery: true });
-            frequencyLabel = `${formatted.frequencyPrefix}${formatted.day}`;
-        }
-
         // Build tag list, injecting 'special-event' tag for one-time events
         const tags = isSpecialEvent
             ? ['special-event', ...(venue.tags || [])]
             : venue.tags;
 
-        // Count other nights for "+N more nights" indicator
-        const otherNightsCount = (venue.schedule?.length || 1) - 1;
-        const otherNightsText = otherNightsCount > 0
-            ? `+${otherNightsCount} more night${otherNightsCount !== 1 ? 's' : ''}`
-            : '';
+        // Schedule context: frequency label + "+N more" indicator
+        const { frequencyLabel, moreCount, moreText } = getScheduleContext(venue, schedule);
 
         // Build full address string and map URL
         const fullAddress = formatAddress(venue.address);
@@ -93,9 +83,9 @@ export class VenueCard extends Component {
                         ${schedule?.note ? `<span class="venue-card__note">${escapeHtml(schedule.note)}</span>` : ''}
                     </div>
                 ` : ''}
-                ${showSchedule && otherNightsCount > 0 ? `
+                ${showSchedule && moreCount > 0 ? `
                     <div class="venue-card__more-nights">
-                        <i class="fa-regular fa-calendar-days"></i> ${otherNightsText}
+                        <i class="fa-regular fa-calendar-days"></i> ${moreText}
                     </div>
                 ` : ''}
                 <div class="venue-card__location">

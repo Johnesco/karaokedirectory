@@ -486,8 +486,13 @@ When enabled:
   - Added 8 implementation note blockquotes to `docs/functional-spec.md` (sections 2, 3, 4, 6, 7, 9, 13, 21)
   - Added Mermaid.js plugin to Docsify portal (`docs/index.html`)
   - Updated sidebar navigation (`docs/_sidebar.md`) with links to new documents
-- **2026-02**: Added "+N more nights" indicator to compact venue cards (#21)
-  - When a venue has multiple schedule entries, compact cards show "+N more night(s)" below the time line
+- **2026-02**: Unified frequency label and "+N more" into `getScheduleContext()` (#30)
+  - Extracted frequency label + "+N more" logic from `VenueCard.compactTemplate()` into `getScheduleContext()` in `js/utils/render.js`
+  - Single function takes venue + matched schedule entry, returns `{ frequencyLabel, moreCount, moreText }`
+  - VenueCard now imports and destructures result instead of inline logic
+  - No visual change to rendered output
+- **2026-02**: Added "+N more" indicator to compact venue cards (#21)
+  - When a venue has multiple schedule entries, compact cards show "+N more" below the time line
   - Count logic: `N = venue.schedule.length - 1` (all other entries including recurring and one-time)
   - Muted, italic text with calendar-days icon, styled as `.venue-card__more-nights`
   - Only shown when `showSchedule` is true and N > 0; singular/plural handled

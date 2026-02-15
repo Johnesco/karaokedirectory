@@ -315,7 +315,8 @@ Displays:
 - **Venue name** — clickable button
 - **Special event indicator** — star icon + event name (for `frequency: "once"` events). If `eventUrl` is set, event name is a link. Adds `.venue-card--special-event` class and injects `special-event` tag.
 - **Frequency + time** — clock icon + frequency label + time range. Format: "Every Friday · 9:00 PM - 1:00 AM" or "First Saturday · 9:00 PM - 1:00 AM". Frequency label is wrapped in `.venue-card__frequency` span with muted color. Skipped for `frequency: "once"` events (they already have event name line). If `eventUrl` is set (and not already shown as special event link), shows arrow link icon.
-- **More nights indicator** — calendar-days icon + "+N more night(s)" when venue has additional schedule entries (N = total entries − 1). Muted, italic, not clickable. Only shown when `showSchedule` is true and N > 0. CSS class: `.venue-card__more-nights`.
+- **More entries indicator** — calendar-days icon + "+N more" when venue has additional schedule entries (N = total entries − 1). Muted, italic, not clickable. Only shown when `showSchedule` is true and N > 0. CSS class: `.venue-card__more-nights`.
+- Both the frequency label and "+N more" indicator are produced by `getScheduleContext()` in `js/utils/render.js`.
 - **Address** — location icon + full address as Google Maps link
 - **Host** — "Presented by [host display]" (compact format: company name, or name if no company)
 - **Tags** — color-coded badge list
@@ -1097,8 +1098,9 @@ Pub/sub event bus for component communication.
 | 2026-02 | 1.0.13 | Migrated project management from Taiga to GitHub Issues + Projects. All work items now tracked as GitHub Issues with labels, milestones, and a Projects kanban board. Issue templates enforce documentation-first workflow. Commit convention changed from `Taiga #XX` to `#XX` (GitHub issue numbers). | Claude Code |
 | 2026-02 | 1.0.14 | #16: Added frequency labels to venue cards ("Every Friday · 9:00 PM – 1:00 AM") and dedup notice to extended sections ("Plus X recurring venues already shown above"). | Claude Code |
 | 2026-02 | 1.0.15 | #17: Extended sections (Next Week, Later in Month, Next Month) now always visible in Weekly view, not just during search. #18: Renamed SearchSection component to ExtendedSection. Updated Section 2 with Extended Sections subsection, rewrote Section 9 to reference it. | Claude Code |
-| 2026-02 | 1.0.16 | #21: Added "+N more night(s)" indicator to compact venue cards. Shows when venue has multiple schedule entries. Updated Section 6. | Claude Code |
+| 2026-02 | 1.0.16 | #21: Added "+N more" indicator to compact venue cards. Shows when venue has multiple schedule entries. Updated Section 6. | Claude Code |
 | 2026-02 | 1.0.17 | #22: Added implementation note blockquotes to sections 2, 3, 4, 6, 7, 9, 13, 21. Created `docs/architecture.md` and `docs/patterns.md`. Added Mermaid plugin to Docsify portal. Updated sidebar. | Claude Code |
+| 2026-02 | 1.0.18 | #30: Unified frequency label and "+N more" indicator into `getScheduleContext()` in `render.js`. Removed inline logic from `VenueCard.compactTemplate()`. Updated Section 6. | Claude Code |
 
 ---
 
