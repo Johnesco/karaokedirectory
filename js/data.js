@@ -623,11 +623,11 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "once",
-          "date": "2026-01-29",
+          "date": "2026-02-24",
           "startTime": "21:00",
           "endTime": "00:00",
           "eventName": "Karaoke Underground @ Cheer Up!",
-          "eventUrl": "https://www.facebook.com/share/1CPcw6gNjC/"
+          "eventUrl": "https://www.facebook.com/share/188S7mskYU/"
         }
       ],
       "host": {
@@ -647,10 +647,6 @@ const karaokeData = {
       "coordinates": {
         "lat": 30.2696323,
         "lng": -97.7363879
-      },
-      "dateRange": {
-        "start": "2026-01-29",
-        "end": "2026-01-30"
       }
     },
     {
