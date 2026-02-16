@@ -92,7 +92,7 @@ export function validateVenue(venue) {
  */
 export function validateScheduleEntry(entry) {
     const errors = [];
-    const validFrequencies = ['every', 'first', 'second', 'third', 'fourth', 'fifth', 'last'];
+    const validFrequencies = ['every', 'first', 'second', 'third', 'fourth', 'fifth', 'last', 'once'];
     const validDays = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
     if (!entry.frequency) {

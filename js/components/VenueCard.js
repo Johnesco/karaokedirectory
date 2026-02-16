@@ -85,7 +85,7 @@ export class VenueCard extends Component {
                 ` : ''}
                 ${showSchedule && moreCount > 0 ? `
                     <div class="venue-card__more-nights">
-                        <i class="fa-regular fa-calendar-days"></i> ${moreText}
+                        ${moreText === 'Everyday' ? '' : '<i class="fa-regular fa-calendar-days"></i> '}${moreText}
                     </div>
                 ` : ''}
                 <div class="venue-card__location">

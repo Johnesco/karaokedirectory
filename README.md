@@ -18,7 +18,6 @@ A mobile-friendly web application for discovering karaoke venues in and around A
 - **Venue Submissions** — Community-driven venue suggestions via web form
 - **Venue Editor** — Full-featured editor tool with live preview, tag management, and address geocoding
 - **Debug Mode** — Schedule troubleshooting overlay via `?debug=1` URL parameter
-- **Test Suite** — Browser-based schedule verification tests with interactive date tester
 
 ## Tech Stack
 
@@ -122,7 +121,7 @@ Know a karaoke spot that's missing? You can:
   schedule: [
     {
       frequency: "every",     // "every", "first", "second", "third", "fourth", "last", "once"
-      day: "friday",          // Day name (for recurring events)
+      day: "Friday",          // Day name, capitalized (for recurring events)
       startTime: "21:00",     // 24-hour format
       endTime: "01:00",       // Can cross midnight (optional)
       eventUrl: "https://..." // Optional: link to event page
@@ -151,7 +150,8 @@ Know a karaoke spot that's missing? You can:
     instagram: "https://instagram.com/...",
     twitter: "https://twitter.com/...",
     tiktok: "https://tiktok.com/...",
-    youtube: "https://youtube.com/..."
+    youtube: "https://youtube.com/...",
+    bluesky: "https://bsky.app/..."
   }
 }
 ```

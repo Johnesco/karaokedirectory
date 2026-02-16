@@ -3,7 +3,7 @@
  * View toggles, week navigation, search input, and filters.
  *
  * Features:
- * - View switcher buttons (Calendar, A-Z, Map, Bingo)
+ * - View switcher buttons (Calendar, A-Z, Map) + Bingo link (separate page)
  * - Week navigation (prev/next/today) - only shown in weekly view
  * - Global search input with clear button
  * - Dedicated venue toggle checkbox

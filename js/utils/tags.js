@@ -1,6 +1,6 @@
 /**
  * Tag configuration and rendering utilities
- * Tags provide "vibe" information about venues
+ * Tags provide descriptive information about venue characteristics (type, policies, amenities)
  * Configuration is loaded from data.js at runtime
  */
 

@@ -105,8 +105,85 @@ export function renderHostSection(host, classPrefix, options = {}) {
 }
 
 /**
+ * Abbreviate a full day name to 3 letters
+ * @param {string} dayName - Full day name (e.g., "Wednesday")
+ * @returns {string} 3-letter abbreviation (e.g., "Wed")
+ */
+function abbreviateDay(dayName) {
+    return dayName.charAt(0).toUpperCase() + dayName.slice(1, 3).toLowerCase();
+}
+
+/**
+ * Build the "Also ..." or "Nightly" text from a venue's other schedule entries
+ * @param {Object[]} otherEntries - Schedule entries other than the current card's match
+ * @param {Object[]} allEntries - All schedule entries for the venue
+ * @returns {string} Formatted text like "Also Tue, Wed", "Nightly", or ""
+ */
+function buildAlsoText(otherEntries, allEntries) {
+    // Check for "Nightly": all entries are "every" and cover all 7 weekdays
+    const everyEntries = allEntries.filter(e => e.frequency === 'every');
+    const uniqueDays = new Set(everyEntries.map(e => e.day.toLowerCase()));
+    if (everyEntries.length === allEntries.length && uniqueDays.size === 7) {
+        return 'Everyday';
+    }
+
+    // Group entries by day name for same-day ordinal combining
+    // e.g., "second Friday" + "fourth Friday" → "2nd & 4th Fri"
+    const groups = [];
+    const dayMap = new Map(); // day name → array of entries
+
+    for (const entry of otherEntries) {
+        if (entry.frequency === 'once') {
+            // One-time events get their own entry: "Mar 15"
+            const dateObj = new Date(entry.date + 'T12:00:00');
+            const label = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            groups.push({ sort: dateObj.getTime(), text: label });
+        } else {
+            const dayKey = entry.day.toLowerCase();
+            if (!dayMap.has(dayKey)) {
+                dayMap.set(dayKey, []);
+            }
+            dayMap.get(dayKey).push(entry);
+        }
+    }
+
+    // Ordinal abbreviation map
+    const ordinalAbbrev = {
+        first: '1st', second: '2nd', third: '3rd',
+        fourth: '4th', fifth: '5th', last: 'Last'
+    };
+
+    // Day sort order for consistent ordering
+    const daySortOrder = {
+        sunday: 0, monday: 1, tuesday: 2, wednesday: 3,
+        thursday: 4, friday: 5, saturday: 6
+    };
+
+    // Process day-grouped entries
+    for (const [dayKey, entries] of dayMap) {
+        const abbrevDay = abbreviateDay(entries[0].day);
+        const sortKey = daySortOrder[dayKey] ?? 7;
+
+        // Check if all entries for this day are "every"
+        const allEvery = entries.every(e => e.frequency === 'every');
+        if (allEvery) {
+            groups.push({ sort: sortKey, text: abbrevDay });
+        } else {
+            // Combine ordinals: "2nd & 4th Fri"
+            const ordinals = entries.map(e => ordinalAbbrev[e.frequency] || e.frequency);
+            groups.push({ sort: sortKey, text: `${ordinals.join(' & ')} ${abbrevDay}` });
+        }
+    }
+
+    // Sort: weekday entries by day order, then once events by date
+    groups.sort((a, b) => a.sort - b.sort);
+
+    return `Also ${groups.map(g => g.text).join(', ')}`;
+}
+
+/**
  * Render schedule context for compact venue cards
- * Combines the frequency label (e.g., "Every Friday") and "+N more" indicator
+ * Combines the frequency label (e.g., "Every Friday") and the "Also ..." indicator
  * into a single output for display after the time.
  * @param {Object} venue - Venue data object (needs schedule array)
  * @param {Object|null} schedule - The matched schedule entry for this card
@@ -120,9 +197,13 @@ export function getScheduleContext(venue, schedule) {
         frequencyLabel = `${formatted.frequencyPrefix}${formatted.day}`;
     }
 
-    // Count additional schedule entries
+    // Build "Also ..." or "Nightly" text for multi-entry venues
     const moreCount = (venue.schedule?.length || 1) - 1;
-    const moreText = moreCount > 0 ? `+${moreCount} more` : '';
+    let moreText = '';
+    if (moreCount > 0) {
+        const otherEntries = venue.schedule.filter(s => s !== schedule);
+        moreText = buildAlsoText(otherEntries, venue.schedule);
+    }
 
     return { frequencyLabel, moreCount, moreText };
 }
