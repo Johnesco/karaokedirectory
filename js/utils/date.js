@@ -266,21 +266,21 @@ export function formatScheduleEntry(entry, options = {}) {
 }
 
 /**
- * Format a date range for display
- * @param {Object} dateRange - Object with start and/or end date strings
- * @returns {string} Formatted date range text, or empty string if no range
+ * Format an active period for display
+ * @param {Object} activePeriod - Object with start and/or end date strings
+ * @returns {string} Formatted active period text, or empty string if no period
  */
-export function formatDateRangeText(dateRange) {
-    if (!dateRange) return '';
+export function formatActivePeriodText(activePeriod) {
+    if (!activePeriod) return '';
 
-    const { start, end } = dateRange;
+    const { start, end } = activePeriod;
 
     if (start && end) {
-        return `Available ${start} to ${end}`;
+        return `Active ${start} to ${end}`;
     } else if (start) {
-        return `Starting ${start}`;
+        return `Active from ${start}`;
     } else if (end) {
-        return `Until ${end}`;
+        return `Active until ${end}`;
     }
 
     return '';

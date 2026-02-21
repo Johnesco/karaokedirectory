@@ -55,16 +55,16 @@ export function validateVenue(venue) {
         }
     }
 
-    // Date range validation
-    if (venue.dateRange) {
-        if (venue.dateRange.start && !isValidDateString(venue.dateRange.start)) {
+    // Active period validation
+    if (venue.activePeriod) {
+        if (venue.activePeriod.start && !isValidDateString(venue.activePeriod.start)) {
             errors.push('Invalid start date format (use YYYY-MM-DD)');
         }
-        if (venue.dateRange.end && !isValidDateString(venue.dateRange.end)) {
+        if (venue.activePeriod.end && !isValidDateString(venue.activePeriod.end)) {
             errors.push('Invalid end date format (use YYYY-MM-DD)');
         }
-        if (venue.dateRange.start && venue.dateRange.end) {
-            if (new Date(venue.dateRange.start) > new Date(venue.dateRange.end)) {
+        if (venue.activePeriod.start && venue.activePeriod.end) {
+            if (new Date(venue.activePeriod.start) > new Date(venue.activePeriod.end)) {
                 errors.push('Start date must be before end date');
             }
         }

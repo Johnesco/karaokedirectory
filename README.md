@@ -11,7 +11,7 @@ A mobile-friendly web application for discovering karaoke venues in and around A
 - **Venue Details** — View addresses, schedules, host/KJ info, and social media links (mobile modal / desktop side pane)
 - **Venue Tags** — 19 color-coded badges showing venue characteristics (LGBTQ+, 21+, Dive Bar, Live Band, etc.)
 - **Special Events** — One-time karaoke events with specific dates, event names, and event page links
-- **Seasonal Venues** — Date range support for seasonal or temporary events
+- **Active Periods** — Define when a venue appears in the directory
 - **Quick Directions** — One-tap access to Google Maps navigation
 - **Dedicated Venue Filter** — Toggle to show only dedicated karaoke bars
 - **Karaoke Bingo** — A fun bingo card game with karaoke-themed scenarios
@@ -135,7 +135,7 @@ Know a karaoke spot that's missing? You can:
       eventUrl: "https://..."      // Optional: event page link
     }
   ],
-  dateRange: {                // Optional: for seasonal venues
+  activePeriod: {             // Optional: limits when venue appears
     start: "2026-06-01",
     end: "2026-08-31"
   },

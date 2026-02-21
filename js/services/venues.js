@@ -129,9 +129,9 @@ export function getVenuesForDate(date, options = {}) {
             return false;
         }
 
-        // Check date range
-        if (venue.dateRange) {
-            if (!isDateInRange(date, venue.dateRange.start, venue.dateRange.end)) {
+        // Check active period
+        if (venue.activePeriod) {
+            if (!isDateInRange(date, venue.activePeriod.start, venue.activePeriod.end)) {
                 return false;
             }
         }
@@ -301,7 +301,7 @@ export function filterVenues(filters = {}) {
     // Filter by specific date
     if (date) {
         result = result.filter(venue => {
-            if (venue.dateRange && !isDateInRange(date, venue.dateRange.start, venue.dateRange.end)) {
+            if (venue.activePeriod && !isDateInRange(date, venue.activePeriod.start, venue.activePeriod.end)) {
                 return false;
             }
             return venue.schedule.some(sched => scheduleMatchesDate(sched, date));

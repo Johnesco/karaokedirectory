@@ -335,7 +335,7 @@ Displays everything in compact mode plus:
 - **Complete schedule** — all schedule entries listed (not just the one matching today)
 - **Host section** — full host name, company, website
 - **Social links** — all venue social media icons
-- **Date range notice** — if seasonal venue
+- **Active period notice** — if venue has active period
 
 ### Debug Info
 
@@ -364,7 +364,7 @@ The modal opens only when ALL of these conditions are met:
 - Window width is **less than 1400px**
 - The current view is **not** the map view (map uses its own floating card)
 
-> **Implementation note:** The open guard in VenueModal checks `window.innerWidth < 1400` AND `getState('view') !== 'map'`. Schedule tables, host sections, and date range notices are rendered using shared utilities from `js/utils/render.js` (`renderScheduleTable()`, `renderHostSection()`, `renderDateRange()`) — the same functions used by VenueDetailPane and MapView's expanded card.
+> **Implementation note:** The open guard in VenueModal checks `window.innerWidth < 1400` AND `getState('view') !== 'map'`. Schedule tables, host sections, and active period notices are rendered using shared utilities from `js/utils/render.js` (`renderScheduleTable()`, `renderHostSection()`, `renderActivePeriod()`) — the same functions used by VenueDetailPane and MapView's expanded card.
 
 ### Content Sections
 
@@ -372,12 +372,12 @@ The modal opens only when ALL of these conditions are met:
 |---------|---------|
 | Header | Venue name, event name (if special event), tags |
 | Location | Full address, "View Map" button, "Directions" button |
-| Schedule | Schedule table (all entries) + date range notice if seasonal |
+| Schedule | Schedule table (all entries) + active period notice if applicable |
 | Host | Host name, company, website, social links |
 | Social Media | Venue social links (if any) |
 | Contact | Phone number link (if venue has phone field) |
 
-Schedule tables, host sections, and date range notices are rendered using shared utilities from `js/utils/render.js`.
+Schedule tables, host sections, and active period notices are rendered using shared utilities from `js/utils/render.js`.
 
 ### Close Triggers
 
@@ -475,9 +475,9 @@ The Navigation component does **not** re-render when search changes, to preserve
 - **When unchecked:** Venues with `dedicated: true` are excluded from all views
 - **Map view:** A floating "Show/Hide Dedicated" button replaces the checkbox
 
-### Date Range Filtering
+### Active Period Filtering
 
-Venues with a `dateRange` field only appear when the current date falls within `dateRange.start` and `dateRange.end` (inclusive). This is automatic — no user control.
+Venues with an `activePeriod` field only appear when the current date falls within `activePeriod.start` and `activePeriod.end` (inclusive). This is automatic — no user control.
 
 ### Filter Event Flow
 
@@ -532,9 +532,9 @@ All venue data is stored in a single JavaScript file as `const karaokeData = { t
       eventName         string        OPTIONAL  Display name for the event
       eventUrl          string        OPTIONAL  Link to event page
 
-  dateRange             object        OPTIONAL  For seasonal venues
-    dateRange.start     string        "YYYY-MM-DD"
-    dateRange.end       string        "YYYY-MM-DD"
+  activePeriod          object        OPTIONAL  Limits when venue appears
+    activePeriod.start  string        "YYYY-MM-DD"
+    activePeriod.end    string        "YYYY-MM-DD"
 
   host                  object|null   OPTIONAL
     host.name           string        OPTIONAL
@@ -661,9 +661,9 @@ The day-of-week of the target date must match `schedule.day`. Comparison is **ca
 
 > **Implementation note:** `scheduleMatchesDate()` in `js/utils/date.js` performs all matching. Nth-weekday occurrence is computed as `Math.ceil(date.getDate() / 7)` — day 1–7 = first, 8–14 = second, etc. "Last" detection checks if `date + 7 days` crosses the month boundary (`nextWeek.getMonth() !== date.getMonth()`). Day-of-week comparison is case-insensitive via `.toLowerCase()`. See [Patterns: Add a Schedule Frequency](patterns.md#recipe-add-a-schedule-frequency) for the full switch statement.
 
-### Date Range Filtering
+### Active Period Filtering
 
-Separate from schedule matching. If a venue has `dateRange`, it only appears when the current viewing date is within `dateRange.start` and `dateRange.end` (both inclusive). Checked via `isDateInRange()`.
+Separate from schedule matching. If a venue has `activePeriod`, it only appears when the current viewing date is within `activePeriod.start` and `activePeriod.end` (both inclusive). Checked via `isDateInRange()`.
 
 ### Time Formatting
 
@@ -854,7 +854,7 @@ All fields from the venue data model are editable:
   - Event URL
 - **Host:** Name, Company, Website
 - **Socials:** Website, Facebook, Instagram, Twitter, TikTok, YouTube, Bluesky
-- **Date Range:** Start and end dates for seasonal venues
+- **Active Period:** Start and end dates limiting when venue appears
 
 ### Geocoding
 

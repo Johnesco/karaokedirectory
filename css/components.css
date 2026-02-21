@@ -561,8 +561,8 @@
     font-size: var(--font-size-sm);
 }
 
-.venue-modal__date-range,
-.detail-pane__date-range {
+.venue-modal__active-period,
+.detail-pane__active-period {
     color: var(--color-warning);
     font-size: var(--font-size-sm);
     margin-top: var(--spacing-sm);

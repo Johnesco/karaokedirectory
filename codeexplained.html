@@ -327,7 +327,7 @@ karaokedirectory/
                 <li><strong>address</strong> - An object containing street, city, state, zip, and optional neighborhood.</li>
                 <li><strong>coordinates</strong> - Latitude and longitude for the map. Can be auto-filled using the editor's geocode button.</li>
                 <li><strong>schedule</strong> - An array of schedule entries. Recurring entries have frequency (every, first, second, third, fourth, last), day, start time, and end time. One-time entries use frequency "once" with a specific date, optional event name, and optional event URL.</li>
-                <li><strong>dateRange</strong> - Optional start and end dates for seasonal or temporary venues. Venues only appear within their active range.</li>
+                <li><strong>activePeriod</strong> - Optional start and end dates that limit when a venue appears in the directory.</li>
                 <li><strong>host</strong> - Information about the karaoke host/KJ, including name, company, and optional website.</li>
                 <li><strong>socials</strong> - Links to social media profiles (website, Facebook, Instagram, Twitter/X, TikTok, YouTube).</li>
             </ul>
@@ -356,7 +356,7 @@ karaokedirectory/
                 <li>The day of the week (Monday, Tuesday, etc.)</li>
                 <li>The frequency (every week, first Saturday, second Thursday, last Friday, etc.)</li>
                 <li>One-time events with frequency "once" that match a specific date</li>
-                <li>Date ranges — venues with a <span class="code-term">dateRange</span> only appear within their active start/end dates</li>
+                <li>Active periods — venues with an <span class="code-term">activePeriod</span> only appear within their active start/end dates</li>
             </ul>
 
             <p>For "first", "second", etc., it calculates which occurrence of that weekday in the month the date falls on. For "last", it checks if there's another occurrence of that weekday later in the same month. For "once" events, it simply compares the schedule's date field against the target date.</p>
@@ -679,7 +679,7 @@ karaokedirectory/
                 <li><strong>formatTime12(time24)</strong> - Converts "21:00" to "9:00 PM"</li>
                 <li><strong>formatTimeRange(start, end)</strong> - Formats as "9:00 PM - 2:00 AM"</li>
                 <li><strong>formatScheduleEntry(entry)</strong> - Formats a schedule entry for display (handles all frequency types including "once")</li>
-                <li><strong>formatDateRangeText(dateRange)</strong> - Formats a date range as human-readable text</li>
+                <li><strong>formatActivePeriodText(activePeriod)</strong> - Formats an active period as human-readable text</li>
                 <li><strong>scheduleMatchesDate(schedule, date)</strong> - Checks if a schedule entry applies to a date (supports recurring, ordinal, "once", and date ranges)</li>
             </ul>
 
@@ -716,7 +716,7 @@ karaokedirectory/
 
             <ul>
                 <li><strong>renderScheduleTable(schedule, classPrefix)</strong> - Generates an HTML table showing all schedule entries, with special handling for "once" events and event URL links</li>
-                <li><strong>renderDateRange(dateRange, classPrefix)</strong> - Renders a date range notice with calendar icon</li>
+                <li><strong>renderActivePeriod(activePeriod, classPrefix)</strong> - Renders an active period notice with calendar icon</li>
                 <li><strong>renderHostSection(host, classPrefix)</strong> - Renders the host/KJ section with name, company, website link, and social media</li>
                 <li><strong>formatHostDisplay(host)</strong> - Returns a compact "Name (Company)" string for venue cards</li>
             </ul>

@@ -275,9 +275,9 @@ function fillForm(venue) {
     // Schedule
     renderScheduleList(venue.schedule || []);
 
-    // Date Range
-    document.getElementById('daterange-start').value = venue.dateRange?.start || '';
-    document.getElementById('daterange-end').value = venue.dateRange?.end || '';
+    // Active Period
+    document.getElementById('active-period-start').value = venue.activePeriod?.start || '';
+    document.getElementById('active-period-end').value = venue.activePeriod?.end || '';
 }
 
 /**
@@ -408,12 +408,12 @@ function getFormData() {
         lng: parseFloat(lngValue)
     } : null;
 
-    // Get date range
-    const dateRangeStart = document.getElementById('daterange-start').value;
-    const dateRangeEnd = document.getElementById('daterange-end').value;
-    const dateRange = (dateRangeStart || dateRangeEnd) ? {
-        start: dateRangeStart || undefined,
-        end: dateRangeEnd || undefined
+    // Get active period
+    const activePeriodStart = document.getElementById('active-period-start').value;
+    const activePeriodEnd = document.getElementById('active-period-end').value;
+    const activePeriod = (activePeriodStart || activePeriodEnd) ? {
+        start: activePeriodStart || undefined,
+        end: activePeriodEnd || undefined
     } : null;
 
     const result = {
@@ -443,9 +443,9 @@ function getFormData() {
         result.coordinates = coordinates;
     }
 
-    // Include date range if set
-    if (dateRange) {
-        result.dateRange = dateRange;
+    // Include active period if set
+    if (activePeriod) {
+        result.activePeriod = activePeriod;
     }
 
     return result;
@@ -545,7 +545,7 @@ function createNewVenue() {
         tags: [],
         address: { street: '', city: '', state: 'TX', zip: '', neighborhood: '' },
         schedule: [],
-        dateRange: null,
+        activePeriod: null,
         host: null,
         socials: {}
     });
@@ -588,10 +588,10 @@ function renderModalPreview(venue) {
             <h3>${escapeHtml(venue.name)}</h3>
             ${tagsHtml}
             <p><i class="fa-solid fa-location-dot"></i> ${addressHtml}</p>
-            ${venue.dateRange ? `
-                <div class="daterange-preview">
+            ${venue.activePeriod ? `
+                <div class="active-period-preview">
                     <i class="fa-solid fa-calendar-days"></i>
-                    <strong>Season:</strong> ${venue.dateRange.start || '?'} to ${venue.dateRange.end || '?'}
+                    <strong>Active Period:</strong> ${venue.activePeriod.start || '?'} to ${venue.activePeriod.end || '?'}
                 </div>
             ` : ''}
             ${venue.schedule.length ? `

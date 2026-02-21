@@ -8,7 +8,7 @@ import { escapeHtml } from '../utils/string.js';
 import { buildMapUrl, buildDirectionsUrl, createSocialLinks, formatAddress } from '../utils/url.js';
 import { on, emit, Events } from '../core/events.js';
 import { renderTags } from '../utils/tags.js';
-import { renderScheduleTable, renderDateRange, renderHostSection } from '../utils/render.js';
+import { renderScheduleTable, renderActivePeriod, renderHostSection } from '../utils/render.js';
 
 export class VenueDetailPane extends Component {
     init() {
@@ -61,7 +61,7 @@ export class VenueDetailPane extends Component {
                 <section class="detail-pane__section">
                     <h3><i class="fa-regular fa-calendar"></i> Schedule</h3>
                     ${renderScheduleTable(venue.schedule, 'detail-pane')}
-                    ${renderDateRange(venue.dateRange, 'detail-pane')}
+                    ${renderActivePeriod(venue.activePeriod, 'detail-pane')}
                 </section>
 
                 ${renderHostSection(venue.host, 'detail-pane')}

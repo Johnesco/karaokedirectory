@@ -9,7 +9,7 @@ import { buildMapUrl, buildDirectionsUrl, createSocialLinks, formatAddress } fro
 import { on, emit, Events } from '../core/events.js';
 import { getState } from '../core/state.js';
 import { renderTags } from '../utils/tags.js';
-import { renderScheduleTable, renderDateRange, renderHostSection } from '../utils/render.js';
+import { renderScheduleTable, renderActivePeriod, renderHostSection } from '../utils/render.js';
 
 export class VenueModal extends Component {
     init() {
@@ -69,7 +69,7 @@ export class VenueModal extends Component {
                     <section class="venue-modal__section">
                         <h3><i class="fa-regular fa-calendar"></i> Schedule</h3>
                         ${renderScheduleTable(venue.schedule, 'venue-modal')}
-                        ${renderDateRange(venue.dateRange, 'venue-modal')}
+                        ${renderActivePeriod(venue.activePeriod, 'venue-modal')}
                     </section>
 
                     ${renderHostSection(venue.host, 'venue-modal')}

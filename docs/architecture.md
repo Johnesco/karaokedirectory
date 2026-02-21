@@ -193,7 +193,7 @@ graph TD
     subgraph PureFns ["Pure Rendering Functions"]
         RST["renderScheduleTable()"]
         RHS["renderHostSection()"]
-        RDR["renderDateRange()"]
+        RDR["renderActivePeriod()"]
         RT["renderTags()"]
         CSL["createSocialLinks()"]
         FHD["formatHostDisplay()"]

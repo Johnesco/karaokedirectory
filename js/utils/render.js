@@ -4,7 +4,7 @@
  */
 
 import { escapeHtml } from './string.js';
-import { formatScheduleEntry, formatDateRangeText } from './date.js';
+import { formatScheduleEntry, formatActivePeriodText } from './date.js';
 import { createSocialLinks, sanitizeUrl } from './url.js';
 
 /**
@@ -57,16 +57,16 @@ export function renderScheduleTable(schedule, classPrefix) {
 }
 
 /**
- * Render a date range notice with icon
- * @param {Object} dateRange - Object with start and/or end date strings
+ * Render an active period notice with icon
+ * @param {Object} activePeriod - Object with start and/or end date strings
  * @param {string} classPrefix - CSS class prefix
- * @returns {string} HTML string or empty if no range
+ * @returns {string} HTML string or empty if no active period
  */
-export function renderDateRange(dateRange, classPrefix) {
-    const text = formatDateRangeText(dateRange);
+export function renderActivePeriod(activePeriod, classPrefix) {
+    const text = formatActivePeriodText(activePeriod);
     if (!text) return '';
 
-    return `<p class="${classPrefix}__date-range"><i class="fa-solid fa-calendar-check"></i> ${text}</p>`;
+    return `<p class="${classPrefix}__active-period"><i class="fa-solid fa-calendar-check"></i> ${text}</p>`;
 }
 
 /**

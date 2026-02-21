@@ -946,13 +946,13 @@ body.view--map .app-layout__detail {
     color: var(--text-primary);
 }
 
-.map-venue-card__date-range {
+.map-venue-card__active-period {
     font-size: var(--font-size-sm);
     color: var(--text-secondary);
     margin: var(--spacing-xs) 0 0;
 }
 
-.map-venue-card__date-range i {
+.map-venue-card__active-period i {
     margin-right: var(--spacing-xs);
     color: var(--color-primary);
 }

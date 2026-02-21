@@ -129,7 +129,7 @@ karaokedirectory/
 │   └── utils/
 │       ├── date.js        # Date formatting, schedule matching
 │       ├── debug.js       # Debug mode utilities
-│       ├── render.js      # Shared rendering (schedule table, host section, date range)
+│       ├── render.js      # Shared rendering (schedule table, host section, active period)
 │       ├── string.js      # Text manipulation, escaping
 │       ├── tags.js        # Venue tag rendering and configuration
 │       ├── url.js         # URL building, sanitization
@@ -192,7 +192,7 @@ When adding or modifying venues in `js/data.js`, follow this structure:
       eventUrl: "https://..."  // Optional: link to event page
     }
   ],
-  dateRange: {                // Optional: for seasonal venues
+  activePeriod: {             // Optional: limits when venue appears
     start: "2026-06-01",      // Venue only appears within this range
     end: "2026-08-31"
   },

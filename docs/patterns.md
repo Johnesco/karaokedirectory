@@ -78,7 +78,7 @@ Full venue with all optional fields:
       eventUrl: "https://example.com/special"
     }
   ],
-  dateRange: {                    // Optional: seasonal venues only
+  activePeriod: {                 // Optional: limits when venue appears
     start: "2026-06-01",
     end: "2026-08-31"
   },
@@ -740,7 +740,7 @@ const text = pluralize(5, 'venue');  // "5 venues"
 
 | File | Purpose | Leaf? |
 |------|---------|-------|
-| `date.js` | Date formatting, schedule matching, date ranges | Yes |
+| `date.js` | Date formatting, schedule matching, active periods | Yes |
 | `string.js` | Text manipulation, escaping, search highlighting | Yes |
 | `url.js` | URL building, sanitization, social links | Yes |
 | `tags.js` | Tag configuration storage and badge rendering | Yes |

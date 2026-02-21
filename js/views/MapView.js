@@ -13,7 +13,7 @@ import { escapeHtml } from '../utils/string.js';
 import { formatScheduleEntry } from '../utils/date.js';
 import { buildDirectionsUrl, buildMapUrl, formatAddress, createSocialLinks, sanitizeUrl } from '../utils/url.js';
 import { renderTags } from '../utils/tags.js';
-import { renderScheduleTable, renderDateRange, renderHostSection } from '../utils/render.js';
+import { renderScheduleTable, renderActivePeriod, renderHostSection } from '../utils/render.js';
 
 export class MapView extends Component {
     init() {
@@ -434,7 +434,7 @@ export class MapView extends Component {
                 <section class="map-venue-card__section">
                     <h4><i class="fa-regular fa-calendar"></i> Schedule</h4>
                     ${renderScheduleTable(venue.schedule, 'map-venue-card')}
-                    ${renderDateRange(venue.dateRange, 'map-venue-card')}
+                    ${renderActivePeriod(venue.activePeriod, 'map-venue-card')}
                 </section>
 
                 ${renderHostSection(venue.host, 'map-venue-card', { socialSize: '' })}

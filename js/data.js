@@ -797,7 +797,7 @@ const karaokeData = {
       "id": "coyote-ugly",
       "name": "Coyote Ugly",
       "active": true,
-      "dateRange": {
+      "activePeriod": {
         "start": "2025-12-18",
         "end": ""
       },
@@ -1806,7 +1806,7 @@ const karaokeData = {
       ],
       "dedicated": false,
       "active": false,
-      "dateRange": {
+      "activePeriod": {
         "start": "2025-12-18",
         "end": "2026-01-11"
       },
