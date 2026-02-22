@@ -94,7 +94,10 @@ async function init() {
     const viewParam = urlParams.get('view');
     const initialView = validViews.includes(viewParam) ? viewParam : 'weekly';
 
-    // Render initial view directly (setState won't trigger if value unchanged)
+    // Sync state to match the URL-driven initial view, then render.
+    // setState alone won't trigger the subscriber if the value matches the
+    // default ('weekly'), so we always call renderView explicitly as well.
+    setState({ view: initialView });
     renderView(initialView);
 
     // Expose helper for map popups
