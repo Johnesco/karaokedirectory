@@ -1382,6 +1382,38 @@ const karaokeData = {
       }
     },
     {
+      "id": "hudsons-on-mercer",
+      "name": "Hudson's On Mercer St.",
+      "dedicated": false,
+      "address": {
+        "street": "381 West Mercer Street",
+        "city": "Dripping Springs",
+        "state": "TX",
+        "zip": "78620"
+      },
+      "schedule": [
+        {
+          "frequency": "every",
+          "day": "Friday",
+          "startTime": "20:00",
+          "endTime": "23:00"
+        }
+      ],
+      "host": {
+        "name": "Armando"
+      },
+      "socials": {
+        "website": "https://www.hudsonsonmercer.com/",
+        "facebook": "https://www.facebook.com/Hudsonsonmer/",
+        "instagram": "https://www.instagram.com/hudsonsonmercer/",
+        "youtube": "https://www.youtube.com/@ChadHudsonMusic/streams"
+      },
+      "coordinates": {
+        "lat": 30.192704771657,
+        "lng": -98.090720840424
+      }
+    },
+    {
       "id": "the-iron-bear",
       "name": "The Iron Bear",
       "tags": [
