@@ -1385,6 +1385,9 @@ const karaokeData = {
       "id": "hudsons-on-mercer",
       "name": "Hudson's On Mercer St.",
       "dedicated": false,
+      "activePeriod": {
+        "start": "2025-02-01"
+      },
       "address": {
         "street": "381 West Mercer Street",
         "city": "Dripping Springs",
