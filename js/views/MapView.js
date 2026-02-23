@@ -11,7 +11,7 @@ import { emit, on, Events } from '../core/events.js';
 import { getVenuesWithCoordinates, getAllVenues } from '../services/venues.js';
 import { escapeHtml } from '../utils/string.js';
 import { formatScheduleEntry } from '../utils/date.js';
-import { buildDirectionsUrl, buildMapUrl, formatAddress, createSocialLinks, sanitizeUrl } from '../utils/url.js';
+import { buildDirectionsUrl, buildMapUrl, formatAddress, createSocialLinks, sanitizeUrl, shareVenue } from '../utils/url.js';
 import { renderTags } from '../utils/tags.js';
 import { renderScheduleTable, renderActivePeriod, renderHostSection } from '../utils/render.js';
 
@@ -428,6 +428,9 @@ export class MapView extends Component {
                         <a href="${directionsUrl}" target="_blank" rel="noopener noreferrer" class="btn btn--secondary btn--small">
                             <i class="fa-solid fa-diamond-turn-right"></i> Directions
                         </a>
+                        <button class="btn btn--secondary btn--small map-venue-card__share" type="button">
+                            <i class="fa-solid fa-share-from-square"></i> Share
+                        </button>
                     </div>
                 </section>
 
@@ -456,6 +459,12 @@ export class MapView extends Component {
         `;
 
         cardEl.classList.add('map-venue-card--expanded');
+
+        // Bind share button
+        const shareBtn = cardEl.querySelector('.map-venue-card__share');
+        if (shareBtn) {
+            shareBtn.addEventListener('click', () => shareVenue(venue, shareBtn));
+        }
     }
 
     hideVenueCard() {

@@ -194,3 +194,29 @@ export function updateHashParams(updates) {
     const current = getHashParams();
     setHashParams({ ...current, ...updates });
 }
+
+/**
+ * Share a venue link via Web Share API (mobile) or clipboard copy (desktop)
+ * @param {Object} venue - Venue object with id and name
+ * @param {HTMLElement} [buttonEl] - Button element for "Copied!" feedback
+ */
+export async function shareVenue(venue, buttonEl) {
+    const url = `${window.location.origin}${window.location.pathname}#view=weekly&venue=${venue.id}`;
+
+    if (navigator.share) {
+        try {
+            await navigator.share({ title: venue.name, url });
+            return;
+        } catch (err) {
+            if (err.name === 'AbortError') return; // user cancelled
+        }
+    }
+
+    // Fallback: copy to clipboard
+    await navigator.clipboard.writeText(url);
+    if (buttonEl) {
+        const originalHTML = buttonEl.innerHTML;
+        buttonEl.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+        setTimeout(() => { buttonEl.innerHTML = originalHTML; }, 2000);
+    }
+}

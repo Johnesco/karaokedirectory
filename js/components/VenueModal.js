@@ -5,7 +5,7 @@
 
 import { Component } from './Component.js';
 import { escapeHtml } from '../utils/string.js';
-import { buildMapUrl, buildDirectionsUrl, createSocialLinks, formatAddress } from '../utils/url.js';
+import { buildMapUrl, buildDirectionsUrl, createSocialLinks, formatAddress, shareVenue } from '../utils/url.js';
 import { on, emit, Events } from '../core/events.js';
 import { getState } from '../core/state.js';
 import { renderTags } from '../utils/tags.js';
@@ -63,6 +63,9 @@ export class VenueModal extends Component {
                             <a href="${directionsUrl}" target="_blank" rel="noopener noreferrer" class="btn btn--secondary">
                                 <i class="fa-solid fa-diamond-turn-right"></i> Directions
                             </a>
+                            <button class="btn btn--secondary venue-modal__share" type="button">
+                                <i class="fa-solid fa-share-from-square"></i> Share
+                            </button>
                         </div>
                     </section>
 
@@ -102,6 +105,11 @@ export class VenueModal extends Component {
 
         // Backdrop click
         this.addEventListener('.venue-modal__backdrop', 'click', () => this.close());
+
+        // Share button
+        this.addEventListener('.venue-modal__share', 'click', (e) => {
+            shareVenue(this.state.venue, e.currentTarget);
+        });
 
         // Escape key
         this._escHandler = (e) => {

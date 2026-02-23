@@ -231,7 +231,7 @@ A card that appears over the map when a marker is selected. Has two states:
 | State | Content |
 |-------|---------|
 | **Summary** | Venue name, tags, schedule, "Directions" link, "Details" button |
-| **Details** (expanded) | Full location, schedule, host, socials, contact info |
+| **Details** (expanded) | Full location, schedule, host, socials, contact info, "Share" button |
 
 - Close button (X) hides the card
 - "Details" button expands the card and shows a back arrow
@@ -371,7 +371,7 @@ The modal opens only when ALL of these conditions are met:
 | Section | Content |
 |---------|---------|
 | Header | Venue name, event name (if special event), tags |
-| Location | Full address, "View Map" button, "Directions" button |
+| Location | Full address, "View Map" button, "Directions" button, "Share" button |
 | Schedule | Schedule table (all entries) + active period notice if applicable |
 | Host | Host name, company, website, social links |
 | Social Media | Venue social links (if any) |
@@ -1068,6 +1068,46 @@ Pub/sub event bus for component communication.
 - `emit(event, data)` — fire event to all subscribers (errors caught per-handler)
 - `clear(event?)` — remove listeners for one or all events
 
+### URL Hash Sync and Shareable Links
+
+**File:** `js/app.js`, `js/utils/url.js`
+
+Venue selections are reflected in the URL hash, enabling shareable direct links to specific venues.
+
+#### Hash Format
+
+`#view=weekly&venue={venue-id}` — e.g., `index.html#view=weekly&venue=egos`
+
+#### Behavior
+
+| Action | URL Effect |
+|--------|-----------|
+| User selects a venue (click, marker, etc.) | Hash updates to `#view=weekly&venue={id}` via `replaceState` |
+| User closes venue detail (modal, pane, card) | Hash is cleared via `replaceState` |
+| Page loads with `#view=weekly&venue={id}` | Switches to weekly view, then opens venue detail |
+| Bare `#venue={id}` (no view param) | Defaults to weekly view, then opens venue detail |
+| Page loads with `#view=weekly`, `#view=map`, etc. | Switches to that view |
+| Legacy `#weekly`, `#alphabetical`, `#map` | Still supported for backwards compatibility |
+
+- `history.replaceState` is used (not `location.hash`) to avoid creating back-button entries for each venue click and to prevent recursive `hashchange` events.
+- On initial page load, `handleHashChange()` is called after views are initialized to handle deep links.
+
+#### Share Button
+
+All three venue detail surfaces include a "Share" button alongside "View Map" and "Directions":
+
+| Surface | Button Class | Location |
+|---------|-------------|----------|
+| Mobile modal (`VenueModal`) | `.venue-modal__share` | Location section map-links |
+| Desktop pane (`VenueDetailPane`) | `.detail-pane__share` | Location section map-links |
+| Map card (`MapView`) | `.map-venue-card__share` | Expanded details map-links |
+
+**Behavior:**
+- **Mobile** (Web Share API available): Opens the native share sheet with venue name and URL
+- **Desktop** (no Web Share API): Copies the venue URL to clipboard and shows "Copied!" feedback on the button for 2 seconds
+
+The `shareVenue(venue, buttonEl)` utility in `js/utils/url.js` handles both paths.
+
 > **Implementation note:** State subscriptions in components use the pattern `this.subscribe(subscribe('key', cb))` — the inner `subscribe()` (from state.js) returns an unsubscribe function, and the outer `this.subscribe()` (from Component.js) stores that function in `_subscriptions[]`. On `destroy()`, Component iterates `_subscriptions` and calls each stored function, automatically cleaning up all listeners. There are three state tiers: **global** (state.js `setState`/`subscribe`), **component-local** (`this.setState` on Component base class — triggers re-render and `onStateChange`), and **service-level** (module-scoped variables in venues.js, mutated by `initVenues()`). See [Architecture: State Management](architecture.md#5-state-management) for diagrams.
 
 ---
@@ -1109,6 +1149,7 @@ Pub/sub event bus for component communication.
 | 2026-02 | 1.0.18 | #30: Unified frequency label and "+N more" indicator into `getScheduleContext()` in `render.js`. Removed inline logic from `VenueCard.compactTemplate()`. Updated Section 6. | Claude Code |
 | 2026-02 | 1.0.19 | #31: Added Display Principle #5 — Balance Visibility. Documented in CLAUDE.md Display Philosophy section. | Claude Code |
 | 2026-02 | 1.0.20 | #32: Replaced "+N more" with smart "Also [days]" / "Everyday" schedule indicator on compact venue cards. Added `buildAlsoText()` and `abbreviateDay()` helpers in `render.js`. Updated Section 6. | Claude Code |
+| 2026-02 | 1.0.21 | Shareable venue links: URL hash syncs with venue selection (`#venue={id}`), share button on all detail surfaces (modal, pane, map card) with Web Share API / clipboard fallback. Added `shareVenue()` to `url.js`. Updated Sections 4, 7, 21. | Claude Code |
 
 ---
 

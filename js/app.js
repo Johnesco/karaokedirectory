@@ -14,6 +14,7 @@ import { AlphabeticalView } from './views/AlphabeticalView.js';
 import { MapView } from './views/MapView.js';
 import { initDebugMode } from './utils/debug.js';
 import { initTagConfig } from './utils/tags.js';
+import { getHashParams } from './utils/url.js';
 
 // View instances
 let navigation = null;
@@ -62,7 +63,7 @@ async function init() {
     venueDetailPane = new VenueDetailPane('#venue-detail-pane');
     venueDetailPane.render();
 
-    // Handle venue selection highlighting
+    // Handle venue selection highlighting + URL hash sync
     on(Events.VENUE_SELECTED, (venue) => {
         // Remove selected state from all venue cards
         document.querySelectorAll('.venue-card--selected').forEach(card => {
@@ -73,6 +74,8 @@ async function init() {
             document.querySelectorAll(`[data-venue-id="${venue.id}"]`).forEach(card => {
                 card.classList.add('venue-card--selected');
             });
+            // Update URL hash (replaceState avoids triggering hashchange)
+            history.replaceState(null, '', '#view=weekly&venue=' + venue.id);
         }
     });
 
@@ -81,6 +84,8 @@ async function init() {
         document.querySelectorAll('.venue-card--selected').forEach(card => {
             card.classList.remove('venue-card--selected');
         });
+        // Clear URL hash
+        history.replaceState(null, '', window.location.pathname + window.location.search);
     });
 
     // Subscribe to view changes
@@ -121,6 +126,9 @@ async function init() {
             }
         }, 50);
     };
+
+    // Handle initial deep link (e.g. #venue=xyz on page load)
+    handleHashChange();
 
     // Expose helper to check if viewing current week
     window.isCurrentWeek = () => {
@@ -224,16 +232,32 @@ function renderView(viewName) {
  * Handle URL hash for deep linking
  */
 function handleHashChange() {
-    const hash = window.location.hash.slice(1);
+    const params = getHashParams();
+    const validViews = ['weekly', 'alphabetical', 'map'];
 
-    if (hash.startsWith('venue=')) {
-        const venueId = hash.split('=')[1];
-        const venue = getVenueById(venueId);
+    // Switch view if specified
+    if (params.view && validViews.includes(params.view)) {
+        if (getState('view') !== params.view) {
+            setState({ view: params.view });
+        }
+    }
+
+    // Open venue if specified
+    if (params.venue) {
+        const venue = getVenueById(params.venue);
         if (venue) {
+            // Default to weekly view for venue links if no view was specified
+            if (!params.view && getState('view') !== 'weekly') {
+                setState({ view: 'weekly' });
+            }
             emit(Events.VENUE_SELECTED, venue);
         }
-    } else if (['weekly', 'alphabetical', 'map'].includes(hash)) {
-        setState({ view: hash });
+    } else if (!params.view) {
+        // Legacy single-value hashes (e.g. #weekly)
+        const hash = window.location.hash.slice(1);
+        if (validViews.includes(hash)) {
+            setState({ view: hash });
+        }
     }
 }
 

@@ -5,7 +5,7 @@
 
 import { Component } from './Component.js';
 import { escapeHtml } from '../utils/string.js';
-import { buildMapUrl, buildDirectionsUrl, createSocialLinks, formatAddress } from '../utils/url.js';
+import { buildMapUrl, buildDirectionsUrl, createSocialLinks, formatAddress, shareVenue } from '../utils/url.js';
 import { on, emit, Events } from '../core/events.js';
 import { renderTags } from '../utils/tags.js';
 import { renderScheduleTable, renderActivePeriod, renderHostSection } from '../utils/render.js';
@@ -55,6 +55,9 @@ export class VenueDetailPane extends Component {
                         <a href="${directionsUrl}" target="_blank" rel="noopener noreferrer" class="btn btn--secondary">
                             <i class="fa-solid fa-diamond-turn-right"></i> Directions
                         </a>
+                        <button class="btn btn--secondary detail-pane__share" type="button">
+                            <i class="fa-solid fa-share-from-square"></i> Share
+                        </button>
                     </div>
                 </section>
 
@@ -83,6 +86,15 @@ export class VenueDetailPane extends Component {
                 ` : ''}
             </div>
         `;
+    }
+
+    afterRender() {
+        if (!this.state.venue) return;
+
+        // Share button
+        this.addEventListener('.detail-pane__share', 'click', (e) => {
+            shareVenue(this.state.venue, e.currentTarget);
+        });
     }
 
     renderEmptyState() {

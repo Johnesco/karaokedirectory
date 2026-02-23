@@ -917,6 +917,7 @@ body.view--map .app-layout__detail {
 
 .map-venue-card__map-links {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--spacing-sm);
     margin-top: var(--spacing-xs);
 }
