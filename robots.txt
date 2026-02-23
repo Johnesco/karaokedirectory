@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Disallow: /editor.html
+Disallow: /docs/
+
+Sitemap: https://karaokedirectory.com/sitemap.xml

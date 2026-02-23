@@ -1112,7 +1112,51 @@ The `shareVenue(venue, buttonEl)` utility in `js/utils/url.js` handles both path
 
 ---
 
-## 22 Known Discrepancies
+## 22 SEO and Social Metadata
+
+### Meta Descriptions
+
+Each public-facing page includes a `<meta name="description">` tag with a concise summary (~150 characters) for search engine result snippets.
+
+| Page | Description |
+|------|-------------|
+| `index.html` | "Find karaoke in Austin, TX. Browse 70+ venues by day, search by name or neighborhood, and explore the interactive map." |
+| `about.html` | "Learn about the Greater Austin Karaoke Directory — a community-sourced guide to karaoke nights across Austin, Texas." |
+| `submit.html` | "Submit a karaoke venue to the Greater Austin Karaoke Directory. Help us keep Austin's karaoke scene up to date." |
+| `bingo.html` | "Play Karaoke Bingo at your next karaoke night! A fun interactive game from the Austin Karaoke Directory." |
+| `codeexplained.html` | "An interactive guide to the Austin Karaoke Directory codebase — learn how vanilla JavaScript, HTML, and CSS power the app." |
+
+### Open Graph and Twitter Card Tags
+
+Each public page includes Open Graph (`og:title`, `og:description`, `og:type`, `og:url`) and Twitter Card (`twitter:card`, `twitter:title`, `twitter:description`) meta tags. These control how links appear when shared on social media. No `og:image` or `twitter:image` is set — shares use text-only cards until a social preview image is added.
+
+### Canonical URLs
+
+Each public page includes a `<link rel="canonical">` tag pointing to its canonical URL on `https://karaokedirectory.com/`. This prevents duplicate content issues if the site is accessible from multiple domains or with query parameters.
+
+### Crawler Directives
+
+**`robots.txt`** (project root):
+- Allows all crawlers to index public pages
+- Disallows `/editor.html` and `/docs/` (internal tools)
+- References `sitemap.xml`
+
+**`sitemap.xml`** (project root):
+- Lists all 5 public pages for search engine discovery
+- Does not include `editor.html` or `docs/`
+
+**`editor.html`** has an additional `<meta name="robots" content="noindex, nofollow">` tag as a belt-and-suspenders measure alongside `robots.txt`.
+
+### Pages Excluded from Indexing
+
+| Page | Reason | Mechanism |
+|------|--------|-----------|
+| `editor.html` | Internal dev tool | `robots.txt` + `noindex` meta tag |
+| `docs/index.html` | Developer documentation (Docsify) | `robots.txt` |
+
+---
+
+## 23 Known Discrepancies
 
 > Items listed here represent differences found between existing documentation and code during the initial spec creation. Each must be validated and resolved.
 
@@ -1124,7 +1168,7 @@ The `shareVenue(venue, buttonEl)` utility in `js/utils/url.js` handles both path
 
 ---
 
-## 23 Change Log
+## 24 Change Log
 
 | Date | Version | Change | Author |
 |------|---------|--------|--------|
@@ -1150,6 +1194,7 @@ The `shareVenue(venue, buttonEl)` utility in `js/utils/url.js` handles both path
 | 2026-02 | 1.0.19 | #31: Added Display Principle #5 — Balance Visibility. Documented in CLAUDE.md Display Philosophy section. | Claude Code |
 | 2026-02 | 1.0.20 | #32: Replaced "+N more" with smart "Also [days]" / "Everyday" schedule indicator on compact venue cards. Added `buildAlsoText()` and `abbreviateDay()` helpers in `render.js`. Updated Section 6. | Claude Code |
 | 2026-02 | 1.0.21 | Shareable venue links: URL hash syncs with venue selection (`#venue={id}`), share button on all detail surfaces (modal, pane, map card) with Web Share API / clipboard fallback. Added `shareVenue()` to `url.js`. Updated Sections 4, 7, 21. | Claude Code |
+| 2026-02 | 1.0.22 | SEO quick wins: Added meta descriptions, Open Graph tags, Twitter Card tags, and canonical URLs to all 5 public pages. Created `robots.txt` and `sitemap.xml`. Added `noindex` to `editor.html`. New Section 22. Renumbered Sections 22–23 → 23–24. | Claude Code |
 
 ---
 
