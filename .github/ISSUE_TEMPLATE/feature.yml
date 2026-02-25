@@ -21,7 +21,7 @@ body:
       description: Specific, testable conditions that must be true when this is done.
       value: |
         - [ ] Feature implemented and working
-        - [ ] Functional Spec updated (`docs/functional-spec.md`)
+        - [ ] Project spec updated (if behavior changed)
         - [ ] CLAUDE.md updated (if architecture changed)
         - [ ] README.md updated (if public-facing)
   - type: textarea

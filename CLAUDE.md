@@ -78,7 +78,8 @@ karaokedirectory/
 │       ├── config.yml     # Disable blank issues
 │       ├── feature.yml    # Feature/user story issue template
 │       ├── bug.yml        # Bug report issue template
-│       ├── chore.yml      # Refactors, deps, tooling template
+│       ├── task.yml       # Refactors, deps, tooling template
+│       ├── spike.yml      # Research/investigation template
 │       └── doc.yml        # Documentation-only changes template
 ├── CLAUDE.md              # THIS FILE - Claude project memory
 ├── README.md              # Public documentation
@@ -360,8 +361,8 @@ When enabled:
 
 <!-- ============================================================
      SDLC WORKFLOW
-     This section is universal across all projects using the
-     sdlc-baseline process. Keep in sync with CLAUDE-TEMPLATE.md.
+     This section is universal. It works across any project that
+     uses GitHub Issues + Projects for tracking.
 
      Source: https://github.com/Johnesco/sdlc-baseline
      ============================================================ -->
@@ -373,7 +374,7 @@ When enabled:
 | Role | Owner | Board Columns | Key Rule |
 |------|-------|---------------|----------|
 | **PO** (Product Owner) | Human | Backlog, Done | Decides priority, accepts work |
-| **BA** (Business Analyst) | Human or Claude | Refining, Ready | Scopes tickets, writes acceptance criteria |
+| **BA** (Business Analyst) | Human or Claude | Backlog, Ready | Scopes tickets, writes acceptance criteria |
 | **Dev** (Developer) | Claude (primary) | In Progress | Writes code, follows conventions |
 | **Documenter** | Claude (bundled with Dev) | In Progress | Updates spec, CLAUDE.md, README |
 | **QA** (Quality Assurance) | **Human (always)** | **Verify** | Verifies completed work |
@@ -390,7 +391,9 @@ When enabled:
 
 Every software change — feature, bug fix, refactor, or data update — follows this sequence. No step may be skipped.
 
-The **Functional Specification** (`docs/functional-spec.md`) is the authoritative record of all application features, behavior, and data formats. It is the single source of truth for what this application does.
+The **project specification** (`docs/functional-spec.md`) is the authoritative record of all application features, behavior, and data formats. It is the single source of truth for what this application does.
+
+> If your project does not yet have a spec, treat CLAUDE.md as the primary record until one exists.
 
 **Before ANY change**, follow these steps in order:
 
@@ -402,7 +405,7 @@ The **Functional Specification** (`docs/functional-spec.md`) is the authoritativ
    > ```
    > An issue that is not on the board is considered incomplete. This is a known gotcha — do not skip this step.
 
-2. **Review documentation for affected areas** — Read the sections of the Functional Specification (and other docs like CLAUDE.md, README.md) that describe the area being changed. Identify what exists, what will be impacted, and note any discrepancies.
+2. **Review documentation for affected areas** — Read the sections of the spec (and other docs like CLAUDE.md, README.md) that describe the area being changed. Identify what exists, what will be impacted, and note any discrepancies.
 
 3. **Flag discrepancies** — If existing code already differs from what the documentation says, stop and flag the mismatch for validation before proceeding. Do not silently "fix" documentation to match code or vice versa without explicit confirmation.
 
@@ -410,7 +413,7 @@ The **Functional Specification** (`docs/functional-spec.md`) is the authoritativ
 
 5. **Implement the change** — Write the code. Reference the ticket number (`#XX`) in commits.
 
-6. **Update all documentation** — Update the Functional Specification, CLAUDE.md, README.md, and any other affected docs so they accurately reflect the new state. This is not optional — a change is not complete until its documentation is current.
+6. **Update all documentation** — Update the spec, CLAUDE.md, README.md, and any other affected docs so they accurately reflect the new state. This is not optional — a change is not complete until its documentation is current.
 
 7. **Verify consistency** — After updating, confirm that the documentation and code are in agreement. Any remaining gaps must be called out explicitly.
 
@@ -419,13 +422,13 @@ The **Functional Specification** (`docs/functional-spec.md`) is the authoritativ
 - A change without a corresponding documentation update is considered **incomplete**
 - Documentation updates are part of the definition of done, not a follow-up task
 - When in doubt about whether docs need updating, they do
-- The Functional Specification is the primary document; CLAUDE.md and README.md are secondary but must stay consistent
+- The spec is the primary document; CLAUDE.md and README.md are secondary but must stay consistent
 
 ### Compressing Steps for Small Changes
 
 Not every change needs the full ceremony. Here's when you can compress:
 
-- **Data-only changes** (adding a venue, fixing a typo): Steps 2-4 can compress into a quick scan. Still need a ticket (Step 1) and human verification (Step 7).
+- **Data-only changes** (adding a record, fixing a typo): Steps 2-4 can compress into a quick scan. Still need a ticket (Step 1) and human verification (Step 7).
 - **Bug fixes with obvious cause**: Step 2 becomes "confirm the spec describes the expected behavior." Steps 3-4 can compress into a single issue comment.
 - **Documentation-only changes**: Step 5 becomes "edit the docs" instead of "write code." Step 6 is the main deliverable.
 - **When NOT to compress**: New features, changes affecting multiple files, changes where you're unsure about existing behavior, anything that modifies user-facing behavior.
@@ -434,35 +437,26 @@ Not every change needs the full ceremony. Here's when you can compress:
 1. **Ticket first** — Follow the workflow above before all else
 2. **Read before editing** — Always read files before modifying them
 3. **Follow existing patterns** — Match the coding style already in use
-4. **Keep it simple** — This project intentionally avoids over-engineering
-5. **Test responsively** — Changes should work on mobile and desktop
+4. **Keep it simple** — Avoid over-engineering
 
 ### Maintaining Documentation
 
-**UPDATE the Functional Specification** (`docs/functional-spec.md`) when you:
+**UPDATE the project spec** when you:
 - Add, modify, or remove any feature
 - Fix a bug that changes observable behavior
-- Change data formats or venue fields
+- Change data formats or API contracts
 - Alter UI behavior, states, or interactions
-- Modify search, filtering, or navigation logic
 
 **UPDATE CLAUDE.md** when you:
 - Add new features or pages
 - Change the file structure
 - Modify architectural patterns
-- Add new venue data fields
 - Make significant design decisions
 
 **UPDATE README.md** when changes affect:
 - Public-facing feature descriptions
 - Setup or usage instructions
-- Project overview or screenshots
-
-### Security Considerations
-- Always use `escapeHtml()` when rendering user-provided content
-- Use `sanitizeUrl()` for any URLs before rendering
-- Never store API keys or secrets in code
-- Validate all form inputs
+- Project overview
 
 ## Development Workflow
 
@@ -470,9 +464,10 @@ Not every change needs the full ceremony. Here's when you can compress:
 
 All work is tracked in **GitHub Issues** with a **GitHub Projects** kanban board.
 
-- **Issues** = All work items (features, bugs, docs, chores)
-- **Labels** = Type (`feature`, `bug`, `docs`, `chore`) + Area (`area:frontend`, `area:data`, etc.) + Priority (`priority:high`, `priority:low`)
-- **Milestones** = Major feature areas aligned to Functional Spec sections (replace Taiga epics). Every issue must have a milestone by the time it ships. If no existing milestone fits, create a new one.
+- **Issues** = All work items (features, bugs, docs, tasks, spikes)
+- **Labels** = Type (`feature`, `bug`, `docs`, `task`, `spike`) + Area (`area:frontend`, `area:data`, etc.) + Priority (`priority:high`, `priority:low`) + Resolution (`resolution:wontfix`, `resolution:duplicate`, etc.)
+  - Resolution labels are only applied when closing an issue **without completing the work**. No resolution label = completed.
+- **Milestones** = Major feature areas. Every issue must have a milestone by the time it ships. If no existing milestone fits, create a new one.
 - **Projects board** = Visual kanban for tracking status
 
 ### Milestones
@@ -497,8 +492,7 @@ All work is tracked in **GitHub Issues** with a **GitHub Projects** kanban board
 
 | Column | What's Here |
 |--------|-------------|
-| **Backlog** | Captured but not yet scoped |
-| **Refining** | Defining scope and requirements |
+| **Backlog** | Captured; refinement happens here (doc review, scope, AC) |
 | **Ready** | Acceptance criteria finalized, ready to build |
 | **In Progress** | Actively being coded |
 | **Verify** | Code complete, awaiting human testing |
@@ -519,8 +513,7 @@ These transitions are **manual** and must be set during the workflow:
 
 | Transition | When to Move |
 |------------|-------------|
-| Backlog → Refining | When scoping/discussing the issue |
-| Refining → Ready | When acceptance criteria are finalized |
+| Backlog → Ready | Refinement checklist complete, acceptance criteria finalized |
 | Ready → In Progress | When coding begins |
 | In Progress → Verify | When code is complete, awaiting testing |
 
@@ -543,7 +536,8 @@ Where `XX` is the GitHub Issue number. Use `Fixes #XX` in PR body for auto-close
 | `feature/` | New features |
 | `fix/` | Bug fixes |
 | `docs/` | Documentation changes |
-| `chore/` | Refactors, tooling, dependencies |
+| `task/` | Refactors, tooling, dependencies |
+| `spike/` | Research, investigation |
 
 Use lowercase and hyphens. Include issue number if helpful: `feature/12-avatar-upload`. Solo projects can commit to main freely — branch when changes need review or span multiple sessions.
 
@@ -574,6 +568,12 @@ The PO can override the default mapping when business context warrants it (e.g.,
      END SDLC WORKFLOW
      Everything below this line is project-specific.
      ============================================================ -->
+
+## Security Considerations
+- Always use `escapeHtml()` when rendering user-provided content
+- Use `sanitizeUrl()` for any URLs before rendering
+- Never store API keys or secrets in code
+- Validate all form inputs
 
 ## Related Documentation
 
