@@ -1199,6 +1199,9 @@ const karaokeData = {
         "website": "https://drafthouse.com/austin/theater-bar/south-lamar",
         "instagram": "https://www.instagram.com/highballaustin/?hl=en"
       },
+      "tags": [
+        "lgbtq"
+      ],
       "coordinates": {
         "lat": 30.255811,
         "lng": -97.7636195
@@ -1220,19 +1223,23 @@ const karaokeData = {
         {
           "frequency": "once",
           "date": "2026-02-28",
-          "startTime": "21:00",
-          "endTime": "02:00",
-          "eventName": "Story-Oke @ Highball!"
+          "startTime": "19:30",
+          "endTime": "21:00",
+          "eventName": "Story-Oke @ Highball!",
+          "eventUrl": "https://fb.me/e/5vGkMpOuE"
         }
       ],
       "host": {
-        "name": "Xpider Cantu",
-        "website": "https://www.xpidermagic.com/karaoke"
+        "company": "Story-Oke Austin",
+        "website": "https://www.storyokeaustin.com/"
       },
       "socials": {
         "website": "https://drafthouse.com/austin/theater-bar/south-lamar",
         "instagram": "https://www.instagram.com/highballaustin/?hl=en"
       },
+      "tags": [
+        "lgbtq"
+      ],
       "coordinates": {
         "lat": 30.255811,
         "lng": -97.7636195
