@@ -1225,7 +1225,7 @@ const karaokeData = {
           "date": "2026-02-28",
           "startTime": "19:30",
           "endTime": "21:00",
-          "eventName": "Story-Oke @ Highball!",
+          "eventName": "Story-Oke: Breakups @ Highball!",
           "eventUrl": "https://fb.me/e/5vGkMpOuE"
         }
       ],
