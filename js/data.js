@@ -1205,6 +1205,40 @@ const karaokeData = {
       }
     },
     {
+      "id": "the-highball-storyoke",
+      "name": "The Highball",
+      "active": true,
+      "dedicated": false,
+      "address": {
+        "street": "1120 S Lamar Blvd",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78704",
+        "neighborhood": ""
+      },
+      "schedule": [
+        {
+          "frequency": "once",
+          "date": "2026-02-28",
+          "startTime": "21:00",
+          "endTime": "02:00",
+          "eventName": "Story-Oke @ Highball!"
+        }
+      ],
+      "host": {
+        "name": "Xpider Cantu",
+        "website": "https://www.xpidermagic.com/karaoke"
+      },
+      "socials": {
+        "website": "https://drafthouse.com/austin/theater-bar/south-lamar",
+        "instagram": "https://www.instagram.com/highballaustin/?hl=en"
+      },
+      "coordinates": {
+        "lat": 30.255811,
+        "lng": -97.7636195
+      }
+    },
+    {
       "id": "the-hive",
       "name": "The Hive",
       "tags": [
