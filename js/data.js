@@ -1606,6 +1606,41 @@ const karaokeData = {
       }
     },
     {
+      "id": "the-lions-den-tea",
+      "name": "The Lion's Den Tea",
+      "active": true,
+      "dedicated": false,
+      "address": {
+        "street": "760 Airport Blvd Suite 168",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78702"
+      },
+      "schedule": [
+        {
+          "frequency": "once",
+          "date": "2026-03-05",
+          "startTime": "18:00",
+          "endTime": "21:00",
+          "eventName": "Sip and Sing",
+          "eventUrl": "https://www.facebook.com/share/1FnpwKxHaY/"
+        }
+      ],
+      "host": {
+        "company": "Lion's Den Tea"
+      },
+      "socials": {
+        "instagram": "https://www.instagram.com/lionsdentea/"
+      },
+      "tags": [
+        "lgbtq"
+      ],
+      "coordinates": {
+        "lat": 30.2545224,
+        "lng": -97.6931045
+      }
+    },
+    {
       "id": "lone-star-bar",
       "name": "Lone Star Bar",
       "active": true,
