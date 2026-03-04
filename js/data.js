@@ -971,36 +971,43 @@ const karaokeData = {
     {
       "id": "the-fieldhouse-at-the-crossover",
       "name": "The Fieldhouse at the Crossover",
-      "tags": [
-        "sports-bar",
-        "family-friendly"
-      ],
+      "active": true,
       "dedicated": false,
       "address": {
         "street": "1717 Scottsdale Dr Suite 160",
         "city": "Leander",
         "state": "TX",
-        "zip": "78641"
+        "zip": "78641",
+        "neighborhood": ""
       },
       "schedule": [
         {
           "frequency": "every",
-          "day": "Wednesday",
+          "day": "thursday",
           "startTime": "19:00",
           "endTime": "22:00"
         }
       ],
       "host": {
-        "company": "Texas Live Band Karaoke"
+        "company": "Texas Live Band Karaoke",
+        "website": "https://www.facebook.com/texaslbk"
       },
       "socials": {
+        "website": "https://www.thefieldhousetexas.com/",
         "facebook": "https://www.facebook.com/thefieldhousetexas/",
-        "instagram": "https://www.instagram.com/thefieldhousetexas",
-        "website": "https://www.thefieldhousetexas.com/"
+        "instagram": "https://www.instagram.com/thefieldhousetexas"
       },
+      "tags": [
+        "sports-bar",
+        "family-friendly",
+        "live-band-karaoke"
+      ],
       "coordinates": {
         "lat": 30.550840314015,
         "lng": -97.816453231715
+      },
+      "activePeriod": {
+        "start": "2026-03-04"
       }
     },
     {
