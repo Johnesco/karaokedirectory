@@ -426,8 +426,8 @@ const karaokeData = {
         }
       ],
       "host": {
-        "name": "Dan DeSetto",
-        "company": "Heart of Texas Music Entertainment"
+        "name": "KJ Average Joe",
+        "company": "Starling Karaoke"
       },
       "socials": {
         "facebook": "https://www.facebook.com/boomerzaustin",
@@ -2075,7 +2075,7 @@ const karaokeData = {
         }
       ],
       "host": {
-        "name": "KJ Average Joe",
+        "name": "KJ Stephanie",
         "company": "Starling Karaoke"
       },
       "socials": {
@@ -2142,7 +2142,7 @@ const karaokeData = {
         }
       ],
       "host": {
-        "name": "Average Joe",
+        "name": "KJ J3N",
         "company": "Starling Karaoke"
       },
       "socials": {
