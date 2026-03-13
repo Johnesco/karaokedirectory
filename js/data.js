@@ -1192,7 +1192,21 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "once",
-          "date": "2026-02-28",
+          "date": "2026-03-13",
+          "startTime": "21:00",
+          "endTime": "02:00",
+          "eventName": "Karaoke with Xpider @ Highball!"
+        },
+        {
+          "frequency": "once",
+          "date": "2026-03-14",
+          "startTime": "21:00",
+          "endTime": "02:00",
+          "eventName": "Karaoke with Xpider @ Highball!"
+        },
+        {
+          "frequency": "once",
+          "date": "2026-03-15",
           "startTime": "21:00",
           "endTime": "02:00",
           "eventName": "Karaoke with Xpider @ Highball!"
