@@ -2014,7 +2014,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "Thursday",
+          "day": "Friday",
           "startTime": "18:00",
           "endTime": "21:00"
         }
