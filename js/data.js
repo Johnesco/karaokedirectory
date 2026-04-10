@@ -2647,6 +2647,41 @@ const karaokeData = {
       }
     },
     {
+      "id": "texas-bar-and-grill",
+      "name": "Texas Bar & Grill",
+      "tags": [
+        "restaurant"
+      ],
+      "dedicated": false,
+      "address": {
+        "street": "14611 N Mo Pac Expy Ste 100",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78728"
+      },
+      "schedule": [
+        {
+          "frequency": "second",
+          "day": "Thursday",
+          "startTime": "20:00",
+          "endTime": "00:00"
+        },
+        {
+          "frequency": "fourth",
+          "day": "Thursday",
+          "startTime": "20:00",
+          "endTime": "00:00"
+        }
+      ],
+      "host": {
+        "company": "All About Music"
+      },
+      "coordinates": {
+        "lat": 30.4501661,
+        "lng": -97.6946604
+      }
+    },
+    {
       "id": "topspin-austin",
       "name": "TopSpin Austin",
       "tags": [
