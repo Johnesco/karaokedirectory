@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="John's Double Karaoke Night — a birthday invite from the Austin Karaoke Directory.">
+    <meta property="og:title" content="John's Double Karaoke Night">
+    <meta property="og:description" content="Dinner, StoryOke, and Xpider Karaoke — all in one night at The Highball.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://karaokedirectory.com/bday">
+    <meta name="twitter:card" content="summary">
+    <link rel="canonical" href="https://karaokedirectory.com/bday">
+    <title>John's Double Karaoke Night 🎤🎂</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+
+    <style>
+        /* ============================
+           Birthday page — self-contained styles
+           ============================ */
+
+        :root {
+            --bday-accent: #ffd166;
+            --bday-pink: #ff6b9d;
+            --bday-purple: #b388ff;
+            --bday-teal: #4dd0e1;
+        }
+
+        body {
+            background-image: none;
+            background:
+                radial-gradient(circle at 10% 0%, rgba(179, 136, 255, 0.25), transparent 50%),
+                radial-gradient(circle at 90% 10%, rgba(255, 107, 157, 0.25), transparent 50%),
+                radial-gradient(circle at 50% 100%, rgba(77, 208, 225, 0.18), transparent 50%),
+                var(--bg-primary);
+            background-attachment: fixed;
+        }
+
+        .bday-main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: var(--spacing-lg) var(--spacing-md) var(--spacing-2xl);
+        }
+
+        /* --- Hero --- */
+        .bday-hero {
+            position: relative;
+            text-align: center;
+            padding: var(--spacing-2xl) var(--spacing-md);
+            margin-bottom: var(--spacing-xl);
+            overflow: hidden;
+            border-radius: var(--border-radius-lg);
+            background: linear-gradient(
+                135deg,
+                rgba(179, 136, 255, 0.20),
+                rgba(255, 107, 157, 0.20),
+                rgba(255, 209, 102, 0.15)
+            );
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .bday-hero__eyebrow,
+        .bday-hero__title,
+        .bday-hero__subtitle,
+        .bday-hero__date {
+            position: relative;
+            z-index: 1;
+        }
+
+        .bday-hero__eyebrow {
+            display: inline-block;
+            font-size: var(--font-size-sm);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--bday-accent);
+            margin-bottom: var(--spacing-sm);
+            font-weight: 600;
+        }
+
+        .bday-hero__title {
+            font-size: clamp(2rem, 6vw, 3.25rem);
+            line-height: 1.15;
+            margin-bottom: var(--spacing-md);
+            background: linear-gradient(90deg, var(--bday-pink), var(--bday-purple), var(--bday-teal));
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: bday-gradient 6s linear infinite;
+        }
+
+        @keyframes bday-gradient {
+            0%   { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        .bday-hero__subtitle {
+            font-size: var(--font-size-lg);
+            color: var(--text-secondary);
+            max-width: 42ch;
+            margin: 0 auto var(--spacing-lg);
+        }
+
+        .bday-hero__date {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 999px;
+            color: var(--bday-accent);
+            font-weight: 600;
+        }
+
+        /* Floating emojis */
+        .bday-floaters {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .bday-floater {
+            position: absolute;
+            font-size: 1.75rem;
+            opacity: 0.85;
+            animation: bday-float 9s ease-in-out infinite;
+            will-change: transform;
+        }
+
+        .bday-floater:nth-child(1) { left:  4%; top: 78%; animation-delay: 0s;   }
+        .bday-floater:nth-child(2) { left: 12%; top: 88%; animation-delay: 1.2s; font-size: 2.2rem; }
+        .bday-floater:nth-child(3) { left: 90%; top: 82%; animation-delay: 2.1s; }
+        .bday-floater:nth-child(4) { left: 82%; top: 90%; animation-delay: 0.8s; font-size: 2rem; }
+        .bday-floater:nth-child(5) { left:  2%; top: 10%; animation-delay: 3.0s; }
+        .bday-floater:nth-child(6) { left: 94%; top: 14%; animation-delay: 1.8s; }
+
+        @keyframes bday-float {
+            0%, 100% { transform: translateY(0) rotate(-4deg); }
+            50%      { transform: translateY(-14px) rotate(4deg); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .bday-hero__title { animation: none; }
+            .bday-floater     { animation: none; }
+        }
+
+        /* --- Itinerary --- */
+        .bday-section-title {
+            font-size: var(--font-size-2xl);
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+            color: var(--text-primary);
+        }
+
+        .bday-section-title .bday-emoji {
+            display: inline-block;
+            animation: bday-wiggle 2.5s ease-in-out infinite;
+            transform-origin: 50% 80%;
+        }
+
+        @keyframes bday-wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25%      { transform: rotate(-12deg); }
+            75%      { transform: rotate(12deg); }
+        }
+
+        .bday-timeline {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .bday-stop {
+            position: relative;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: var(--spacing-md);
+            align-items: start;
+            padding: var(--spacing-lg);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            transition: transform var(--transition), border-color var(--transition);
+        }
+
+        .bday-stop:hover {
+            transform: translateY(-2px);
+            border-color: var(--color-primary-light);
+        }
+
+        .bday-stop__number {
+            width: 3rem;
+            height: 3rem;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--bday-purple), var(--bday-pink));
+            color: var(--color-white);
+            font-weight: 700;
+            font-size: var(--font-size-xl);
+            box-shadow: var(--shadow);
+        }
+
+        .bday-stop__body h3 {
+            margin-bottom: var(--spacing-xs);
+            font-size: var(--font-size-xl);
+            color: var(--color-primary-dark);
+        }
+
+        .bday-stop__time {
+            display: inline-block;
+            margin-bottom: var(--spacing-sm);
+            color: var(--bday-accent);
+            font-weight: 600;
+            font-size: var(--font-size-sm);
+        }
+
+        .bday-stop__meta {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            margin-top: var(--spacing-sm);
+        }
+
+        .bday-stop__meta a {
+            color: var(--color-primary-light);
+        }
+
+        .bday-stop__desc {
+            color: var(--text-secondary);
+            font-size: var(--font-size-base);
+        }
+
+        .bday-stop--special {
+            border: 1px solid rgba(255, 209, 102, 0.35);
+            background:
+                linear-gradient(135deg, rgba(255, 209, 102, 0.08), rgba(255, 107, 157, 0.06)),
+                var(--bg-card);
+        }
+
+        /* --- Parking callout --- */
+        .bday-parking {
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--bday-teal);
+            border-radius: var(--border-radius);
+        }
+
+        .bday-parking h3 {
+            margin-bottom: var(--spacing-xs);
+            font-size: var(--font-size-lg);
+            color: var(--bday-teal);
+        }
+
+        .bday-parking p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+        }
+
+        /* --- CTA --- */
+        .bday-cta {
+            text-align: center;
+            padding: var(--spacing-xl) var(--spacing-md);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .bday-cta h2 {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .bday-cta p {
+            color: var(--text-secondary);
+            max-width: 48ch;
+            margin: 0 auto var(--spacing-lg);
+        }
+
+        .bday-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md) var(--spacing-xl);
+            background: linear-gradient(135deg, #1877f2, #0a5dc5);
+            color: var(--color-white);
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: var(--font-size-lg);
+            box-shadow: var(--shadow);
+            transition: transform var(--transition), box-shadow var(--transition);
+        }
+
+        .bday-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            text-decoration: none;
+            color: var(--color-white);
+        }
+
+        .bday-btn[aria-disabled="true"] {
+            background: var(--color-gray-700);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .bday-btn[aria-disabled="true"]:hover {
+            transform: none;
+            box-shadow: var(--shadow);
+        }
+
+        /* --- Confetti ribbon --- */
+        .bday-confetti {
+            position: fixed;
+            inset: 0 0 auto 0;
+            height: 0;
+            pointer-events: none;
+            z-index: var(--z-toast);
+            overflow: visible;
+        }
+
+        .bday-confetti span {
+            position: absolute;
+            top: -20px;
+            width: 8px;
+            height: 14px;
+            border-radius: 2px;
+            opacity: 0;
+            animation: bday-fall linear infinite;
+        }
+
+        @keyframes bday-fall {
+            0%   { transform: translateY(-20px) rotate(0deg);   opacity: 0; }
+            10%  { opacity: 1; }
+            100% { transform: translateY(110vh) rotate(720deg); opacity: 0.9; }
+        }
+
+        /* --- Desktop refinements --- */
+        @media (min-width: 768px) {
+            .bday-main {
+                padding: var(--spacing-2xl) var(--spacing-xl);
+            }
+
+            .bday-hero {
+                padding: var(--spacing-2xl) var(--spacing-2xl);
+            }
+
+            .bday-timeline {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-lg);
+            }
+
+            .bday-stop {
+                padding: var(--spacing-xl);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bday-confetti" id="bday-confetti" aria-hidden="true"></div>
+
+    <header class="site-header site-header--compact">
+        <div class="site-header__content">
+            <h1 class="site-header__title">
+                <i class="fa-solid fa-cake-candles"></i> You're Invited
+            </h1>
+            <p class="site-header__tagline">A karaoke directory birthday special</p>
+        </div>
+    </header>
+
+    <nav class="navigation-container">
+        <div class="navigation">
+            <a href="index.html" class="nav-btn">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back to Directory</span>
+            </a>
+        </div>
+    </nav>
+
+    <main class="bday-main">
+        <section class="bday-hero">
+            <div class="bday-floaters" aria-hidden="true">
+                <span class="bday-floater">🎤</span>
+                <span class="bday-floater">🎂</span>
+                <span class="bday-floater">🎉</span>
+                <span class="bday-floater">🎈</span>
+                <span class="bday-floater">🎵</span>
+                <span class="bday-floater">⭐</span>
+            </div>
+            <span class="bday-hero__eyebrow">John's Birthday Bash</span>
+            <h1 class="bday-hero__title">John's Double Karaoke Night</h1>
+            <p class="bday-hero__subtitle">
+                Dinner, stories, and songs — at <a href="index.html#venue=the-highball">Highball</a>.
+            </p>
+            <div class="bday-hero__date" id="bday-date">
+                <i class="fa-regular fa-calendar"></i>
+                <span>Date TBD</span>
+            </div>
+        </section>
+
+        <h2 class="bday-section-title">
+            <span class="bday-emoji">🗓️</span> The Itinerary
+        </h2>
+
+        <div class="bday-timeline" id="bday-timeline">
+            <!-- Rendered by JS -->
+        </div>
+
+        <aside class="bday-parking">
+            <h3>🅿️ Free Parking at Highball</h3>
+            <p>
+                Free garage parking at
+                <a href="https://maps.google.com/?q=1120+S+Lamar+Blvd+Austin+TX+78704"
+                   target="_blank" rel="noopener noreferrer">1120 S Lamar Blvd, Austin, TX 78704</a>.
+                The garage entrance is on <strong>Treadwell St</strong>, between
+                <strong>Josephine</strong> and <strong>Jessie</strong>. No validation needed.
+            </p>
+        </aside>
+
+        <section class="bday-cta">
+            <h2>🎉 Can you make it?</h2>
+            <p>
+                Hit the Facebook invite to RSVP and get the latest details.
+                Bring a song in your head and an appetite — Shake Shack first, then we walk over.
+            </p>
+            <a id="bday-fb-link" class="bday-btn" href="#" aria-disabled="true">
+                <i class="fa-brands fa-facebook"></i>
+                <span>RSVP on Facebook (link coming soon)</span>
+            </a>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="site-footer__social">
+            <h2>Follow Us</h2>
+            <div class="social-links">
+                <a href="https://www.facebook.com/groups/2494105004273043"
+                   target="_blank" rel="noopener noreferrer" title="Facebook">
+                    <i class="fa-brands fa-facebook fa-lg"></i>
+                </a>
+                <a href="https://www.instagram.com/karaokedirectory/"
+                   target="_blank" rel="noopener noreferrer" title="Instagram">
+                    <i class="fa-brands fa-instagram fa-lg"></i>
+                </a>
+            </div>
+        </div>
+        <div class="site-footer__links">
+            <a href="about.html">About Us</a>
+            <a href="submit.html">Submit Venue</a>
+        </div>
+        <p class="site-footer__copyright">
+            &copy; 2026 Austin Karaoke Directory
+        </p>
+    </footer>
+
+    <script src="js/data.js"></script>
+    <script>
+        /* ============================
+           CONFIG — update these as details firm up
+           ============================ */
+        const CONFIG = {
+            // The night of the event (YYYY-MM-DD). Used to match events in karaokeData.
+            BIRTHDAY_DATE: '2026-04-25',
+
+            // Facebook invite URL. Leave empty string until the invite exists.
+            FB_INVITE_URL: 'https://www.facebook.com/share/1CKmZBchCz/',
+
+            // Static dinner stop (not in the karaoke database — it's not karaoke).
+            DINNER: {
+                emoji: '🍔',
+                name: 'Dinner @ Shake Shack',
+                time: '6:00 – 7:00 PM',
+                address: '1100 S Lamar Blvd, Austin, TX 78704',
+                mapUrl: 'https://maps.google.com/?q=Shake+Shack+South+Lamar+Austin',
+                desc: 'Kick-off burgers and shakes right next door to The Highball. Come as you are — then we stroll over for the main event.'
+            },
+
+            // How to identify the two DB-sourced events on BIRTHDAY_DATE.
+            // Each entry: venueId + a keyword to match the eventName (case-insensitive).
+            DB_EVENTS: [
+                {
+                    venueId: 'the-highball-storyoke',
+                    match: 'story',
+                    emoji: '📖',
+                    label: 'StoryOke @ The Highball',
+                    fallbackTime: '7:30 – 9:00 PM',
+                    desc: 'Doors at 7 PM. This month\'s theme: Soundtracks 🎬🎶. Five or six speakers each tell a story, then sing a song that captures it. A totally unique show — and the warm-up for what comes next.'
+                },
+                {
+                    venueId: 'the-highball',
+                    match: 'xpider',
+                    emoji: '🎤',
+                    label: 'Xpider Karaoke @ The Highball',
+                    fallbackTime: '9:00 PM – close',
+                    desc: 'Straight from StoryOke into open karaoke with Xpider Cantu. Stay in the same room, grab the mic, and close the night out together.'
+                }
+            ]
+        };
+
+        /* ============================
+           Helpers
+           ============================ */
+        function escapeHtml(str) {
+            if (str == null) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function formatTime(t24) {
+            if (!t24) return '';
+            const [hStr, m] = t24.split(':');
+            let h = parseInt(hStr, 10);
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            h = h % 12 || 12;
+            return m === '00' ? `${h} ${ampm}` : `${h}:${m} ${ampm}`;
+        }
+
+        function formatDateLong(isoDate) {
+            // Parse as local (avoid TZ shift from Date(str)).
+            const [y, m, d] = isoDate.split('-').map(Number);
+            const dt = new Date(y, m - 1, d);
+            return dt.toLocaleDateString(undefined, {
+                weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+            });
+        }
+
+        /**
+         * Find a matching schedule entry in karaokeData for a given venueId, date,
+         * and eventName keyword. Returns { venue, scheduleEntry } or null.
+         */
+        function findDbEvent(venueId, isoDate, keyword) {
+            if (!window.karaokeData || !Array.isArray(karaokeData.listings)) return null;
+            const venue = karaokeData.listings.find(v => v.id === venueId);
+            if (!venue || !Array.isArray(venue.schedule)) return { venue, scheduleEntry: null };
+            const entry = venue.schedule.find(s =>
+                s.frequency === 'once' &&
+                s.date === isoDate &&
+                (s.eventName || '').toLowerCase().includes(keyword.toLowerCase())
+            );
+            return { venue, scheduleEntry: entry || null };
+        }
+
+        function venueAddress(venue) {
+            if (!venue || !venue.address) return '';
+            const a = venue.address;
+            return [a.street, a.city, a.state, a.zip].filter(Boolean).join(', ');
+        }
+
+        function mapUrlFor(venue) {
+            if (!venue) return '';
+            if (venue.coordinates) {
+                return `https://maps.google.com/?q=${venue.coordinates.lat},${venue.coordinates.lng}`;
+            }
+            return `https://maps.google.com/?q=${encodeURIComponent(venueAddress(venue))}`;
+        }
+
+        /* ============================
+           Render
+           ============================ */
+        function renderDate() {
+            const el = document.getElementById('bday-date');
+            if (!CONFIG.BIRTHDAY_DATE) return;
+            el.querySelector('span').textContent = formatDateLong(CONFIG.BIRTHDAY_DATE);
+        }
+
+        function renderFbLink() {
+            const a = document.getElementById('bday-fb-link');
+            if (CONFIG.FB_INVITE_URL) {
+                a.href = CONFIG.FB_INVITE_URL;
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+                a.removeAttribute('aria-disabled');
+                a.querySelector('span').textContent = 'RSVP on Facebook';
+            }
+        }
+
+        function renderDinnerStop(index) {
+            const d = CONFIG.DINNER;
+            return `
+                <article class="bday-stop bday-stop--special">
+                    <div class="bday-stop__number">${index}</div>
+                    <div class="bday-stop__body">
+                        <h3>${d.emoji} ${escapeHtml(d.name)}</h3>
+                        <span class="bday-stop__time">
+                            <i class="fa-regular fa-clock"></i> ${escapeHtml(d.time)}
+                        </span>
+                        <p class="bday-stop__desc">${escapeHtml(d.desc)}</p>
+                        <p class="bday-stop__meta">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <a href="${escapeHtml(d.mapUrl)}" target="_blank" rel="noopener noreferrer">
+                                ${escapeHtml(d.address)}
+                            </a>
+                        </p>
+                    </div>
+                </article>
+            `;
+        }
+
+        function renderDbEventStop(cfg, index) {
+            const match = findDbEvent(cfg.venueId, CONFIG.BIRTHDAY_DATE, cfg.match);
+            const venue = match && match.venue;
+            const entry = match && match.scheduleEntry;
+
+            const time = entry
+                ? `${formatTime(entry.startTime)} – ${formatTime(entry.endTime)}`
+                : cfg.fallbackTime;
+
+            const eventName = (entry && entry.eventName) || cfg.label;
+            const venueName = venue ? venue.name : 'The Highball';
+            const address = venue ? venueAddress(venue) : '1120 S Lamar Blvd, Austin, TX 78704';
+            const mapUrl = mapUrlFor(venue);
+
+            const host = venue && venue.host
+                ? (venue.host.name || venue.host.company || '')
+                : '';
+
+            const eventUrl = entry && entry.eventUrl ? entry.eventUrl : '';
+
+            return `
+                <article class="bday-stop">
+                    <div class="bday-stop__number">${index}</div>
+                    <div class="bday-stop__body">
+                        <h3>${cfg.emoji} ${escapeHtml(eventName)}</h3>
+                        <span class="bday-stop__time">
+                            <i class="fa-regular fa-clock"></i> ${escapeHtml(time)}
+                        </span>
+                        <p class="bday-stop__desc">${escapeHtml(cfg.desc)}</p>
+                        <p class="bday-stop__meta">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <a href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener noreferrer">
+                                ${escapeHtml(venueName)} — ${escapeHtml(address)}
+                            </a>
+                            ${host ? `<br><i class="fa-solid fa-microphone"></i> Hosted by ${escapeHtml(host)}` : ''}
+                            ${eventUrl ? `<br><i class="fa-solid fa-up-right-from-square"></i> <a href="${escapeHtml(eventUrl)}" target="_blank" rel="noopener noreferrer">Event page</a>` : ''}
+                        </p>
+                    </div>
+                </article>
+            `;
+        }
+
+        function renderTimeline() {
+            const container = document.getElementById('bday-timeline');
+            const parts = [];
+            let i = 1;
+            parts.push(renderDinnerStop(i++));
+            for (const ev of CONFIG.DB_EVENTS) {
+                parts.push(renderDbEventStop(ev, i++));
+            }
+            container.innerHTML = parts.join('');
+        }
+
+        /* ============================
+           Confetti (subtle, low count)
+           ============================ */
+        function spawnConfetti() {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            const host = document.getElementById('bday-confetti');
+            const colors = ['#ff6b9d', '#b388ff', '#4dd0e1', '#ffd166', '#10b981'];
+            const count = 24;
+            for (let i = 0; i < count; i++) {
+                const s = document.createElement('span');
+                s.style.left = Math.random() * 100 + 'vw';
+                s.style.background = colors[i % colors.length];
+                s.style.animationDuration = (6 + Math.random() * 5) + 's';
+                s.style.animationDelay = (Math.random() * 6) + 's';
+                s.style.transform = `rotate(${Math.random() * 360}deg)`;
+                host.appendChild(s);
+            }
+        }
+
+        /* ============================
+           Boot
+           ============================ */
+        document.addEventListener('DOMContentLoaded', () => {
+            renderDate();
+            renderFbLink();
+            renderTimeline();
+            spawnConfetti();
+        });
+    </script>
+</body>
+</html>

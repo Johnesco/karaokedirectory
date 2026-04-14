@@ -474,7 +474,7 @@ const karaokeData = {
       "id": "bungalow",
       "name": "Bungalow",
       "tags": [
-        "outdoors"
+        "outdoor"
       ],
       "dedicated": false,
       "address": {
@@ -983,7 +983,7 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "thursday",
+          "day": "Thursday",
           "startTime": "19:00",
           "endTime": "22:00"
         }
@@ -1210,6 +1210,13 @@ const karaokeData = {
           "startTime": "21:00",
           "endTime": "02:00",
           "eventName": "Karaoke with Xpider @ Highball!"
+        },
+        {
+          "frequency": "once",
+          "date": "2026-04-25",
+          "startTime": "21:00",
+          "endTime": "02:00",
+          "eventName": "Karaoke with Xpider @ Highball!"
         }
       ],
       "host": {
@@ -1248,6 +1255,13 @@ const karaokeData = {
           "endTime": "21:00",
           "eventName": "Story-Oke: Breakups @ Highball!",
           "eventUrl": "https://fb.me/e/5vGkMpOuE"
+        },
+        {
+          "frequency": "once",
+          "date": "2026-04-25",
+          "startTime": "19:30",
+          "endTime": "21:00",
+          "eventName": "Story-Oke: Soundtracks @ Highball!"
         }
       ],
       "host": {
@@ -1323,43 +1337,43 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
-          "day": "sunday",
+          "day": "Sunday",
           "startTime": "21:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "monday",
+          "day": "Monday",
           "startTime": "21:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "tuesday",
+          "day": "Tuesday",
           "startTime": "21:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "wednesday",
+          "day": "Wednesday",
           "startTime": "21:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "thursday",
+          "day": "Thursday",
           "startTime": "21:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "friday",
+          "day": "Friday",
           "startTime": "21:00",
           "endTime": "02:00"
         },
         {
           "frequency": "every",
-          "day": "saturday",
+          "day": "Saturday",
           "startTime": "21:00",
           "endTime": "02:00"
         }
