@@ -1261,7 +1261,8 @@ const karaokeData = {
           "date": "2026-04-25",
           "startTime": "19:30",
           "endTime": "21:00",
-          "eventName": "Story-Oke: Soundtracks @ Highball!"
+          "eventName": "Story-Oke: Soundtracks @ Highball!",
+          "eventUrl": "https://www.facebook.com/share/1CUHiRCZAH/"
         }
       ],
       "host": {

@@ -403,9 +403,9 @@
             <p class="bday-hero__subtitle">
                 Dinner, stories, and songs — at <a href="index.html#venue=the-highball">Highball</a>.
             </p>
-            <div class="bday-hero__date" id="bday-date">
+            <div class="bday-hero__date">
                 <i class="fa-regular fa-calendar"></i>
-                <span>Date TBD</span>
+                <span>Saturday, April 25, 2026</span>
             </div>
         </section>
 
@@ -413,8 +413,80 @@
             <span class="bday-emoji">🗓️</span> The Itinerary
         </h2>
 
-        <div class="bday-timeline" id="bday-timeline">
-            <!-- Rendered by JS -->
+        <div class="bday-timeline">
+            <article class="bday-stop bday-stop--special">
+                <div class="bday-stop__number">1</div>
+                <div class="bday-stop__body">
+                    <h3>🍔 Dinner @ Shake Shack</h3>
+                    <span class="bday-stop__time">
+                        <i class="fa-regular fa-clock"></i> 6:00 – 7:00 PM
+                    </span>
+                    <p class="bday-stop__desc">
+                        Kick-off burgers and shakes right next door to The Highball.
+                        Come as you are — then we stroll over for the main event.
+                    </p>
+                    <p class="bday-stop__meta">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <a href="https://maps.google.com/?q=Shake+Shack+South+Lamar+Austin"
+                           target="_blank" rel="noopener noreferrer">
+                            1100 S Lamar Blvd, Austin, TX 78704
+                        </a>
+                    </p>
+                </div>
+            </article>
+
+            <article class="bday-stop">
+                <div class="bday-stop__number">2</div>
+                <div class="bday-stop__body">
+                    <h3>📖 Story-Oke: Soundtracks @ The Highball</h3>
+                    <span class="bday-stop__time">
+                        <i class="fa-regular fa-clock"></i> 7:30 – 9:00 PM
+                    </span>
+                    <p class="bday-stop__desc">
+                        Doors at 7 PM. This month's theme: Soundtracks 🎬🎶.
+                        Five or six speakers each tell a story, then sing a song that captures it.
+                        A totally unique show — and the warm-up for what comes next.
+                    </p>
+                    <p class="bday-stop__meta">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <a href="https://maps.google.com/?q=30.255811,-97.7636195"
+                           target="_blank" rel="noopener noreferrer">
+                            The Highball — 1120 S Lamar Blvd, Austin, TX 78704
+                        </a>
+                        <br>
+                        <i class="fa-solid fa-microphone"></i>
+                        Hosted by Story-Oke Austin
+                        <br>
+                        <i class="fa-solid fa-up-right-from-square"></i>
+                        <a href="https://www.facebook.com/share/1CUHiRCZAH/"
+                           target="_blank" rel="noopener noreferrer">Event page</a>
+                    </p>
+                </div>
+            </article>
+
+            <article class="bday-stop">
+                <div class="bday-stop__number">3</div>
+                <div class="bday-stop__body">
+                    <h3>🎤 Karaoke with Xpider @ The Highball</h3>
+                    <span class="bday-stop__time">
+                        <i class="fa-regular fa-clock"></i> 9:00 PM – 2:00 AM
+                    </span>
+                    <p class="bday-stop__desc">
+                        Straight from Story-Oke into open karaoke with Xpider Cantu.
+                        Stay in the same room, grab the mic, and close the night out together.
+                    </p>
+                    <p class="bday-stop__meta">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <a href="https://maps.google.com/?q=30.255811,-97.7636195"
+                           target="_blank" rel="noopener noreferrer">
+                            The Highball — 1120 S Lamar Blvd, Austin, TX 78704
+                        </a>
+                        <br>
+                        <i class="fa-solid fa-microphone"></i>
+                        Hosted by Xpider Cantu
+                    </p>
+                </div>
+            </article>
         </div>
 
         <aside class="bday-parking">
@@ -434,9 +506,11 @@
                 Hit the Facebook invite to RSVP and get the latest details.
                 Bring a song in your head and an appetite — Shake Shack first, then we walk over.
             </p>
-            <a id="bday-fb-link" class="bday-btn" href="#" aria-disabled="true">
+            <a class="bday-btn"
+               href="https://www.facebook.com/share/1CKmZBchCz/"
+               target="_blank" rel="noopener noreferrer">
                 <i class="fa-brands fa-facebook"></i>
-                <span>RSVP on Facebook (link coming soon)</span>
+                <span>RSVP on Facebook</span>
             </a>
         </section>
     </main>
@@ -464,215 +538,13 @@
         </p>
     </footer>
 
-    <script src="js/data.js"></script>
     <script>
-        /* ============================
-           CONFIG — update these as details firm up
-           ============================ */
-        const CONFIG = {
-            // The night of the event (YYYY-MM-DD). Used to match events in karaokeData.
-            BIRTHDAY_DATE: '2026-04-25',
-
-            // Facebook invite URL. Leave empty string until the invite exists.
-            FB_INVITE_URL: 'https://www.facebook.com/share/1CKmZBchCz/',
-
-            // Static dinner stop (not in the karaoke database — it's not karaoke).
-            DINNER: {
-                emoji: '🍔',
-                name: 'Dinner @ Shake Shack',
-                time: '6:00 – 7:00 PM',
-                address: '1100 S Lamar Blvd, Austin, TX 78704',
-                mapUrl: 'https://maps.google.com/?q=Shake+Shack+South+Lamar+Austin',
-                desc: 'Kick-off burgers and shakes right next door to The Highball. Come as you are — then we stroll over for the main event.'
-            },
-
-            // How to identify the two DB-sourced events on BIRTHDAY_DATE.
-            // Each entry: venueId + a keyword to match the eventName (case-insensitive).
-            DB_EVENTS: [
-                {
-                    venueId: 'the-highball-storyoke',
-                    match: 'story',
-                    emoji: '📖',
-                    label: 'StoryOke @ The Highball',
-                    fallbackTime: '7:30 – 9:00 PM',
-                    desc: 'Doors at 7 PM. This month\'s theme: Soundtracks 🎬🎶. Five or six speakers each tell a story, then sing a song that captures it. A totally unique show — and the warm-up for what comes next.'
-                },
-                {
-                    venueId: 'the-highball',
-                    match: 'xpider',
-                    emoji: '🎤',
-                    label: 'Xpider Karaoke @ The Highball',
-                    fallbackTime: '9:00 PM – close',
-                    desc: 'Straight from StoryOke into open karaoke with Xpider Cantu. Stay in the same room, grab the mic, and close the night out together.'
-                }
-            ]
-        };
-
-        /* ============================
-           Helpers
-           ============================ */
-        function escapeHtml(str) {
-            if (str == null) return '';
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        }
-
-        function formatTime(t24) {
-            if (!t24) return '';
-            const [hStr, m] = t24.split(':');
-            let h = parseInt(hStr, 10);
-            const ampm = h >= 12 ? 'PM' : 'AM';
-            h = h % 12 || 12;
-            return m === '00' ? `${h} ${ampm}` : `${h}:${m} ${ampm}`;
-        }
-
-        function formatDateLong(isoDate) {
-            // Parse as local (avoid TZ shift from Date(str)).
-            const [y, m, d] = isoDate.split('-').map(Number);
-            const dt = new Date(y, m - 1, d);
-            return dt.toLocaleDateString(undefined, {
-                weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
-            });
-        }
-
-        /**
-         * Find a matching schedule entry in karaokeData for a given venueId, date,
-         * and eventName keyword. Returns { venue, scheduleEntry } or null.
-         */
-        function findDbEvent(venueId, isoDate, keyword) {
-            if (!window.karaokeData || !Array.isArray(karaokeData.listings)) return null;
-            const venue = karaokeData.listings.find(v => v.id === venueId);
-            if (!venue || !Array.isArray(venue.schedule)) return { venue, scheduleEntry: null };
-            const entry = venue.schedule.find(s =>
-                s.frequency === 'once' &&
-                s.date === isoDate &&
-                (s.eventName || '').toLowerCase().includes(keyword.toLowerCase())
-            );
-            return { venue, scheduleEntry: entry || null };
-        }
-
-        function venueAddress(venue) {
-            if (!venue || !venue.address) return '';
-            const a = venue.address;
-            return [a.street, a.city, a.state, a.zip].filter(Boolean).join(', ');
-        }
-
-        function mapUrlFor(venue) {
-            if (!venue) return '';
-            if (venue.coordinates) {
-                return `https://maps.google.com/?q=${venue.coordinates.lat},${venue.coordinates.lng}`;
-            }
-            return `https://maps.google.com/?q=${encodeURIComponent(venueAddress(venue))}`;
-        }
-
-        /* ============================
-           Render
-           ============================ */
-        function renderDate() {
-            const el = document.getElementById('bday-date');
-            if (!CONFIG.BIRTHDAY_DATE) return;
-            el.querySelector('span').textContent = formatDateLong(CONFIG.BIRTHDAY_DATE);
-        }
-
-        function renderFbLink() {
-            const a = document.getElementById('bday-fb-link');
-            if (CONFIG.FB_INVITE_URL) {
-                a.href = CONFIG.FB_INVITE_URL;
-                a.target = '_blank';
-                a.rel = 'noopener noreferrer';
-                a.removeAttribute('aria-disabled');
-                a.querySelector('span').textContent = 'RSVP on Facebook';
-            }
-        }
-
-        function renderDinnerStop(index) {
-            const d = CONFIG.DINNER;
-            return `
-                <article class="bday-stop bday-stop--special">
-                    <div class="bday-stop__number">${index}</div>
-                    <div class="bday-stop__body">
-                        <h3>${d.emoji} ${escapeHtml(d.name)}</h3>
-                        <span class="bday-stop__time">
-                            <i class="fa-regular fa-clock"></i> ${escapeHtml(d.time)}
-                        </span>
-                        <p class="bday-stop__desc">${escapeHtml(d.desc)}</p>
-                        <p class="bday-stop__meta">
-                            <i class="fa-solid fa-location-dot"></i>
-                            <a href="${escapeHtml(d.mapUrl)}" target="_blank" rel="noopener noreferrer">
-                                ${escapeHtml(d.address)}
-                            </a>
-                        </p>
-                    </div>
-                </article>
-            `;
-        }
-
-        function renderDbEventStop(cfg, index) {
-            const match = findDbEvent(cfg.venueId, CONFIG.BIRTHDAY_DATE, cfg.match);
-            const venue = match && match.venue;
-            const entry = match && match.scheduleEntry;
-
-            const time = entry
-                ? `${formatTime(entry.startTime)} – ${formatTime(entry.endTime)}`
-                : cfg.fallbackTime;
-
-            const eventName = (entry && entry.eventName) || cfg.label;
-            const venueName = venue ? venue.name : 'The Highball';
-            const address = venue ? venueAddress(venue) : '1120 S Lamar Blvd, Austin, TX 78704';
-            const mapUrl = mapUrlFor(venue);
-
-            const host = venue && venue.host
-                ? (venue.host.name || venue.host.company || '')
-                : '';
-
-            const eventUrl = entry && entry.eventUrl ? entry.eventUrl : '';
-
-            return `
-                <article class="bday-stop">
-                    <div class="bday-stop__number">${index}</div>
-                    <div class="bday-stop__body">
-                        <h3>${cfg.emoji} ${escapeHtml(eventName)}</h3>
-                        <span class="bday-stop__time">
-                            <i class="fa-regular fa-clock"></i> ${escapeHtml(time)}
-                        </span>
-                        <p class="bday-stop__desc">${escapeHtml(cfg.desc)}</p>
-                        <p class="bday-stop__meta">
-                            <i class="fa-solid fa-location-dot"></i>
-                            <a href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener noreferrer">
-                                ${escapeHtml(venueName)} — ${escapeHtml(address)}
-                            </a>
-                            ${host ? `<br><i class="fa-solid fa-microphone"></i> Hosted by ${escapeHtml(host)}` : ''}
-                            ${eventUrl ? `<br><i class="fa-solid fa-up-right-from-square"></i> <a href="${escapeHtml(eventUrl)}" target="_blank" rel="noopener noreferrer">Event page</a>` : ''}
-                        </p>
-                    </div>
-                </article>
-            `;
-        }
-
-        function renderTimeline() {
-            const container = document.getElementById('bday-timeline');
-            const parts = [];
-            let i = 1;
-            parts.push(renderDinnerStop(i++));
-            for (const ev of CONFIG.DB_EVENTS) {
-                parts.push(renderDbEventStop(ev, i++));
-            }
-            container.innerHTML = parts.join('');
-        }
-
-        /* ============================
-           Confetti (subtle, low count)
-           ============================ */
-        function spawnConfetti() {
+        // Subtle confetti ribbon across the top of the page.
+        document.addEventListener('DOMContentLoaded', () => {
             if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
             const host = document.getElementById('bday-confetti');
             const colors = ['#ff6b9d', '#b388ff', '#4dd0e1', '#ffd166', '#10b981'];
-            const count = 24;
-            for (let i = 0; i < count; i++) {
+            for (let i = 0; i < 24; i++) {
                 const s = document.createElement('span');
                 s.style.left = Math.random() * 100 + 'vw';
                 s.style.background = colors[i % colors.length];
@@ -681,16 +553,6 @@
                 s.style.transform = `rotate(${Math.random() * 360}deg)`;
                 host.appendChild(s);
             }
-        }
-
-        /* ============================
-           Boot
-           ============================ */
-        document.addEventListener('DOMContentLoaded', () => {
-            renderDate();
-            renderFbLink();
-            renderTimeline();
-            spawnConfetti();
         });
     </script>
 </body>
