@@ -13,6 +13,9 @@
     <title>John's Double Karaoke Night 🎤🎂</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Fredoka:wght@500;600;700&display=swap">
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/components.css">
@@ -27,16 +30,32 @@
             --bday-pink: #ff6b9d;
             --bday-purple: #b388ff;
             --bday-teal: #4dd0e1;
+            --bday-green: #6ee7b7;
+            --font-display: 'Fredoka', system-ui, sans-serif;
+            --font-script: 'Caveat', 'Segoe Script', cursive;
         }
 
         body {
             background-image: none;
             background:
-                radial-gradient(circle at 10% 0%, rgba(179, 136, 255, 0.25), transparent 50%),
-                radial-gradient(circle at 90% 10%, rgba(255, 107, 157, 0.25), transparent 50%),
-                radial-gradient(circle at 50% 100%, rgba(77, 208, 225, 0.18), transparent 50%),
+                radial-gradient(circle at 10% 0%, rgba(179, 136, 255, 0.28), transparent 50%),
+                radial-gradient(circle at 90% 10%, rgba(255, 107, 157, 0.28), transparent 50%),
+                radial-gradient(circle at 50% 100%, rgba(77, 208, 225, 0.22), transparent 50%),
                 var(--bg-primary);
             background-attachment: fixed;
+        }
+
+        /* Polka dot "party paper" overlay — subtle, behind everything */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            background-image:
+                radial-gradient(rgba(255, 255, 255, 0.05) 1.5px, transparent 1.5px);
+            background-size: 28px 28px;
+            background-position: 0 0;
         }
 
         .bday-main {
@@ -82,15 +101,19 @@
         }
 
         .bday-hero__title {
-            font-size: clamp(2rem, 6vw, 3.25rem);
-            line-height: 1.15;
+            font-family: var(--font-script);
+            font-weight: 700;
+            font-size: clamp(2.75rem, 9vw, 5rem);
+            line-height: 1.05;
+            letter-spacing: -0.01em;
             margin-bottom: var(--spacing-md);
-            background: linear-gradient(90deg, var(--bday-pink), var(--bday-purple), var(--bday-teal));
-            background-size: 200% auto;
+            background: linear-gradient(90deg, var(--bday-pink), var(--bday-purple), var(--bday-teal), var(--bday-accent));
+            background-size: 300% auto;
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: bday-gradient 6s linear infinite;
+            animation: bday-gradient 8s linear infinite;
+            text-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
         }
 
         @keyframes bday-gradient {
@@ -110,11 +133,13 @@
             align-items: center;
             gap: var(--spacing-sm);
             padding: var(--spacing-sm) var(--spacing-lg);
-            background: rgba(0, 0, 0, 0.35);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 999px;
+            background: rgba(0, 0, 0, 0.45);
+            border: 2px dashed rgba(255, 209, 102, 0.7);
+            border-radius: 8px;
             color: var(--bday-accent);
+            font-family: var(--font-display);
             font-weight: 600;
+            box-shadow: 2px 2px 0 rgba(255, 209, 102, 0.25);
         }
 
         /* Floating emojis */
@@ -141,8 +166,8 @@
         .bday-floater:nth-child(6) { left: 94%; top: 14%; animation-delay: 1.8s; }
 
         @keyframes bday-float {
-            0%, 100% { transform: translateY(0) rotate(-4deg); }
-            50%      { transform: translateY(-14px) rotate(4deg); }
+            0%, 100% { transform: translateY(0); }
+            50%      { transform: translateY(-14px); }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -152,73 +177,122 @@
 
         /* --- Itinerary --- */
         .bday-section-title {
-            font-size: var(--font-size-2xl);
+            font-family: var(--font-display);
+            font-size: clamp(1.75rem, 4vw, 2.25rem);
+            font-weight: 700;
             text-align: center;
-            margin-bottom: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
             color: var(--text-primary);
+            position: relative;
+        }
+
+        .bday-section-title::after {
+            content: "";
+            display: block;
+            width: 120px;
+            height: 10px;
+            margin: var(--spacing-sm) auto 0;
+            background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 10'><path d='M2 6 Q 15 0, 30 5 T 60 5 T 90 5 T 118 5' fill='none' stroke='%23ff6b9d' stroke-width='2.5' stroke-linecap='round'/></svg>") center/contain no-repeat;
         }
 
         .bday-section-title .bday-emoji {
             display: inline-block;
-            animation: bday-wiggle 2.5s ease-in-out infinite;
-            transform-origin: 50% 80%;
-        }
-
-        @keyframes bday-wiggle {
-            0%, 100% { transform: rotate(0deg); }
-            25%      { transform: rotate(-12deg); }
-            75%      { transform: rotate(12deg); }
         }
 
         .bday-timeline {
             display: grid;
             grid-template-columns: 1fr;
-            gap: var(--spacing-md);
+            gap: var(--spacing-xl);
             margin-bottom: var(--spacing-2xl);
+            padding: var(--spacing-md) 0;
         }
 
         .bday-stop {
+            --stop-accent: var(--bday-pink);
             position: relative;
             display: grid;
             grid-template-columns: auto 1fr;
             gap: var(--spacing-md);
             align-items: start;
-            padding: var(--spacing-lg);
+            padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-lg) calc(var(--spacing-lg) + 6px);
             background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius-lg);
-            transition: transform var(--transition), border-color var(--transition);
+            border: 2px solid var(--border-color);
+            border-left: 8px solid var(--stop-accent);
+            border-radius: 18px;
+            box-shadow:
+                0 8px 18px rgba(0, 0, 0, 0.35),
+                0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+            transition: transform var(--transition-slow), box-shadow var(--transition-slow);
         }
 
-        .bday-stop:hover {
-            transform: translateY(-2px);
-            border-color: var(--color-primary-light);
+        /* Per-card accent colors (cards stay level) */
+        .bday-stop:nth-child(1) { --stop-accent: var(--bday-accent); }
+        .bday-stop:nth-child(2) { --stop-accent: var(--bday-pink); }
+        .bday-stop:nth-child(3) { --stop-accent: var(--bday-teal); }
+
+        /* Little "tape strip" at the top of each card */
+        .bday-stop::before {
+            content: "";
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            width: 70px;
+            height: 18px;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 2px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+        }
+
+        .bday-stop:hover,
+        .bday-stop:focus-within {
+            transform: translateY(-4px);
+            box-shadow:
+                0 16px 32px rgba(0, 0, 0, 0.45),
+                0 0 0 2px var(--stop-accent) inset;
         }
 
         .bday-stop__number {
-            width: 3rem;
-            height: 3rem;
+            width: 4rem;
+            height: 4rem;
             flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--bday-purple), var(--bday-pink));
+            background:
+                radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.25), transparent 60%),
+                var(--stop-accent);
             color: var(--color-white);
-            font-weight: 700;
-            font-size: var(--font-size-xl);
-            box-shadow: var(--shadow);
+            font-size: 2.25rem;
+            line-height: 1;
+            box-shadow:
+                0 6px 14px rgba(0, 0, 0, 0.35),
+                0 0 0 4px rgba(255, 255, 255, 0.08);
+            transition: transform var(--transition);
+        }
+
+        .bday-stop:hover .bday-stop__number,
+        .bday-stop:focus-within .bday-stop__number {
+            transform: scale(1.05);
         }
 
         .bday-stop__body h3 {
             margin-bottom: var(--spacing-xs);
-            font-size: var(--font-size-xl);
-            color: var(--color-primary-dark);
+            font-family: var(--font-display);
+            font-size: clamp(1.25rem, 3.5vw, 1.5rem);
+            font-weight: 600;
+            color: var(--color-white);
+            line-height: 1.2;
         }
 
         .bday-stop__time {
             display: inline-block;
             margin-bottom: var(--spacing-sm);
+            padding: 2px 10px;
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: 999px;
             color: var(--bday-accent);
             font-weight: 600;
             font-size: var(--font-size-sm);
@@ -226,8 +300,9 @@
 
         .bday-stop__meta {
             font-size: var(--font-size-sm);
-            color: var(--text-secondary);
+            color: var(--color-gray-300);
             margin-top: var(--spacing-sm);
+            line-height: 1.7;
         }
 
         .bday-stop__meta a {
@@ -235,51 +310,79 @@
         }
 
         .bday-stop__desc {
-            color: var(--text-secondary);
+            color: var(--color-gray-200);
             font-size: var(--font-size-base);
         }
 
-        .bday-stop--special {
-            border: 1px solid rgba(255, 209, 102, 0.35);
-            background:
-                linear-gradient(135deg, rgba(255, 209, 102, 0.08), rgba(255, 107, 157, 0.06)),
-                var(--bg-card);
+        @media (prefers-reduced-motion: reduce) {
+            .bday-stop,
+            .bday-stop:nth-child(n) { transform: none; }
+            .bday-stop__number { transform: none; }
         }
 
-        /* --- Parking callout --- */
+        /* --- Parking callout: ticket-stub look --- */
         .bday-parking {
-            padding: var(--spacing-lg);
-            margin-bottom: var(--spacing-xl);
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-left: 4px solid var(--bday-teal);
-            border-radius: var(--border-radius);
+            position: relative;
+            padding: var(--spacing-lg) var(--spacing-xl);
+            margin: 0 auto var(--spacing-xl);
+            max-width: 640px;
+            background:
+                linear-gradient(135deg, rgba(77, 208, 225, 0.10), rgba(110, 231, 183, 0.08)),
+                var(--bg-card);
+            border: 2px dashed rgba(77, 208, 225, 0.55);
+            border-radius: 14px;
         }
+
+        /* Perforation dots on the left edge */
+        .bday-parking::before,
+        .bday-parking::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 16px;
+            height: 16px;
+            background: var(--bg-primary);
+            border-radius: 50%;
+            transform: translateY(-50%);
+        }
+
+        .bday-parking::before { left: -9px; }
+        .bday-parking::after  { right: -9px; }
 
         .bday-parking h3 {
             margin-bottom: var(--spacing-xs);
+            font-family: var(--font-display);
             font-size: var(--font-size-lg);
+            font-weight: 600;
             color: var(--bday-teal);
         }
 
         .bday-parking p {
             margin: 0;
-            color: var(--text-secondary);
+            color: var(--color-gray-200);
             font-size: var(--font-size-sm);
         }
+
 
         /* --- CTA --- */
         .bday-cta {
             text-align: center;
-            padding: var(--spacing-xl) var(--spacing-md);
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-2xl) var(--spacing-lg);
+            background:
+                radial-gradient(circle at 50% 0%, rgba(255, 107, 157, 0.15), transparent 70%),
+                var(--bg-card);
+            border: 2px solid rgba(255, 107, 157, 0.35);
+            border-radius: 20px;
             margin-bottom: var(--spacing-xl);
+            position: relative;
+            overflow: hidden;
         }
 
         .bday-cta h2 {
             margin-bottom: var(--spacing-md);
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: clamp(1.5rem, 4vw, 2rem);
         }
 
         .bday-cta p {
@@ -341,9 +444,9 @@
         }
 
         @keyframes bday-fall {
-            0%   { transform: translateY(-20px) rotate(0deg);   opacity: 0; }
+            0%   { transform: translateY(-20px); opacity: 0; }
             10%  { opacity: 1; }
-            100% { transform: translateY(110vh) rotate(720deg); opacity: 0.9; }
+            100% { transform: translateY(110vh); opacity: 0.9; }
         }
 
         /* --- Desktop refinements --- */
@@ -414,10 +517,10 @@
         </h2>
 
         <div class="bday-timeline">
-            <article class="bday-stop bday-stop--special">
-                <div class="bday-stop__number">1</div>
+            <article class="bday-stop">
+                <div class="bday-stop__number" aria-hidden="true">🍔</div>
                 <div class="bday-stop__body">
-                    <h3>🍔 Dinner @ Shake Shack</h3>
+                    <h3>Dinner @ Shake Shack</h3>
                     <span class="bday-stop__time">
                         <i class="fa-regular fa-clock"></i> 6:00 – 7:00 PM
                     </span>
@@ -436,9 +539,9 @@
             </article>
 
             <article class="bday-stop">
-                <div class="bday-stop__number">2</div>
+                <div class="bday-stop__number" aria-hidden="true">📖</div>
                 <div class="bday-stop__body">
-                    <h3>📖 Story-Oke: Soundtracks @ The Highball</h3>
+                    <h3>Story-Oke: Soundtracks @ The Highball</h3>
                     <span class="bday-stop__time">
                         <i class="fa-regular fa-clock"></i> 7:30 – 9:00 PM
                     </span>
@@ -465,9 +568,9 @@
             </article>
 
             <article class="bday-stop">
-                <div class="bday-stop__number">3</div>
+                <div class="bday-stop__number" aria-hidden="true">🎤</div>
                 <div class="bday-stop__body">
-                    <h3>🎤 Karaoke with Xpider @ The Highball</h3>
+                    <h3>Karaoke with Xpider @ The Highball</h3>
                     <span class="bday-stop__time">
                         <i class="fa-regular fa-clock"></i> 9:00 PM – 2:00 AM
                     </span>
@@ -550,7 +653,6 @@
                 s.style.background = colors[i % colors.length];
                 s.style.animationDuration = (6 + Math.random() * 5) + 's';
                 s.style.animationDelay = (Math.random() * 6) + 's';
-                s.style.transform = `rotate(${Math.random() * 360}deg)`;
                 host.appendChild(s);
             }
         });
