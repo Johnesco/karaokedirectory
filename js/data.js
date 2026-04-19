@@ -1802,9 +1802,7 @@ const karaokeData = {
           "endTime": "12:00"
         }
       ],
-      "host": {
-        "name": "Xpider Cantu"
-      },
+      "host": null,
       "socials": {
         "website": "https://www.maggiemaesaustin.com/",
         "facebook": "https://www.facebook.com/MaggieMaesAustin/",
@@ -2044,6 +2042,36 @@ const karaokeData = {
       "coordinates": {
         "lat": 30.3498905,
         "lng": -97.3716843
+      }
+    },
+    {
+      "id": "moonlight",
+      "name": "Moonlight",
+      "active": true,
+      "dedicated": false,
+      "address": {
+        "street": "309 E 6th St",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78701",
+        "neighborhood": "Downtown"
+      },
+      "schedule": [
+        {
+          "frequency": "every",
+          "day": "Thursday",
+          "startTime": "21:00",
+          "endTime": "01:00"
+        }
+      ],
+      "host": {
+        "name": "Xpider Cantu",
+        "website": "https://www.xpidermagic.com/karaoke"
+      },
+      "socials": null,
+      "coordinates": {
+        "lat": 30.2676,
+        "lng": -97.7396
       }
     },
     {
