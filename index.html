@@ -427,10 +427,16 @@
     -->
 
     <!--
-      Venue Database
-      This file contains all the karaoke venue information (70+ venues) as a
-      JavaScript object, along with tag definitions (19 tag types).
-      It's loaded as a regular script (not a module) so it creates a global variable.
+      Supabase Client (CDN)
+      Loaded before app.js so window.supabase is available for the data service.
+      The app fetches venue data from Supabase first, falling back to data.js if unreachable.
+    -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+    <!--
+      Venue Database (Fallback)
+      Static copy of venue data used when Supabase is unreachable.
+      Loaded as a regular script (not a module) so it creates a global variable.
     -->
     <script src="js/data.js"></script>
 

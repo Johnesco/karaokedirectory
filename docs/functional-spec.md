@@ -490,9 +490,9 @@ Venues with an `activePeriod` field only appear when the current date falls with
 
 ## 11 Venue Data Model
 
-**File:** `js/data.js`
+**Source files:** `js/data.js` (canonical authoring source + offline fallback), Supabase tables `venues` and `tags` (runtime source of truth).
 
-All venue data is stored in a single JavaScript file as `const karaokeData = { tagDefinitions, listings }`.
+The shape `{ tagDefinitions, listings }` is the contract — both the local file and the Supabase service expose data this way. See [Storage and Data Flow](#storage-and-data-flow) below for how the two stay in sync.
 
 ### Venue Object Schema
 
@@ -556,7 +556,7 @@ All venue data is stored in a single JavaScript file as `const karaokeData = { t
 
 ### Venue Count
 
-As of February 2026: **73 venues** in the listings array.
+As of April 2026: **79 venues** in the listings array.
 
 ### Active/Inactive
 
@@ -565,6 +565,47 @@ Venues default to active. Setting `active: false` hides the venue from all views
 ### Sortable Name
 
 The `getSortableName()` utility strips leading articles for sorting purposes. "The Highball" becomes "Highball, The" and sorts under "H". Recognized articles include English (a, an, the), French, Spanish, Italian, and Portuguese articles.
+
+### Storage and Data Flow
+
+Venue data is stored in two places:
+
+- **`js/data.js`** — the canonical authoring source AND the **currently active runtime source**. Hand-edited or written by the venue editor.
+- **Supabase** — fully wired but **currently disabled** via `useSupabase: false` in `js/config.js`. The infrastructure (schema migrations, seed pipeline, service layer) is in place for when expansion (#17 National Expansion) requires it. See issue #47 for the JSONB redesign that's ready to push.
+
+Runtime fetch priority (configured in `js/config.js` via the `useSupabase` flag):
+
+1. `sessionStorage` cache (30-minute TTL)
+2. Supabase via `js/services/supabase.js` `fetchVenueData()`
+3. `window.karaokeData` global from `js/data.js` script tag (fallback)
+4. ES module import of `js/data.js` (legacy fallback)
+
+The debug indicator (`?debug=1`) shows which source served the current page: `cache`, `supabase`, or `local-fallback`.
+
+#### Supabase Schema (issue #47 — JSONB redesign)
+
+Two tables only. The `venues.data` JSONB column holds the bulk of the venue object; `id`, `name`, and `active` are pulled out as columns for primary-key / sort / RLS-filter use.
+
+| Table | Columns |
+|-------|---------|
+| `tags` | `id` (text PK), `label` (text), `color` (text), `text_color` (text) |
+| `venues` | `id` (text PK), `name` (text), `active` (bool), `data` (jsonb) |
+
+The `data` JSONB matches the Venue Object Schema above minus the three top-level columns: `dedicated`, `tags[]`, `address{}`, `coordinates{}`, `host{}`, `socials{}`, `schedule[]`, `activePeriod{}`.
+
+RLS: tags publicly readable; venues filtered to `active = true` for anonymous access.
+
+Migration history: `001_initial_schema.sql` (original 5-table normalized model), `002_rls_policies.sql`, `003_scale_indexes.sql`, `004_jsonb_redesign.sql` (current — collapses to 2 tables).
+
+#### Reseeding from data.js
+
+When `js/data.js` changes, regenerate Supabase from it:
+
+1. `node scripts/audit-for-supabase.js` — validates data.js against logical rules (duplicate IDs, valid tag refs, schedule shape, etc.)
+2. `node supabase/seed-from-data.js > supabase/seed.sql` — emits `INSERT INTO tags` + `INSERT INTO venues (id, name, active, data) VALUES (..., '{json}'::jsonb)` rows
+3. Run `004_jsonb_redesign.sql` followed by the regenerated `seed.sql` in the Supabase SQL editor (the migration drops + recreates tables, so the seed runs against an empty schema)
+
+There is no automatic sync. data.js → Supabase is a manual push by an authorized editor.
 
 ---
 

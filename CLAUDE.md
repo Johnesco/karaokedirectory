@@ -33,8 +33,9 @@
 - Event bus for component communication (`js/core/events.js`)
 
 ### 5. Data-Driven
-- All venue data in `js/data.js` (currently 70+ venues)
-- Service layer abstracts data access (`js/services/venues.js`)
+- All venue data in `js/data.js` (currently 79 venues) — **the active runtime source**, plus canonical authoring source
+- Supabase wiring exists (`js/services/supabase.js`, JSONB-heavy 2-table schema in `supabase/migrations/`) but is currently **disabled** via `useSupabase: false` in `js/config.js`. Flip the flag to activate when ready to expand. See spec §11 *Storage and Data Flow*.
+- Service layer abstracts data access (`js/services/venues.js`) — data-source agnostic, so the swap is a one-flag change
 - Schedule matching logic handles complex recurrence patterns
 
 ## Display Philosophy
@@ -125,7 +126,10 @@ karaokedirectory/
 │   │   └── MapView.js         # Leaflet.js map view
 │   │
 │   ├── services/
-│   │   └── venues.js      # Venue data operations, search, filtering
+│   │   ├── venues.js      # Venue data operations, search, filtering (data-source agnostic)
+│   │   └── supabase.js    # Supabase client + fetchVenueData() — runtime source
+│   │
+│   ├── config.js          # App config (Supabase URL/key, useSupabase feature flag)
 │   │
 │   └── utils/
 │       ├── date.js        # Date formatting, schedule matching
@@ -141,7 +145,13 @@ karaokedirectory/
 │
 ├── scripts/               # Developer tools
 │   ├── geocode-venues.js  # Add coordinates to venues
-│   └── validate-data.js   # Validate venue data integrity
+│   ├── validate-data.js   # Validate venue data integrity
+│   └── audit-for-supabase.js  # Pre-seed validation against logical rules
+│
+├── supabase/              # Supabase schema + seed pipeline
+│   ├── migrations/        # SQL migrations (001–004; 004 is the current JSONB schema)
+│   ├── seed-from-data.js  # Generates seed.sql from js/data.js
+│   └── seed.sql           # Generated INSERT statements for venues + tags
 │
 ├── assets/images/         # Static images
 │

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supabase PoC — Spike #44</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+    h1 { font-size: 1.5rem; }
+    .status { padding: 0.5rem 1rem; border-radius: 4px; margin: 1rem 0; }
+    .status.ok { background: #e8f5e9; color: #2e7d32; }
+    .status.err { background: #ffebee; color: #c62828; }
+    .venue { border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin: 0.5rem 0; }
+    .venue h3 { margin: 0 0 0.5rem; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; margin-right: 4px; }
+    .schedule { color: #666; font-size: 0.9rem; }
+    pre { background: #f5f5f5; padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <h1>Supabase Proof of Concept — Spike #44</h1>
+  <div id="status">Connecting to Supabase...</div>
+  <div id="results"></div>
+
+  <!-- Supabase JS client (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    const SUPABASE_URL = 'https://psayzvtyhyvizatgymkh.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzYXl6dnR5aHl2aXphdGd5bWtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczNDMxNzUsImV4cCI6MjA4MjkxOTE3NX0.ZMozNPinGDAZFrb5rFn79pewDeT2yc87LY2RPlrXGDQ';
+
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const statusEl = document.getElementById('status');
+    const resultsEl = document.getElementById('results');
+
+    async function runPoC() {
+      try {
+        // Test 1: Read venues with their tags and schedules
+        const { data: venues, error } = await db
+          .from('venues')
+          .select(`
+            id, name, city, neighborhood, dedicated,
+            host:hosts(name, company),
+            venue_tags(tag:tags(id, label, color, text_color)),
+            schedules(frequency, day, date, start_time, end_time, event_name)
+          `)
+          .eq('active', true)
+          .order('name')
+          .limit(10);
+
+        if (error) throw error;
+
+        statusEl.className = 'status ok';
+        statusEl.textContent = `Connected. Read ${venues.length} venues from Supabase.`;
+
+        // Render venues
+        let html = '';
+        for (const v of venues) {
+          const tags = (v.venue_tags || [])
+            .map(vt => vt.tag)
+            .filter(Boolean)
+            .map(t => `<span class="tag" style="background:${t.color};color:${t.text_color}">${t.label}</span>`)
+            .join('');
+
+          const schedules = (v.schedules || [])
+            .map(s => {
+              if (s.frequency === 'once') return `${s.date}: ${s.event_name || 'Special Event'}`;
+              const freq = s.frequency === 'every' ? 'Every' : s.frequency.charAt(0).toUpperCase() + s.frequency.slice(1);
+              return `${freq} ${s.day} ${s.start_time}–${s.end_time}`;
+            })
+            .join('<br>');
+
+          const host = v.host
+            ? `Host: ${[v.host.name, v.host.company].filter(Boolean).join(' / ')}`
+            : '';
+
+          html += `
+            <div class="venue">
+              <h3>${v.name}</h3>
+              <div>${v.city || ''}${v.neighborhood ? ` · ${v.neighborhood}` : ''}</div>
+              ${tags ? `<div style="margin:4px 0">${tags}</div>` : ''}
+              ${host ? `<div style="color:#666">${host}</div>` : ''}
+              <div class="schedule">${schedules}</div>
+            </div>
+          `;
+        }
+
+        resultsEl.innerHTML = html || '<p>No venues found. Have you run the schema + seed SQL?</p>';
+
+        // Show raw JSON for debugging
+        resultsEl.innerHTML += `<h2>Raw response (first venue)</h2><pre>${JSON.stringify(venues[0], null, 2)}</pre>`;
+
+      } catch (err) {
+        statusEl.className = 'status err';
+        statusEl.textContent = `Error: ${err.message}`;
+        resultsEl.innerHTML = `<pre>${JSON.stringify(err, null, 2)}</pre>
+          <h2>Troubleshooting</h2>
+          <ol>
+            <li>Run <code>001_initial_schema.sql</code> in the Supabase SQL Editor</li>
+            <li>Run <code>002_rls_policies.sql</code> in the Supabase SQL Editor</li>
+            <li>Run <code>seed.sql</code> in the Supabase SQL Editor</li>
+            <li>Refresh this page</li>
+          </ol>`;
+      }
+    }
+
+    runPoC();
+  </script>
+</body>
+</html>

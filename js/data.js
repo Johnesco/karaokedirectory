@@ -609,6 +609,35 @@ const karaokeData = {
       }
     },
     {
+      "id": "cedar-park-pub",
+      "name": "Cedar Park Pub",
+      "active": true,
+      "dedicated": false,
+      "address": {
+        "street": "2403 S Bell Blvd",
+        "city": "Cedar Park",
+        "state": "TX",
+        "zip": "78613",
+        "neighborhood": ""
+      },
+      "schedule": [
+        {
+          "frequency": "every",
+          "day": "monday",
+          "startTime": "20:00",
+          "endTime": "23:00"
+        }
+      ],
+      "host": null,
+      "socials": {
+        "instagram": "https://www.instagram.com/cedar.park.pub/"
+      },
+      "coordinates": {
+        "lat": 30.4816279,
+        "lng": -97.805495
+      }
+    },
+    {
       "id": "cheer-up-charlies",
       "name": "Cheer Up Charlie's",
       "active": true,

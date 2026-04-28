@@ -12,9 +12,11 @@ import { VenueDetailPane } from './components/VenueDetailPane.js';
 import { WeeklyView } from './views/WeeklyView.js';
 import { AlphabeticalView } from './views/AlphabeticalView.js';
 import { MapView } from './views/MapView.js';
-import { initDebugMode } from './utils/debug.js';
+import { initDebugMode, isDebugMode } from './utils/debug.js';
 import { initTagConfig } from './utils/tags.js';
 import { getHashParams } from './utils/url.js';
+import { config } from './config.js';
+import { fetchVenueData } from './services/supabase.js';
 
 // View instances
 let navigation = null;
@@ -149,23 +151,43 @@ async function init() {
 }
 
 /**
- * Load venue data from data.js
- * Supports both global variable (old format) and ES module export (new format)
+ * Load venue data — tries Supabase first, falls back to local data.js
+ *
+ * Data source priority:
+ *   1. sessionStorage cache (if fresh and useSupabase enabled)
+ *   2. Supabase fetch (if useSupabase enabled)
+ *   3. karaokeData global (from data.js script tag — fallback)
+ *   4. Dynamic import of data.js (legacy fallback)
  */
 async function loadData() {
     try {
         let data = null;
+        let dataSource = 'unknown';
 
-        // First, check if data is available as a global (loaded via script tag)
-        if (typeof karaokeData !== 'undefined') {
+        // Try Supabase (or its cache) first
+        if (config.useSupabase) {
+            try {
+                data = await fetchVenueData();
+                dataSource = data.source || 'supabase';
+            } catch (supabaseError) {
+                console.warn('Supabase unavailable, falling back to local data:', supabaseError.message);
+            }
+        }
+
+        // Fallback: global variable from data.js script tag
+        if (!data && typeof karaokeData !== 'undefined') {
             data = karaokeData;
-            console.log('Loaded data from global variable');
-        } else {
-            // Try dynamic import (for ES module format)
+            dataSource = 'local-fallback';
+            console.log('Data source: local-fallback (global)');
+        }
+
+        // Fallback: dynamic import
+        if (!data) {
             try {
                 const dataModule = await import('./data.js');
                 data = dataModule.karaokeData || dataModule.default;
-                console.log('Loaded data from ES module');
+                dataSource = 'local-fallback';
+                console.log('Data source: local-fallback (module)');
             } catch (importError) {
                 console.warn('Could not import data.js as module:', importError);
             }
@@ -180,6 +202,14 @@ async function loadData() {
 
         initVenues(data);
         emit(Events.DATA_LOADED, data);
+
+        // Update debug indicator with data source
+        if (isDebugMode()) {
+            const indicator = document.querySelector('.debug-indicator');
+            if (indicator) {
+                indicator.innerHTML = `<i class="fa-solid fa-bug"></i> Debug Mode | ${dataSource}`;
+            }
+        }
     } catch (error) {
         console.error('Failed to load venue data:', error);
         emit(Events.DATA_ERROR, error);
