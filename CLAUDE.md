@@ -87,7 +87,7 @@ karaokedirectory/
 ├── index.html             # Main SPA (heavily commented)
 ├── about.html             # About page
 ├── bingo.html             # Karaoke bingo game
-├── submit.html            # Venue submission form
+├── submit.html            # Venue submission form (mobile-first, single-flow)
 ├── editor.html            # Venue data editor tool
 ├── codeexplained.html     # Interactive code documentation
 │
@@ -486,7 +486,7 @@ All work is tracked in **GitHub Issues** with a **GitHub Projects** kanban board
 |-----------|---------------|-------------|
 | Documentation Portal | — | Documentation site navigation and landing pages |
 | Exclusion Dates | — (future) | Venue closure/exclusion dates feature |
-| Form Parity | 15 | Bring submit form to parity with editor |
+| Form Parity | 15 | Submit form UX (intentionally a slim subset of editor; curator handles the rest) |
 | Weekly Calendar View | 2, 13 | Weekly schedule grid, day cards, schedule matching |
 | Alphabetical View | 3 | A-Z venue listing |
 | Map View | 4 | Interactive Leaflet map, immersive mode |

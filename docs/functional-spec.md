@@ -781,79 +781,76 @@ Automatically restored on page load.
 
 **File:** `submit.html`
 
-Two-tab form: "New Venue" and "Report Issue."
+Single-purpose mobile-first form for community submissions of new karaoke venues. Optimized for KJs/fans on a phone with limited time. Single column on mobile (<768px), multi-column on tablet+. Touch targets ≥44×44 px, native input types for keyboard intent (`type="time"`, `type="url"`, `type="email"`, `type="tel"`, `inputmode="numeric"` on ZIP), 16px input font-size to prevent iOS auto-zoom, sticky submit button always reachable.
 
-### New Venue Tab
+### Required vs optional split
 
-#### Fields
+The form is structured as a short required-fields zone, then a single `<details>` toggle ("Add more details") containing everything optional. Selecting "I'm the KJ/Host" auto-expands the details and scrolls the contact section into view.
 
-| Section | Field | Required | Notes |
-|---------|-------|----------|-------|
-| Venue Info | Venue Name | Yes | |
-| Venue Info | Dedicated Karaoke | No | Checkbox |
-| Tags | Tag checkboxes | No | 13 tags available in grid layout |
-| Tags | Age restriction | No | Radio: not sure, 21+, 18+, all-ages, family-friendly |
-| Address | Street | Yes | |
-| Address | City | Yes | Default: "Austin" |
-| Address | State | No | Default: "TX" |
-| Address | ZIP | No | Pattern validation (5 or 5+4 digits) |
-| Address | Neighborhood | No | Optional, helps with filtering |
-| Schedule | Frequency | Yes | Select: every, first, second, third, fourth, last, once (One-Time Event) |
-| Schedule | Day | Conditional | Select: Sunday–Saturday (shown for recurring events) |
-| Schedule | Date | Conditional | Date picker (shown for one-time events) |
-| Schedule | Event Name | No | Text (shown for one-time events) |
-| Schedule | Start time | Yes | Default: 21:00 |
-| Schedule | End time | Yes | Default: 01:00 |
-| Schedule | Event URL | No | URL (shown for all frequencies) |
-| Host | Host Name | No | |
-| Host | Company | No | |
-| Host | Website | No | URL |
-| Socials | Website, Facebook, Instagram, Twitter, TikTok, YouTube, Bluesky | No | URL fields (7 platforms) |
-| Notes | Additional notes | No | Textarea |
-| Submitter | Type | Yes | Radio: "Just a fan" (default) or "I'm the KJ/Host" |
-| Submitter | Name | Conditional | Required if KJ/Host |
-| Submitter | Contact preferences | Conditional | Checkboxes: email, phone text, phone call, other |
+**Required (blocks submission):**
 
-- Schedule entries are dynamic — "Add Another Day" button creates additional entries
-- Each schedule entry has a remove button
-- Selecting "One-Time Event" frequency shows Date and Event Name fields, hides Day field
+| Field | Notes |
+|-------|-------|
+| Venue Name | |
+| Street | `autocomplete="street-address"` |
+| City | Default "Austin", `autocomplete="address-level2"` |
+| ZIP | `pattern="\d{5}(-\d{4})?"`, `inputmode="numeric"` |
+| Schedule (≥ 1 entry) | First entry needs a day (recurring) or date (one-time); start/end times default to 21:00 / 01:00 |
 
-#### Bot Protection
+**Optional, always visible:**
 
-Hidden honeypot field `website_url` with `aria-hidden` and `tabindex=-1`. If filled, submission is rejected.
+| Field | Notes |
+|-------|-------|
+| State | Default "TX", `maxlength="2"` |
+| Submitter type radio | Default "Just a fan / patron"; selecting "I'm the KJ / Host" reveals required indicators on Name + Contact and auto-opens the details panel |
+| Add another night | Schedule entries are dynamic; each beyond the first has a remove button |
 
-#### Rate Limiting
+**Optional, collapsed under "Add more details":**
+
+| Section | Fields |
+|---------|--------|
+| Tags | 13 tag checkboxes (chip-style), age restriction radio (not sure / 21+ / 18+ / all-ages / family-friendly) |
+| Host / KJ Info | Host name, company, host website |
+| Venue Social Links | Website, Facebook, Instagram (3 fields — other platforms intentionally cut to reduce friction; curator can add via editor) |
+| Notes | Free-text textarea |
+| Your Contact Info | Submitter name (required if KJ); contact methods checkboxes (email, phone text, phone call, other), each reveals its input on check |
+
+**Removed from the form (handled by curator in editor.html):**
+
+- Coordinates (lat/lng) — geocoded by curator
+- Neighborhood — only ~50% filled in current data; curator adds when relevant
+- Dedicated checkbox — curator decides
+- Active period dates — only ~6% used in current data
+- Twitter, TikTok, YouTube, Bluesky social fields — low submitter uptake; curator adds if surfaced
+- Report Issue tab — removed entirely (focus on new-venue submissions; report flow may return as a separate page later)
+- "Preview JSON" button — low value on mobile
+
+### Bot protection
+
+Hidden honeypot field `website_url` (positioned offscreen via `.hp-field` CSS) with `aria-hidden` and `tabindex=-1`. If filled, `collectFormData()` returns null and submission silently fails (bots get no signal of detection).
+
+### Rate Limiting
 
 - Maximum 3 submissions per hour per browser
 - Tracked via `localStorage` key `karaoke-submit-history`
 - Warning shown when approaching limit
 - Submit button disabled at limit
-- Countdown timer shows when submissions will be available again
+- Countdown shows when submissions will be available again
 
-#### Submission Flow
+### Submission Flow
 
-1. Validates all required fields; scrolls to first error if validation fails
-2. Checks honeypot and rate limit
-3. POSTs to Google Apps Script backend (no-cors mode)
-4. **On success:** Shows success message, saves timestamp, updates rate limit counter
-5. **On failure:** Offers fallback options:
-   - Open in email app (pre-formatted mailto: link with venue JSON)
+1. Inline-validate required fields; scroll to and highlight first offender if missing (form uses `novalidate` so the JS controls UX rather than the native browser bubble)
+2. KJ-specific validation: name + at least one contact method
+3. Check honeypot and rate limit
+4. POST to Google Apps Script backend (`mode: 'no-cors'` — opaque response is treated as success)
+5. **On success:** Shows success message, saves timestamp, updates rate limit counter
+6. **On failure:** Offers fallback options:
+   - Open in email app (pre-formatted `mailto:` link with venue JSON in body)
    - Copy to clipboard (formatted text in textarea)
 
-#### JSON Preview
+### Email body format
 
-"Preview JSON" button opens a modal showing the formatted venue data as JSON, with a copy button.
-
-### Report Issue Tab
-
-| Field | Required | Notes |
-|-------|----------|-------|
-| Venue Name | Yes | Text input |
-| Issue type | Yes (at least 1) | Checkboxes: Closed, Wrong address, Wrong hours, Event cancelled, Host changed, Other |
-| Additional details | No | Textarea |
-| Reporter email | No | Email input |
-
-Submit button posts to the same Google Apps Script endpoint.
+`formatEmailBody()` produces a structured plaintext email containing the full venue object as JSON between two `----...----` delimiter lines, plus submitter metadata and a TODO checklist (verify info, geocode, add to data.js). The JSON block is intended to be copy-paste-ready for the curator's editor workflow.
 
 ---
 

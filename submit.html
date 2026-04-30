@@ -44,504 +44,351 @@
     <main class="main-content">
         <div class="submit-form">
             <div class="submit-wrapper">
-            <div class="intro-text">
-                <p><strong>Help us keep the directory accurate!</strong></p>
-                <p>Submit a new venue or report an issue with an existing listing.</p>
-            </div>
+                <div class="intro-text">
+                    <p>Tell us about a karaoke night so we can add it to the directory. Three things are required: <strong>venue name</strong>, <strong>address</strong>, and <strong>at least one karaoke night</strong>. Everything else is optional.</p>
+                </div>
 
-            <!-- Submission Type Tabs -->
-            <div class="submission-tabs">
-                <button type="button" class="submission-tab active" onclick="switchMode('new')" id="tab-new">
-                    <i class="fa-solid fa-plus"></i> New Venue
-                </button>
-                <button type="button" class="submission-tab" onclick="switchMode('report')" id="tab-report">
-                    <i class="fa-solid fa-flag"></i> Report Issue
-                </button>
-            </div>
+                <div id="rate-limit-message" class="rate-limit-warning" style="display: none;"></div>
+                <div id="success-message" class="success-message" style="display: none;"></div>
 
-            <div id="rate-limit-message" class="rate-limit-warning" style="display: none;"></div>
-            <div id="success-message" class="success-message" style="display: none;"></div>
+                <form id="venue-form" novalidate>
+                    <!-- Honeypot field to catch bots -->
+                    <div class="hp-field" aria-hidden="true">
+                        <label for="website_url">Leave this empty</label>
+                        <input type="text" id="website_url" name="website_url" tabindex="-1" autocomplete="off">
+                    </div>
 
-            <!-- Report Issue Form -->
-            <div id="report-mode" class="form-mode">
-                <form id="report-form">
                     <fieldset class="form-section">
-                        <legend><i class="fa-solid fa-location-dot"></i> Which Venue?</legend>
+                        <legend><i class="fa-solid fa-music"></i> Venue</legend>
                         <div class="form-row">
                             <div class="form-group form-group--full">
-                                <label for="report-venue-name">Venue Name <span class="required">*</span></label>
-                                <input type="text" id="report-venue-name" name="report-venue-name" required placeholder="Enter the venue name">
+                                <label for="venue-name">Venue Name <span class="required">*</span></label>
+                                <input type="text" id="venue-name" name="venue-name" required autocomplete="off" placeholder="e.g., The Karaoke Bar">
                             </div>
                         </div>
                     </fieldset>
 
                     <fieldset class="form-section">
-                        <legend><i class="fa-solid fa-triangle-exclamation"></i> What's the Issue?</legend>
+                        <legend><i class="fa-solid fa-location-dot"></i> Address</legend>
                         <div class="form-row">
                             <div class="form-group form-group--full">
-                                <label>Select all that apply <span class="required">*</span></label>
-                                <div id="report-issue-error" class="validation-error" style="display: none;">
-                                    Please select at least one issue
+                                <label for="street">Street Address <span class="required">*</span></label>
+                                <input type="text" id="street" name="street" required autocomplete="street-address" placeholder="e.g., 123 Main Street">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="city">City <span class="required">*</span></label>
+                                <input type="text" id="city" name="city" required autocomplete="address-level2" value="Austin">
+                            </div>
+                            <div class="form-group">
+                                <label for="state">State</label>
+                                <input type="text" id="state" name="state" autocomplete="address-level1" value="TX" maxlength="2">
+                            </div>
+                            <div class="form-group">
+                                <label for="zip">ZIP <span class="required">*</span></label>
+                                <input type="text" id="zip" name="zip" required pattern="\d{5}(-\d{4})?" inputmode="numeric" autocomplete="postal-code" placeholder="78701">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="form-section">
+                        <legend><i class="fa-solid fa-calendar"></i> Karaoke Night <span class="required">*</span></legend>
+                        <div id="schedule-entries">
+                            <div class="schedule-entry" data-index="0">
+                                <div class="form-group">
+                                    <label>Frequency</label>
+                                    <select name="frequency-0" onchange="toggleScheduleFields(this)">
+                                        <option value="every">Every</option>
+                                        <option value="first">First</option>
+                                        <option value="second">Second</option>
+                                        <option value="third">Third</option>
+                                        <option value="fourth">Fourth</option>
+                                        <option value="last">Last</option>
+                                        <option value="once">One-Time Event</option>
+                                    </select>
+                                </div>
+                                <div class="form-group schedule-day-group">
+                                    <label>Day <span class="required">*</span></label>
+                                    <select name="day-0" required>
+                                        <option value="">Select day...</option>
+                                        <option value="Sunday">Sunday</option>
+                                        <option value="Monday">Monday</option>
+                                        <option value="Tuesday">Tuesday</option>
+                                        <option value="Wednesday">Wednesday</option>
+                                        <option value="Thursday">Thursday</option>
+                                        <option value="Friday">Friday</option>
+                                        <option value="Saturday">Saturday</option>
+                                    </select>
+                                </div>
+                                <div class="form-group schedule-date-group" style="display: none;">
+                                    <label>Date <span class="required">*</span></label>
+                                    <input type="date" name="date-0">
+                                </div>
+                                <div class="form-group schedule-event-name-group" style="display: none;">
+                                    <label>Event Name</label>
+                                    <input type="text" name="eventName-0" placeholder="e.g., Birthday Bash">
+                                </div>
+                                <div class="form-group">
+                                    <label>Start Time</label>
+                                    <input type="time" name="startTime-0" value="21:00">
+                                </div>
+                                <div class="form-group">
+                                    <label>End Time</label>
+                                    <input type="time" name="endTime-0" value="01:00">
+                                </div>
+                                <div class="form-group schedule-event-url-group">
+                                    <label>Event URL</label>
+                                    <input type="url" name="eventUrl-0" inputmode="url" placeholder="https://...">
                                 </div>
                             </div>
                         </div>
-
-                        <div class="quick-report-options">
-                            <label class="quick-report-option">
-                                <input type="checkbox" name="issue-closed" value="closed">
-                                <i class="fa-solid fa-store-slash"></i>
-                                <span>Venue closed / No longer exists</span>
-                            </label>
-                            <label class="quick-report-option">
-                                <input type="checkbox" name="issue-address" value="address">
-                                <i class="fa-solid fa-map-marker-alt"></i>
-                                <span>Wrong address or location</span>
-                            </label>
-                            <label class="quick-report-option">
-                                <input type="checkbox" name="issue-hours" value="hours">
-                                <i class="fa-solid fa-clock"></i>
-                                <span>Wrong hours or schedule</span>
-                            </label>
-                            <label class="quick-report-option">
-                                <input type="checkbox" name="issue-cancelled" value="cancelled">
-                                <i class="fa-solid fa-calendar-xmark"></i>
-                                <span>Event cancelled / No longer happening</span>
-                            </label>
-                            <label class="quick-report-option">
-                                <input type="checkbox" name="issue-kj" value="kj">
-                                <i class="fa-solid fa-microphone"></i>
-                                <span>KJ / Host changed</span>
-                            </label>
-                            <label class="quick-report-option">
-                                <input type="checkbox" name="issue-other" value="other">
-                                <i class="fa-solid fa-circle-info"></i>
-                                <span>Other issue</span>
-                            </label>
-                        </div>
+                        <button type="button" class="btn btn--secondary add-schedule-btn" onclick="addScheduleEntry()">
+                            <i class="fa-solid fa-plus"></i> Add Another Night
+                        </button>
                     </fieldset>
 
                     <fieldset class="form-section">
-                        <legend><i class="fa-solid fa-comment"></i> Additional Details</legend>
+                        <legend><i class="fa-solid fa-user"></i> About You</legend>
                         <div class="form-row">
                             <div class="form-group form-group--full">
-                                <label for="report-details">Tell us more (optional)</label>
-                                <textarea id="report-details" name="report-details" placeholder="Any additional information that would help us update the listing..."></textarea>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group form-group--full">
-                                <label for="report-contact">Your email (optional)</label>
-                                <input type="email" id="report-contact" name="report-contact" placeholder="In case we need to follow up">
+                                <label>Are you the KJ/Host for this venue?</label>
+                                <div class="radio-group">
+                                    <label class="radio-option">
+                                        <input type="radio" name="submitter-type" value="fan" checked onchange="toggleSubmitterType()">
+                                        <span>Just a fan / patron</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="submitter-type" value="kj" onchange="toggleSubmitterType()">
+                                        <span>I'm the KJ / Host</span>
+                                    </label>
+                                </div>
+                                <small>If you're the KJ, you'll be asked for your name and a way to reach you.</small>
                             </div>
                         </div>
                     </fieldset>
 
+                    <details class="more-details">
+                        <summary>
+                            <i class="fa-solid fa-circle-plus"></i>
+                            <span>Add more details (optional)</span>
+                            <i class="fa-solid fa-chevron-down more-details__chevron"></i>
+                        </summary>
+                        <div class="more-details__content">
+                            <fieldset class="form-section">
+                                <legend><i class="fa-solid fa-tags"></i> Venue Tags</legend>
+                                <div class="form-row">
+                                    <div class="form-group form-group--full">
+                                        <small>Pick whatever fits.</small>
+                                    </div>
+                                </div>
+                                <div class="tag-checkbox-grid">
+                                    <label class="tag-checkbox-option">
+                                        <input type="checkbox" name="tag-lgbtq" value="lgbtq">
+                                        <span class="tag-badge" style="background:#e040fb;color:#fff">LGBTQ+</span>
+                                    </label>
+                                    <label class="tag-checkbox-option">
+                                        <input type="checkbox" name="tag-dive" value="dive">
+                                        <span class="tag-badge" style="background:#8d6e63;color:#fff">Dive Bar</span>
+                                    </label>
+                                    <label class="tag-checkbox-option">
+                                        <input type="checkbox" name="tag-sports-bar" value="sports-bar">
+                                        <span class="tag-badge" style="background:#4caf50;color:#fff">Sports Bar</span>
+                                    </label>
+                                    <label class="tag-checkbox-option">
+                                        <input type="checkbox" name="tag-country-bar" value="country-bar">
+                                        <span class="tag-badge" style="background:#ff9800;color:#fff">Country Bar</span>
+                                    </label>
+                                    <label class="tag-checkbox-option">
+                                        <input type="checkbox" name="tag-restaurant" value="restaurant">
+                                        <span class="tag-badge" style="background:#795548;color:#fff">Restaurant</span>
+                                    </label>
+                                    <label class="tag-checkbox-option">
+                                        <input type="checkbox" name="tag-brewery" value="brewery">
+                                        <span class="tag-badge" style="background:#ff5722;color:#fff">Brewery</span>
+                                    </label>
+                                    <label class="tag-checkbox-option">
+                                        <input type="checkbox" name="tag-craft-cocktails" value="craft-cocktails">
+                                        <span class="tag-badge" style="background:#e91e63;color:#fff">Craft Cocktails</span>
+                                    </label>
+                                    <label class="tag-checkbox-option">
+                                        <input type="checkbox" name="tag-neighborhood" value="neighborhood">
+                                        <span class="tag-badge" style="background:#9e9e9e;color:#fff">Neighborhood Bar</span>
+                                    </label>
+                                    <label class="tag-checkbox-option">
+                                        <input type="checkbox" name="tag-live-band-karaoke" value="live-band-karaoke">
+                                        <span class="tag-badge" style="background:#9c27b0;color:#fff">Live Band Karaoke</span>
+                                    </label>
+                                    <label class="tag-checkbox-option">
+                                        <input type="checkbox" name="tag-outdoor" value="outdoor">
+                                        <span class="tag-badge" style="background:#4caf50;color:#fff">Outdoor / Patio</span>
+                                    </label>
+                                    <label class="tag-checkbox-option">
+                                        <input type="checkbox" name="tag-games" value="games">
+                                        <span class="tag-badge" style="background:#00bcd4;color:#fff">Games / Arcade</span>
+                                    </label>
+                                    <label class="tag-checkbox-option">
+                                        <input type="checkbox" name="tag-billiards" value="billiards">
+                                        <span class="tag-badge" style="background:#607d8b;color:#fff">Billiards</span>
+                                    </label>
+                                    <label class="tag-checkbox-option">
+                                        <input type="checkbox" name="tag-smoking-inside" value="smoking-inside">
+                                        <span class="tag-badge" style="background:#e90707;color:#fff">Smoking Inside</span>
+                                    </label>
+                                </div>
+                                <div class="form-row" style="margin-top: var(--spacing-md);">
+                                    <div class="form-group form-group--full">
+                                        <label>Age Restriction</label>
+                                        <div class="radio-group">
+                                            <label class="radio-option">
+                                                <input type="radio" name="age-restriction" value="" checked>
+                                                <span>Not sure</span>
+                                            </label>
+                                            <label class="radio-option">
+                                                <input type="radio" name="age-restriction" value="21+">
+                                                <span>21+</span>
+                                            </label>
+                                            <label class="radio-option">
+                                                <input type="radio" name="age-restriction" value="18+">
+                                                <span>18+</span>
+                                            </label>
+                                            <label class="radio-option">
+                                                <input type="radio" name="age-restriction" value="all-ages">
+                                                <span>All Ages</span>
+                                            </label>
+                                            <label class="radio-option">
+                                                <input type="radio" name="age-restriction" value="family-friendly">
+                                                <span>Family Friendly</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <fieldset class="form-section">
+                                <legend><i class="fa-solid fa-microphone"></i> Host / KJ Info</legend>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="host-name">Host Name</label>
+                                        <input type="text" id="host-name" name="host-name" autocomplete="off" placeholder="e.g., DJ Mike">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="company">Company</label>
+                                        <input type="text" id="company" name="company" autocomplete="off" placeholder="e.g., Karaoke Kings">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group form-group--full">
+                                        <label for="host-website">Host / Company Website</label>
+                                        <input type="url" id="host-website" name="host-website" inputmode="url" placeholder="https://">
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <fieldset class="form-section">
+                                <legend><i class="fa-solid fa-share-nodes"></i> Venue Social Links</legend>
+                                <div class="form-row">
+                                    <div class="form-group form-group--full">
+                                        <label for="venue-website"><i class="fa-solid fa-globe"></i> Website</label>
+                                        <input type="url" id="venue-website" name="venue-website" inputmode="url" placeholder="https://">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="venue-facebook"><i class="fa-brands fa-facebook"></i> Facebook</label>
+                                        <input type="url" id="venue-facebook" name="venue-facebook" inputmode="url" placeholder="https://facebook.com/...">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="venue-instagram"><i class="fa-brands fa-instagram"></i> Instagram</label>
+                                        <input type="url" id="venue-instagram" name="venue-instagram" inputmode="url" placeholder="https://instagram.com/...">
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <fieldset class="form-section">
+                                <legend><i class="fa-solid fa-comment"></i> Notes</legend>
+                                <div class="form-row">
+                                    <div class="form-group form-group--full">
+                                        <label for="notes">Anything else we should know?</label>
+                                        <textarea id="notes" name="notes" placeholder="e.g., Private rooms, cover charge, special events..."></textarea>
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <fieldset class="form-section">
+                                <legend><i class="fa-solid fa-id-card"></i> Your Contact Info</legend>
+                                <div class="form-row">
+                                    <div class="form-group form-group--full">
+                                        <label for="submitter-name">Your Name <span id="name-required" class="required" style="display: none;">*</span></label>
+                                        <input type="text" id="submitter-name" name="submitter-name" autocomplete="name" placeholder="So we can credit you!">
+                                        <div id="name-error" class="validation-error" style="display: none;">
+                                            Name is required for KJs/Hosts
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group form-group--full">
+                                        <label>How would you like to be contacted? <span id="contact-required" class="required" style="display: none;">*</span></label>
+                                        <small id="contact-hint">Optional - provide if you'd like us to reach out</small>
+                                        <div id="contact-error" class="validation-error" style="display: none;">
+                                            Please provide at least one contact method
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="checkbox-group">
+                                    <div>
+                                        <label class="checkbox-option">
+                                            <input type="checkbox" name="contact-email-check" onchange="toggleContactInput('email')">
+                                            <span><i class="fa-solid fa-envelope"></i> Email</span>
+                                        </label>
+                                        <div id="contact-email-input" class="contact-input hidden">
+                                            <input type="email" name="contact-email" inputmode="email" autocomplete="email" placeholder="your@email.com">
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="checkbox-option">
+                                            <input type="checkbox" name="contact-text-check" onchange="toggleContactInput('text')">
+                                            <span><i class="fa-solid fa-message"></i> Phone (Text)</span>
+                                        </label>
+                                        <div id="contact-text-input" class="contact-input hidden">
+                                            <input type="tel" name="contact-text" inputmode="tel" autocomplete="tel" placeholder="(512) 555-1234">
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="checkbox-option">
+                                            <input type="checkbox" name="contact-call-check" onchange="toggleContactInput('call')">
+                                            <span><i class="fa-solid fa-phone"></i> Phone (Call)</span>
+                                        </label>
+                                        <div id="contact-call-input" class="contact-input hidden">
+                                            <input type="tel" name="contact-call" inputmode="tel" autocomplete="tel" placeholder="(512) 555-1234">
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="checkbox-option">
+                                            <input type="checkbox" name="contact-other-check" onchange="toggleContactInput('other')">
+                                            <span><i class="fa-solid fa-ellipsis"></i> Other</span>
+                                        </label>
+                                        <div id="contact-other-input" class="contact-input hidden">
+                                            <textarea name="contact-other" placeholder="e.g., Instagram DM @handle, Facebook, etc." rows="2"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </details>
+
                     <div class="form-actions">
-                        <button type="submit" class="btn btn--primary btn--large" id="report-submit-btn">
-                            <i class="fa-solid fa-paper-plane"></i> Submit Report
+                        <button type="submit" class="btn btn--primary btn--large" id="submit-btn">
+                            <i class="fa-solid fa-paper-plane"></i> Submit Venue
                         </button>
                     </div>
                 </form>
-            </div>
-
-            <!-- New Venue Form -->
-            <div id="new-mode" class="form-mode active">
-            <form id="venue-form">
-                <!-- Honeypot field to catch bots -->
-                <div class="hp-field" aria-hidden="true">
-                    <label for="website_url">Leave this empty</label>
-                    <input type="text" id="website_url" name="website_url" tabindex="-1" autocomplete="off">
-                </div>
-
-                <fieldset class="form-section">
-                    <legend><i class="fa-solid fa-music"></i> Venue Information</legend>
-                    <div class="form-row">
-                        <div class="form-group form-group--full">
-                            <label for="venue-name">Venue Name <span class="required">*</span></label>
-                            <input type="text" id="venue-name" name="venue-name" required placeholder="e.g., The Karaoke Bar">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="dedicated">
-                                <input type="checkbox" id="dedicated" name="dedicated">
-                                Dedicated Karaoke Venue
-                            </label>
-                            <small>Check if this is primarily a karaoke venue</small>
-                        </div>
-                    </div>
-                </fieldset>
-
-                <fieldset class="form-section">
-                    <legend><i class="fa-solid fa-tags"></i> Venue Tags</legend>
-                    <div class="form-row">
-                        <div class="form-group form-group--full">
-                            <label>Select all that apply</label>
-                            <small>Help users know what to expect at this venue</small>
-                        </div>
-                    </div>
-                    <div class="tag-checkbox-grid">
-                        <label class="tag-checkbox-option">
-                            <input type="checkbox" name="tag-lgbtq" value="lgbtq">
-                            <span class="tag-badge" style="background:#e040fb;color:#fff">LGBTQ+</span>
-                        </label>
-                        <label class="tag-checkbox-option">
-                            <input type="checkbox" name="tag-dive" value="dive">
-                            <span class="tag-badge" style="background:#8d6e63;color:#fff">Dive Bar</span>
-                        </label>
-                        <label class="tag-checkbox-option">
-                            <input type="checkbox" name="tag-sports-bar" value="sports-bar">
-                            <span class="tag-badge" style="background:#4caf50;color:#fff">Sports Bar</span>
-                        </label>
-                        <label class="tag-checkbox-option">
-                            <input type="checkbox" name="tag-country-bar" value="country-bar">
-                            <span class="tag-badge" style="background:#ff9800;color:#fff">Country Bar</span>
-                        </label>
-                        <label class="tag-checkbox-option">
-                            <input type="checkbox" name="tag-restaurant" value="restaurant">
-                            <span class="tag-badge" style="background:#795548;color:#fff">Restaurant</span>
-                        </label>
-                        <label class="tag-checkbox-option">
-                            <input type="checkbox" name="tag-brewery" value="brewery">
-                            <span class="tag-badge" style="background:#ff5722;color:#fff">Brewery</span>
-                        </label>
-                        <label class="tag-checkbox-option">
-                            <input type="checkbox" name="tag-craft-cocktails" value="craft-cocktails">
-                            <span class="tag-badge" style="background:#e91e63;color:#fff">Craft Cocktails</span>
-                        </label>
-                        <label class="tag-checkbox-option">
-                            <input type="checkbox" name="tag-neighborhood" value="neighborhood">
-                            <span class="tag-badge" style="background:#9e9e9e;color:#fff">Neighborhood Bar</span>
-                        </label>
-                        <label class="tag-checkbox-option">
-                            <input type="checkbox" name="tag-live-band-karaoke" value="live-band-karaoke">
-                            <span class="tag-badge" style="background:#9c27b0;color:#fff">Live Band Karaoke</span>
-                        </label>
-                        <label class="tag-checkbox-option">
-                            <input type="checkbox" name="tag-outdoor" value="outdoor">
-                            <span class="tag-badge" style="background:#4caf50;color:#fff">Outdoor / Patio</span>
-                        </label>
-                        <label class="tag-checkbox-option">
-                            <input type="checkbox" name="tag-games" value="games">
-                            <span class="tag-badge" style="background:#00bcd4;color:#fff">Games / Arcade</span>
-                        </label>
-                        <label class="tag-checkbox-option">
-                            <input type="checkbox" name="tag-billiards" value="billiards">
-                            <span class="tag-badge" style="background:#607d8b;color:#fff">Billiards</span>
-                        </label>
-                        <label class="tag-checkbox-option">
-                            <input type="checkbox" name="tag-smoking-inside" value="smoking-inside">
-                            <span class="tag-badge" style="background:#e90707;color:#fff">Smoking Inside</span>
-                        </label>
-                    </div>
-                    <div class="form-row" style="margin-top: var(--spacing-md);">
-                        <div class="form-group form-group--full">
-                            <label>Age Restriction</label>
-                            <div class="radio-group">
-                                <label class="radio-option">
-                                    <input type="radio" name="age-restriction" value="" checked>
-                                    <span>Not sure</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="age-restriction" value="21+">
-                                    <span>21+</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="age-restriction" value="18+">
-                                    <span>18+</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="age-restriction" value="all-ages">
-                                    <span>All Ages</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="age-restriction" value="family-friendly">
-                                    <span>Family Friendly</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </fieldset>
-
-                <fieldset class="form-section">
-                    <legend><i class="fa-solid fa-location-dot"></i> Address</legend>
-                    <div class="form-row">
-                        <div class="form-group form-group--full">
-                            <label for="street">Street Address <span class="required">*</span></label>
-                            <input type="text" id="street" name="street" required placeholder="e.g., 123 Main Street">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="city">City <span class="required">*</span></label>
-                            <input type="text" id="city" name="city" required value="Austin" placeholder="Austin">
-                        </div>
-                        <div class="form-group">
-                            <label for="state">State</label>
-                            <input type="text" id="state" name="state" value="TX" maxlength="2">
-                        </div>
-                        <div class="form-group">
-                            <label for="zip">ZIP Code</label>
-                            <input type="text" id="zip" name="zip" pattern="\d{5}(-\d{4})?" placeholder="78701">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group form-group--full">
-                            <label for="neighborhood">Neighborhood</label>
-                            <input type="text" id="neighborhood" name="neighborhood" placeholder="e.g., Downtown, East Austin, Round Rock">
-                            <small>Optional - helps with filtering</small>
-                        </div>
-                    </div>
-                </fieldset>
-
-                <fieldset class="form-section">
-                    <legend><i class="fa-solid fa-calendar"></i> Karaoke Schedule</legend>
-                    <div id="schedule-entries">
-                        <div class="schedule-entry" data-index="0">
-                            <div class="form-group">
-                                <label>Frequency</label>
-                                <select name="frequency-0" onchange="toggleScheduleFields(this)">
-                                    <option value="every">Every</option>
-                                    <option value="first">First</option>
-                                    <option value="second">Second</option>
-                                    <option value="third">Third</option>
-                                    <option value="fourth">Fourth</option>
-                                    <option value="last">Last</option>
-                                    <option value="once">One-Time Event</option>
-                                </select>
-                            </div>
-                            <div class="form-group schedule-day-group">
-                                <label>Day <span class="required">*</span></label>
-                                <select name="day-0" required>
-                                    <option value="">Select day...</option>
-                                    <option value="Sunday">Sunday</option>
-                                    <option value="Monday">Monday</option>
-                                    <option value="Tuesday">Tuesday</option>
-                                    <option value="Wednesday">Wednesday</option>
-                                    <option value="Thursday">Thursday</option>
-                                    <option value="Friday">Friday</option>
-                                    <option value="Saturday">Saturday</option>
-                                </select>
-                            </div>
-                            <div class="form-group schedule-date-group" style="display: none;">
-                                <label>Date <span class="required">*</span></label>
-                                <input type="date" name="date-0">
-                            </div>
-                            <div class="form-group schedule-event-name-group" style="display: none;">
-                                <label>Event Name</label>
-                                <input type="text" name="eventName-0" placeholder="e.g., Birthday Bash">
-                            </div>
-                            <div class="form-group">
-                                <label>Start Time</label>
-                                <input type="time" name="startTime-0" value="21:00">
-                            </div>
-                            <div class="form-group">
-                                <label>End Time</label>
-                                <input type="time" name="endTime-0" value="01:00">
-                            </div>
-                            <div class="form-group schedule-event-url-group">
-                                <label>Event URL</label>
-                                <input type="url" name="eventUrl-0" placeholder="https://...">
-                            </div>
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn--secondary add-schedule-btn" onclick="addScheduleEntry()">
-                        <i class="fa-solid fa-plus"></i> Add Another Day
-                    </button>
-
-                    <div class="form-row form-row--active-period">
-                        <div class="form-group">
-                            <label for="active-period-start"><i class="fa-solid fa-calendar-plus"></i> Active From</label>
-                            <input type="date" id="active-period-start" name="active-period-start">
-                        </div>
-                        <div class="form-group">
-                            <label for="active-period-end"><i class="fa-solid fa-calendar-minus"></i> Active Until</label>
-                            <input type="date" id="active-period-end" name="active-period-end">
-                        </div>
-                    </div>
-                    <small class="form-hint">Limits when this venue appears in the directory (leave empty if always active)</small>
-                </fieldset>
-
-                <fieldset class="form-section">
-                    <legend><i class="fa-solid fa-microphone"></i> Host/KJ Info (Optional)</legend>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="host-name">Host Name</label>
-                            <input type="text" id="host-name" name="host-name" placeholder="e.g., DJ Mike">
-                        </div>
-                        <div class="form-group">
-                            <label for="company">Company</label>
-                            <input type="text" id="company" name="company" placeholder="e.g., Karaoke Kings">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group form-group--full">
-                            <label for="host-website">Host/Company Website</label>
-                            <input type="url" id="host-website" name="host-website" placeholder="https://">
-                        </div>
-                    </div>
-                </fieldset>
-
-                <fieldset class="form-section">
-                    <legend><i class="fa-solid fa-share-nodes"></i> Venue Social Links (Optional)</legend>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="venue-website"><i class="fa-solid fa-globe"></i> Website</label>
-                            <input type="url" id="venue-website" name="venue-website" placeholder="https://">
-                        </div>
-                        <div class="form-group">
-                            <label for="venue-facebook"><i class="fa-brands fa-facebook"></i> Facebook</label>
-                            <input type="url" id="venue-facebook" name="venue-facebook" placeholder="https://facebook.com/...">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="venue-instagram"><i class="fa-brands fa-instagram"></i> Instagram</label>
-                            <input type="url" id="venue-instagram" name="venue-instagram" placeholder="https://instagram.com/...">
-                        </div>
-                        <div class="form-group">
-                            <label for="venue-twitter"><i class="fa-brands fa-x-twitter"></i> X/Twitter</label>
-                            <input type="url" id="venue-twitter" name="venue-twitter" placeholder="https://x.com/...">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="venue-tiktok"><i class="fa-brands fa-tiktok"></i> TikTok</label>
-                            <input type="url" id="venue-tiktok" name="venue-tiktok" placeholder="https://tiktok.com/...">
-                        </div>
-                        <div class="form-group">
-                            <label for="venue-youtube"><i class="fa-brands fa-youtube"></i> YouTube</label>
-                            <input type="url" id="venue-youtube" name="venue-youtube" placeholder="https://youtube.com/...">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="venue-bluesky"><i class="fa-solid fa-cloud"></i> Bluesky</label>
-                            <input type="url" id="venue-bluesky" name="venue-bluesky" placeholder="https://bsky.app/...">
-                        </div>
-                    </div>
-                </fieldset>
-
-                <fieldset class="form-section">
-                    <legend><i class="fa-solid fa-comment"></i> Additional Notes</legend>
-                    <div class="form-row">
-                        <div class="form-group form-group--full">
-                            <label for="notes">Anything else we should know?</label>
-                            <textarea id="notes" name="notes" placeholder="e.g., Private rooms available, cover charge, special events, etc."></textarea>
-                        </div>
-                    </div>
-                </fieldset>
-
-                <fieldset class="form-section">
-                    <legend><i class="fa-solid fa-user"></i> About You</legend>
-                    <div class="form-row">
-                        <div class="form-group form-group--full">
-                            <label>Are you the KJ/Host for this venue?</label>
-                            <div class="radio-group">
-                                <label class="radio-option">
-                                    <input type="radio" name="submitter-type" value="fan" checked onchange="toggleSubmitterType()">
-                                    <span>Just a fan / patron</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="submitter-type" value="kj" onchange="toggleSubmitterType()">
-                                    <span>I'm the KJ / Host</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-row" style="margin-top: var(--spacing-md);">
-                        <div class="form-group form-group--full">
-                            <label for="submitter-name">Your Name <span id="name-required" class="required" style="display: none;">*</span></label>
-                            <input type="text" id="submitter-name" name="submitter-name" placeholder="So we can credit you!">
-                            <div id="name-error" class="validation-error" style="display: none;">
-                                Name is required for KJs/Hosts
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group form-group--full">
-                            <label>How would you like to be contacted? <span id="contact-required" class="required" style="display: none;">*</span></label>
-                            <small id="contact-hint">Optional - provide if you'd like us to reach out</small>
-                            <div id="contact-error" class="validation-error" style="display: none;">
-                                Please provide at least one contact method
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="checkbox-group">
-                        <div>
-                            <label class="checkbox-option">
-                                <input type="checkbox" name="contact-email-check" onchange="toggleContactInput('email')">
-                                <span><i class="fa-solid fa-envelope"></i> Email</span>
-                            </label>
-                            <div id="contact-email-input" class="contact-input hidden">
-                                <input type="email" name="contact-email" placeholder="your@email.com">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="checkbox-option">
-                                <input type="checkbox" name="contact-text-check" onchange="toggleContactInput('text')">
-                                <span><i class="fa-solid fa-message"></i> Phone (Text)</span>
-                            </label>
-                            <div id="contact-text-input" class="contact-input hidden">
-                                <input type="tel" name="contact-text" placeholder="(512) 555-1234">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="checkbox-option">
-                                <input type="checkbox" name="contact-call-check" onchange="toggleContactInput('call')">
-                                <span><i class="fa-solid fa-phone"></i> Phone (Call)</span>
-                            </label>
-                            <div id="contact-call-input" class="contact-input hidden">
-                                <input type="tel" name="contact-call" placeholder="(512) 555-1234">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="checkbox-option">
-                                <input type="checkbox" name="contact-other-check" onchange="toggleContactInput('other')">
-                                <span><i class="fa-solid fa-ellipsis"></i> Other</span>
-                            </label>
-                            <div id="contact-other-input" class="contact-input hidden">
-                                <textarea name="contact-other" placeholder="e.g., Instagram DM @handle, Facebook, etc." rows="2"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </fieldset>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn btn--primary btn--large" id="submit-btn">
-                        <i class="fa-solid fa-paper-plane"></i> Submit Venue
-                    </button>
-                    <button type="button" class="btn btn--secondary btn--large" onclick="previewJSON()">
-                        <i class="fa-solid fa-eye"></i> Preview JSON
-                    </button>
-                </div>
-            </form>
-            </div><!-- end new-mode -->
             </div><!-- end submit-wrapper -->
-
-            <!-- JSON Preview Modal -->
-            <div id="json-preview-modal" class="venue-modal">
-                <div class="venue-modal__backdrop" onclick="closePreview()"></div>
-                <div class="venue-modal__content">
-                    <button class="venue-modal__close" onclick="closePreview()">
-                        <i class="fa-solid fa-times"></i>
-                    </button>
-                    <h3 style="margin-bottom: var(--spacing-md);">JSON Preview</h3>
-                    <pre id="json-preview" style="background: var(--bg-secondary); padding: var(--spacing-md); border-radius: var(--border-radius-sm); overflow-x: auto; font-size: var(--font-size-sm);"></pre>
-                    <div style="margin-top: var(--spacing-md); display: flex; gap: var(--spacing-sm);">
-                        <button class="btn btn--primary" onclick="copyJSON()">
-                            <i class="fa-solid fa-copy"></i> Copy JSON
-                        </button>
-                        <button class="btn btn--secondary" onclick="closePreview()">Close</button>
-                    </div>
-                </div>
-            </div>
         </div>
     </main>
 
@@ -577,37 +424,14 @@
         };
 
         // Email configuration
-        const EMAIL_ADDRESS = 'karaokedirectoryatx@gmail.com'; // Change this to your email
+        const EMAIL_ADDRESS = 'karaokedirectoryatx@gmail.com';
 
-        // Google Apps Script web app URL (replace after deploying Code.gs)
+        // Google Apps Script web app URL
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyC6_0vlIncIjXHsNz_JFbuxyOoSmBJmRaxAJjQ3Mwf4uJfXj_rMa4BC-Z9g8CsOSlC/exec';
 
         let scheduleCount = 1;
 
-        // Switch between New Venue and Report Issue modes
-        function switchMode(mode) {
-            const newMode = document.getElementById('new-mode');
-            const reportMode = document.getElementById('report-mode');
-            const tabNew = document.getElementById('tab-new');
-            const tabReport = document.getElementById('tab-report');
-
-            if (mode === 'new') {
-                newMode.classList.add('active');
-                reportMode.classList.remove('active');
-                tabNew.classList.add('active');
-                tabReport.classList.remove('active');
-            } else {
-                newMode.classList.remove('active');
-                reportMode.classList.add('active');
-                tabNew.classList.remove('active');
-                tabReport.classList.add('active');
-            }
-
-            // Clear any displayed messages
-            document.getElementById('success-message').style.display = 'none';
-        }
-
-        // Toggle submitter type - show/hide required indicators
+        // Toggle submitter type - show/hide required indicators, auto-expand details for KJ
         function toggleSubmitterType() {
             const isKJ = document.querySelector('input[name="submitter-type"]:checked')?.value === 'kj';
 
@@ -620,6 +444,17 @@
             hint.textContent = isKJ
                 ? 'Required - please provide at least one contact method'
                 : 'Optional - provide if you\'d like us to reach out';
+
+            // Auto-expand the optional details when KJ identifies themselves,
+            // and scroll the contact section into view so they see what's needed.
+            if (isKJ) {
+                const details = document.querySelector('.more-details');
+                if (details && !details.open) details.open = true;
+                const submitterField = document.getElementById('submitter-name');
+                if (submitterField) {
+                    setTimeout(() => submitterField.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+                }
+            }
 
             // Clear errors when switching
             document.getElementById('name-error').style.display = 'none';
@@ -636,7 +471,6 @@
                 inputDiv.querySelector('input, textarea')?.focus();
             } else {
                 inputDiv.classList.add('hidden');
-                // Clear the input when unchecking
                 const input = inputDiv.querySelector('input, textarea');
                 if (input) input.value = '';
             }
@@ -652,6 +486,10 @@
             if (!isKJ) return true; // No validation needed for fans
 
             let isValid = true;
+
+            // Make sure the optional details panel is open so errors are visible
+            const details = document.querySelector('.more-details');
+            if (details && !details.open) details.open = true;
 
             // Validate name for KJ
             const name = document.getElementById('submitter-name').value.trim();
@@ -674,7 +512,6 @@
             const call = document.querySelector('input[name="contact-call"]').value.trim();
             const other = document.querySelector('textarea[name="contact-other"]').value.trim();
 
-            // Check if at least one contact method is provided with a value
             const hasValidContact =
                 (emailCheck && email) ||
                 (textCheck && text) ||
@@ -683,7 +520,7 @@
 
             if (!hasValidContact) {
                 document.getElementById('contact-error').style.display = 'block';
-                if (isValid) { // Only scroll if name was valid (so we don't override name scroll)
+                if (isValid) {
                     document.getElementById('contact-error').scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
                 isValid = false;
@@ -719,10 +556,7 @@
             const now = Date.now();
             const windowStart = now - RATE_LIMIT_CONFIG.windowMs;
 
-            // Filter to only submissions within the time window
             const recentSubmissions = history.filter(timestamp => timestamp > windowStart);
-
-            // Clean up old entries
             localStorage.setItem(RATE_LIMIT_CONFIG.storageKey, JSON.stringify(recentSubmissions));
 
             const messageEl = document.getElementById('rate-limit-message');
@@ -804,7 +638,7 @@
                 </div>
                 <div class="form-group schedule-event-url-group">
                     <label>Event URL</label>
-                    <input type="url" name="eventUrl-${scheduleCount}" placeholder="https://...">
+                    <input type="url" name="eventUrl-${scheduleCount}" inputmode="url" placeholder="https://...">
                 </div>
                 <button type="button" class="remove-schedule-btn" onclick="removeScheduleEntry(this)">
                     <i class="fa-solid fa-trash"></i> Remove
@@ -828,7 +662,6 @@
             if (dateGroup) dateGroup.style.display = isOnce ? '' : 'none';
             if (eventNameGroup) eventNameGroup.style.display = isOnce ? '' : 'none';
 
-            // Update required attribute on day/date fields
             const daySelect = entry.querySelector('[name^="day-"]');
             const dateInput = entry.querySelector('[name^="date-"]');
             if (daySelect) daySelect.required = !isOnce;
@@ -874,7 +707,6 @@
                 const endTime = formData.get(`endTime-${index}`) || '01:00';
 
                 if (frequency === 'once') {
-                    // One-time event - use date instead of day
                     if (date) {
                         const scheduleEntry = {
                             frequency: 'once',
@@ -887,7 +719,6 @@
                         schedule.push(scheduleEntry);
                     }
                 } else if (day) {
-                    // Recurring event
                     const scheduleEntry = {
                         frequency: frequency,
                         day: day,
@@ -1058,127 +889,6 @@
             return body;
         }
 
-        function previewJSON() {
-            const data = collectFormData();
-
-            if (!data) {
-                alert('Please fill in at least the venue name.');
-                return;
-            }
-
-            const preview = document.getElementById('json-preview');
-            preview.textContent = JSON.stringify(data.venue, null, 2);
-
-            const modal = document.getElementById('json-preview-modal');
-            modal.classList.add('venue-modal--open');
-        }
-
-        function closePreview() {
-            const modal = document.getElementById('json-preview-modal');
-            modal.classList.remove('venue-modal--open');
-        }
-
-        function copyJSON() {
-            const data = collectFormData();
-            if (data) {
-                navigator.clipboard.writeText(JSON.stringify(data.venue, null, 2))
-                    .then(() => alert('JSON copied to clipboard!'))
-                    .catch(() => alert('Failed to copy. Please select and copy manually.'));
-            }
-        }
-
-        // Toggle visual feedback for quick report options
-        document.querySelectorAll('.quick-report-option input[type="checkbox"]').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const option = this.closest('.quick-report-option');
-                if (this.checked) {
-                    option.classList.add('selected');
-                } else {
-                    option.classList.remove('selected');
-                }
-                // Clear validation error when any checkbox is selected
-                document.getElementById('report-issue-error').style.display = 'none';
-            });
-        });
-
-        // Validate report form - at least one issue must be selected
-        function validateReportForm() {
-            const checkboxes = document.querySelectorAll('.quick-report-options input[type="checkbox"]');
-            const hasSelection = Array.from(checkboxes).some(cb => cb.checked);
-
-            if (!hasSelection) {
-                document.getElementById('report-issue-error').style.display = 'block';
-                document.getElementById('report-issue-error').scrollIntoView({ behavior: 'smooth', block: 'center' });
-                return false;
-            }
-
-            const venueName = document.getElementById('report-venue-name').value.trim();
-            if (!venueName) {
-                document.getElementById('report-venue-name').focus();
-                return false;
-            }
-
-            return true;
-        }
-
-        // Collect report form data
-        function collectReportData() {
-            const venueName = document.getElementById('report-venue-name').value.trim();
-            const details = document.getElementById('report-details').value.trim();
-            const contact = document.getElementById('report-contact').value.trim();
-
-            const issues = [];
-            const issueLabels = {
-                'issue-closed': 'Venue closed / No longer exists',
-                'issue-address': 'Wrong address or location',
-                'issue-hours': 'Wrong hours or schedule',
-                'issue-cancelled': 'Event cancelled / No longer happening',
-                'issue-kj': 'KJ / Host changed',
-                'issue-other': 'Other issue'
-            };
-
-            document.querySelectorAll('.quick-report-options input[type="checkbox"]:checked').forEach(cb => {
-                issues.push(issueLabels[cb.name] || cb.value);
-            });
-
-            return {
-                venueName,
-                issues,
-                details,
-                contact
-            };
-        }
-
-        // Format report email body
-        function formatReportEmailBody(data) {
-            let body = 'VENUE ISSUE REPORT\n';
-            body += '='.repeat(40) + '\n\n';
-
-            body += `VENUE: ${data.venueName}\n\n`;
-
-            body += 'REPORTED ISSUES:\n';
-            data.issues.forEach(issue => {
-                body += `- ${issue}\n`;
-            });
-            body += '\n';
-
-            if (data.details) {
-                body += 'ADDITIONAL DETAILS:\n';
-                body += data.details + '\n\n';
-            }
-
-            if (data.contact) {
-                body += 'REPORTER CONTACT:\n';
-                body += data.contact + '\n\n';
-            }
-
-            body += 'TODO:\n';
-            body += '- [ ] Verify reported issues\n';
-            body += '- [ ] Update venue listing\n';
-
-            return body;
-        }
-
         // ---- API Submission with Fallback ----
 
         // Escape text for safe insertion into innerHTML-created textarea
@@ -1283,36 +993,29 @@
                 });
         }
 
-        // Report form submission
-        document.getElementById('report-form').addEventListener('submit', function(e) {
-            e.preventDefault();
+        // Inline error helper - shows a message and scrolls the offender into view
+        function showInlineError(target, message) {
+            // Remove existing inline error if present
+            target.parentElement.querySelectorAll('.field-error--inline').forEach(el => el.remove());
 
-            // Validate
-            if (!validateReportForm()) {
-                return;
-            }
+            const err = document.createElement('div');
+            err.className = 'field-error--inline validation-error';
+            err.textContent = message;
+            target.parentElement.appendChild(err);
+            target.setAttribute('aria-invalid', 'true');
+            target.focus({ preventScroll: true });
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-            // Check rate limit
-            if (!checkRateLimit()) {
-                return;
-            }
-
-            const data = collectReportData();
-            const emailBody = formatReportEmailBody(data);
-            const subject = `Issue Report: ${data.venueName}`;
-            const submitBtn = document.getElementById('report-submit-btn');
-
-            const payload = {
-                type: 'report',
-                venueName: data.venueName,
-                issues: data.issues,
-                details: data.details,
-                contact: data.contact,
-                emailBody: emailBody
+            // Auto-clear when user starts typing/selecting
+            const clear = () => {
+                err.remove();
+                target.removeAttribute('aria-invalid');
+                target.removeEventListener('input', clear);
+                target.removeEventListener('change', clear);
             };
-
-            submitToAPI(payload, subject, emailBody, submitBtn);
-        });
+            target.addEventListener('input', clear);
+            target.addEventListener('change', clear);
+        }
 
         // Form submission
         document.getElementById('venue-form').addEventListener('submit', function(e) {
@@ -1320,6 +1023,36 @@
 
             // Check rate limit
             if (!checkRateLimit()) {
+                return;
+            }
+
+            // Validate required fields inline (we use novalidate on the form so we control the UX)
+            const requiredFields = [
+                ['venue-name', 'Venue name is required'],
+                ['street', 'Street address is required'],
+                ['city', 'City is required'],
+                ['zip', 'ZIP code is required']
+            ];
+
+            for (const [id, msg] of requiredFields) {
+                const el = document.getElementById(id);
+                if (!el.value.trim()) {
+                    showInlineError(el, msg);
+                    return;
+                }
+            }
+
+            // Schedule must have at least one valid day or date
+            const firstSchedule = document.querySelector('.schedule-entry');
+            const firstFrequency = firstSchedule?.querySelector('[name^="frequency-"]')?.value;
+            const firstDay = firstSchedule?.querySelector('[name^="day-"]')?.value;
+            const firstDate = firstSchedule?.querySelector('[name^="date-"]')?.value;
+            if (firstFrequency === 'once' && !firstDate) {
+                showInlineError(firstSchedule.querySelector('[name^="date-"]'), 'Pick a date for the one-time event');
+                return;
+            }
+            if (firstFrequency !== 'once' && !firstDay) {
+                showInlineError(firstSchedule.querySelector('[name^="day-"]'), 'Pick the day of the week');
                 return;
             }
 
@@ -1331,8 +1064,7 @@
             const data = collectFormData();
 
             if (!data) {
-                // Could be bot or empty form
-                alert('Please fill in the required fields.');
+                // Honeypot tripped or empty — fail silently
                 return;
             }
 
