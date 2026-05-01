@@ -24,12 +24,10 @@ A mobile-friendly web application for discovering karaoke venues in and around A
 - **HTML5** / **CSS3** / **Vanilla JavaScript** (ES6 modules)
 - **Leaflet.js** for interactive maps
 - **Font Awesome** for icons
-- No frameworks — lightweight and fast
-- No build step — edit and refresh
 
 ## Getting Started
 
-This is a static site with no build step required.
+The site is currently served as static files.
 
 ### Local Development
 
@@ -62,7 +60,6 @@ Deploy to any static hosting service (GitHub Pages, Netlify, Vercel, etc.) — j
 ├── bingo.html          # Karaoke bingo game
 ├── submit.html         # Venue submission form
 ├── editor.html         # Venue data editor tool
-├── codeexplained.html  # Interactive code documentation
 ├── css/
 │   ├── base.css        # CSS variables, reset, typography
 │   ├── layout.css      # Header, navigation, page structure
@@ -70,8 +67,7 @@ Deploy to any static hosting service (GitHub Pages, Netlify, Vercel, etc.) — j
 │   ├── views.css       # View-specific styles (weekly, map, etc.)
 │   ├── bingo.css       # Bingo game styles
 │   ├── editor.css      # Editor page styles
-│   ├── submit.css      # Submission form styles
-│   └── docs.css        # Documentation page styles
+│   └── submit.css      # Submission form styles
 ├── js/
 │   ├── app.js          # Application entry point
 │   ├── data.js         # Venue database (70+ venues)

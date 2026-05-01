@@ -1,6 +1,5 @@
 /**
- * Simple reactive state management
- * No framework, just plain JavaScript.
+ * Reactive state store with subscribe/get/set + key-scoped subscribers.
  *
  * State keys:
  * - view: Current view ('weekly', 'alphabetical', 'map')

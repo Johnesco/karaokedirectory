@@ -22,12 +22,12 @@ A mobile-friendly web application helping users discover karaoke venues in and a
 
 Karaoke enthusiasts looking for venues, schedules, and event details in the greater Austin area.
 
-### Design Philosophy
+### Architecture
 
-- **Vanilla JavaScript only** — no frameworks, no build step
+- **Vanilla JavaScript** (ES6 modules), HTML5, CSS3 — currently no build step
 - **Mobile-first responsive design** — base styles target mobile, enhanced for larger screens
-- **Data-driven** — all venue data in a single JavaScript file (`js/data.js`), currently 73 venues
-- **Component-based** — lightweight custom `Component` base class with state management and event bus
+- **Data layer** — all venue data in a single JavaScript file (`js/data.js`), currently 79 venues; Supabase wiring exists but is dormant (see §11 *Storage and Data Flow*)
+- **Component-based** — `Component` base class with state management and event bus
 - **Balanced calendar visibility** — daily venues must not overwhelm less frequent shows in the weekly calendar view; Alphabetical and Map views show everything equally
 
 ### Pages
@@ -37,9 +37,8 @@ Karaoke enthusiasts looking for venues, schedules, and event details in the grea
 | Main app | `index.html` | Single-page app with all three views |
 | About | `about.html` | Project info, feature overview, contact |
 | Bingo | `bingo.html` | Karaoke bingo game |
-| Submit | `submit.html` | Venue submission and issue reporting |
+| Submit | `submit.html` | Venue submission form |
 | Editor | `editor.html` | Venue data editing tool |
-| Docs | `codeexplained.html` | Interactive code documentation (beginner-oriented) |
 | Spec viewer | `docs/index.html` | Docsify-powered documentation portal (renders this spec) |
 
 ---
@@ -964,7 +963,7 @@ Static informational page.
 2. **What You Can Do** — Seven feature highlights with icons (weekly calendar, A-Z listing, interactive map, search, venue tags, special events, karaoke bingo)
 3. **Submit a Venue** — Link to `submit.html`
 4. **Submit Feedback** — Link to Google Form
-5. **For Developers** — Links to Functional Specification (`docs/index.html`) and Code Explained (`codeexplained.html`)
+5. **For Developers** — Link to Functional Specification (`docs/index.html`)
 6. **Contact Us** — Social links: Facebook Group, Instagram (@karaokedirectory)
 
 ### Footer
@@ -1162,7 +1161,6 @@ Each public-facing page includes a `<meta name="description">` tag with a concis
 | `about.html` | "Learn about the Greater Austin Karaoke Directory — a community-sourced guide to karaoke nights across Austin, Texas." |
 | `submit.html` | "Submit a karaoke venue to the Greater Austin Karaoke Directory. Help us keep Austin's karaoke scene up to date." |
 | `bingo.html` | "Play Karaoke Bingo at your next karaoke night! A fun interactive game from the Austin Karaoke Directory." |
-| `codeexplained.html` | "An interactive guide to the Austin Karaoke Directory codebase — learn how vanilla JavaScript, HTML, and CSS power the app." |
 
 ### Open Graph and Twitter Card Tags
 

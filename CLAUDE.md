@@ -9,13 +9,14 @@
 **Target Users:** Karaoke enthusiasts looking for venues, schedules, and event details
 **Live Site:** [Add deployment URL when available]
 
-## Core Philosophy & Design Principles
+## Architecture
 
-### 1. No Framework, By Design
-- **Vanilla JavaScript only** - No React, Vue, Angular, etc.
-- Keeps the codebase educational, lightweight, and easy to understand
-- No build step required - edit and refresh
-- All patterns are explicit, not hidden behind framework "magic"
+### 1. Stack
+- **Vanilla JavaScript** (ES6 modules) for the application code
+- **HTML5 + CSS3** for structure and styling
+- **Leaflet.js** for the map view
+- **Font Awesome** for icons
+- Currently no build step — files served as-is
 
 ### 2. Mobile-First Responsive Design
 - Base styles target mobile devices
@@ -28,13 +29,13 @@
 - **JavaScript:** Behavior only (`js/` folder with ES6 modules)
 
 ### 4. Component-Based Architecture
-- Custom lightweight `Component` base class (`js/components/Component.js`)
-- State management via simple observer pattern (`js/core/state.js`)
+- `Component` base class (`js/components/Component.js`)
+- State management via observer pattern (`js/core/state.js`)
 - Event bus for component communication (`js/core/events.js`)
 
-### 5. Data-Driven
-- All venue data in `js/data.js` (currently 79 venues) — **the active runtime source**, plus canonical authoring source
-- Supabase wiring exists (`js/services/supabase.js`, JSONB-heavy 2-table schema in `supabase/migrations/`) but is currently **disabled** via `useSupabase: false` in `js/config.js`. Flip the flag to activate when ready to expand. See spec §11 *Storage and Data Flow*.
+### 5. Data Layer
+- All venue data in `js/data.js` (currently 79 venues) — the active runtime source, plus canonical authoring source
+- Supabase wiring exists (`js/services/supabase.js`, JSONB-heavy 2-table schema in `supabase/migrations/`) but is currently **disabled** via `useSupabase: false` in `js/config.js`. See spec §11 *Storage and Data Flow*.
 - Service layer abstracts data access (`js/services/venues.js`) — data-source agnostic, so the swap is a one-flag change
 - Schedule matching logic handles complex recurrence patterns
 
@@ -89,7 +90,6 @@ karaokedirectory/
 ├── bingo.html             # Karaoke bingo game
 ├── submit.html            # Venue submission form (mobile-first, single-flow)
 ├── editor.html            # Venue data editor tool
-├── codeexplained.html     # Interactive code documentation
 │
 ├── css/
 │   ├── base.css           # CSS variables, reset, typography (ALWAYS FIRST)
@@ -99,7 +99,6 @@ karaokedirectory/
 │   ├── bingo.css          # Bingo game styles (extends components)
 │   ├── editor.css         # Editor page styles (extends components)
 │   ├── submit.css         # Submission form styles (extends components)
-│   ├── docs.css           # Documentation page styles (codeexplained.html)
 │   └── snowflakes.css     # Seasonal snowfall animation (disabled, commented out in index.html)
 │
 ├── js/
@@ -313,7 +312,6 @@ All pages should load CSS in this order for consistency:
 | submit.html | base, layout, components, views, submit |
 | bingo.html | base, layout, components, bingo |
 | editor.html | base, layout, components, editor |
-| codeexplained.html | base, layout, components, docs |
 
 ### BEM Naming
 - Block: `.venue-card`
@@ -591,8 +589,6 @@ The PO can override the default mapping when business context warrants it (e.g.,
 - `docs/architecture.md` - **Architecture Reference** — Mermaid.js diagrams covering module dependencies, component hierarchy, data flow, event lifecycle, state management, and CSS architecture.
 - `docs/patterns.md` - **Code Pattern Cookbook** — 10 annotated recipes for common implementation tasks (add venue, add view, add component, add tag, etc.).
 - `README.md` - Public-facing project documentation
-- `codeexplained.html` - Interactive beginner's guide to the codebase
-- Inline comments in `index.html` - Extensive HTML documentation
 - JSDoc comments in JavaScript files
 
 ---

@@ -1,6 +1,6 @@
 /**
- * Base Component class for UI components
- * Provides a lightweight component pattern without a framework
+ * Base Component class for UI components.
+ * Subclasses override template() and afterRender() to render markup and bind behavior.
  */
 
 export class Component {

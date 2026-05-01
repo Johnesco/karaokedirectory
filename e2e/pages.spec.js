@@ -29,10 +29,4 @@ test.describe('Secondary pages load correctly', () => {
     await expect(editorMain).toBeVisible({ timeout: 10000 });
   });
 
-  test('code explained page renders content', async ({ page }) => {
-    await page.goto('/codeexplained.html');
-    const docsContainer = page.locator('.docs-container');
-    await expect(docsContainer).toBeVisible({ timeout: 5000 });
-  });
-
 });
