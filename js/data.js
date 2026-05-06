@@ -1223,14 +1223,14 @@ const karaokeData = {
           "frequency": "once",
           "date": "2026-05-08",
           "startTime": "19:00",
-          "endTime": "00:00",
+          "endTime": "01:00",
           "eventName": "Karaoke with Xpider @ Highball!"
         },
         {
           "frequency": "once",
           "date": "2026-05-09",
           "startTime": "19:00",
-          "endTime": "00:00",
+          "endTime": "01:00",
           "eventName": "Karaoke with Xpider @ Highball!"
         }
       ],
