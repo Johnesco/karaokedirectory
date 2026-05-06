@@ -1221,30 +1221,16 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "once",
-          "date": "2026-03-13",
-          "startTime": "21:00",
-          "endTime": "02:00",
+          "date": "2026-05-08",
+          "startTime": "19:00",
+          "endTime": "00:00",
           "eventName": "Karaoke with Xpider @ Highball!"
         },
         {
           "frequency": "once",
-          "date": "2026-03-14",
-          "startTime": "21:00",
-          "endTime": "02:00",
-          "eventName": "Karaoke with Xpider @ Highball!"
-        },
-        {
-          "frequency": "once",
-          "date": "2026-03-15",
-          "startTime": "21:00",
-          "endTime": "02:00",
-          "eventName": "Karaoke with Xpider @ Highball!"
-        },
-        {
-          "frequency": "once",
-          "date": "2026-04-25",
-          "startTime": "21:00",
-          "endTime": "02:00",
+          "date": "2026-05-09",
+          "startTime": "19:00",
+          "endTime": "00:00",
           "eventName": "Karaoke with Xpider @ Highball!"
         }
       ],
@@ -1683,19 +1669,18 @@ const karaokeData = {
       },
       "schedule": [
         {
-          "frequency": "once",
-          "date": "2026-03-05",
+          "frequency": "first",
+          "day": "Thursday",
           "startTime": "18:00",
-          "endTime": "21:00",
-          "eventName": "Sip and Sing",
-          "eventUrl": "https://www.facebook.com/share/1FnpwKxHaY/"
+          "endTime": "22:00"
         }
       ],
       "host": {
         "company": "Lion's Den Tea"
       },
       "socials": {
-        "instagram": "https://www.instagram.com/lionsdentea/"
+        "instagram": "https://www.instagram.com/lionsdentea/",
+        "facebook": "https://www.facebook.com/lionsdentea/"
       },
       "tags": [
         "lgbtq"
