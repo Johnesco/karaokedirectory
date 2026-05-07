@@ -466,6 +466,18 @@ Not every change needs the full ceremony. Here's when you can compress:
 - Setup or usage instructions
 - Project overview
 
+**WRITE a new ADR** in `docs/adr/` when you make an architectural decision that meets the [threshold rule](https://github.com/Johnesco/sdlc-baseline/blob/main/docs/adrs.md#threshold-rule--when-to-write-one): the decision is expensive to reverse, reasonable contributors would consider alternatives, or future contributors will second-guess it. Use the [sdlc-baseline ADR template](https://github.com/Johnesco/sdlc-baseline/blob/main/examples/adr-template.md). Update `docs/adr/README.md` with the new entry.
+
+### Architecture Decisions
+
+Architectural decisions are recorded as ADRs in [`docs/adr/`](docs/adr/). See [sdlc-baseline `docs/adrs.md`](https://github.com/Johnesco/sdlc-baseline/blob/main/docs/adrs.md) for protocol, format, and threshold rule.
+
+Current ADRs:
+- [ADR-001](docs/adr/001-supabase-schema-jsonb.md) — Supabase schema: JSONB venues over normalized relational
+- [ADR-002](docs/adr/002-vanilla-js-no-build.md) — Vanilla JS, no framework, no build step
+- [ADR-003](docs/adr/003-github-pages-deploy.md) — GitHub Pages as deploy target
+- [ADR-004](docs/adr/004-parallel-data-source-flag.md) — Parallel data source via URL flag
+
 ## Development Workflow
 
 ### GitHub Issues & Projects
