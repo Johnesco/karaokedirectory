@@ -4,3 +4,6 @@
   - [Functional Specification](functional-spec.md)
   - [Architecture](architecture.md)
   - [Code Patterns](patterns.md)
+- **Architecture Decisions**
+  - [ADR Index](adr/README.md)
+  - [001: Supabase JSONB schema](adr/001-supabase-schema-jsonb.md)
