@@ -73,21 +73,16 @@
 }
 
 /* ---- Form rows / fields ----
- * Mobile: single column. Desktop (>=768px): auto-fit multi-column.
+ * Container-relative auto-fit: collapses to 1 column when narrower than ~200px + gap,
+ * fans out to N columns as the container widens. min(200px, 100%) prevents overflow
+ * inside containers narrower than the 200px floor.
  */
 
 .form-row {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
     gap: var(--spacing-md);
     margin-bottom: var(--spacing-md);
-}
-
-@media (min-width: 768px) {
-    .form-row {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    }
 }
 
 .form-row:last-child {
@@ -100,10 +95,8 @@
     gap: var(--spacing-xs);
 }
 
-@media (min-width: 768px) {
-    .form-group--full {
-        grid-column: 1 / -1;
-    }
+.form-group--full {
+    grid-column: 1 / -1;
 }
 
 .form-group label {
@@ -157,30 +150,22 @@
     line-height: 1.4;
 }
 
-/* ---- Schedule entry ---- */
+/* ---- Schedule entry ----
+ * Container-relative auto-fit. With 5-6 visible fields (Frequency, Day/Date,
+ * [EventName], StartTime, EndTime, EventUrl), a 160px floor settles into
+ * 1 col on mobile and ~3 cols at the 700px form max — avoiding the orphaned
+ * cell from the old fixed 4-col layout. min-width: 0 on children stops
+ * intrinsic-min-content from breaking out of grid tracks.
+ */
 
 .schedule-entry {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-sm);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr));
+    gap: var(--spacing-md);
     padding: var(--spacing-md);
     background: var(--bg-secondary);
     border-radius: var(--border-radius-sm);
     margin-bottom: var(--spacing-sm);
-}
-
-@media (min-width: 768px) {
-    .schedule-entry {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: var(--spacing-md);
-    }
-}
-
-@media (min-width: 1024px) {
-    .schedule-entry {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
 }
 
 .schedule-entry .form-group {
