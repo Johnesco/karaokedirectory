@@ -98,8 +98,8 @@ const karaokeData = {
   },
   "listings": [
     {
-      "id": "the-alcove-cantina",
-      "name": "The Alcove Cantina",
+      "id": "sociedad",
+      "name": "Sociedad",
       "tags": [
         "restaurant"
       ],
@@ -113,6 +113,12 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "every",
+          "day": "Tuesday",
+          "startTime": "19:30",
+          "endTime": "00:00"
+        },
+        {
+          "frequency": "every",
           "day": "Wednesday",
           "startTime": "19:30",
           "endTime": "00:00"
@@ -122,7 +128,7 @@ const karaokeData = {
         "company": "Diamond Karaoke Austin"
       },
       "socials": {
-        "facebook": "https://www.facebook.com/groups/1594100210824616/user/100063785610717/",
+        "facebook": "https://www.facebook.com/AlcoveCantina",
         "instagram": "https://www.instagram.com/alcovecantinarr/",
         "twitter": "https://twitter.com/AlcoveCantina",
         "website": "https://www.alcovecantina.com/"
@@ -1620,7 +1626,7 @@ const karaokeData = {
       },
       "socials": {
         "facebook": "https://www.facebook.com/NomadBarATX",
-        "instagram": "https://www.instagram.com/alcovecantinarr/",
+        "instagram": "https://www.instagram.com/nomadbar/",
         "website": "http://knomadbar.com/"
       },
       "coordinates": {
