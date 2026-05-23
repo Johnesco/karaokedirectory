@@ -1970,11 +1970,7 @@ const karaokeData = {
         "all-ages"
       ],
       "dedicated": false,
-      "active": false,
-      "activePeriod": {
-        "start": "2025-12-18",
-        "end": "2026-01-11"
-      },
+      "active": true,
       "address": {
         "street": "200 N. Main St.",
         "city": "Buda",
@@ -1983,10 +1979,10 @@ const karaokeData = {
       },
       "schedule": [
         {
-          "frequency": "every",
-          "day": "Wednesday",
-          "startTime": "18:00",
-          "endTime": "21:00"
+          "frequency": "once",
+          "date": "2026-05-23",
+          "startTime": "19:00",
+          "endTime": "22:00"
         }
       ],
       "host": null,
