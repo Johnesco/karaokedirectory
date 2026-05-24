@@ -383,11 +383,6 @@
     border-top: 1px solid var(--border-color);
 }
 
-.btn--large {
-    padding: var(--spacing-md) var(--spacing-xl);
-    font-size: var(--font-size-lg);
-}
-
 .btn--danger {
     background: transparent;
     color: var(--color-error);

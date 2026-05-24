@@ -400,18 +400,6 @@
     max-width: 360px;
 }
 
-.btn--large {
-    padding: var(--spacing-md) var(--spacing-xl);
-    font-size: var(--font-size-lg);
-    min-height: 52px;
-}
-
-/* ---- Buttons (general touch target) ---- */
-
-.btn {
-    min-height: 44px;
-}
-
 /* ---- Status messages ---- */
 
 .rate-limit-warning {
