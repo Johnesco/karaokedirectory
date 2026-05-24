@@ -7,9 +7,10 @@
 
 import { Component } from '../components/Component.js';
 import { renderVenueCard } from '../components/VenueCard.js';
+import { attachVenueSelectionListener } from '../components/venue-selection.js';
 import { getState, subscribe } from '../core/state.js';
-import { on, emit, Events } from '../core/events.js';
-import { getVenuesSorted, getVenueById } from '../services/venues.js';
+import { on, Events } from '../core/events.js';
+import { getVenuesSorted } from '../services/venues.js';
 import { getSortableName } from '../utils/string.js';
 
 export class AlphabeticalView extends Component {
@@ -108,20 +109,7 @@ export class AlphabeticalView extends Component {
             this._indexObserver.observe(indexEl);
         }
 
-        // Event delegation for venue card clicks (whole card is clickable)
-        this.delegate('click', '.venue-card', (e, target) => {
-            // Don't trigger modal if clicking on a link (like address)
-            if (e.target.closest('a')) {
-                return;
-            }
-
-            e.preventDefault();
-            const venueId = target.dataset.venueId;
-            const venue = getVenueById(venueId);
-            if (venue) {
-                emit(Events.VENUE_SELECTED, venue);
-            }
-        });
+        attachVenueSelectionListener(this);
     }
 
     onDestroy() {

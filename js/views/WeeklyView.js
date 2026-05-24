@@ -8,10 +8,11 @@
 import { Component } from '../components/Component.js';
 import { renderDayCard } from '../components/DayCard.js';
 import { renderExtendedSection, attachExtendedSectionListeners } from '../components/ExtendedSection.js';
+import { attachVenueSelectionListener } from '../components/venue-selection.js';
 import { getState, subscribe } from '../core/state.js';
-import { on, emit, Events } from '../core/events.js';
+import { on, Events } from '../core/events.js';
 import { getWeekDates, getWeekStart, getNextWeekRange, getThisMonthRange, getNextMonthRange, getMonthName } from '../utils/date.js';
-import { getVenueById, getVenuesForDate } from '../services/venues.js';
+import { getVenuesForDate } from '../services/venues.js';
 
 export class WeeklyView extends Component {
     init() {
@@ -117,20 +118,7 @@ export class WeeklyView extends Component {
             }
         });
 
-        // Event delegation for venue card clicks (whole card is clickable)
-        this.delegate('click', '.venue-card', (e, target) => {
-            // Don't trigger modal if clicking on a link (like address)
-            if (e.target.closest('a')) {
-                return;
-            }
-
-            e.preventDefault();
-            const venueId = target.dataset.venueId;
-            const venue = getVenueById(venueId);
-            if (venue) {
-                emit(Events.VENUE_SELECTED, venue);
-            }
-        });
+        attachVenueSelectionListener(this);
 
         // Attach extended section toggle listeners
         if (this.container) {
