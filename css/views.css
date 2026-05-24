@@ -915,16 +915,12 @@ body.view--map .app-layout__detail {
 }
 
 .map-venue-card__schedule-table {
-    width: 100%;
     font-size: var(--font-size-sm);
-    border-collapse: collapse;
 }
 
 .map-venue-card__schedule-table th,
 .map-venue-card__schedule-table td {
-    text-align: left;
     padding: var(--spacing-xs) var(--spacing-sm);
-    border-bottom: 1px solid var(--border-color);
 }
 
 .map-venue-card__schedule-table th {

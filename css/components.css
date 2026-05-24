@@ -541,7 +541,8 @@
 }
 
 .venue-modal__schedule-table,
-.detail-pane__schedule-table {
+.detail-pane__schedule-table,
+.map-venue-card__schedule-table {
     width: 100%;
     border-collapse: collapse;
 }
@@ -549,10 +550,18 @@
 .venue-modal__schedule-table th,
 .venue-modal__schedule-table td,
 .detail-pane__schedule-table th,
-.detail-pane__schedule-table td {
-    padding: var(--spacing-sm);
+.detail-pane__schedule-table td,
+.map-venue-card__schedule-table th,
+.map-venue-card__schedule-table td {
     text-align: left;
     border-bottom: 1px solid var(--border-color);
+}
+
+.venue-modal__schedule-table th,
+.venue-modal__schedule-table td,
+.detail-pane__schedule-table th,
+.detail-pane__schedule-table td {
+    padding: var(--spacing-sm);
 }
 
 .venue-modal__schedule-table th,
