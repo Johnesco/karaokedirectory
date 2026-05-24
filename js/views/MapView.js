@@ -10,9 +10,9 @@ import { getState, setState, subscribe } from '../core/state.js';
 import { emit, on, Events } from '../core/events.js';
 import { getVenuesWithCoordinates, getAllVenues } from '../services/venues.js';
 import { escapeHtml } from '../utils/string.js';
-import { buildDirectionsUrl, buildMapUrl, formatAddress, createSocialLinks, shareVenue } from '../utils/url.js';
+import { buildDirectionsUrl, shareVenue } from '../utils/url.js';
 import { renderTags } from '../utils/tags.js';
-import { renderScheduleTable, renderScheduleCompact, renderActivePeriod, renderHostSection } from '../utils/render.js';
+import { renderScheduleCompact, renderVenueDetailSections } from '../utils/render.js';
 
 export class MapView extends Component {
     init() {
@@ -392,10 +392,6 @@ export class MapView extends Component {
         const cardEl = this.$('#map-venue-card');
         if (!cardEl || !venue) return;
 
-        const addressHtml = formatAddress(venue.address);
-        const mapUrl = buildMapUrl(venue.address, venue.name);
-        const directionsUrl = buildDirectionsUrl(venue.address, venue.name);
-        const socialLinksHtml = createSocialLinks(venue.socials, { size: 'fa-lg' });
         const tagsHtml = renderTags(venue.tags, { dedicated: venue.dedicated });
 
         cardEl.innerHTML = `
@@ -410,43 +406,7 @@ export class MapView extends Component {
             </div>
             ${tagsHtml}
             <div class="map-venue-card__detail-content">
-                <section class="map-venue-card__section">
-                    <h4><i class="fa-solid fa-location-dot"></i> Location</h4>
-                    <address class="map-venue-card__address">${addressHtml}</address>
-                    <div class="map-venue-card__map-links">
-                        <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" class="btn btn--secondary btn--small">
-                            <i class="fa-solid fa-map"></i> Map
-                        </a>
-                        <a href="${directionsUrl}" target="_blank" rel="noopener noreferrer" class="btn btn--secondary btn--small">
-                            <i class="fa-solid fa-diamond-turn-right"></i> Directions
-                        </a>
-                        <button class="btn btn--secondary btn--small map-venue-card__share" type="button">
-                            <i class="fa-solid fa-share-from-square"></i> Share
-                        </button>
-                    </div>
-                </section>
-
-                <section class="map-venue-card__section">
-                    <h4><i class="fa-regular fa-calendar"></i> Schedule</h4>
-                    ${renderScheduleTable(venue.schedule, 'map-venue-card')}
-                    ${renderActivePeriod(venue.activePeriod, 'map-venue-card')}
-                </section>
-
-                ${renderHostSection(venue.host, 'map-venue-card', { socialSize: '' })}
-
-                ${socialLinksHtml ? `
-                    <section class="map-venue-card__section">
-                        <h4><i class="fa-solid fa-share-nodes"></i> Venue Social Media</h4>
-                        <div class="map-venue-card__socials">${socialLinksHtml}</div>
-                    </section>
-                ` : ''}
-
-                ${venue.phone ? `
-                    <section class="map-venue-card__section">
-                        <h4><i class="fa-solid fa-phone"></i> Contact</h4>
-                        <a href="tel:${venue.phone}" class="map-venue-card__phone">${escapeHtml(venue.phone)}</a>
-                    </section>
-                ` : ''}
+                ${renderVenueDetailSections(venue, { classPrefix: 'map-venue-card', hostSocialSize: '' })}
             </div>
         `;
 

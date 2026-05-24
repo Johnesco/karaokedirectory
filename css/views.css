@@ -876,18 +876,6 @@ body.view--map .app-layout__detail {
     padding-top: var(--spacing-sm);
 }
 
-.map-venue-card__section h4 {
-    font-size: var(--font-size-sm);
-    font-weight: 600;
-    margin: 0 0 var(--spacing-xs);
-    color: var(--text-secondary);
-}
-
-.map-venue-card__section h4 i {
-    margin-right: var(--spacing-xs);
-    color: var(--color-primary);
-}
-
 .map-venue-card__section h3 {
     font-size: var(--font-size-sm);
     font-weight: 600;

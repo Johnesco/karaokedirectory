@@ -5,11 +5,11 @@
 
 import { Component } from './Component.js';
 import { escapeHtml } from '../utils/string.js';
-import { buildMapUrl, buildDirectionsUrl, createSocialLinks, formatAddress, shareVenue } from '../utils/url.js';
+import { shareVenue } from '../utils/url.js';
 import { on, emit, Events } from '../core/events.js';
 import { getState } from '../core/state.js';
 import { renderTags } from '../utils/tags.js';
-import { renderScheduleTable, renderActivePeriod, renderHostSection } from '../utils/render.js';
+import { renderVenueDetailSections } from '../utils/render.js';
 
 export class VenueModal extends Component {
     init() {
@@ -30,11 +30,6 @@ export class VenueModal extends Component {
             return '<div class="venue-modal" hidden></div>';
         }
 
-        const addressHtml = formatAddress(venue.address);
-        const mapUrl = buildMapUrl(venue.address, venue.name);
-        const directionsUrl = buildDirectionsUrl(venue.address, venue.name);
-        const socialLinksHtml = createSocialLinks(venue.socials, { size: 'fa-lg' });
-
         return `
             <div class="venue-modal venue-modal--open" role="dialog" aria-modal="true" aria-labelledby="venue-modal-title">
                 <div class="venue-modal__backdrop"></div>
@@ -51,47 +46,7 @@ export class VenueModal extends Component {
                         ${renderTags(venue.tags, { dedicated: venue.dedicated })}
                     </header>
 
-                    <section class="venue-modal__section">
-                        <h3><i class="fa-solid fa-location-dot"></i> Location</h3>
-                        <address class="venue-modal__address">
-                            ${addressHtml}
-                        </address>
-                        <div class="venue-modal__map-links">
-                            <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" class="btn btn--secondary">
-                                <i class="fa-solid fa-map"></i> View Map
-                            </a>
-                            <a href="${directionsUrl}" target="_blank" rel="noopener noreferrer" class="btn btn--secondary">
-                                <i class="fa-solid fa-diamond-turn-right"></i> Directions
-                            </a>
-                            <button class="btn btn--secondary venue-modal__share" type="button">
-                                <i class="fa-solid fa-share-from-square"></i> Share
-                            </button>
-                        </div>
-                    </section>
-
-                    <section class="venue-modal__section">
-                        <h3><i class="fa-regular fa-calendar"></i> Schedule</h3>
-                        ${renderScheduleTable(venue.schedule, 'venue-modal')}
-                        ${renderActivePeriod(venue.activePeriod, 'venue-modal')}
-                    </section>
-
-                    ${renderHostSection(venue.host, 'venue-modal')}
-
-                    ${socialLinksHtml ? `
-                        <section class="venue-modal__section">
-                            <h3><i class="fa-solid fa-share-nodes"></i> Venue Social Media</h3>
-                            <div class="venue-modal__socials">
-                                ${socialLinksHtml}
-                            </div>
-                        </section>
-                    ` : ''}
-
-                    ${venue.phone ? `
-                        <section class="venue-modal__section">
-                            <h3><i class="fa-solid fa-phone"></i> Contact</h3>
-                            <a href="tel:${venue.phone}" class="venue-modal__phone">${escapeHtml(venue.phone)}</a>
-                        </section>
-                    ` : ''}
+                    ${renderVenueDetailSections(venue, { classPrefix: 'venue-modal' })}
                 </div>
             </div>
         `;

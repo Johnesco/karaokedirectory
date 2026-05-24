@@ -5,7 +5,7 @@
 
 import { escapeHtml } from './string.js';
 import { formatScheduleEntry, formatActivePeriodText, WEEKDAYS } from './date.js';
-import { createSocialLinks, sanitizeUrl } from './url.js';
+import { buildMapUrl, buildDirectionsUrl, createSocialLinks, formatAddress, sanitizeUrl } from './url.js';
 
 /**
  * Render a schedule table for venue details
@@ -218,6 +218,66 @@ export function getScheduleContext(venue, schedule) {
     }
 
     return { frequencyLabel, moreCount, moreText };
+}
+
+/**
+ * Render the full venue-detail sections (location, schedule, host, socials, contact)
+ * shared by VenueModal, VenueDetailPane, and MapView's expanded detail card.
+ *
+ * Caller wraps these sections in their own outer container + header — the surfaces
+ * differ in their wrappers (modal backdrop vs sticky pane vs floating map card).
+ *
+ * @param {Object} venue - Venue data object
+ * @param {Object} options
+ * @param {string} options.classPrefix - BEM prefix (e.g. 'venue-modal', 'detail-pane', 'map-venue-card')
+ * @param {string} [options.hostSocialSize='fa-lg'] - Font Awesome size class for host socials ('' for compact)
+ * @returns {string} HTML string of <section> elements
+ */
+export function renderVenueDetailSections(venue, { classPrefix, hostSocialSize = 'fa-lg' }) {
+    const addressHtml = formatAddress(venue.address);
+    const mapUrl = buildMapUrl(venue.address, venue.name);
+    const directionsUrl = buildDirectionsUrl(venue.address, venue.name);
+    const socialLinksHtml = createSocialLinks(venue.socials, { size: 'fa-lg' });
+
+    return `
+        <section class="${classPrefix}__section">
+            <h3><i class="fa-solid fa-location-dot"></i> Location</h3>
+            <address class="${classPrefix}__address">${addressHtml}</address>
+            <div class="${classPrefix}__map-links">
+                <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" class="btn btn--secondary">
+                    <i class="fa-solid fa-map"></i> View Map
+                </a>
+                <a href="${directionsUrl}" target="_blank" rel="noopener noreferrer" class="btn btn--secondary">
+                    <i class="fa-solid fa-diamond-turn-right"></i> Directions
+                </a>
+                <button class="btn btn--secondary ${classPrefix}__share" type="button">
+                    <i class="fa-solid fa-share-from-square"></i> Share
+                </button>
+            </div>
+        </section>
+
+        <section class="${classPrefix}__section">
+            <h3><i class="fa-regular fa-calendar"></i> Schedule</h3>
+            ${renderScheduleTable(venue.schedule, classPrefix)}
+            ${renderActivePeriod(venue.activePeriod, classPrefix)}
+        </section>
+
+        ${renderHostSection(venue.host, classPrefix, { socialSize: hostSocialSize })}
+
+        ${socialLinksHtml ? `
+            <section class="${classPrefix}__section">
+                <h3><i class="fa-solid fa-share-nodes"></i> Venue Social Media</h3>
+                <div class="${classPrefix}__socials">${socialLinksHtml}</div>
+            </section>
+        ` : ''}
+
+        ${venue.phone ? `
+            <section class="${classPrefix}__section">
+                <h3><i class="fa-solid fa-phone"></i> Contact</h3>
+                <a href="tel:${venue.phone}" class="${classPrefix}__phone">${escapeHtml(venue.phone)}</a>
+            </section>
+        ` : ''}
+    `;
 }
 
 /**
