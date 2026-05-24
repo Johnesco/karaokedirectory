@@ -203,22 +203,36 @@ export function formatTimeRange(startTime, endTime) {
 }
 
 /**
+ * Parse a YYYY-MM-DD string as a local-time Date.
+ * `new Date("2026-05-23")` treats the string as ISO/UTC midnight, which
+ * lands at the prior calendar day in any timezone west of UTC (e.g.
+ * 2026-05-22 19:00 in America/Chicago, UTC-5). Use this anywhere a
+ * date-only string is parsed for comparison against local dates.
+ * @param {string} s - YYYY-MM-DD string
+ * @returns {Date} Date at midnight local time on that calendar day
+ */
+export function parseLocalDate(s) {
+    const [y, m, d] = s.split('-').map(Number);
+    return new Date(y, m - 1, d);
+}
+
+/**
  * Check if a date is within a range
  * @param {Date} date - Date to check
- * @param {string|null} startDate - Start date ISO string
- * @param {string|null} endDate - End date ISO string
- * @returns {boolean} True if date is in range
+ * @param {string|null} startDate - Start date as YYYY-MM-DD
+ * @param {string|null} endDate - End date as YYYY-MM-DD
+ * @returns {boolean} True if date is in range (inclusive)
  */
 export function isDateInRange(date, startDate, endDate) {
     const checkDate = new Date(date).setHours(0, 0, 0, 0);
 
     if (startDate) {
-        const start = new Date(startDate).setHours(0, 0, 0, 0);
+        const start = parseLocalDate(startDate).setHours(0, 0, 0, 0);
         if (checkDate < start) return false;
     }
 
     if (endDate) {
-        const end = new Date(endDate).setHours(23, 59, 59, 999);
+        const end = parseLocalDate(endDate).setHours(23, 59, 59, 999);
         if (checkDate > end) return false;
     }
 

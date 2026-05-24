@@ -2,7 +2,7 @@
  * Data validation utilities
  */
 
-import { WEEKDAYS, ORDINALS } from './date.js';
+import { WEEKDAYS, ORDINALS, parseLocalDate } from './date.js';
 
 /**
  * Validate venue data against schema
@@ -66,7 +66,7 @@ export function validateVenue(venue) {
             errors.push('Invalid end date format (use YYYY-MM-DD)');
         }
         if (venue.activePeriod.start && venue.activePeriod.end) {
-            if (new Date(venue.activePeriod.start) > new Date(venue.activePeriod.end)) {
+            if (parseLocalDate(venue.activePeriod.start) > parseLocalDate(venue.activePeriod.end)) {
                 errors.push('Start date must be before end date');
             }
         }
