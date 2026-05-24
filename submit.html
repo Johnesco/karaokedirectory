@@ -185,55 +185,55 @@
                                 <div class="tag-checkbox-grid">
                                     <label class="tag-checkbox-option">
                                         <input type="checkbox" name="tag-lgbtq" value="lgbtq">
-                                        <span class="tag-badge" style="background:#e040fb;color:#fff">LGBTQ+</span>
+                                        <span class="tag-badge" data-tag="lgbtq">LGBTQ+</span>
                                     </label>
                                     <label class="tag-checkbox-option">
                                         <input type="checkbox" name="tag-dive" value="dive">
-                                        <span class="tag-badge" style="background:#8d6e63;color:#fff">Dive Bar</span>
+                                        <span class="tag-badge" data-tag="dive">Dive Bar</span>
                                     </label>
                                     <label class="tag-checkbox-option">
                                         <input type="checkbox" name="tag-sports-bar" value="sports-bar">
-                                        <span class="tag-badge" style="background:#4caf50;color:#fff">Sports Bar</span>
+                                        <span class="tag-badge" data-tag="sports-bar">Sports Bar</span>
                                     </label>
                                     <label class="tag-checkbox-option">
                                         <input type="checkbox" name="tag-country-bar" value="country-bar">
-                                        <span class="tag-badge" style="background:#ff9800;color:#fff">Country Bar</span>
+                                        <span class="tag-badge" data-tag="country-bar">Country Bar</span>
                                     </label>
                                     <label class="tag-checkbox-option">
                                         <input type="checkbox" name="tag-restaurant" value="restaurant">
-                                        <span class="tag-badge" style="background:#795548;color:#fff">Restaurant</span>
+                                        <span class="tag-badge" data-tag="restaurant">Restaurant</span>
                                     </label>
                                     <label class="tag-checkbox-option">
                                         <input type="checkbox" name="tag-brewery" value="brewery">
-                                        <span class="tag-badge" style="background:#ff5722;color:#fff">Brewery</span>
+                                        <span class="tag-badge" data-tag="brewery">Brewery</span>
                                     </label>
                                     <label class="tag-checkbox-option">
                                         <input type="checkbox" name="tag-craft-cocktails" value="craft-cocktails">
-                                        <span class="tag-badge" style="background:#e91e63;color:#fff">Craft Cocktails</span>
+                                        <span class="tag-badge" data-tag="craft-cocktails">Craft Cocktails</span>
                                     </label>
                                     <label class="tag-checkbox-option">
                                         <input type="checkbox" name="tag-neighborhood" value="neighborhood">
-                                        <span class="tag-badge" style="background:#9e9e9e;color:#fff">Neighborhood Bar</span>
+                                        <span class="tag-badge" data-tag="neighborhood">Neighborhood Bar</span>
                                     </label>
                                     <label class="tag-checkbox-option">
                                         <input type="checkbox" name="tag-live-band-karaoke" value="live-band-karaoke">
-                                        <span class="tag-badge" style="background:#9c27b0;color:#fff">Live Band Karaoke</span>
+                                        <span class="tag-badge" data-tag="live-band-karaoke">Live Band Karaoke</span>
                                     </label>
                                     <label class="tag-checkbox-option">
                                         <input type="checkbox" name="tag-outdoor" value="outdoor">
-                                        <span class="tag-badge" style="background:#4caf50;color:#fff">Outdoor / Patio</span>
+                                        <span class="tag-badge" data-tag="outdoor">Outdoor / Patio</span>
                                     </label>
                                     <label class="tag-checkbox-option">
                                         <input type="checkbox" name="tag-games" value="games">
-                                        <span class="tag-badge" style="background:#00bcd4;color:#fff">Games / Arcade</span>
+                                        <span class="tag-badge" data-tag="games">Games / Arcade</span>
                                     </label>
                                     <label class="tag-checkbox-option">
                                         <input type="checkbox" name="tag-billiards" value="billiards">
-                                        <span class="tag-badge" style="background:#607d8b;color:#fff">Billiards</span>
+                                        <span class="tag-badge" data-tag="billiards">Billiards</span>
                                     </label>
                                     <label class="tag-checkbox-option">
                                         <input type="checkbox" name="tag-smoking-inside" value="smoking-inside">
-                                        <span class="tag-badge" style="background:#e90707;color:#fff">Smoking Inside</span>
+                                        <span class="tag-badge" data-tag="smoking-inside">Smoking Inside</span>
                                     </label>
                                 </div>
                                 <div class="form-row" style="margin-top: var(--spacing-md);">
@@ -415,7 +415,19 @@
         </p>
     </footer>
 
+    <script src="js/data.js"></script>
     <script>
+        // Hydrate tag-badge colors from tagDefinitions (single source of truth in data.js)
+        (function hydrateTagBadgeColors() {
+            const defs = (typeof karaokeData !== 'undefined' && karaokeData.tagDefinitions) || {};
+            document.querySelectorAll('.tag-badge[data-tag]').forEach(el => {
+                const def = defs[el.dataset.tag];
+                if (!def) return;
+                el.style.background = def.color;
+                el.style.color = def.textColor;
+            });
+        })();
+
         // Rate limiting configuration
         const RATE_LIMIT_CONFIG = {
             maxSubmissions: 3,      // Max submissions allowed
