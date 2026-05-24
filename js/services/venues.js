@@ -31,6 +31,18 @@ function isVenueActive(venue) {
 }
 
 /**
+ * Check if a venue's activePeriod includes the given date.
+ * Venues without an activePeriod are always considered active.
+ * @param {Object} venue - Venue object
+ * @param {Date} date - Date to check
+ * @returns {boolean} True if the venue is in its active window on `date`
+ */
+function isVenueActiveOn(venue, date) {
+    if (!venue.activePeriod) return true;
+    return isDateInRange(date, venue.activePeriod.start, venue.activePeriod.end);
+}
+
+/**
  * Get only active venues (filters out inactive ones)
  * @returns {Object[]} Active venues only
  */
@@ -119,24 +131,9 @@ export function getVenuesForDate(date, options = {}) {
     const { includeDedicated = true, searchQuery = '' } = options;
 
     return getActiveVenues().filter(venue => {
-        // Check dedicated filter
-        if (!includeDedicated && venue.dedicated) {
-            return false;
-        }
-
-        // Check search query
-        if (searchQuery && !venueMatchesSearch(venue, searchQuery)) {
-            return false;
-        }
-
-        // Check active period
-        if (venue.activePeriod) {
-            if (!isDateInRange(date, venue.activePeriod.start, venue.activePeriod.end)) {
-                return false;
-            }
-        }
-
-        // Check if any schedule matches this date
+        if (!includeDedicated && venue.dedicated) return false;
+        if (searchQuery && !venueMatchesSearch(venue, searchQuery)) return false;
+        if (!isVenueActiveOn(venue, date)) return false;
         return venue.schedule.some(sched => scheduleMatchesDate(sched, date));
     }).sort((a, b) => {
         // Special events sort to top
@@ -153,14 +150,17 @@ export function getVenuesForDate(date, options = {}) {
 }
 
 /**
- * Get all venues sorted alphabetically
+ * Get all venues sorted alphabetically.
+ * Filters out venues whose activePeriod doesn't include today — seasonally-
+ * bounded venues should not appear in the global list outside their window.
  * @param {Object} options - Filter options
  * @returns {Object[]} Sorted venues
  */
 export function getVenuesSorted(options = {}) {
     const { includeDedicated = true, searchQuery = '' } = options;
+    const today = new Date();
 
-    let result = getActiveVenues();
+    let result = getActiveVenues().filter(v => isVenueActiveOn(v, today));
 
     if (!includeDedicated) {
         result = result.filter(v => !v.dedicated);
@@ -210,10 +210,13 @@ function venueMatchesDedicated(venue, query) {
 }
 
 /**
- * Search venues by query
+ * Search venues by query.
+ * Uses venueMatchesSearch for matching (single source of truth) and filters
+ * out venues outside their activePeriod for today — a seasonally-bounded
+ * venue should not appear in search results outside its window.
  * @param {string} query - Search query
  * @param {Object} options - Search options
- * @returns {Object[]} Matching venues
+ * @returns {Object[]} Matching venues sorted with name-matches first
  */
 export function searchVenues(query, options = {}) {
     if (!query?.trim()) {
@@ -222,34 +225,12 @@ export function searchVenues(query, options = {}) {
 
     const q = query.toLowerCase().trim();
     const { includeDedicated = true } = options;
+    const today = new Date();
 
     return getActiveVenues().filter(venue => {
-        if (!includeDedicated && venue.dedicated) {
-            return false;
-        }
-
-        // Search in name
-        if (containsIgnoreCase(venue.name, q)) return true;
-
-        // Search in city
-        if (containsIgnoreCase(venue.address.city, q)) return true;
-
-        // Search in neighborhood
-        if (containsIgnoreCase(venue.address.neighborhood, q)) return true;
-
-        // Search in host name
-        if (containsIgnoreCase(venue.host?.name, q)) return true;
-
-        // Search in company
-        if (containsIgnoreCase(venue.host?.company, q)) return true;
-
-        // Search in tags (by ID or label)
-        if (venueMatchesTag(venue, q)) return true;
-
-        // Search for "dedicated" venues
-        if (venueMatchesDedicated(venue, q)) return true;
-
-        return false;
+        if (!includeDedicated && venue.dedicated) return false;
+        if (!isVenueActiveOn(venue, today)) return false;
+        return venueMatchesSearch(venue, q);
     }).sort((a, b) => {
         // Prioritize name matches
         const aNameMatch = containsIgnoreCase(a.name, q);
@@ -355,23 +336,20 @@ export function getNeighborhoods() {
 }
 
 /**
- * Get active venues with coordinates (for map view)
+ * Get active venues with coordinates (for map view).
+ * Also filters out venues outside their activePeriod for today.
  * @param {Object} options - Filter options
  * @returns {Object[]} Active venues with valid coordinates
  */
 export function getVenuesWithCoordinates(options = {}) {
     const { includeDedicated = true, searchQuery = '' } = options;
+    const today = new Date();
 
     return getActiveVenues().filter(v => {
-        // Must have coordinates
         if (!v.coordinates?.lat || !v.coordinates?.lng) return false;
-
-        // Check dedicated filter
         if (!includeDedicated && v.dedicated) return false;
-
-        // Check search query
+        if (!isVenueActiveOn(v, today)) return false;
         if (searchQuery && !venueMatchesSearch(v, searchQuery)) return false;
-
         return true;
     });
 }
