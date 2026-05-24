@@ -268,7 +268,7 @@
 }
 
 .extended-section__content {
-    transition: opacity var(--transition-normal);
+    transition: opacity var(--transition);
 }
 
 .extended-section__dedup-notice {
