@@ -10,10 +10,9 @@ import { getState, setState, subscribe } from '../core/state.js';
 import { emit, on, Events } from '../core/events.js';
 import { getVenuesWithCoordinates, getAllVenues } from '../services/venues.js';
 import { escapeHtml } from '../utils/string.js';
-import { formatScheduleEntry } from '../utils/date.js';
-import { buildDirectionsUrl, buildMapUrl, formatAddress, createSocialLinks, sanitizeUrl, shareVenue } from '../utils/url.js';
+import { buildDirectionsUrl, buildMapUrl, formatAddress, createSocialLinks, shareVenue } from '../utils/url.js';
 import { renderTags } from '../utils/tags.js';
-import { renderScheduleTable, renderActivePeriod, renderHostSection } from '../utils/render.js';
+import { renderScheduleTable, renderScheduleCompact, renderActivePeriod, renderHostSection } from '../utils/render.js';
 
 export class MapView extends Component {
     init() {
@@ -358,14 +357,7 @@ export class MapView extends Component {
         const cardEl = this.$('#map-venue-card');
         if (!cardEl || !venue) return;
 
-        // Build schedule HTML using shared utility
-        const scheduleHtml = venue.schedule.map(s => {
-            const { fullText } = formatScheduleEntry(s, { showEvery: false });
-            const eventLink = s.eventUrl
-                ? ` <a href="${escapeHtml(sanitizeUrl(s.eventUrl) || '')}" target="_blank" rel="noopener noreferrer" class="schedule-event-link" title="Event page"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>`
-                : '';
-            return `<div>${fullText}${eventLink}</div>`;
-        }).join('');
+        const scheduleHtml = renderScheduleCompact(venue.schedule);
 
         // Build directions URL
         const directionsUrl = buildDirectionsUrl(venue.address, venue.name);

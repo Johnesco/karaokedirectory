@@ -57,6 +57,23 @@ export function renderScheduleTable(schedule, classPrefix) {
 }
 
 /**
+ * Render a compact schedule list (div per entry, no table) for summary cards.
+ * Used by MapView's marker-popup card where a table would be too heavy.
+ * @param {Object[]} schedule - Array of schedule entries
+ * @returns {string} HTML string of <div> elements, or empty string
+ */
+export function renderScheduleCompact(schedule) {
+    if (!schedule || schedule.length === 0) return '';
+    return schedule.map(entry => {
+        const { fullText } = formatScheduleEntry(entry, { showEvery: false });
+        const eventLink = entry.eventUrl
+            ? ` <a href="${escapeHtml(sanitizeUrl(entry.eventUrl) || '')}" target="_blank" rel="noopener noreferrer" class="schedule-event-link" title="Event page"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>`
+            : '';
+        return `<div>${fullText}${eventLink}</div>`;
+    }).join('');
+}
+
+/**
  * Render an active period notice with icon
  * @param {Object} activePeriod - Object with start and/or end date strings
  * @param {string} classPrefix - CSS class prefix
