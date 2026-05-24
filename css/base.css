@@ -30,6 +30,17 @@
     --color-white: #ffffff;
     --color-black: #000000;
 
+    /* Social brand colors */
+    --color-social-facebook: #1877f2;
+    --color-social-instagram: #e4405f;
+    --color-social-twitter: #000000;
+    --color-social-tiktok: #000000;
+    --color-social-youtube: #ff0000;
+    --color-social-bluesky: #0085ff;
+
+    /* Accent — special-event venue cards */
+    --color-accent-special-event: #e91e63;
+
     /* Background */
     --bg-primary: var(--color-gray-900);
     --bg-secondary: var(--color-gray-800);
