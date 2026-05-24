@@ -312,6 +312,9 @@ All pages should load CSS in this order for consistency:
 | submit.html | base, layout, components, views, submit |
 | bingo.html | base, layout, components, bingo |
 | editor.html | base, layout, components, editor |
+| bday.html | base, layout, components (inline `<style>` for the rest) |
+
+Enforced by `scripts/check-css-load-order.js` — run it before merging any change that touches `<link>` tags. Exits non-zero on violation.
 
 ### BEM Naming
 - Block: `.venue-card`
