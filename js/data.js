@@ -1230,52 +1230,34 @@ const karaokeData = {
           "date": "2026-05-08",
           "startTime": "19:00",
           "endTime": "01:00",
-          "eventName": "Karaoke with Xpider @ Highball!"
+          "eventName": "Karaoke with Xpider @ Highball!",
+          "host": {
+            "name": "Xpider Cantu",
+            "website": "https://www.xpidermagic.com/karaoke"
+          }
         },
         {
           "frequency": "once",
           "date": "2026-05-09",
           "startTime": "19:00",
           "endTime": "01:00",
-          "eventName": "Karaoke with Xpider @ Highball!"
-        }
-      ],
-      "host": {
-        "name": "Xpider Cantu",
-        "website": "https://www.xpidermagic.com/karaoke"
-      },
-      "socials": {
-        "website": "https://drafthouse.com/austin/theater-bar/south-lamar",
-        "instagram": "https://www.instagram.com/highballaustin/?hl=en"
-      },
-      "tags": [
-        "lgbtq"
-      ],
-      "coordinates": {
-        "lat": 30.255811,
-        "lng": -97.7636195
-      }
-    },
-    {
-      "id": "the-highball-storyoke",
-      "name": "The Highball",
-      "active": true,
-      "dedicated": false,
-      "address": {
-        "street": "1120 S Lamar Blvd",
-        "city": "Austin",
-        "state": "TX",
-        "zip": "78704",
-        "neighborhood": ""
-      },
-      "schedule": [
+          "eventName": "Karaoke with Xpider @ Highball!",
+          "host": {
+            "name": "Xpider Cantu",
+            "website": "https://www.xpidermagic.com/karaoke"
+          }
+        },
         {
           "frequency": "once",
           "date": "2026-02-28",
           "startTime": "19:30",
           "endTime": "21:00",
           "eventName": "Story-Oke: Breakups @ Highball!",
-          "eventUrl": "https://fb.me/e/5vGkMpOuE"
+          "eventUrl": "https://fb.me/e/5vGkMpOuE",
+          "host": {
+            "company": "Story-Oke Austin",
+            "website": "https://www.storyokeaustin.com/"
+          }
         },
         {
           "frequency": "once",
@@ -1283,13 +1265,13 @@ const karaokeData = {
           "startTime": "19:30",
           "endTime": "21:00",
           "eventName": "Story-Oke: Soundtracks @ Highball!",
-          "eventUrl": "https://www.facebook.com/share/1CUHiRCZAH/"
+          "eventUrl": "https://www.facebook.com/share/1CUHiRCZAH/",
+          "host": {
+            "company": "Story-Oke Austin",
+            "website": "https://www.storyokeaustin.com/"
+          }
         }
       ],
-      "host": {
-        "company": "Story-Oke Austin",
-        "website": "https://www.storyokeaustin.com/"
-      },
       "socials": {
         "website": "https://drafthouse.com/austin/theater-bar/south-lamar",
         "instagram": "https://www.instagram.com/highballaustin/?hl=en"
@@ -1412,40 +1394,6 @@ const karaokeData = {
       "coordinates": {
         "lat": 30.4355974,
         "lng": -97.6738592
-      }
-    },
-    {
-      "id": "hudson-tavern-xpider",
-      "name": "Hudson Tavern",
-      "active": false,
-      "tags": [
-        "neighborhood"
-      ],
-      "dedicated": false,
-      "address": {
-        "street": "5000 Hudson Bend Rd Suite D",
-        "city": "Lake Travis",
-        "state": "TX",
-        "zip": "78734"
-      },
-      "schedule": [
-        {
-          "frequency": "every",
-          "day": "Friday",
-          "startTime": "21:00",
-          "endTime": "01:00"
-        }
-      ],
-      "host": {
-        "name": "Xpider"
-      },
-      "socials": {
-        "facebook": "https://www.facebook.com/thehudsontavern/",
-        "instagram": "https://www.instagram.com/explore/locations/1655266901454617/hudson-tavern/"
-      },
-      "coordinates": {
-        "lat": 30.413296837711,
-        "lng": -97.927601334553
       }
     },
     {

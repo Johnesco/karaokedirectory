@@ -140,6 +140,13 @@ for (const venue of data.listings) {
                     fail(venue, `${prefix} endTime "12:00" (noon) for a ${entry.startTime} start — likely typo`);
                 }
             }
+
+            // Per-show host (multi-host venues) — same empty-string rules as venue-level host
+            if (entry.host) {
+                for (const f of ['name', 'company', 'website']) {
+                    if (entry.host[f] === '') fail(venue, `${prefix} host.${f} is an empty string — omit the field instead`);
+                }
+            }
         });
     }
 }

@@ -112,6 +112,14 @@ export function venueMatchesSearch(venue, query) {
     // Search in company
     if (containsIgnoreCase(venue.host?.company, q)) return true;
 
+    // Search in per-show hosts (multi-host venues like The Highball)
+    if (Array.isArray(venue.schedule)) {
+        for (const entry of venue.schedule) {
+            if (containsIgnoreCase(entry.host?.name, q)) return true;
+            if (containsIgnoreCase(entry.host?.company, q)) return true;
+        }
+    }
+
     // Search in tags (by ID or label)
     if (venueMatchesTag(venue, q)) return true;
 

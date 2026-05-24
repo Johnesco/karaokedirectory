@@ -8,16 +8,40 @@ import { formatScheduleEntry, formatActivePeriodText, WEEKDAYS } from './date.js
 import { buildMapUrl, buildDirectionsUrl, createSocialLinks, formatAddress, sanitizeUrl } from './url.js';
 
 /**
- * Render a schedule table for venue details
- * Used by VenueModal and VenueDetailPane
- * @param {Object[]} schedule - Array of schedule entries
+ * Resolve the effective host for a single show.
+ * Per-show host overrides venue host; falls back to null when neither is set.
+ * @param {Object} venue - Venue data
+ * @param {Object} scheduleEntry - One entry from venue.schedule
+ * @returns {Object|null} Host object ({ name?, company?, website?, socials? }) or null
+ */
+export function resolveHostFor(venue, scheduleEntry) {
+    return scheduleEntry?.host ?? venue?.host ?? null;
+}
+
+/**
+ * @param {Object} venue
+ * @returns {boolean} True if any schedule entry carries its own host
+ */
+function hasPerShowHosts(venue) {
+    return Array.isArray(venue?.schedule) && venue.schedule.some(e => e.host);
+}
+
+/**
+ * Render a schedule table for venue details.
+ * When any schedule entry has its own host (multi-host venue, e.g. The Highball),
+ * a Host column is added. Otherwise the column is omitted and host info lives
+ * in the venue-level "Presented By" section as before.
+ * @param {Object} venue - Full venue object (needs .schedule and optionally .host)
  * @param {string} classPrefix - CSS class prefix (e.g., 'venue-modal', 'detail-pane')
  * @returns {string} HTML string for schedule table
  */
-export function renderScheduleTable(schedule, classPrefix) {
+export function renderScheduleTable(venue, classPrefix) {
+    const schedule = venue?.schedule;
     if (!schedule || schedule.length === 0) {
         return '<p>No schedule information available.</p>';
     }
+
+    const showHostColumn = hasPerShowHosts(venue);
 
     const rows = schedule.map(entry => {
         const formatted = formatScheduleEntry(entry, { showEvery: true });
@@ -31,10 +55,15 @@ export function renderScheduleTable(schedule, classPrefix) {
             ? ` <a href="${escapeHtml(sanitizeUrl(entry.eventUrl) || '')}" target="_blank" rel="noopener noreferrer" class="schedule-event-link" title="Event page"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>`
             : '';
 
+        const hostCell = showHostColumn
+            ? `<td>${escapeHtml(formatHostDisplay(resolveHostFor(venue, entry)))}</td>`
+            : '';
+
         return `
             <tr>
                 <td>${dayLabel}${eventLink}</td>
                 <td>${formatted.time}</td>
+                ${hostCell}
                 ${entry.note ? `<td class="schedule-note">${escapeHtml(entry.note)}</td>` : '<td></td>'}
             </tr>
         `;
@@ -46,6 +75,7 @@ export function renderScheduleTable(schedule, classPrefix) {
                 <tr>
                     <th>Day</th>
                     <th>Time</th>
+                    ${showHostColumn ? '<th>Host</th>' : ''}
                     <th>Note</th>
                 </tr>
             </thead>
@@ -258,7 +288,7 @@ export function renderVenueDetailSections(venue, { classPrefix, hostSocialSize =
 
         <section class="${classPrefix}__section">
             <h3><i class="fa-regular fa-calendar"></i> Schedule</h3>
-            ${renderScheduleTable(venue.schedule, classPrefix)}
+            ${renderScheduleTable(venue, classPrefix)}
             ${renderActivePeriod(venue.activePeriod, classPrefix)}
         </section>
 
