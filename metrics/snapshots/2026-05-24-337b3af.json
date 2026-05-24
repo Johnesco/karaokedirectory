@@ -1,0 +1,73 @@
+{
+  "date": "2026-05-24T19:15:52.648Z",
+  "commit": "337b3af5ef805459b2a99e9c8ccac17faf0832b7",
+  "branch": "main",
+  "total": {
+    "files": 82,
+    "bytes": 1123846,
+    "lines": 23989,
+    "nonBlank": 20802
+  },
+  "buckets": {
+    "other": {
+      "files": 17,
+      "bytes": 318281,
+      "lines": 1342,
+      "nonBlank": 1104
+    },
+    "app-html": {
+      "files": 6,
+      "bytes": 121822,
+      "lines": 2578,
+      "nonBlank": 2310
+    },
+    "claude": {
+      "files": 1,
+      "bytes": 22761,
+      "lines": 466,
+      "nonBlank": 390
+    },
+    "app-css": {
+      "files": 8,
+      "bytes": 97860,
+      "lines": 4480,
+      "nonBlank": 3807
+    },
+    "docs": {
+      "files": 11,
+      "bytes": 144166,
+      "lines": 3418,
+      "nonBlank": 2544
+    },
+    "editor": {
+      "files": 1,
+      "bytes": 33203,
+      "lines": 950,
+      "nonBlank": 811
+    },
+    "app-js": {
+      "files": 25,
+      "bytes": 244591,
+      "lines": 8090,
+      "nonBlank": 7386
+    },
+    "config": {
+      "files": 2,
+      "bytes": 39537,
+      "lines": 1141,
+      "nonBlank": 1139
+    },
+    "scripts": {
+      "files": 4,
+      "bytes": 25644,
+      "lines": 780,
+      "nonBlank": 673
+    },
+    "supabase": {
+      "files": 7,
+      "bytes": 75981,
+      "lines": 744,
+      "nonBlank": 638
+    }
+  }
+}
