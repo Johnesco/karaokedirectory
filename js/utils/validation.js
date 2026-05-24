@@ -2,6 +2,8 @@
  * Data validation utilities
  */
 
+import { WEEKDAYS, ORDINALS } from './date.js';
+
 /**
  * Validate venue data against schema
  * @param {Object} venue - Venue object to validate
@@ -92,8 +94,7 @@ export function validateVenue(venue) {
  */
 export function validateScheduleEntry(entry) {
     const errors = [];
-    const validFrequencies = ['every', 'first', 'second', 'third', 'fourth', 'fifth', 'last', 'once'];
-    const validDays = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const validFrequencies = ['every', ...ORDINALS, 'once'];
 
     if (!entry.frequency) {
         errors.push('Frequency is required');
@@ -103,8 +104,8 @@ export function validateScheduleEntry(entry) {
 
     if (!entry.day) {
         errors.push('Day is required');
-    } else if (!validDays.includes(entry.day.toLowerCase())) {
-        errors.push(`Invalid day "${entry.day}". Must be one of: ${validDays.join(', ')}`);
+    } else if (!WEEKDAYS.includes(entry.day.toLowerCase())) {
+        errors.push(`Invalid day "${entry.day}". Must be one of: ${WEEKDAYS.join(', ')}`);
     }
 
     if (!entry.startTime) {

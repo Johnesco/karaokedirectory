@@ -4,7 +4,7 @@
  */
 
 import { escapeHtml } from './string.js';
-import { formatScheduleEntry, formatActivePeriodText } from './date.js';
+import { formatScheduleEntry, formatActivePeriodText, WEEKDAYS } from './date.js';
 import { createSocialLinks, sanitizeUrl } from './url.js';
 
 /**
@@ -153,16 +153,11 @@ function buildAlsoText(otherEntries, allEntries) {
         fourth: '4th', fifth: '5th', last: 'Last'
     };
 
-    // Day sort order for consistent ordering
-    const daySortOrder = {
-        sunday: 0, monday: 1, tuesday: 2, wednesday: 3,
-        thursday: 4, friday: 5, saturday: 6
-    };
-
     // Process day-grouped entries
     for (const [dayKey, entries] of dayMap) {
         const abbrevDay = abbreviateDay(entries[0].day);
-        const sortKey = daySortOrder[dayKey] ?? 7;
+        const dayIdx = WEEKDAYS.indexOf(dayKey);
+        const sortKey = dayIdx >= 0 ? dayIdx : 7;
 
         // Check if all entries for this day are "every"
         const allEvery = entries.every(e => e.frequency === 'every');

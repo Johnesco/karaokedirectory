@@ -3,7 +3,7 @@
  */
 
 import { renderVenueCard } from '../js/components/VenueCard.js';
-import { formatTimeRange } from '../js/utils/date.js';
+import { formatTimeRange, WEEKDAYS } from '../js/utils/date.js';
 import { escapeHtml, getSortableName } from '../js/utils/string.js';
 import { buildMapUrl, formatAddress, createSocialLinks } from '../js/utils/url.js';
 import { renderTags, initTagConfig } from '../js/utils/tags.js';
@@ -290,7 +290,6 @@ function renderScheduleList(schedules) {
 
 function createScheduleRowHtml(schedule = {}, index = 0) {
     const frequencies = ['every', 'first', 'second', 'third', 'fourth', 'last', 'once'];
-    const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
     const isOnce = schedule.frequency === 'once';
 
     return `
@@ -299,7 +298,7 @@ function createScheduleRowHtml(schedule = {}, index = 0) {
                 ${frequencies.map(f => `<option value="${f}" ${schedule.frequency === f ? 'selected' : ''}>${f.charAt(0).toUpperCase() + f.slice(1)}</option>`).join('')}
             </select>
             <select name="schedule[${index}].day" class="schedule-day" ${isOnce ? 'hidden' : ''}>
-                ${days.map(d => `<option value="${d}" ${schedule.day?.toLowerCase() === d ? 'selected' : ''}>${d.charAt(0).toUpperCase() + d.slice(1)}</option>`).join('')}
+                ${WEEKDAYS.map(d => `<option value="${d}" ${schedule.day?.toLowerCase() === d ? 'selected' : ''}>${d.charAt(0).toUpperCase() + d.slice(1)}</option>`).join('')}
             </select>
             <input type="date" name="schedule[${index}].date" class="schedule-date" value="${schedule.date || ''}" ${isOnce ? '' : 'hidden'} placeholder="Date">
             <input type="text" name="schedule[${index}].eventName" class="schedule-event-name" value="${escapeHtml(schedule.eventName || '')}" ${isOnce ? '' : 'hidden'} placeholder="Event name (optional)">

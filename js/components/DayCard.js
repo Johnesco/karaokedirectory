@@ -14,7 +14,7 @@
 
 import { Component } from './Component.js';
 import { renderVenueCard } from './VenueCard.js';
-import { formatDateShort, isToday, getDayDisplayName } from '../utils/date.js';
+import { formatDateShort, isToday, getDayDisplayName, getDayName } from '../utils/date.js';
 import { getVenuesForDate } from '../services/venues.js';
 import { getState } from '../core/state.js';
 
@@ -44,7 +44,7 @@ export class DayCard extends Component {
 
         const dayName = getDayDisplayName(date);
         const dateStr = formatDateShort(date);
-        const dayOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'][date.getDay()];
+        const dayOfWeek = getDayName(date);
         const todayClass = isToday(date) ? 'day-card--today' : '';
         const pastClass = isPast(date) ? 'day-card--past' : '';
         const emptyClass = venues.length === 0 ? 'day-card--empty' : '';
