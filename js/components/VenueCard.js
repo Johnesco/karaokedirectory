@@ -10,7 +10,7 @@ import { buildMapUrl, createSocialLinks, formatAddress, sanitizeUrl } from '../u
 import { emit, Events } from '../core/events.js';
 import { isDebugMode, getDebugHtml } from '../utils/debug.js';
 import { renderTags } from '../utils/tags.js';
-import { formatHostDisplay, getScheduleContext } from '../utils/render.js';
+import { formatHostDisplay, renderScheduleContext } from '../utils/render.js';
 
 export class VenueCard extends Component {
     /**
@@ -52,8 +52,8 @@ export class VenueCard extends Component {
             ? ['special-event', ...(venue.tags || [])]
             : venue.tags;
 
-        // Schedule context: frequency label + "+N more" indicator
-        const { frequencyLabel, moreCount, moreText } = getScheduleContext(venue, schedule);
+        // Schedule context: frequency label + "+N more" indicator (HTML-ready)
+        const { frequencyHtml, moreNightsHtml } = renderScheduleContext(venue, schedule);
 
         // Build full address string and map URL
         const fullAddress = formatAddress(venue.address);
@@ -78,16 +78,12 @@ export class VenueCard extends Component {
                 ${eventName ? `<div class="venue-card__event-name"><i class="fa-solid fa-star"></i> ${schedule?.eventUrl ? `<a href="${escapeHtml(sanitizeUrl(schedule.eventUrl) || '')}" target="_blank" rel="noopener noreferrer" class="venue-card__event-link">${escapeHtml(eventName)} <i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : escapeHtml(eventName)}</div>` : ''}
                 ${showSchedule && timeDisplay ? `
                     <div class="venue-card__time">
-                        <i class="fa-regular fa-clock"></i> ${frequencyLabel ? `<span class="venue-card__frequency">${escapeHtml(frequencyLabel)}</span> &middot; ` : ''}${timeDisplay}
+                        <i class="fa-regular fa-clock"></i> ${frequencyHtml}${timeDisplay}
                         ${!eventName && schedule?.eventUrl ? `<a href="${escapeHtml(sanitizeUrl(schedule.eventUrl) || '')}" target="_blank" rel="noopener noreferrer" class="venue-card__event-link" title="Event page"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : ''}
                         ${schedule?.note ? `<span class="venue-card__note">${escapeHtml(schedule.note)}</span>` : ''}
                     </div>
                 ` : ''}
-                ${showSchedule && moreCount > 0 ? `
-                    <div class="venue-card__more-nights">
-                        ${moreText === 'Everyday' ? '' : '<i class="fa-regular fa-calendar-days"></i> '}${moreText}
-                    </div>
-                ` : ''}
+                ${showSchedule ? moreNightsHtml : ''}
                 <div class="venue-card__location">
                     <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" class="venue-card__map-link">
                         <i class="fa-solid fa-location-dot"></i>

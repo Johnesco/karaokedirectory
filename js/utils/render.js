@@ -311,6 +311,35 @@ export function renderVenueDetailSections(venue, { classPrefix, hostSocialSize =
 }
 
 /**
+ * Render the schedule context HTML for compact venue cards.
+ * Wraps getScheduleContext and returns the two HTML fragments the caller
+ * needs to embed: an inline frequency badge (placed before the time in
+ * the time row) and a separate more-nights block (placed below the time).
+ *
+ * Centralizes assembly + escaping so VenueCard doesn't duplicate the
+ * markup or forget to escape user-provided data (day/event names).
+ *
+ * @param {Object} venue - Venue data (needs venue.schedule)
+ * @param {Object|null} schedule - The matched schedule entry for this card
+ * @returns {{ frequencyHtml: string, moreNightsHtml: string }}
+ */
+export function renderScheduleContext(venue, schedule) {
+    const { frequencyLabel, moreCount, moreText } = getScheduleContext(venue, schedule);
+
+    const frequencyHtml = frequencyLabel
+        ? `<span class="venue-card__frequency">${escapeHtml(frequencyLabel)}</span> &middot; `
+        : '';
+
+    let moreNightsHtml = '';
+    if (moreCount > 0) {
+        const icon = moreText === 'Everyday' ? '' : '<i class="fa-regular fa-calendar-days"></i> ';
+        moreNightsHtml = `<div class="venue-card__more-nights">${icon}${escapeHtml(moreText)}</div>`;
+    }
+
+    return { frequencyHtml, moreNightsHtml };
+}
+
+/**
  * Render a compact host display line (for venue cards)
  * Shows "Presented by [name]" format
  * @param {Object} host - Host object with name and/or company
