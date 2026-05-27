@@ -277,8 +277,7 @@ const karaokeData = {
         "street": "113 W 2nd St",
         "city": "Taylor",
         "state": "TX",
-        "zip": "76574",
-        "neighborhood": ""
+        "zip": "76574"
       },
       "schedule": [
         {
@@ -325,9 +324,6 @@ const karaokeData = {
           "endTime": "02:00"
         }
       ],
-      "host": {
-        "name": ""
-      },
       "socials": {
         "instagram": "https://www.instagram.com/blindsidelounge",
         "website": "https://blindsidelounge.com/"
@@ -623,13 +619,12 @@ const karaokeData = {
         "street": "2403 S Bell Blvd",
         "city": "Cedar Park",
         "state": "TX",
-        "zip": "78613",
-        "neighborhood": ""
+        "zip": "78613"
       },
       "schedule": [
         {
           "frequency": "every",
-          "day": "monday",
+          "day": "Monday",
           "startTime": "20:00",
           "endTime": "23:00"
         }
@@ -833,16 +828,14 @@ const karaokeData = {
       "name": "Coyote Ugly",
       "active": true,
       "activePeriod": {
-        "start": "2025-12-18",
-        "end": ""
+        "start": "2025-12-18"
       },
       "dedicated": false,
       "address": {
         "street": "501 E 6th St",
         "city": "Austin",
         "state": "TX",
-        "zip": "78701",
-        "neighborhood": ""
+        "zip": "78701"
       },
       "schedule": [
         {
@@ -974,8 +967,7 @@ const karaokeData = {
         "street": "11190 Circle Dr,  building 2, Suite 208",
         "city": "Austin",
         "state": "TX",
-        "zip": "78736",
-        "neighborhood": ""
+        "zip": "78736"
       },
       "schedule": [
         {
@@ -1012,8 +1004,7 @@ const karaokeData = {
         "street": "1717 Scottsdale Dr Suite 160",
         "city": "Leander",
         "state": "TX",
-        "zip": "78641",
-        "neighborhood": ""
+        "zip": "78641"
       },
       "schedule": [
         {
@@ -1171,7 +1162,6 @@ const karaokeData = {
       "host": {
         "name": "Marshall Joshua"
       },
-      "socials": {},
       "coordinates": {
         "lat": 30.2453635,
         "lng": -97.7804511
@@ -1221,8 +1211,7 @@ const karaokeData = {
         "street": "1120 S Lamar Blvd",
         "city": "Austin",
         "state": "TX",
-        "zip": "78704",
-        "neighborhood": ""
+        "zip": "78704"
       },
       "schedule": [
         {
@@ -1335,8 +1324,7 @@ const karaokeData = {
         "street": "1779 Wells Branch Pkwy",
         "city": "Austin",
         "state": "TX",
-        "zip": "78728",
-        "neighborhood": ""
+        "zip": "78728"
       },
       "schedule": [
         {
@@ -1653,8 +1641,7 @@ const karaokeData = {
         "street": "403 FM 685",
         "city": "Pflugerville",
         "state": "TX",
-        "zip": "78660",
-        "neighborhood": ""
+        "zip": "78660"
       },
       "schedule": [
         {
@@ -1767,7 +1754,7 @@ const karaokeData = {
           "frequency": "every",
           "day": "Thursday",
           "startTime": "21:00",
-          "endTime": "12:00"
+          "endTime": "00:00"
         }
       ],
       "host": null,
@@ -2256,8 +2243,7 @@ const karaokeData = {
         "street": "2113 Wells Branch Pkwy, Ste 600",
         "city": "Austin",
         "state": "TX",
-        "zip": "78728",
-        "neighborhood": ""
+        "zip": "78728"
       },
       "schedule": [
         {
@@ -2450,7 +2436,7 @@ const karaokeData = {
           "frequency": "every",
           "day": "Wednesday",
           "startTime": "20:00",
-          "endTime": "24:00"
+          "endTime": "00:00"
         }
       ],
       "host": {
@@ -2618,8 +2604,7 @@ const karaokeData = {
         "street": "11940 Menchaca Rd. Suite 114",
         "city": "Austin",
         "state": "TX",
-        "zip": "78748",
-        "neighborhood": ""
+        "zip": "78748"
       },
       "schedule": [
         {
@@ -2799,8 +2784,7 @@ const karaokeData = {
         "street": "3519 A Ranch Road N",
         "city": "Austin",
         "state": "TX",
-        "zip": "78734",
-        "neighborhood": ""
+        "zip": "78734"
       },
       "schedule": [
         {
@@ -2862,8 +2846,7 @@ const karaokeData = {
         "street": "7309 McNeil Dr",
         "city": "Austin",
         "state": "TX",
-        "zip": "78729",
-        "neighborhood": ""
+        "zip": "78729"
       },
       "schedule": [
         {
@@ -2893,7 +2876,7 @@ const karaokeData = {
         {
           "frequency": "every",
           "day": "Sunday",
-          "startTime": "17:03",
+          "startTime": "17:00",
           "endTime": "21:00"
         }
       ],
