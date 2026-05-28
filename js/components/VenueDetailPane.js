@@ -7,6 +7,7 @@ import { Component } from './Component.js';
 import { escapeHtml } from '../utils/string.js';
 import { shareVenue } from '../utils/url.js';
 import { on, emit, Events } from '../core/events.js';
+import { getState } from '../core/state.js';
 import { renderTags } from '../utils/tags.js';
 import { renderVenueDetailSections } from '../utils/render.js';
 
@@ -64,6 +65,11 @@ export class VenueDetailPane extends Component {
     }
 
     showVenue(venue) {
+        // On map view the floating .map-venue-card is the contextual UI;
+        // populating the side pane would compete with it for attention.
+        if (getState('view') === 'map') {
+            return;
+        }
         this.setState({ venue });
         // Emit event so VenueCard can show selected state
         emit(Events.VENUE_DETAIL_SHOWN, venue);

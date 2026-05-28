@@ -81,8 +81,8 @@ export class VenueModal extends Component {
         if (window.innerWidth >= 1400) {
             return;
         }
-
-        // Don't open modal in map view (immersive mode handles its own venue display)
+        // On map view the floating .map-venue-card is the contextual UI;
+        // opening the modal would obscure the map.
         if (getState('view') === 'map') {
             return;
         }
