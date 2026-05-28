@@ -41,6 +41,15 @@
     /* Accent — special-event venue cards */
     --color-accent-special-event: #e91e63;
 
+    /* Karaoke-themed brand colors */
+    --color-karaoke-header-start: #1e3a5f;
+    --color-karaoke-header-end: #0f2744;
+    --color-karaoke-header-border: #2a4a6d;
+    --color-karaoke-header-text: #a8c5e2;
+    --color-karaoke-glow: #4a6fa5;
+    --color-karaoke-neon: #00ffff;
+    --color-karaoke-hot: #ff69b4;
+
     /* Background */
     --bg-primary: var(--color-gray-900);
     --bg-secondary: var(--color-gray-800);
@@ -64,6 +73,7 @@
     --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.4);
 
     /* Spacing */
+    --spacing-2xs: 2px;
     --spacing-xs: 0.25rem;
     --spacing-sm: 0.5rem;
     --spacing-md: 1rem;
@@ -93,6 +103,11 @@
     --z-modal: 400;
     --z-tooltip: 450;
     --z-toast: 500;
+
+    /* Icon / touch-target sizes */
+    --size-icon-sm: 32px;
+    --size-icon-md: 36px;
+    --size-icon-lg: 44px;
 
     /* Layout heights - initial fallback; dynamically updated by app.js ResizeObserver */
     --nav-height: 56px;

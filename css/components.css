@@ -9,7 +9,7 @@
     justify-content: center;
     gap: var(--spacing-sm);
     padding: var(--spacing-sm) var(--spacing-md);
-    min-height: 44px;
+    min-height: var(--size-icon-lg);
     border-radius: var(--border-radius);
     font-weight: 500;
     transition: all var(--transition-fast);
@@ -318,7 +318,7 @@
 
 .venue-tag {
     display: inline-block;
-    padding: 2px 8px;
+    padding: var(--spacing-2xs) var(--spacing-sm);
     border-radius: var(--border-radius-sm);
     font-size: var(--font-size-xs);
     font-weight: 500;
@@ -416,8 +416,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
+    width: var(--size-icon-md);
+    height: var(--size-icon-md);
     border-radius: 50%;
     background: var(--color-gray-700);
     color: var(--text-primary);
@@ -808,7 +808,7 @@
     background: var(--color-gray-800);
     color: var(--color-primary-light);
     font-size: var(--font-size-xs);
-    padding: 2px 6px;
+    padding: var(--spacing-2xs) 6px;
     border-radius: var(--border-radius-sm);
     font-family: monospace;
     opacity: 0.8;

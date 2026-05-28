@@ -157,7 +157,7 @@
     background: var(--color-primary);
     color: var(--color-white);
     font-size: var(--font-size-xs);
-    padding: 2px 8px;
+    padding: var(--spacing-2xs) var(--spacing-sm);
     border-radius: var(--border-radius-sm);
     margin-left: auto;
 }
@@ -246,14 +246,14 @@
     color: var(--color-white);
     font-size: var(--font-size-xs);
     font-weight: 600;
-    padding: 2px 8px;
+    padding: var(--spacing-2xs) var(--spacing-sm);
     border-radius: var(--border-radius-sm);
 }
 
 .extended-section__toggle {
     margin-left: auto;
-    width: 32px;
-    height: 32px;
+    width: var(--size-icon-sm);
+    height: var(--size-icon-sm);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -323,8 +323,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: var(--size-icon-sm);
+    height: var(--size-icon-sm);
     border-radius: var(--border-radius-sm);
     font-weight: 600;
     color: var(--text-secondary);
@@ -579,7 +579,7 @@
 
 .map-cluster--small {
     font-size: var(--font-size-sm, 0.875rem);
-    line-height: 36px;
+    line-height: var(--size-icon-md);
 }
 
 .map-cluster--medium {
@@ -699,8 +699,8 @@ body.view--map .app-layout__detail {
 }
 
 .map-controls__btn {
-    width: 44px;
-    height: 44px;
+    width: var(--size-icon-lg);
+    height: var(--size-icon-lg);
     border-radius: 50%;
     background: var(--bg-card);
     color: var(--text-primary);
@@ -795,8 +795,8 @@ body.view--map .app-layout__detail {
     position: absolute;
     top: var(--spacing-sm);
     right: var(--spacing-sm);
-    width: 32px;
-    height: 32px;
+    width: var(--size-icon-sm);
+    height: var(--size-icon-sm);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -841,8 +841,8 @@ body.view--map .app-layout__detail {
 }
 
 .map-venue-card__back {
-    width: 32px;
-    height: 32px;
+    width: var(--size-icon-sm);
+    height: var(--size-icon-sm);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -940,7 +940,7 @@ body.view--map .app-layout__detail {
 
 .map-venue-card__host-name {
     font-weight: 600;
-    margin: 0 0 2px;
+    margin: 0 0 var(--spacing-2xs);
 }
 
 .map-venue-card__host-company {

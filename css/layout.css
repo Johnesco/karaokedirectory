@@ -4,10 +4,10 @@
 
 /* Site header */
 .site-header {
-    background: linear-gradient(135deg, #1e3a5f, #0f2744);
+    background: linear-gradient(135deg, var(--color-karaoke-header-start), var(--color-karaoke-header-end));
     padding: var(--spacing-xl) var(--spacing-md);
     text-align: center;
-    border-bottom: 1px solid #2a4a6d;
+    border-bottom: 1px solid var(--color-karaoke-header-border);
 }
 
 .site-header__title {
@@ -18,7 +18,7 @@
 }
 
 .site-header__tagline {
-    color: #a8c5e2;
+    color: var(--color-karaoke-header-text);
     font-size: var(--font-size-base);
     margin: 0;
 }
@@ -118,22 +118,22 @@
 
 @keyframes karaokeHighlight {
     0% {
-        color: #4a6fa5;
+        color: var(--color-karaoke-glow);
         text-shadow: 0 0 10px rgba(74, 111, 165, 0.5);
     }
     50% {
-        color: #00ffff;
+        color: var(--color-karaoke-neon);
         text-shadow:
-            0 0 5px #00ffff,
-            0 0 10px #00ffff,
-            0 0 20px #00ffff,
-            0 0 40px #00ffff;
+            0 0 5px var(--color-karaoke-neon),
+            0 0 10px var(--color-karaoke-neon),
+            0 0 20px var(--color-karaoke-neon),
+            0 0 40px var(--color-karaoke-neon);
     }
     100% {
-        color: #ff69b4;
+        color: var(--color-karaoke-hot);
         text-shadow:
-            0 0 5px #ff69b4,
-            0 0 10px #ff69b4,
+            0 0 5px var(--color-karaoke-hot),
+            0 0 10px var(--color-karaoke-hot),
             2px 2px 0 #000;
     }
 }

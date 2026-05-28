@@ -119,7 +119,7 @@
     color: var(--text-primary);
     transition: border-color var(--transition-fast);
     font-size: 16px;             /* Prevents iOS auto-zoom on focus */
-    min-height: 44px;            /* Touch target */
+    min-height: var(--size-icon-lg);            /* Touch target */
     box-sizing: border-box;
 }
 
@@ -184,7 +184,7 @@
 .add-schedule-btn {
     margin-top: var(--spacing-md);
     width: 100%;
-    min-height: 44px;
+    min-height: var(--size-icon-lg);
 }
 
 @media (min-width: 768px) {
@@ -202,7 +202,7 @@
     cursor: pointer;
     font-size: var(--font-size-sm);
     margin-top: var(--spacing-sm);
-    min-height: 44px;
+    min-height: var(--size-icon-lg);
 }
 
 /* ---- Radio / checkbox groups ---- */
@@ -227,7 +227,7 @@
     align-items: center;
     gap: var(--spacing-sm);
     cursor: pointer;
-    min-height: 44px;        /* Touch target */
+    min-height: var(--size-icon-lg);        /* Touch target */
     padding: var(--spacing-xs) 0;
 }
 
@@ -262,7 +262,7 @@
     background: var(--bg-secondary);
     border: 2px solid transparent;
     transition: all var(--transition-fast);
-    min-height: 44px;        /* Touch target */
+    min-height: var(--size-icon-lg);        /* Touch target */
 }
 
 .tag-checkbox-option:has(input:checked) {
