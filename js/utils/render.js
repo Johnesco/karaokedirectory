@@ -161,17 +161,19 @@ function abbreviateDay(dayName) {
 }
 
 /**
- * Build the "Also ..." or "Nightly" text from a venue's other schedule entries
+ * Build the "Also ..." text for a venue's other schedule entries.
+ * Every variant starts with "Also" so the more-nights indicator reads
+ * uniformly under the time row.
  * @param {Object[]} otherEntries - Schedule entries other than the current card's match
  * @param {Object[]} allEntries - All schedule entries for the venue
- * @returns {string} Formatted text like "Also Tue, Wed", "Nightly", or ""
+ * @returns {string} Formatted text like "Also Tue, Wed", "Also every day", etc.
  */
 function buildAlsoText(otherEntries, allEntries) {
-    // Check for "Nightly": all entries are "every" and cover all 7 weekdays
+    // All 7 weekdays, all "every" frequency -> the venue runs daily
     const everyEntries = allEntries.filter(e => e.frequency === 'every');
     const uniqueDays = new Set(everyEntries.map(e => e.day.toLowerCase()));
     if (everyEntries.length === allEntries.length && uniqueDays.size === 7) {
-        return 'Everyday';
+        return 'Also every day';
     }
 
     // Group entries by day name for same-day ordinal combining
@@ -332,8 +334,7 @@ export function renderScheduleContext(venue, schedule) {
 
     let moreNightsHtml = '';
     if (moreCount > 0) {
-        const icon = moreText === 'Everyday' ? '' : '<i class="fa-regular fa-calendar-days"></i> ';
-        moreNightsHtml = `<div class="venue-card__more-nights">${icon}${escapeHtml(moreText)}</div>`;
+        moreNightsHtml = `<div class="venue-card__more-nights"><i class="fa-regular fa-calendar-days"></i> ${escapeHtml(moreText)}</div>`;
     }
 
     return { frequencyHtml, moreNightsHtml };
