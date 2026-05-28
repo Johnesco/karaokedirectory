@@ -2340,7 +2340,7 @@ const karaokeData = {
       }
     },
     {
-      "id": "red-rooters-pub-and-grub",
+      "id": "red-roosters-pub-and-grub",
       "name": "Red Rooster's Pub and Grub",
       "tags": [
         "dive"
