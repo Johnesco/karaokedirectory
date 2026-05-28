@@ -6,6 +6,7 @@
  * - weekStart: Date for current week in weekly view
  * - showDedicated: Whether to show dedicated karaoke venues
  * - searchQuery: Global search filter text
+ * - hostFilter: KJ/host name filter, URL-driven via ?kj= (substring match against host name/company only)
  * - selectedVenue: Currently selected venue object (for modal/detail pane)
  * - isLoading: Loading indicator state
  */
@@ -25,6 +26,7 @@ const state = {
     weekStart: new Date(),
     showDedicated: true,
     searchQuery: '',
+    hostFilter: '',
     selectedVenue: null,
     isLoading: false
 };

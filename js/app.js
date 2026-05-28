@@ -12,6 +12,7 @@ import { VenueDetailPane } from './components/VenueDetailPane.js';
 import { WeeklyView } from './views/WeeklyView.js';
 import { AlphabeticalView } from './views/AlphabeticalView.js';
 import { MapView } from './views/MapView.js';
+import { KJDossierView } from './views/KJDossierView.js';
 import { initDebugMode, isDebugMode } from './utils/debug.js';
 import { initTagConfig } from './utils/tags.js';
 import { getHashParams } from './utils/url.js';
@@ -101,11 +102,31 @@ async function init() {
     const viewParam = urlParams.get('view');
     const initialView = validViews.includes(viewParam) ? viewParam : 'weekly';
 
+    // Read ?kj= for the KJ/host filter (substring match, host fields only)
+    const kjParam = urlParams.get('kj');
+    if (kjParam) {
+        setState({ hostFilter: kjParam });
+    }
+
     // Sync state to match the URL-driven initial view, then render.
     // setState alone won't trigger the subscriber if the value matches the
     // default ('weekly'), so we always call renderView explicitly as well.
     setState({ view: initialView });
     renderView(initialView);
+
+    // Keep ?kj= in the URL in sync with hostFilter state and re-render the view
+    // (toggle between KJDossierView and the regular weekly/alphabetical/map views).
+    subscribe('hostFilter', (value) => {
+        const url = new URL(window.location.href);
+        if (value) {
+            url.searchParams.set('kj', value);
+        } else {
+            url.searchParams.delete('kj');
+        }
+        history.replaceState(null, '', url.pathname + url.search + url.hash);
+        renderView(getState('view'));
+        emit(Events.FILTER_CHANGED, { hostFilter: value });
+    });
 
     // Expose helper for map popups
     window.showVenueDetails = (venueId) => {
@@ -238,8 +259,13 @@ function renderView(viewName) {
         return;
     }
 
-    // Toggle body class for immersive map mode
-    document.body.classList.toggle('view--map', viewName === 'map');
+    // KJ dossier mode overrides the normal weekly/alphabetical/map views.
+    // It's a self-audit page for KJs, reached via ?kj=<name>.
+    const inDossierMode = !!getState('hostFilter');
+
+    // Toggle body class for immersive map mode (only when NOT in dossier mode)
+    document.body.classList.toggle('view--map', viewName === 'map' && !inDossierMode);
+    document.body.classList.toggle('view--kj-dossier', inDossierMode);
 
     // Destroy current view
     if (currentView) {
@@ -247,8 +273,7 @@ function renderView(viewName) {
         currentView = null;
     }
 
-    // Create new view
-    const ViewClass = views[viewName];
+    const ViewClass = inDossierMode ? KJDossierView : views[viewName];
     if (!ViewClass) {
         console.error(`Unknown view: ${viewName}`);
         return;

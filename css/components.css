@@ -147,6 +147,58 @@
     max-width: 400px;
 }
 
+/* Active-filter chips row (shown when ?kj= or similar URL-driven filter is active) */
+.navigation__active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-2xs) var(--spacing-sm);
+    background: var(--color-primary);
+    color: var(--color-white);
+    border-radius: 999px;
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+
+.filter-chip__label {
+    opacity: 0.85;
+}
+
+.filter-chip__value {
+    font-weight: 600;
+    max-width: 18ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.filter-chip__clear {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    margin-left: var(--spacing-xs);
+    background: rgba(255, 255, 255, 0.18);
+    color: var(--color-white);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: var(--font-size-xs);
+    transition: background var(--transition-fast);
+}
+
+.filter-chip__clear:hover {
+    background: rgba(255, 255, 255, 0.35);
+}
+
 /* Search Input - Global search in navigation bar */
 .search-input {
     position: relative;

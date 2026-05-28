@@ -5,6 +5,7 @@
  * - Alphabetical View (A-Z listing)
  * - Letter Card (alphabetical grouping)
  * - Map View (standard and immersive modes)
+ * - KJ Dossier (?kj=<name> view — self-audit for KJs)
  */
 
 /* ============================================
@@ -1026,4 +1027,159 @@ body.view--map .app-layout__detail {
         top: var(--spacing-lg);
         transform: translateX(0) translateY(0);
     }
+}
+
+/* ============================================
+   KJ DOSSIER VIEW
+   Self-audit page reached via ?kj=<name>. Replaces normal views
+   while active. One card per venue, full schedule details.
+   ============================================ */
+
+.kj-dossier {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--spacing-lg) var(--spacing-md);
+}
+
+.kj-dossier__header {
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.kj-dossier__title {
+    font-size: var(--font-size-2xl);
+    margin: 0 0 var(--spacing-xs);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.kj-dossier__title i {
+    color: var(--color-primary);
+}
+
+.kj-dossier__stats {
+    margin: 0 0 var(--spacing-xs);
+    color: var(--text-secondary);
+    font-size: var(--font-size-base);
+}
+
+.kj-dossier__hint {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    font-style: italic;
+}
+
+.kj-dossier__empty-hint {
+    color: var(--text-secondary);
+    font-size: var(--font-size-base);
+}
+
+.kj-dossier__empty-hint code {
+    background: var(--color-gray-800);
+    padding: var(--spacing-2xs) var(--spacing-xs);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--font-size-sm);
+}
+
+.kj-dossier__venues {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.kj-dossier__venue {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-md) var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.kj-dossier__venue-header {
+    margin-bottom: var(--spacing-sm);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px dashed var(--border-color);
+}
+
+.kj-dossier__venue-name {
+    margin: 0 0 var(--spacing-2xs);
+    font-size: var(--font-size-xl);
+    color: var(--text-primary);
+}
+
+.kj-dossier__venue-address {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.kj-dossier__venue-address i {
+    margin-right: var(--spacing-2xs);
+    opacity: 0.7;
+}
+
+.kj-dossier__shows {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.kj-dossier__show {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-xs) 0;
+    font-size: var(--font-size-base);
+}
+
+.kj-dossier__show-when {
+    min-width: 14ch;
+    color: var(--text-primary);
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.kj-dossier__show-when i {
+    color: var(--color-primary);
+    width: 1em;
+    text-align: center;
+}
+
+.kj-dossier__show--once .kj-dossier__show-when i {
+    color: var(--color-accent-special-event);
+}
+
+.kj-dossier__show-time {
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.kj-dossier__show-event {
+    flex-basis: 100%;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    font-style: italic;
+    padding-left: calc(14ch + var(--spacing-sm));
+}
+
+@media (max-width: 600px) {
+    .kj-dossier__show-event {
+        padding-left: 0;
+    }
+}
+
+/* Minimal nav while in dossier mode */
+.navigation--dossier {
+    justify-content: center;
+    padding: var(--spacing-sm) var(--spacing-md);
 }

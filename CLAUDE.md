@@ -279,6 +279,12 @@ Tags are rendered as color-coded badges in VenueCard, VenueModal, and VenueDetai
 - `venues.js` → `venueMatchesSearch()` matches: name, city, neighborhood, host, tags (ID + label), event names
 - Empty results collapse day cards to header-only (`.day-card--empty`)
 
+### URL Query Params
+- `?view=<weekly|alphabetical|map>` — initial view
+- `?kj=<name>` — KJ self-audit dossier (`KJDossierView` replaces normal views; `venueMatchesHost()` filters venues; minimal nav with `.filter-chip` × clear)
+- `?debug=1` — debug mode (also `localStorage.debug=1`)
+- `app.js` reads URL params on boot; `subscribe('hostFilter', ...)` writes back to URL via `history.replaceState`
+
 ### Extended Sections
 - `ExtendedSection` component renders collapsible sections: "Next Week", "Later in [Month]", "[Next Month]"
 - Date helpers in `js/utils/date.js`; deduplication skips already-shown venues in later sections

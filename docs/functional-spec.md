@@ -478,10 +478,24 @@ The Navigation component does **not** re-render when search changes, to preserve
 
 Venues with an `activePeriod` field only appear when the current date falls within `activePeriod.start` and `activePeriod.end` (inclusive). This is automatic — no user control.
 
+### KJ Dossier (`?kj=`)
+
+- **Audience:** KJs auditing their own listings ("what do I have up on karaokedirectory?"). Not a customer-facing filter.
+- **URL-driven:** Append `?kj=<name>` to `index.html` (e.g. `index.html?kj=xpider`).
+- **Match scope:** Case-insensitive substring against `venue.host.{name,company}` and per-show `schedule[N].host.{name,company}` only. Does NOT match venue name, city, tags, or event names.
+- **Replaces the normal views:** `KJDossierView` renders in place of weekly/alphabetical/map. Navigation collapses to a minimal bar showing just the `KJ: <name>` chip with a × close button (clearing the chip exits dossier mode and strips `?kj=` from the URL).
+- **Layout per venue:**
+  - Venue name + address
+  - All recurring slots that belong to this KJ (one entry per slot, sorted Sunday → Saturday)
+  - All upcoming one-time events that belong to this KJ (sorted chronologically, with weekday + date + time + event name). Past one-times are excluded.
+- **Multi-host venues:** Only entries whose per-show host matches the KJ are shown. A venue with 4 events split 2/2 between two KJs shows only that KJ's 2 entries in their dossier.
+- **Empty state:** "No venues currently listed" with a hint to check spelling or contact the directory.
+- **State:** `hostFilter` key. URL ↔ state sync via `history.replaceState`. Re-renders the view (not just the data) on change, because dossier and normal views are different view classes.
+
 ### Filter Event Flow
 
-1. User changes filter (dedicated toggle, search input)
-2. State updated (`showDedicated` or `searchQuery`)
+1. User changes filter (dedicated toggle, search input) or loads a URL with `?kj=`
+2. State updated (`showDedicated`, `searchQuery`, or `hostFilter`)
 3. `FILTER_CHANGED` event emitted
 4. All views re-render with filtered results
 

@@ -23,6 +23,7 @@ export class Navigation extends Component {
         this.subscribe(subscribe('view', () => this.render()));
         this.subscribe(subscribe('weekStart', () => this.render()));
         this.subscribe(subscribe('showDedicated', () => this.render()));
+        this.subscribe(subscribe('hostFilter', () => this.render()));
         // Don't re-render on searchQuery change to avoid losing focus
     }
 
@@ -30,6 +31,26 @@ export class Navigation extends Component {
         const view = getState('view');
         const weekStart = getState('weekStart');
         const showDedicated = getState('showDedicated');
+        const hostFilter = getState('hostFilter');
+
+        // KJ dossier mode: minimal nav with just the chip — the rest of the
+        // controls are irrelevant for a KJ auditing their own listings.
+        if (hostFilter) {
+            return `
+                <nav class="navigation navigation--dossier">
+                    <div class="navigation__active-filters">
+                        <span class="filter-chip" role="status">
+                            <i class="fa-solid fa-microphone-lines"></i>
+                            <span class="filter-chip__label">KJ:</span>
+                            <span class="filter-chip__value">${hostFilter}</span>
+                            <button class="filter-chip__clear" data-filter="clear-kj" type="button" aria-label="Exit KJ view">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </span>
+                    </div>
+                </nav>
+            `;
+        }
 
         const weekRange = formatWeekRange(getWeekStart(weekStart));
         const isCurrentWeek = this.isCurrentWeek(weekStart);
@@ -115,6 +136,7 @@ export class Navigation extends Component {
                         <span>Show dedicated venues</span>
                     </label>
                 </div>
+
             </nav>
         `;
     }
@@ -173,6 +195,11 @@ export class Navigation extends Component {
             } else if (!query && clearBtn) {
                 clearBtn.remove();
             }
+        });
+
+        // KJ filter chip clear
+        this.delegate('click', '[data-filter="clear-kj"]', () => {
+            setState({ hostFilter: '' });
         });
 
         // Search clear button

@@ -87,6 +87,34 @@ export function getVenueById(id) {
 }
 
 /**
+ * Check if a venue is hosted by a KJ matching the given query.
+ * Substring + case-insensitive. Matches on venue.host.name, venue.host.company,
+ * and per-show schedule[N].host.{name,company} (for multi-host venues like
+ * The Highball). Does NOT match venue name, city, tags, or event names — use
+ * venueMatchesSearch() for that.
+ *
+ * @param {Object} venue - Venue object
+ * @param {string} query - Host name or company substring
+ * @returns {boolean} True if any host field substring-matches
+ */
+export function venueMatchesHost(venue, query) {
+    if (!query?.trim()) return true;
+    const q = query.toLowerCase().trim();
+
+    if (containsIgnoreCase(venue.host?.name, q)) return true;
+    if (containsIgnoreCase(venue.host?.company, q)) return true;
+
+    if (Array.isArray(venue.schedule)) {
+        for (const entry of venue.schedule) {
+            if (containsIgnoreCase(entry.host?.name, q)) return true;
+            if (containsIgnoreCase(entry.host?.company, q)) return true;
+        }
+    }
+
+    return false;
+}
+
+/**
  * Check if a venue matches search query
  * @param {Object} venue - Venue object
  * @param {string} query - Search query
