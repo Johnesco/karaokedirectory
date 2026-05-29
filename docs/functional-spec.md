@@ -478,10 +478,18 @@ The Navigation component does **not** re-render when search changes, to preserve
 
 Venues with an `activePeriod` field only appear when the current date falls within `activePeriod.start` and `activePeriod.end` (inclusive). This is automatic — no user control.
 
-### KJ Dossier (`?kj=`)
+### KJ Index (`?kj=all`)
+
+- **URL-driven:** `index.html?kj=all` renders `KJIndexView` — an alphabetical directory of every unique KJ name in the dataset.
+- **Source:** Walks every active venue and collects names from `venue.host.{name,company}` and per-show `schedule[N].host.{name,company}`. Case-insensitive de-dupe (display name preserved from first occurrence).
+- **Each entry:** KJ name + venue count, linking to `?kj=<encoded name>` (real anchor — page reloads into `KJDossierView`).
+- **Chip:** Reads "All KJs" (special-cased) instead of the literal "all". × exits to weekly view.
+- **Empty state:** "No KJs found in the directory." (renders when data has zero host fields populated).
+
+### KJ Dossier (`?kj=<name>`)
 
 - **Audience:** KJs auditing their own listings ("what do I have up on karaokedirectory?"). Not a customer-facing filter.
-- **URL-driven:** Append `?kj=<name>` to `index.html` (e.g. `index.html?kj=xpider`).
+- **URL-driven:** Append `?kj=<name>` to `index.html` (e.g. `index.html?kj=xpider`). Discoverable via `?kj=all`.
 - **Match scope:** Case-insensitive substring against `venue.host.{name,company}` and per-show `schedule[N].host.{name,company}` only. Does NOT match venue name, city, tags, or event names.
 - **Replaces the normal views:** `KJDossierView` renders in place of weekly/alphabetical/map. Navigation collapses to a minimal bar showing just the `KJ: <name>` chip with a × close button (clearing the chip exits dossier mode and strips `?kj=` from the URL).
 - **Layout per venue:**

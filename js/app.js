@@ -13,6 +13,7 @@ import { WeeklyView } from './views/WeeklyView.js';
 import { AlphabeticalView } from './views/AlphabeticalView.js';
 import { MapView } from './views/MapView.js';
 import { KJDossierView } from './views/KJDossierView.js';
+import { KJIndexView } from './views/KJIndexView.js';
 import { initDebugMode, isDebugMode } from './utils/debug.js';
 import { initTagConfig } from './utils/tags.js';
 import { getHashParams } from './utils/url.js';
@@ -259,13 +260,18 @@ function renderView(viewName) {
         return;
     }
 
-    // KJ dossier mode overrides the normal weekly/alphabetical/map views.
-    // It's a self-audit page for KJs, reached via ?kj=<name>.
-    const inDossierMode = !!getState('hostFilter');
+    // KJ-mode overrides the normal weekly/alphabetical/map views.
+    // ?kj=all   → KJIndexView (alphabetical directory of every KJ name)
+    // ?kj=<n>   → KJDossierView (one KJ's full schedule across venues)
+    const hostFilter = getState('hostFilter');
+    const inKJIndexMode = hostFilter && hostFilter.toLowerCase() === 'all';
+    const inDossierMode = !!hostFilter && !inKJIndexMode;
+    const inKJMode = inKJIndexMode || inDossierMode;
 
-    // Toggle body class for immersive map mode (only when NOT in dossier mode)
-    document.body.classList.toggle('view--map', viewName === 'map' && !inDossierMode);
+    // Toggle body class for immersive map mode (only when NOT in KJ mode)
+    document.body.classList.toggle('view--map', viewName === 'map' && !inKJMode);
     document.body.classList.toggle('view--kj-dossier', inDossierMode);
+    document.body.classList.toggle('view--kj-index', inKJIndexMode);
 
     // Destroy current view
     if (currentView) {
@@ -273,7 +279,11 @@ function renderView(viewName) {
         currentView = null;
     }
 
-    const ViewClass = inDossierMode ? KJDossierView : views[viewName];
+    const ViewClass = inKJIndexMode
+        ? KJIndexView
+        : inDossierMode
+            ? KJDossierView
+            : views[viewName];
     if (!ViewClass) {
         console.error(`Unknown view: ${viewName}`);
         return;

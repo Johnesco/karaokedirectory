@@ -33,16 +33,19 @@ export class Navigation extends Component {
         const showDedicated = getState('showDedicated');
         const hostFilter = getState('hostFilter');
 
-        // KJ dossier mode: minimal nav with just the chip — the rest of the
-        // controls are irrelevant for a KJ auditing their own listings.
+        // KJ mode (dossier or index): minimal nav with just the chip — the rest
+        // of the controls are irrelevant for a KJ auditing their own listings.
         if (hostFilter) {
+            const isIndex = hostFilter.toLowerCase() === 'all';
+            const chipLabel = isIndex ? '' : 'KJ:';
+            const chipValue = isIndex ? 'All KJs' : hostFilter;
             return `
                 <nav class="navigation navigation--dossier">
                     <div class="navigation__active-filters">
                         <span class="filter-chip" role="status">
                             <i class="fa-solid fa-microphone-lines"></i>
-                            <span class="filter-chip__label">KJ:</span>
-                            <span class="filter-chip__value">${hostFilter}</span>
+                            ${chipLabel ? `<span class="filter-chip__label">${chipLabel}</span>` : ''}
+                            <span class="filter-chip__value">${chipValue}</span>
                             <button class="filter-chip__clear" data-filter="clear-kj" type="button" aria-label="Exit KJ view">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>

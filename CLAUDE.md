@@ -281,7 +281,8 @@ Tags are rendered as color-coded badges in VenueCard, VenueModal, and VenueDetai
 
 ### URL Query Params
 - `?view=<weekly|alphabetical|map>` — initial view
-- `?kj=<name>` — KJ self-audit dossier (`KJDossierView` replaces normal views; `venueMatchesHost()` filters venues; minimal nav with `.filter-chip` × clear)
+- `?kj=all` — KJ index (`KJIndexView`, alphabetical directory of every unique KJ name)
+- `?kj=<name>` — KJ self-audit dossier (`KJDossierView`; `venueMatchesHost()` filters venues; minimal nav with `.filter-chip` × clear)
 - `?debug=1` — debug mode (also `localStorage.debug=1`)
 - `app.js` reads URL params on boot; `subscribe('hostFilter', ...)` writes back to URL via `history.replaceState`
 

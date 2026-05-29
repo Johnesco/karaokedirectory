@@ -1183,3 +1183,89 @@ body.view--map .app-layout__detail {
     justify-content: center;
     padding: var(--spacing-sm) var(--spacing-md);
 }
+
+/* ============================================
+   KJ INDEX VIEW
+   Alphabetical directory of every KJ. Reached via ?kj=all.
+   ============================================ */
+
+.kj-index {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: var(--spacing-lg) var(--spacing-md);
+}
+
+.kj-index__header {
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.kj-index__title {
+    font-size: var(--font-size-2xl);
+    margin: 0 0 var(--spacing-xs);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.kj-index__title i {
+    color: var(--color-primary);
+}
+
+.kj-index__stats {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--font-size-base);
+}
+
+.kj-index__empty {
+    color: var(--text-secondary);
+    font-size: var(--font-size-base);
+}
+
+.kj-index__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2xs);
+}
+
+.kj-index__item {
+    margin: 0;
+}
+
+.kj-index__link {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.kj-index__link:hover {
+    background: var(--color-gray-700);
+    border-color: var(--color-primary);
+    transform: translateX(2px);
+}
+
+.kj-index__name {
+    font-size: var(--font-size-base);
+    font-weight: 500;
+}
+
+.kj-index__count {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
