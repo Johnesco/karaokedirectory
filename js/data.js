@@ -1239,7 +1239,7 @@ const karaokeData = {
         {
           "frequency": "once",
           "date": "2026-05-30",
-          "startTime": "19:00",
+          "startTime": "21:00",
           "endTime": "01:00",
           "eventName": "Karaoke with Xpider @ Highball!",
           "host": {
@@ -1277,6 +1277,18 @@ const karaokeData = {
           "endTime": "21:00",
           "eventName": "Story-Oke: Soundtracks @ Highball!",
           "eventUrl": "https://www.facebook.com/share/1CUHiRCZAH/",
+          "host": {
+            "company": "Story-Oke Austin",
+            "website": "https://www.storyokeaustin.com/"
+          }
+        },
+        {
+          "frequency": "once",
+          "date": "2026-05-30",
+          "startTime": "19:30",
+          "endTime": "21:00",
+          "eventName": "Story-Oke: Country @ Highball!",
+          "eventUrl": "https://www.facebook.com/share/1Cjd681y4d/",
           "host": {
             "company": "Story-Oke Austin",
             "website": "https://www.storyokeaustin.com/"
