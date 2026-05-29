@@ -1160,7 +1160,7 @@ const karaokeData = {
         }
       ],
       "host": {
-        "name": "Marshall Joshua"
+        "name": "Marshall Joshua Entertainment"
       },
       "coordinates": {
         "lat": 30.2453635,
@@ -2474,7 +2474,7 @@ const karaokeData = {
         }
       ],
       "host": {
-        "name": "Marshall Joshua"
+        "name": "Marshall Joshua Entertainment"
       },
       "socials": {
         "facebook": "https://www.facebook.com/RoundRockTavern/",
