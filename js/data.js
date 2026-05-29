@@ -1238,6 +1238,28 @@ const karaokeData = {
         },
         {
           "frequency": "once",
+          "date": "2026-05-30",
+          "startTime": "19:00",
+          "endTime": "01:00",
+          "eventName": "Karaoke with Xpider @ Highball!",
+          "host": {
+            "name": "Xpider Cantu",
+            "website": "https://www.xpidermagic.com/karaoke"
+          }
+        },
+        {
+          "frequency": "once",
+          "date": "2026-06-04",
+          "startTime": "19:00",
+          "endTime": "01:00",
+          "eventName": "Karaoke with Xpider @ Highball!",
+          "host": {
+            "name": "Xpider Cantu",
+            "website": "https://www.xpidermagic.com/karaoke"
+          }
+        },
+        {
+          "frequency": "once",
           "date": "2026-02-28",
           "startTime": "19:30",
           "endTime": "21:00",
