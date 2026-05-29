@@ -2981,7 +2981,7 @@ const karaokeData = {
         }
       ],
       "host": {
-        "company": "Diamond Karaoke"
+        "company": "Diamond Karaoke Austin"
       },
       "socials": {
         "facebook": "https://www.facebook.com/profile.php?id=61573452677081",
