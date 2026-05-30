@@ -186,6 +186,58 @@ export function getVenuesForDate(date, options = {}) {
 }
 
 /**
+ * Get every venue+schedule pairing for a date — one entry per matching
+ * schedule entry, so a venue with two events on the same day appears twice.
+ *
+ * This is what the weekly calendar should render (one card per event), in
+ * contrast to getVenuesForDate which returns each venue at most once. Use
+ * getVenuesForDate when you need unique-venue counts; use this when you're
+ * rendering per-event UI.
+ *
+ * Sort order:
+ *   1. Special one-time events sort to the top
+ *   2. Then alphabetical by venue name (ignoring leading "The")
+ *   3. Ties broken by startTime
+ *
+ * @param {Date} date - Date to check
+ * @param {Object} options - Filter options
+ * @returns {Array<{venue: Object, schedule: Object}>} One entry per matching schedule entry
+ */
+export function getVenueEventsForDate(date, options = {}) {
+    const { includeDedicated = true, searchQuery = '' } = options;
+
+    const events = [];
+    for (const venue of getActiveVenues()) {
+        if (!includeDedicated && venue.dedicated) continue;
+        if (searchQuery && !venueMatchesSearch(venue, searchQuery)) continue;
+        if (!isVenueActiveOn(venue, date)) continue;
+
+        for (const schedule of venue.schedule) {
+            if (scheduleMatchesDate(schedule, date)) {
+                events.push({ venue, schedule });
+            }
+        }
+    }
+
+    return events.sort((a, b) => {
+        // Special events sort to top
+        const aSpecial = a.schedule.frequency === 'once';
+        const bSpecial = b.schedule.frequency === 'once';
+        if (aSpecial && !bSpecial) return -1;
+        if (!aSpecial && bSpecial) return 1;
+
+        // Then alphabetical by venue name
+        const nameA = getSortableName(a.venue.name).toLowerCase();
+        const nameB = getSortableName(b.venue.name).toLowerCase();
+        const nameCmp = nameA.localeCompare(nameB);
+        if (nameCmp !== 0) return nameCmp;
+
+        // Ties broken by startTime so multiple events at one venue read chronologically
+        return (a.schedule.startTime || '').localeCompare(b.schedule.startTime || '');
+    });
+}
+
+/**
  * Get all venues sorted alphabetically.
  * Filters out venues whose activePeriod doesn't include today — seasonally-
  * bounded venues should not appear in the global list outside their window.

@@ -15,7 +15,7 @@
 import { Component } from './Component.js';
 import { renderVenueCard } from './VenueCard.js';
 import { formatDateShort, isToday, getDayDisplayName, getDayName } from '../utils/date.js';
-import { getVenuesForDate } from '../services/venues.js';
+import { getVenueEventsForDate } from '../services/venues.js';
 import { getState } from '../core/state.js';
 
 /**
@@ -40,14 +40,19 @@ export class DayCard extends Component {
         const { date } = this.props;
         const showDedicated = getState('showDedicated');
         const searchQuery = getState('searchQuery');
-        const venues = getVenuesForDate(date, { includeDedicated: showDedicated, searchQuery });
+        // One entry per matching schedule entry, so a venue with two events
+        // on the same day renders two cards (each with its own event title/time).
+        const events = getVenueEventsForDate(date, { includeDedicated: showDedicated, searchQuery });
+        // Footer count is unique venues, since "venues" is the user-facing unit
+        // even when a single venue contributes multiple cards.
+        const uniqueVenueCount = new Set(events.map(e => e.venue.id)).size;
 
         const dayName = getDayDisplayName(date);
         const dateStr = formatDateShort(date);
         const dayOfWeek = getDayName(date);
         const todayClass = isToday(date) ? 'day-card--today' : '';
         const pastClass = isPast(date) ? 'day-card--past' : '';
-        const emptyClass = venues.length === 0 ? 'day-card--empty' : '';
+        const emptyClass = events.length === 0 ? 'day-card--empty' : '';
 
         return `
             <article class="day-card day-card--${dayOfWeek} ${todayClass} ${pastClass} ${emptyClass}">
@@ -61,27 +66,27 @@ export class DayCard extends Component {
                 </header>
 
                 <div class="day-card__content">
-                    ${venues.length > 0
-                        ? this.renderVenues(venues, date)
+                    ${events.length > 0
+                        ? this.renderEvents(events, date)
                         : '<p class="day-card__empty">No karaoke scheduled</p>'
                     }
                 </div>
 
-                ${venues.length > 0 ? `
+                ${events.length > 0 ? `
                     <footer class="day-card__footer">
-                        <span class="day-card__count">${venues.length} venue${venues.length !== 1 ? 's' : ''}</span>
+                        <span class="day-card__count">${uniqueVenueCount} venue${uniqueVenueCount !== 1 ? 's' : ''}</span>
                     </footer>
                 ` : ''}
             </article>
         `;
     }
 
-    renderVenues(venues, date) {
+    renderEvents(events, date) {
         return `
             <ul class="day-card__venues">
-                ${venues.map(venue => `
+                ${events.map(({ venue, schedule }) => `
                     <li class="day-card__venue-item">
-                        ${renderVenueCard(venue, { mode: 'compact', date, showSchedule: true })}
+                        ${renderVenueCard(venue, { mode: 'compact', date, schedule, showSchedule: true })}
                     </li>
                 `).join('')}
             </ul>

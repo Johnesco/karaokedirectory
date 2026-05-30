@@ -77,13 +77,18 @@ Each day card header displays:
 ### Day Card Content
 
 When expanded, shows:
-- List of venue cards in compact mode
-- Footer with venue count (e.g., "5 venues")
+- One venue card per **matching schedule entry** (a venue with two events on the same date renders two cards, each showing its own event name, time, and host)
+- Footer with **unique venue count** (e.g., "14 venues" even if 15 cards rendered because one venue had two events)
 
 ### Sorting
 
-- **Special events first** — venues with `frequency: "once"` matching that date sort to the top
-- **Then alphabetical** — remaining venues sorted by `getSortableName()` (ignores articles like "The", "A", etc.)
+- **Special events first** — schedule entries with `frequency: "once"` matching that date sort to the top
+- **Then alphabetical** — remaining entries sorted by `getSortableName()` (ignores articles like "The", "A", etc.)
+- **Ties** broken by `startTime` so multiple events at the same venue read chronologically
+
+### "Also …" Indicator (Other Nights)
+
+Below the time row, each card shows a small calendar icon and an "Also …" line listing the venue's other dates/days. To avoid confusing self-reference, this list **excludes any schedule entry that also matches the current card's date** — so a card rendered for May 30 will never list "May 30" in its Also line, even if the venue has another event that day (which would render as a separate card immediately adjacent).
 
 ### Interaction
 

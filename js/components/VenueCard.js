@@ -19,6 +19,7 @@ export class VenueCard extends Component {
      * @param {Object} props.venue - Venue data
      * @param {string} [props.mode='compact'] - Display mode: 'compact' | 'full'
      * @param {Date} [props.date] - Date for schedule display
+     * @param {Object} [props.schedule] - Specific schedule entry to render (overrides date-based auto-pick)
      * @param {boolean} [props.showSchedule=true] - Show schedule info
      */
     init() {
@@ -28,16 +29,19 @@ export class VenueCard extends Component {
     }
 
     template() {
-        const { venue, mode = 'compact', date, showSchedule = true } = this.props;
+        const { venue, mode = 'compact', date, schedule, showSchedule = true } = this.props;
 
         if (mode === 'compact') {
-            return this.compactTemplate(venue, date, showSchedule);
+            return this.compactTemplate(venue, date, showSchedule, schedule);
         }
         return this.fullTemplate(venue);
     }
 
-    compactTemplate(venue, date, showSchedule) {
-        const schedule = this.getScheduleForDate(venue, date);
+    compactTemplate(venue, date, showSchedule, scheduleProp) {
+        // Prefer explicit schedule prop (so callers can pick the specific event
+        // when a venue has multiple matches on the same date). Fall back to
+        // auto-detection when no prop is passed.
+        const schedule = scheduleProp || this.getScheduleForDate(venue, date);
         const timeDisplay = schedule
             ? formatTimeRange(schedule.startTime, schedule.endTime)
             : '';
@@ -52,8 +56,10 @@ export class VenueCard extends Component {
             ? ['special-event', ...(venue.tags || [])]
             : venue.tags;
 
-        // Schedule context: frequency label + "+N more" indicator (HTML-ready)
-        const { frequencyHtml, moreNightsHtml } = renderScheduleContext(venue, schedule);
+        // Schedule context: frequency label + "+N more" indicator (HTML-ready).
+        // Passes the render date so the "Also" list can exclude same-day entries
+        // (avoids "Also May 30" appearing on a card already rendered for May 30).
+        const { frequencyHtml, moreNightsHtml } = renderScheduleContext(venue, schedule, date);
 
         // Build full address string and map URL
         const fullAddress = formatAddress(venue.address);
@@ -205,10 +211,10 @@ export class VenueCard extends Component {
  * @returns {string} HTML string
  */
 export function renderVenueCard(venue, options = {}) {
-    const { mode = 'compact', date = null, showSchedule = true } = options;
+    const { mode = 'compact', date = null, schedule = null, showSchedule = true } = options;
 
     // Create a temporary container and component
     const container = document.createElement('div');
-    const card = new VenueCard(container, { venue, mode, date, showSchedule });
+    const card = new VenueCard(container, { venue, mode, date, schedule, showSchedule });
     return card.template();
 }

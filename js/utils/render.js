@@ -4,7 +4,7 @@
  */
 
 import { escapeHtml } from './string.js';
-import { formatScheduleEntry, formatActivePeriodText, WEEKDAYS } from './date.js';
+import { formatScheduleEntry, formatActivePeriodText, scheduleMatchesDate, WEEKDAYS } from './date.js';
 import { buildMapUrl, buildDirectionsUrl, createSocialLinks, formatAddress, sanitizeUrl } from './url.js';
 
 /**
@@ -231,9 +231,10 @@ function buildAlsoText(otherEntries, allEntries) {
  * into a single output for display after the time.
  * @param {Object} venue - Venue data object (needs schedule array)
  * @param {Object|null} schedule - The matched schedule entry for this card
+ * @param {Date|null} [currentDate] - Date the card is rendered for; if given, schedule entries on the same date are excluded from the "Also" list (avoids "Also May 30" on a card already on May 30)
  * @returns {{ frequencyLabel: string, moreCount: number, moreText: string }} Schedule context parts
  */
-export function getScheduleContext(venue, schedule) {
+export function getScheduleContext(venue, schedule, currentDate = null) {
     // Build frequency label for non-once events
     let frequencyLabel = '';
     if (schedule && schedule.frequency !== 'once') {
@@ -241,11 +242,19 @@ export function getScheduleContext(venue, schedule) {
         frequencyLabel = `${formatted.frequencyPrefix}${formatted.day}`;
     }
 
-    // Build "Also ..." or "Nightly" text for multi-entry venues
-    const moreCount = (venue.schedule?.length || 1) - 1;
+    // "Other" entries: everything that isn't the matched one, and (if a date is
+    // provided) isn't a different entry that also matches the same date.
+    // The second clause prevents the "Also" list from listing today's other
+    // events as if they were on another night.
+    const otherEntries = (venue.schedule || []).filter(s => {
+        if (s === schedule) return false;
+        if (currentDate && scheduleMatchesDate(s, currentDate)) return false;
+        return true;
+    });
+
+    const moreCount = otherEntries.length;
     let moreText = '';
     if (moreCount > 0) {
-        const otherEntries = venue.schedule.filter(s => s !== schedule);
         moreText = buildAlsoText(otherEntries, venue.schedule);
     }
 
@@ -325,8 +334,8 @@ export function renderVenueDetailSections(venue, { classPrefix, hostSocialSize =
  * @param {Object|null} schedule - The matched schedule entry for this card
  * @returns {{ frequencyHtml: string, moreNightsHtml: string }}
  */
-export function renderScheduleContext(venue, schedule) {
-    const { frequencyLabel, moreCount, moreText } = getScheduleContext(venue, schedule);
+export function renderScheduleContext(venue, schedule, currentDate = null) {
+    const { frequencyLabel, moreCount, moreText } = getScheduleContext(venue, schedule, currentDate);
 
     const frequencyHtml = frequencyLabel
         ? `<span class="venue-card__frequency">${escapeHtml(frequencyLabel)}</span> &middot; `
