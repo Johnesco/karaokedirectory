@@ -563,8 +563,8 @@ The shape `{ tagDefinitions, listings }` is the contract — both the local file
     activePeriod.end    string        "YYYY-MM-DD"
 
   host                  object|null   OPTIONAL
-    host.name           string        OPTIONAL
-    host.company        string        OPTIONAL
+    host.name           string        OPTIONAL  Individual KJ name
+    host.affiliation    string        OPTIONAL  Parent company/org (e.g. "Starling Karaoke")
     host.website        string        OPTIONAL  Host/KJ personal website
 
   socials               object|null   OPTIONAL

@@ -14,7 +14,7 @@
 
 import { Component } from './Component.js';
 import { renderVenueCard } from './VenueCard.js';
-import { formatDateShort, isToday, getDayDisplayName, getDayName } from '../utils/date.js';
+import { formatDateShort, isToday, getDayDisplayName, getDayName, getScheduleExclusion } from '../utils/date.js';
 import { getVenueEventsForDate } from '../services/venues.js';
 import { getState } from '../core/state.js';
 
@@ -43,9 +43,14 @@ export class DayCard extends Component {
         // One entry per matching schedule entry, so a venue with two events
         // on the same day renders two cards (each with its own event title/time).
         const events = getVenueEventsForDate(date, { includeDedicated: showDedicated, searchQuery });
-        // Footer count is unique venues, since "venues" is the user-facing unit
-        // even when a single venue contributes multiple cards.
-        const uniqueVenueCount = new Set(events.map(e => e.venue.id)).size;
+        // Footer count is unique venues that are actually open — exclude
+        // venues whose only event today is suppressed by an exclusion.
+        const openVenueIds = new Set(
+            events
+                .filter(e => !getScheduleExclusion(e.schedule, date))
+                .map(e => e.venue.id)
+        );
+        const uniqueVenueCount = openVenueIds.size;
 
         const dayName = getDayDisplayName(date);
         const dateStr = formatDateShort(date);

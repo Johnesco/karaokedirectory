@@ -48,7 +48,7 @@ function handleVenueSubmission(data) {
   var sheet = getOrCreateSheet(ss, 'Venue Submissions', [
     'Timestamp', 'Venue Name', 'Venue ID', 'Dedicated', 'Tags',
     'Street', 'City', 'State', 'ZIP',
-    'Schedule JSON', 'Host Name', 'Host Company', 'Host Website',
+    'Schedule JSON', 'Host Name', 'Host Affiliation', 'Host Website',
     'Website', 'Facebook', 'Instagram', 'Twitter',
     'Notes', 'Submitter Name', 'Submitter Type', 'Contact Methods',
     'Full Venue JSON', 'Status'
@@ -71,7 +71,7 @@ function handleVenueSubmission(data) {
     address.zip || '',
     JSON.stringify(venue.schedule || []),
     host.name || '',
-    host.company || '',
+    host.affiliation || '',
     host.website || '',
     socials.website || '',
     socials.facebook || '',

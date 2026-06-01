@@ -944,7 +944,7 @@ body.view--map .app-layout__detail {
     margin: 0 0 var(--spacing-2xs);
 }
 
-.map-venue-card__host-company {
+.map-venue-card__host-affiliation {
     color: var(--text-secondary);
     margin: 0 0 var(--spacing-xs);
 }
@@ -1037,8 +1037,10 @@ body.view--map .app-layout__detail {
 
 .kj-dossier {
     max-width: 800px;
-    margin: 0 auto;
+    margin: var(--spacing-md) auto;
     padding: var(--spacing-lg) var(--spacing-md);
+    background: rgba(31, 41, 55, 0.85);
+    border-radius: var(--border-radius);
 }
 
 .kj-dossier__header {
@@ -1191,8 +1193,10 @@ body.view--map .app-layout__detail {
 
 .kj-index {
     max-width: 640px;
-    margin: 0 auto;
+    margin: var(--spacing-md) auto;
     padding: var(--spacing-lg) var(--spacing-md);
+    background: rgba(31, 41, 55, 0.85);
+    border-radius: var(--border-radius);
 }
 
 .kj-index__header {
@@ -1268,4 +1272,56 @@ body.view--map .app-layout__detail {
     color: var(--text-secondary);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
+}
+
+/* Sections — "Affiliations" and "Independent KJs" */
+.kj-index__section {
+    margin-bottom: var(--spacing-xl);
+}
+
+.kj-index__section-title {
+    font-size: var(--font-size-lg);
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 var(--spacing-md);
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Affiliation grouping — parent + nested KJ list */
+.kj-index__group {
+    margin: 0;
+}
+
+.kj-index__link--affiliation {
+    font-weight: 600;
+    border-left: 3px solid var(--color-primary);
+}
+
+.kj-index__sublist {
+    list-style: none;
+    padding: 0;
+    margin: var(--spacing-2xs) 0 var(--spacing-sm) var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2xs);
+    border-left: 1px dashed var(--border-color);
+    padding-left: var(--spacing-md);
+}
+
+.kj-index__subitem {
+    margin: 0;
+}
+
+.kj-index__link--kj {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    padding: var(--spacing-2xs) var(--spacing-sm);
+    font-size: var(--font-size-sm);
+}
+
+.kj-index__link--kj:hover {
+    background: var(--color-gray-700);
+    border-color: var(--color-primary);
 }

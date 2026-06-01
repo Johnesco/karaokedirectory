@@ -125,7 +125,7 @@ const karaokeData = {
         }
       ],
       "host": {
-        "company": "Diamond Karaoke Austin"
+        "affiliation": "Diamond Karaoke Austin"
       },
       "socials": {
         "facebook": "https://www.facebook.com/AlcoveCantina",
@@ -290,7 +290,7 @@ const karaokeData = {
         }
       ],
       "host": {
-        "company": "Karaoke Underground"
+        "affiliation": "Karaoke Underground"
       },
       "socials": {
         "website": "https://www.blacksparrowmusicparlor.com/",
@@ -358,7 +358,7 @@ const karaokeData = {
       ],
       "host": {
         "name": "Keith Ruckus",
-        "company": "Ruckus ATX"
+        "affiliation": "Ruckus ATX"
       },
       "socials": {
         "facebook": "https://www.facebook.com/theboatatx/#",
@@ -393,7 +393,7 @@ const karaokeData = {
       ],
       "host": {
         "name": "Ill Will",
-        "company": "Live Music In Austin"
+        "affiliation": "Live Music In Austin"
       },
       "socials": {
         "facebook": "https://www.facebook.com/bodhishideaway/",
@@ -429,7 +429,7 @@ const karaokeData = {
       ],
       "host": {
         "name": "KJ Average Joe",
-        "company": "Starling Karaoke"
+        "affiliation": "Starling Karaoke"
       },
       "socials": {
         "facebook": "https://www.facebook.com/boomerzaustin",
@@ -565,7 +565,7 @@ const karaokeData = {
         }
       ],
       "host": {
-        "company": "Diamond Karaoke Austin"
+        "affiliation": "Diamond Karaoke Austin"
       },
       "socials": {
         "facebook": "https://www.facebook.com/canaryroostatx",
@@ -599,7 +599,7 @@ const karaokeData = {
       ],
       "host": {
         "name": "Average Joe",
-        "company": "Starling Karaoke"
+        "affiliation": "Starling Karaoke"
       },
       "socials": {
         "instagram": "https://www.instagram.com/coffeehouse/",
@@ -661,7 +661,7 @@ const karaokeData = {
         }
       ],
       "host": {
-        "company": "Karaoke Underground",
+        "affiliation": "Karaoke Underground",
         "website": "https://karaokeunderground.com/"
       },
       "socials": {
@@ -1015,7 +1015,7 @@ const karaokeData = {
         }
       ],
       "host": {
-        "company": "Texas Live Band Karaoke",
+        "affiliation": "Texas Live Band Karaoke",
         "website": "https://www.facebook.com/texaslbk"
       },
       "socials": {
@@ -1190,7 +1190,7 @@ const karaokeData = {
         }
       ],
       "host": {
-        "company": "Diamond Karaoke Austin"
+        "affiliation": "Diamond Karaoke Austin"
       },
       "socials": {
         "facebook": "https://www.facebook.com/hardcountgtown/?ref=page_internal",
@@ -1266,7 +1266,7 @@ const karaokeData = {
           "eventName": "Story-Oke: Breakups @ Highball!",
           "eventUrl": "https://fb.me/e/5vGkMpOuE",
           "host": {
-            "company": "Story-Oke Austin",
+            "affiliation": "Story-Oke Austin",
             "website": "https://www.storyokeaustin.com/"
           }
         },
@@ -1278,7 +1278,7 @@ const karaokeData = {
           "eventName": "Story-Oke: Soundtracks @ Highball!",
           "eventUrl": "https://www.facebook.com/share/1CUHiRCZAH/",
           "host": {
-            "company": "Story-Oke Austin",
+            "affiliation": "Story-Oke Austin",
             "website": "https://www.storyokeaustin.com/"
           }
         },
@@ -1290,7 +1290,7 @@ const karaokeData = {
           "eventName": "Story-Oke: Country @ Highball!",
           "eventUrl": "https://www.facebook.com/share/1Cjd681y4d/",
           "host": {
-            "company": "Story-Oke Austin",
+            "affiliation": "Story-Oke Austin",
             "website": "https://www.storyokeaustin.com/"
           }
         }
@@ -1441,7 +1441,7 @@ const karaokeData = {
       ],
       "host": {
         "name": "Jason Lynum",
-        "company": "CPR Mobile DJs"
+        "affiliation": "CPR Mobile DJs"
       },
       "socials": null,
       "coordinates": {
@@ -1513,7 +1513,7 @@ const karaokeData = {
       ],
       "host": {
         "name": "Murrah",
-        "company": "Planet Karaoke"
+        "affiliation": "Planet Karaoke"
       },
       "socials": {
         "instagram": "https://www.instagram.com/theironbearaustin/",
@@ -1592,7 +1592,7 @@ const karaokeData = {
         }
       ],
       "host": {
-        "company": "The Karaoke Underground"
+        "affiliation": "The Karaoke Underground"
       },
       "socials": {
         "facebook": "https://www.facebook.com/NomadBarATX",
@@ -1652,7 +1652,7 @@ const karaokeData = {
         }
       ],
       "host": {
-        "company": "Lion's Den Tea"
+        "affiliation": "Lion's Den Tea"
       },
       "socials": {
         "instagram": "https://www.instagram.com/lionsdentea/",
@@ -2082,7 +2082,7 @@ const karaokeData = {
       ],
       "host": {
         "name": "DJ P'Nasty",
-        "company": "Karaoke Under the Moon"
+        "affiliation": "Karaoke Under the Moon"
       },
       "socials": {
         "facebook": "https://www.facebook.com/profile.php?id=100064324614170#",
@@ -2118,7 +2118,7 @@ const karaokeData = {
       ],
       "host": {
         "name": "KJ Stephanie",
-        "company": "Starling Karaoke"
+        "affiliation": "Starling Karaoke"
       },
       "socials": {
         "facebook": "https://www.facebook.com/people/Oak-Hill-Social/61552863291533/",
@@ -2152,7 +2152,7 @@ const karaokeData = {
         }
       ],
       "host": {
-        "company": "Diamond Karaoke Austin"
+        "affiliation": "Diamond Karaoke Austin"
       },
       "socials": {
         "facebook": "https://www.facebook.com/profile.php?id=61563834987547"
@@ -2180,12 +2180,15 @@ const karaokeData = {
           "frequency": "every",
           "day": "Friday",
           "startTime": "21:00",
-          "endTime": "00:00"
+          "endTime": "00:00",
+          "exclusions": [
+            { "date": "2026-06-12", "reason": "Private event" }
+          ]
         }
       ],
       "host": {
         "name": "KJ J3N",
-        "company": "Starling Karaoke"
+        "affiliation": "Starling Karaoke"
       },
       "socials": {
         "facebook": "https://www.facebook.com/punchbowlsocial/",
@@ -2288,7 +2291,7 @@ const karaokeData = {
         }
       ],
       "host": {
-        "company": "Marshall Joshua Entertainment"
+        "affiliation": "Marshall Joshua Entertainment"
       },
       "socials": {
         "facebook": "https://www.facebook.com/profile.php?id=100040267276872"
@@ -2321,7 +2324,7 @@ const karaokeData = {
       ],
       "host": {
         "name": "Jen",
-        "company": "Smart Ass Entertainment"
+        "affiliation": "Smart Ass Entertainment"
       },
       "socials": {
         "facebook": "https://www.facebook.com/therailhousebartx/",
@@ -2362,7 +2365,7 @@ const karaokeData = {
       ],
       "host": {
         "name": "Jason Lynum",
-        "company": "CPR Mobile DJs"
+        "affiliation": "CPR Mobile DJs"
       },
       "socials": {
         "facebook": "https://www.facebook.com/tayloricehouse",
@@ -2509,7 +2512,7 @@ const karaokeData = {
         }
       ],
       "host": {
-        "company": "Poppin' Off with Poppy Karaoke"
+        "affiliation": "Poppin' Off with Poppy Karaoke"
       },
       "socials": {
         "facebook": "https://www.facebook.com/shootersatx",
@@ -2546,7 +2549,7 @@ const karaokeData = {
         }
       ],
       "host": {
-        "company": "Party Pipes Karaoke"
+        "affiliation": "Party Pipes Karaoke"
       },
       "socials": {
         "facebook": "https://www.facebook.com/shooterscp",
@@ -2655,7 +2658,7 @@ const karaokeData = {
         }
       ],
       "host": {
-        "company": "By Request Karaoke",
+        "affiliation": "By Request Karaoke",
         "website": "https://www.facebook.com/brkaraoke"
       },
       "socials": {
@@ -2700,7 +2703,7 @@ const karaokeData = {
         }
       ],
       "host": {
-        "company": "All About Music"
+        "affiliation": "All About Music"
       },
       "coordinates": {
         "lat": 30.4501661,
@@ -2915,7 +2918,7 @@ const karaokeData = {
         }
       ],
       "host": {
-        "company": "Stryke3 Karaoke",
+        "affiliation": "Stryke3 Karaoke",
         "website": "https://www.austinkaraokeshows.com/"
       },
       "socials": {
@@ -2953,7 +2956,7 @@ const karaokeData = {
         }
       ],
       "host": {
-        "company": "Party Pipes Karaoke"
+        "affiliation": "Party Pipes Karaoke"
       },
       "socials": {
         "facebook": "https://www.facebook.com/thewhiskeygirlssaloon",
@@ -3015,7 +3018,7 @@ const karaokeData = {
         }
       ],
       "host": {
-        "company": "Diamond Karaoke Austin"
+        "affiliation": "Diamond Karaoke Austin"
       },
       "socials": {
         "facebook": "https://www.facebook.com/profile.php?id=61573452677081",
@@ -3050,7 +3053,7 @@ const karaokeData = {
       ],
       "host": {
         "name": "Kim",
-        "company": "Smart Ass Entertainment"
+        "affiliation": "Smart Ass Entertainment"
       },
       "socials": {
         "facebook": "https://www.facebook.com/williesjoint/",

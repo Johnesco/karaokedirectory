@@ -12,7 +12,7 @@ import { buildMapUrl, buildDirectionsUrl, createSocialLinks, formatAddress, sani
  * Per-show host overrides venue host; falls back to null when neither is set.
  * @param {Object} venue - Venue data
  * @param {Object} scheduleEntry - One entry from venue.schedule
- * @returns {Object|null} Host object ({ name?, company?, website?, socials? }) or null
+ * @returns {Object|null} Host object ({ name?, affiliation?, website?, socials? }) or null
  */
 export function resolveHostFor(venue, scheduleEntry) {
     return scheduleEntry?.host ?? venue?.host ?? null;
@@ -118,7 +118,7 @@ export function renderActivePeriod(activePeriod, classPrefix) {
 
 /**
  * Render the host/KJ section for venue details
- * @param {Object} host - Host object with name, company, website, socials
+ * @param {Object} host - Host object with name, affiliation, website, socials
  * @param {string} classPrefix - CSS class prefix
  * @param {Object} options - Options for social links
  * @returns {string} HTML string or empty if no host
@@ -136,7 +136,7 @@ export function renderHostSection(host, classPrefix, options = {}) {
             <h3>Presented By</h3>
             <div class="${classPrefix}__host">
                 ${host.name ? `<p class="${classPrefix}__host-name">${escapeHtml(host.name)}</p>` : ''}
-                ${host.company ? `<p class="${classPrefix}__host-company">${escapeHtml(host.company)}</p>` : ''}
+                ${host.affiliation ? `<p class="${classPrefix}__host-affiliation">${escapeHtml(host.affiliation)}</p>` : ''}
                 ${host.website ? `
                     <a href="${escapeHtml(host.website)}" target="_blank" rel="noopener noreferrer" class="${classPrefix}__host-website">
                         <i class="fa-solid fa-globe"></i> Website
@@ -352,17 +352,17 @@ export function renderScheduleContext(venue, schedule, currentDate = null) {
 /**
  * Render a compact host display line (for venue cards)
  * Shows "Presented by [name]" format
- * @param {Object} host - Host object with name and/or company
+ * @param {Object} host - Host object with name and/or affiliation
  * @returns {string} Formatted host display string or empty
  */
 export function formatHostDisplay(host) {
     if (!host) return '';
 
-    const { name, company } = host;
+    const { name, affiliation } = host;
 
-    if (name && company) {
-        return `${name} (${company})`;
+    if (name && affiliation) {
+        return `${name} (${affiliation})`;
     }
 
-    return name || company || '';
+    return name || affiliation || '';
 }

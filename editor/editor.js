@@ -260,7 +260,7 @@ function fillForm(venue) {
 
     // Host
     document.getElementById('host-name').value = venue.host?.name || '';
-    document.getElementById('host-company').value = venue.host?.company || '';
+    document.getElementById('host-affiliation').value = venue.host?.affiliation || '';
     document.getElementById('host-website').value = venue.host?.website || '';
 
     // Socials
@@ -391,11 +391,11 @@ function getFormData() {
 
     // Build host object
     const hostName = document.getElementById('host-name').value.trim();
-    const hostCompany = document.getElementById('host-company').value.trim();
+    const hostAffiliation = document.getElementById('host-affiliation').value.trim();
     const hostWebsite = document.getElementById('host-website').value.trim();
-    const host = (hostName || hostCompany || hostWebsite) ? {
+    const host = (hostName || hostAffiliation || hostWebsite) ? {
         name: hostName || undefined,
-        company: hostCompany || undefined,
+        affiliation: hostAffiliation || undefined,
         website: hostWebsite || undefined
     } : null;
 
@@ -608,7 +608,7 @@ function renderModalPreview(venue) {
             ${venue.host ? `
                 <div class="host-preview">
                     <strong>Host:</strong>
-                    ${venue.host.name || ''} ${venue.host.company ? `(${venue.host.company})` : ''}
+                    ${venue.host.name || ''} ${venue.host.affiliation ? `(${venue.host.affiliation})` : ''}
                 </div>
             ` : ''}
             ${socialLinksHtml ? `<div class="socials-preview">${socialLinksHtml}</div>` : ''}

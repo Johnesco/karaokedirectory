@@ -156,6 +156,40 @@ export function scheduleMatchesDate(schedule, date) {
 }
 
 /**
+ * Get the exclusion entry (if any) for a schedule on a given date.
+ *
+ * An exclusion suppresses a recurring schedule entry on a specific date —
+ * useful for holidays, private events, or one-off cancellations. The schedule
+ * still "matches" the date (so the venue can be rendered with a closed
+ * indicator); call this alongside `scheduleMatchesDate()` to know whether to
+ * dim/banner the card.
+ *
+ * Accepts both shorthand (`"2026-06-12"`) and object (`{date, reason}`) forms
+ * inside `schedule.exclusions`.
+ *
+ * @param {Object} schedule - Schedule entry, possibly with `exclusions`
+ * @param {Date} date - Date to check
+ * @returns {{date: string, reason: string|null}|null} Exclusion object or null
+ */
+export function getScheduleExclusion(schedule, date) {
+    if (!schedule?.exclusions?.length) return null;
+
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${y}-${m}-${d}`;
+
+    for (const ex of schedule.exclusions) {
+        if (typeof ex === 'string') {
+            if (ex === dateStr) return { date: ex, reason: null };
+        } else if (ex?.date === dateStr) {
+            return { date: ex.date, reason: ex.reason || null };
+        }
+    }
+    return null;
+}
+
+/**
  * Convert 24-hour time to 12-hour format
  * @param {string} time24 - Time in 24-hour format (e.g., "21:00")
  * @returns {string} Time in 12-hour format (e.g., "9:00 PM")

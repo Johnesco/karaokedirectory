@@ -273,13 +273,13 @@
                                         <input type="text" id="host-name" name="host-name" autocomplete="off" placeholder="e.g., DJ Mike">
                                     </div>
                                     <div class="form-group">
-                                        <label for="company">Company</label>
-                                        <input type="text" id="company" name="company" autocomplete="off" placeholder="e.g., Karaoke Kings">
+                                        <label for="affiliation">Affiliation</label>
+                                        <input type="text" id="affiliation" name="affiliation" autocomplete="off" placeholder="e.g., Karaoke Kings">
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group form-group--full">
-                                        <label for="host-website">Host / Company Website</label>
+                                        <label for="host-website">Host / Affiliation Website</label>
                                         <input type="url" id="host-website" name="host-website" inputmode="url" placeholder="https://">
                                     </div>
                                 </div>
@@ -787,13 +787,13 @@
 
             // Optional: Host info
             const hostName = formData.get('host-name')?.trim();
-            const company = formData.get('company')?.trim();
+            const affiliation = formData.get('affiliation')?.trim();
             const hostWebsite = formData.get('host-website')?.trim();
 
-            if (hostName || company || hostWebsite) {
+            if (hostName || affiliation || hostWebsite) {
                 venue.host = {};
                 if (hostName) venue.host.name = hostName;
-                if (company) venue.host.company = company;
+                if (affiliation) venue.host.affiliation = affiliation;
                 if (hostWebsite) venue.host.website = hostWebsite;
             }
 

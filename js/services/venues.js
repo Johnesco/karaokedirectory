@@ -11,7 +11,7 @@
  * - getVenuesWithCoordinates(options): Get venues with map coordinates
  * - venueMatchesSearch(venue, query): Check if venue matches search query
  *
- * Search matches against: name, city, neighborhood, host, company, tags (ID and label)
+ * Search matches against: name, city, neighborhood, host, affiliation, tags (ID and label)
  */
 
 import { scheduleMatchesDate, isDateInRange } from '../utils/date.js';
@@ -88,13 +88,13 @@ export function getVenueById(id) {
 
 /**
  * Check if a venue is hosted by a KJ matching the given query.
- * Substring + case-insensitive. Matches on venue.host.name, venue.host.company,
- * and per-show schedule[N].host.{name,company} (for multi-host venues like
+ * Substring + case-insensitive. Matches on venue.host.name, venue.host.affiliation,
+ * and per-show schedule[N].host.{name,affiliation} (for multi-host venues like
  * The Highball). Does NOT match venue name, city, tags, or event names — use
  * venueMatchesSearch() for that.
  *
  * @param {Object} venue - Venue object
- * @param {string} query - Host name or company substring
+ * @param {string} query - Host name or affiliation substring
  * @returns {boolean} True if any host field substring-matches
  */
 export function venueMatchesHost(venue, query) {
@@ -102,12 +102,12 @@ export function venueMatchesHost(venue, query) {
     const q = query.toLowerCase().trim();
 
     if (containsIgnoreCase(venue.host?.name, q)) return true;
-    if (containsIgnoreCase(venue.host?.company, q)) return true;
+    if (containsIgnoreCase(venue.host?.affiliation, q)) return true;
 
     if (Array.isArray(venue.schedule)) {
         for (const entry of venue.schedule) {
             if (containsIgnoreCase(entry.host?.name, q)) return true;
-            if (containsIgnoreCase(entry.host?.company, q)) return true;
+            if (containsIgnoreCase(entry.host?.affiliation, q)) return true;
         }
     }
 
@@ -137,14 +137,14 @@ export function venueMatchesSearch(venue, query) {
     // Search in host name
     if (containsIgnoreCase(venue.host?.name, q)) return true;
 
-    // Search in company
-    if (containsIgnoreCase(venue.host?.company, q)) return true;
+    // Search in affiliation
+    if (containsIgnoreCase(venue.host?.affiliation, q)) return true;
 
     // Search in per-show hosts (multi-host venues like The Highball)
     if (Array.isArray(venue.schedule)) {
         for (const entry of venue.schedule) {
             if (containsIgnoreCase(entry.host?.name, q)) return true;
-            if (containsIgnoreCase(entry.host?.company, q)) return true;
+            if (containsIgnoreCase(entry.host?.affiliation, q)) return true;
         }
     }
 
@@ -391,7 +391,7 @@ export function filterVenues(filters = {}) {
             containsIgnoreCase(venue.address.city, q) ||
             containsIgnoreCase(venue.address.neighborhood, q) ||
             containsIgnoreCase(venue.host?.name, q) ||
-            containsIgnoreCase(venue.host?.company, q)
+            containsIgnoreCase(venue.host?.affiliation, q)
         );
     }
 

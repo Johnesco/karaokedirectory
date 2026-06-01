@@ -1,10 +1,20 @@
 /**
  * KJIndexView
- * Alphabetical index of every KJ name in the directory. Reached via
- * ?kj=all. Each entry links to that KJ's dossier (?kj=<name>).
+ * Directory of every KJ and affiliation in the data. Reached via ?kj=all.
  *
- * Audience: a KJ who doesn't know the exact spelling of their own name
- * in the data, or someone browsing who books at karaokedirectory.com.
+ * Structure:
+ *   - Affiliations section: each affiliation (e.g. "Starling Karaoke") is a
+ *     clickable parent row that filters to all venues under that affiliation;
+ *     named KJs under it are nested as clickable children filtering to that
+ *     specific KJ.
+ *   - Independent KJs section: KJs with no affiliation listed.
+ *
+ * Both venue-level (venue.host) and per-show (schedule[N].host) hosts are
+ * collected, so multi-host venues like The Highball contribute every KJ
+ * who appears in a schedule entry.
+ *
+ * Audience: a KJ who doesn't know the exact spelling of their own name in
+ * the data, or anyone browsing who books venues.
  */
 
 import { Component } from '../components/Component.js';
@@ -13,9 +23,9 @@ import { escapeHtml } from '../utils/string.js';
 
 export class KJIndexView extends Component {
     template() {
-        const kjs = this.collectKJs();
+        const { affiliations, independents } = this.collectIndex();
 
-        if (kjs.length === 0) {
+        if (affiliations.length === 0 && independents.length === 0) {
             return `
                 <div class="kj-index">
                     <header class="kj-index__header">
@@ -26,6 +36,9 @@ export class KJIndexView extends Component {
             `;
         }
 
+        const totalKjs = independents.length
+            + affiliations.reduce((sum, a) => sum + a.kjs.length, 0);
+
         return `
             <div class="kj-index">
                 <header class="kj-index__header">
@@ -34,53 +47,150 @@ export class KJIndexView extends Component {
                         All KJs
                     </h2>
                     <p class="kj-index__stats">
-                        ${kjs.length} KJ${kjs.length !== 1 ? 's' : ''} listed across the directory.
-                        Click a name to see their venues.
+                        ${affiliations.length} affiliation${affiliations.length !== 1 ? 's' : ''}
+                        · ${totalKjs} KJ${totalKjs !== 1 ? 's' : ''}.
+                        Click any name to see their venues.
                     </p>
                 </header>
-                <ul class="kj-index__list">
-                    ${kjs.map(kj => this.renderEntry(kj)).join('')}
-                </ul>
+
+                ${affiliations.length > 0 ? `
+                    <section class="kj-index__section">
+                        <h3 class="kj-index__section-title">Affiliations</h3>
+                        <ul class="kj-index__list">
+                            ${affiliations.map(a => this.renderAffiliation(a)).join('')}
+                        </ul>
+                    </section>
+                ` : ''}
+
+                ${independents.length > 0 ? `
+                    <section class="kj-index__section">
+                        <h3 class="kj-index__section-title">Independent KJs</h3>
+                        <ul class="kj-index__list">
+                            ${independents.map(kj => this.renderIndependent(kj)).join('')}
+                        </ul>
+                    </section>
+                ` : ''}
             </div>
         `;
     }
 
     /**
-     * Walk every active venue and collect a unique set of KJ names,
-     * pulling from venue.host.{name,company} and per-show
-     * schedule[N].host.{name,company}. Case-insensitive de-dupe.
+     * Walk every active venue and collect:
+     *   - affiliations: Map<affiliation, { name, venueIds: Set, kjs: Map<kj, venueIds:Set> }>
+     *   - independents: Map<kj, { name, venueIds: Set }>
+     *
+     * A host with both name + affiliation contributes the affiliation as a parent
+     * and the name as a KJ under that affiliation. A host with only a name (no
+     * affiliation) goes to Independents. A host with only an affiliation just
+     * registers the parent row with no children.
+     *
+     * Names are de-duped case-insensitively (using lowercase keys); display uses
+     * the first casing seen.
      */
-    collectKJs() {
-        const map = new Map();
+    collectIndex() {
+        const affiliations = new Map();
+        const independents = new Map();
 
-        const add = (rawName, venueId) => {
-            if (!rawName || typeof rawName !== 'string' || !rawName.trim()) return;
-            const display = rawName.trim();
-            const key = display.toLowerCase();
-            if (!map.has(key)) {
-                map.set(key, { name: display, venueIds: new Set() });
+        const addAffiliation = (rawAff, venueId) => {
+            const aff = (rawAff || '').trim();
+            if (!aff) return null;
+            const key = aff.toLowerCase();
+            if (!affiliations.has(key)) {
+                affiliations.set(key, { name: aff, venueIds: new Set(), kjs: new Map() });
             }
-            map.get(key).venueIds.add(venueId);
+            const entry = affiliations.get(key);
+            entry.venueIds.add(venueId);
+            return entry;
+        };
+
+        const addKJUnder = (affEntry, rawName, venueId) => {
+            const name = (rawName || '').trim();
+            if (!name) return;
+            const key = name.toLowerCase();
+            if (!affEntry.kjs.has(key)) {
+                affEntry.kjs.set(key, { name, venueIds: new Set() });
+            }
+            affEntry.kjs.get(key).venueIds.add(venueId);
+        };
+
+        const addIndependent = (rawName, venueId) => {
+            const name = (rawName || '').trim();
+            if (!name) return;
+            const key = name.toLowerCase();
+            if (!independents.has(key)) {
+                independents.set(key, { name, venueIds: new Set() });
+            }
+            independents.get(key).venueIds.add(venueId);
+        };
+
+        const processHost = (host, venueId) => {
+            if (!host) return;
+            const affEntry = addAffiliation(host.affiliation, venueId);
+            if (affEntry) {
+                addKJUnder(affEntry, host.name, venueId);
+            } else {
+                addIndependent(host.name, venueId);
+            }
         };
 
         getAllVenues().forEach(v => {
-            add(v.host?.name, v.id);
-            add(v.host?.company, v.id);
-            (v.schedule || []).forEach(e => {
-                add(e.host?.name, v.id);
-                add(e.host?.company, v.id);
-            });
+            processHost(v.host, v.id);
+            (v.schedule || []).forEach(e => processHost(e.host, v.id));
         });
 
-        return [...map.values()]
-            .map(e => ({ name: e.name, venueCount: e.venueIds.size }))
-            .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+        const sortByName = (a, b) =>
+            a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+
+        const affiliationList = [...affiliations.values()]
+            .map(a => ({
+                name: a.name,
+                venueCount: a.venueIds.size,
+                kjs: [...a.kjs.values()]
+                    .map(k => ({ name: k.name, venueCount: k.venueIds.size }))
+                    .sort(sortByName),
+            }))
+            .sort(sortByName);
+
+        const independentList = [...independents.values()]
+            .map(k => ({ name: k.name, venueCount: k.venueIds.size }))
+            .sort(sortByName);
+
+        return { affiliations: affiliationList, independents: independentList };
     }
 
-    renderEntry({ name, venueCount }) {
-        // Real anchor link: navigating to ?kj=<name> triggers a page load
-        // which app.js handles on boot (reads ?kj=, sets hostFilter, renders
-        // the dossier). Keeps URL/state behavior consistent.
+    renderAffiliation({ name, venueCount, kjs }) {
+        const href = `?kj=${encodeURIComponent(name)}`;
+        const subList = kjs.length > 0
+            ? `
+                <ul class="kj-index__sublist">
+                    ${kjs.map(kj => this.renderKjUnderAffiliation(kj)).join('')}
+                </ul>
+            `
+            : '';
+        return `
+            <li class="kj-index__group">
+                <a class="kj-index__link kj-index__link--affiliation" href="${href}">
+                    <span class="kj-index__name">${escapeHtml(name)}</span>
+                    <span class="kj-index__count">${venueCount} venue${venueCount !== 1 ? 's' : ''}</span>
+                </a>
+                ${subList}
+            </li>
+        `;
+    }
+
+    renderKjUnderAffiliation({ name, venueCount }) {
+        const href = `?kj=${encodeURIComponent(name)}`;
+        return `
+            <li class="kj-index__subitem">
+                <a class="kj-index__link kj-index__link--kj" href="${href}">
+                    <span class="kj-index__name">${escapeHtml(name)}</span>
+                    <span class="kj-index__count">${venueCount} venue${venueCount !== 1 ? 's' : ''}</span>
+                </a>
+            </li>
+        `;
+    }
+
+    renderIndependent({ name, venueCount }) {
         const href = `?kj=${encodeURIComponent(name)}`;
         return `
             <li class="kj-index__item">

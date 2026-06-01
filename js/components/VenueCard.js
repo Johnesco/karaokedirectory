@@ -5,7 +5,7 @@
 
 import { Component } from './Component.js';
 import { escapeHtml } from '../utils/string.js';
-import { formatTimeRange, formatScheduleEntry, scheduleMatchesDate } from '../utils/date.js';
+import { formatTimeRange, formatScheduleEntry, scheduleMatchesDate, getScheduleExclusion } from '../utils/date.js';
 import { buildMapUrl, createSocialLinks, formatAddress, sanitizeUrl } from '../utils/url.js';
 import { emit, Events } from '../core/events.js';
 import { isDebugMode, getDebugHtml } from '../utils/debug.js';
@@ -48,8 +48,16 @@ export class VenueCard extends Component {
 
         // Detect special event
         const isSpecialEvent = schedule?.frequency === 'once';
-        const cardClass = isSpecialEvent ? 'venue-card venue-card--compact venue-card--special-event' : 'venue-card venue-card--compact';
+        // Excluded: a recurring entry suppressed on this specific date (e.g. holiday, private event)
+        const exclusion = (schedule && date) ? getScheduleExclusion(schedule, date) : null;
+        const classes = ['venue-card', 'venue-card--compact'];
+        if (isSpecialEvent) classes.push('venue-card--special-event');
+        if (exclusion) classes.push('venue-card--excluded');
+        const cardClass = classes.join(' ');
         const eventName = isSpecialEvent ? (schedule.eventName || 'Special Event') : null;
+        const exclusionBanner = exclusion
+            ? `<div class="venue-card__exclusion-banner"><i class="fa-solid fa-ban"></i> Closed${exclusion.reason ? `: ${escapeHtml(exclusion.reason)}` : ' tonight'}</div>`
+            : '';
 
         // Build tag list, injecting 'special-event' tag for one-time events
         const tags = isSpecialEvent
@@ -73,6 +81,7 @@ export class VenueCard extends Component {
 
         return `
             <div class="${cardClass}" data-venue-id="${escapeHtml(venue.id)}">
+                ${exclusionBanner}
                 ${debugHtml}
                 <div class="venue-card__header">
                     <h3 class="venue-card__name">
@@ -138,7 +147,7 @@ export class VenueCard extends Component {
                     <div class="venue-card__host">
                         <h4>Host</h4>
                         ${venue.host.name ? `<div class="venue-card__host-name">${escapeHtml(venue.host.name)}</div>` : ''}
-                        ${venue.host.company ? `<div class="venue-card__host-company">${escapeHtml(venue.host.company)}</div>` : ''}
+                        ${venue.host.affiliation ? `<div class="venue-card__host-affiliation">${escapeHtml(venue.host.affiliation)}</div>` : ''}
                         ${hostSocialsHtml ? `<div class="venue-card__host-socials">${hostSocialsHtml}</div>` : ''}
                     </div>
                 ` : ''}

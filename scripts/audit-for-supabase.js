@@ -96,12 +96,12 @@ for (const v of data.listings) {
     }
   }
 
-  // Host: empty-string name with no company is effectively null
+  // Host: empty-string name with no affiliation is effectively null
   if (v.host && typeof v.host === 'object') {
     const hasName = v.host.name && v.host.name.trim() !== '';
-    const hasCompany = v.host.company && v.host.company.trim() !== '';
-    if (!hasName && !hasCompany) {
-      info(v, 'Host object exists but has no name or company (will be treated as null)');
+    const hasAffiliation = v.host.affiliation && v.host.affiliation.trim() !== '';
+    if (!hasName && !hasAffiliation) {
+      info(v, 'Host object exists but has no name or affiliation (will be treated as null)');
     }
   }
 

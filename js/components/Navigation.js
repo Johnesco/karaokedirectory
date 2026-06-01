@@ -33,14 +33,16 @@ export class Navigation extends Component {
         const showDedicated = getState('showDedicated');
         const hostFilter = getState('hostFilter');
 
-        // KJ mode (dossier or index): minimal nav with just the chip — the rest
-        // of the controls are irrelevant for a KJ auditing their own listings.
+        // KJ mode (dossier or index): show the full view switcher + a filter chip.
+        // CAL/A-Z/MAP click handlers clear hostFilter (see afterRender), so clicking
+        // any of them leaves KJ mode cleanly. The KJs link is active on the index.
         if (hostFilter) {
             const isIndex = hostFilter.toLowerCase() === 'all';
             const chipLabel = isIndex ? '' : 'KJ:';
             const chipValue = isIndex ? 'All KJs' : hostFilter;
             return `
                 <nav class="navigation navigation--dossier">
+                    ${this.renderViewSwitcher({ view, kjIndexActive: isIndex })}
                     <div class="navigation__active-filters">
                         <span class="filter-chip" role="status">
                             <i class="fa-solid fa-microphone-lines"></i>
@@ -60,39 +62,7 @@ export class Navigation extends Component {
 
         return `
             <nav class="navigation">
-                <div class="navigation__views">
-                    <button
-                        class="nav-btn nav-btn--labeled ${view === 'weekly' ? 'nav-btn--active' : ''}"
-                        data-view="weekly"
-                        type="button"
-                    >
-                        <i class="fa-regular fa-calendar"></i>
-                        <span class="nav-btn__label">CAL</span>
-                    </button>
-                    <button
-                        class="nav-btn nav-btn--labeled ${view === 'alphabetical' ? 'nav-btn--active' : ''}"
-                        data-view="alphabetical"
-                        type="button"
-                    >
-                        <i class="fa-solid fa-list"></i>
-                        <span class="nav-btn__label">A-Z</span>
-                    </button>
-                    <button
-                        class="nav-btn nav-btn--labeled ${view === 'map' ? 'nav-btn--active' : ''}"
-                        data-view="map"
-                        type="button"
-                    >
-                        <i class="fa-solid fa-map-location-dot"></i>
-                        <span class="nav-btn__label">MAP</span>
-                    </button>
-                    <a
-                        class="nav-btn nav-btn--labeled"
-                        href="bingo.html"
-                    >
-                        <i class="fa-solid fa-table-cells"></i>
-                        <span class="nav-btn__label">BINGO</span>
-                    </a>
-                </div>
+                ${this.renderViewSwitcher({ view, kjIndexActive: false })}
 
                 ${view === 'weekly' ? `
                     <div class="navigation__week">
@@ -144,6 +114,48 @@ export class Navigation extends Component {
         `;
     }
 
+    /**
+     * Render the CAL / A-Z / MAP / KJs / BINGO view switcher. Shared between
+     * the main nav and the KJ-mode nav so users can leave KJ mode by clicking
+     * any other view.
+     *
+     * @param {Object} opts
+     * @param {string} opts.view - Current view state (weekly|alphabetical|map)
+     * @param {boolean} opts.kjIndexActive - True when on the KJ index page
+     *   (gives the KJs link the active indicator). When in dossier mode,
+     *   pass false — no nav button is "active" for a single-KJ view.
+     */
+    renderViewSwitcher({ view, kjIndexActive }) {
+        // In KJ mode, CAL/A-Z/MAP shouldn't appear active even though `view`
+        // still holds the prior selection — the user isn't in those views.
+        const inKJMode = !!getState('hostFilter');
+        const cls = (active) => `nav-btn nav-btn--labeled${active ? ' nav-btn--active' : ''}`;
+        return `
+            <div class="navigation__views">
+                <button class="${cls(!inKJMode && view === 'weekly')}" data-view="weekly" type="button">
+                    <i class="fa-regular fa-calendar"></i>
+                    <span class="nav-btn__label">CAL</span>
+                </button>
+                <button class="${cls(!inKJMode && view === 'alphabetical')}" data-view="alphabetical" type="button">
+                    <i class="fa-solid fa-list"></i>
+                    <span class="nav-btn__label">A-Z</span>
+                </button>
+                <button class="${cls(!inKJMode && view === 'map')}" data-view="map" type="button">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                    <span class="nav-btn__label">MAP</span>
+                </button>
+                <a class="${cls(kjIndexActive)}" href="?kj=all">
+                    <i class="fa-solid fa-microphone-lines"></i>
+                    <span class="nav-btn__label">KJs</span>
+                </a>
+                <a class="nav-btn nav-btn--labeled" href="bingo.html">
+                    <i class="fa-solid fa-table-cells"></i>
+                    <span class="nav-btn__label">BINGO</span>
+                </a>
+            </div>
+        `;
+    }
+
     isCurrentWeek(weekStart) {
         const today = new Date();
         const currentWeekStart = getWeekStart(today);
@@ -152,10 +164,11 @@ export class Navigation extends Component {
     }
 
     afterRender() {
-        // View toggle buttons
+        // View toggle buttons. Always clear hostFilter so clicking from a KJ
+        // page exits KJ mode cleanly. No-op when hostFilter is already empty.
         this.delegate('click', '[data-view]', (e, target) => {
             const view = target.dataset.view;
-            setState({ view });
+            setState({ view, hostFilter: '' });
             emit(Events.VIEW_CHANGED, view);
         });
 

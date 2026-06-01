@@ -86,7 +86,7 @@ export class KJDossierView extends Component {
 
         const venueLevelHost = (v) =>
             containsIgnoreCase(v.host?.name, kjName) ||
-            containsIgnoreCase(v.host?.company, kjName);
+            containsIgnoreCase(v.host?.affiliation, kjName);
 
         const matches = getAllVenues()
             .filter(v => venueMatchesHost(v, kjName))
@@ -96,7 +96,7 @@ export class KJDossierView extends Component {
                     if (venueLevel) return true;
                     return (
                         containsIgnoreCase(e.host?.name, kjName) ||
-                        containsIgnoreCase(e.host?.company, kjName)
+                        containsIgnoreCase(e.host?.affiliation, kjName)
                     );
                 });
 
