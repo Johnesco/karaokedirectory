@@ -1325,3 +1325,25 @@ body.view--map .app-layout__detail {
     background: var(--color-gray-700);
     border-color: var(--color-primary);
 }
+
+.kj-index__no-host-link {
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-md);
+    border-top: 1px dashed var(--border-color);
+    text-align: center;
+}
+
+.kj-index__no-host-link a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: var(--font-size-sm);
+}
+
+.kj-index__no-host-link a:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+}
+
+.kj-index__no-host-link i {
+    margin-right: var(--spacing-2xs);
+}

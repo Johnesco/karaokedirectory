@@ -32,19 +32,26 @@ export class KJDossierView extends Component {
             return '<div class="kj-dossier kj-dossier--empty"></div>';
         }
 
-        const matches = this.getMatches(kjName);
+        const isNone = kjName.toLowerCase() === 'none';
+        const matches = isNone ? this.getNoHostMatches() : this.getMatches(kjName);
 
         if (matches.length === 0) {
             return `
                 <div class="kj-dossier">
                     <header class="kj-dossier__header">
-                        <h2 class="kj-dossier__title">KJ: ${escapeHtml(kjName)}</h2>
+                        <h2 class="kj-dossier__title">${isNone ? 'Venues with no listed host' : `KJ: ${escapeHtml(kjName)}`}</h2>
                         <p class="kj-dossier__stats">No venues currently listed.</p>
                     </header>
-                    <p class="kj-dossier__empty-hint">
-                        Nothing matches that KJ name in <code>js/data.js</code>.
-                        Check spelling or contact the directory maintainer to get your venues listed.
-                    </p>
+                    ${!isNone ? `
+                        <p class="kj-dossier__empty-hint">
+                            Nothing matches that KJ name in <code>js/data.js</code>.
+                            Check spelling or contact the directory maintainer to get your venues listed.
+                        </p>
+                    ` : `
+                        <p class="kj-dossier__empty-hint">
+                            Every active venue has a host listed. Nice.
+                        </p>
+                    `}
                 </div>
             `;
         }
@@ -52,27 +59,74 @@ export class KJDossierView extends Component {
         const totalRecurring = matches.reduce((sum, m) => sum + m.recurring.length, 0);
         const totalOneTimes = matches.reduce((sum, m) => sum + m.oneTimes.length, 0);
 
+        const title = isNone
+            ? `<i class="fa-solid fa-circle-question"></i> Venues with no listed host`
+            : `<i class="fa-solid fa-microphone-lines"></i> KJ: ${escapeHtml(kjName)}`;
+
+        const hint = isNone
+            ? 'These venues have no <code>host</code> field on the venue or on any schedule entry. If you host at one of these, contact the directory to get your attribution added.'
+            : 'Verify your listings here. Anything wrong or missing? Contact the directory.';
+
         return `
             <div class="kj-dossier">
                 <header class="kj-dossier__header">
-                    <h2 class="kj-dossier__title">
-                        <i class="fa-solid fa-microphone-lines"></i>
-                        KJ: ${escapeHtml(kjName)}
-                    </h2>
+                    <h2 class="kj-dossier__title">${title}</h2>
                     <p class="kj-dossier__stats">
                         ${matches.length} venue${matches.length !== 1 ? 's' : ''}
                         &middot; ${totalRecurring} recurring slot${totalRecurring !== 1 ? 's' : ''}
                         &middot; ${totalOneTimes} upcoming one-time event${totalOneTimes !== 1 ? 's' : ''}
                     </p>
-                    <p class="kj-dossier__hint">
-                        Verify your listings here. Anything wrong or missing? Contact the directory.
-                    </p>
+                    <p class="kj-dossier__hint">${hint}</p>
                 </header>
                 <div class="kj-dossier__venues">
                     ${matches.map(m => this.renderVenue(m)).join('')}
                 </div>
             </div>
         `;
+    }
+
+    /**
+     * Find venues with no host info anywhere — no host.name or host.affiliation
+     * at the venue level, AND no host.name or host.affiliation on any schedule
+     * entry. A venue gets attributed at the per-show level if even one entry
+     * names a host, so those are excluded here.
+     */
+    getNoHostMatches() {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const hasAnyHost = (host) => {
+            if (!host) return false;
+            const name = host.name?.trim();
+            const aff = host.affiliation?.trim();
+            return !!(name || aff);
+        };
+
+        return getAllVenues()
+            .filter(v => {
+                if (hasAnyHost(v.host)) return false;
+                return !(v.schedule || []).some(e => hasAnyHost(e.host));
+            })
+            .map(v => {
+                const recurring = (v.schedule || [])
+                    .filter(e => e.frequency !== 'once')
+                    .sort((a, b) => {
+                        const aIdx = WEEKDAYS.indexOf(a.day?.toLowerCase());
+                        const bIdx = WEEKDAYS.indexOf(b.day?.toLowerCase());
+                        return aIdx - bIdx;
+                    });
+
+                const oneTimes = (v.schedule || [])
+                    .filter(e => e.frequency === 'once' && e.date)
+                    .filter(e => parseLocalDate(e.date) >= today)
+                    .sort((a, b) => a.date.localeCompare(b.date));
+
+                return { venue: v, recurring, oneTimes };
+            })
+            // Show every hostless venue — including ones with no upcoming events.
+            // These are exactly the records a curator wants to audit, so don't hide
+            // stale ones (unlike the KJ-dossier path, which filters out stale-only).
+            .sort((a, b) => a.venue.name.localeCompare(b.venue.name));
     }
 
     /**

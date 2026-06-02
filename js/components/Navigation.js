@@ -37,15 +37,26 @@ export class Navigation extends Component {
         // CAL/A-Z/MAP click handlers clear hostFilter (see afterRender), so clicking
         // any of them leaves KJ mode cleanly. The KJs link is active on the index.
         if (hostFilter) {
-            const isIndex = hostFilter.toLowerCase() === 'all';
-            const chipLabel = isIndex ? '' : 'KJ:';
-            const chipValue = isIndex ? 'All KJs' : hostFilter;
+            const lc = hostFilter.toLowerCase();
+            const isIndex = lc === 'all';
+            const isNone = lc === 'none';
+            let chipLabel = 'KJ:';
+            let chipValue = hostFilter;
+            let chipIcon = 'fa-microphone-lines';
+            if (isIndex) {
+                chipLabel = '';
+                chipValue = 'All KJs';
+            } else if (isNone) {
+                chipLabel = '';
+                chipValue = 'No host listed';
+                chipIcon = 'fa-circle-question';
+            }
             return `
                 <nav class="navigation navigation--dossier">
                     ${this.renderViewSwitcher({ view, kjIndexActive: isIndex })}
                     <div class="navigation__active-filters">
                         <span class="filter-chip" role="status">
-                            <i class="fa-solid fa-microphone-lines"></i>
+                            <i class="fa-solid ${chipIcon}"></i>
                             ${chipLabel ? `<span class="filter-chip__label">${chipLabel}</span>` : ''}
                             <span class="filter-chip__value">${chipValue}</span>
                             <button class="filter-chip__clear" data-filter="clear-kj" type="button" aria-label="Exit KJ view">

@@ -23,9 +23,9 @@ import { escapeHtml } from '../utils/string.js';
 
 export class KJIndexView extends Component {
     template() {
-        const { affiliations, independents } = this.collectIndex();
+        const { affiliations, independents, noHostCount } = this.collectIndex();
 
-        if (affiliations.length === 0 && independents.length === 0) {
+        if (affiliations.length === 0 && independents.length === 0 && noHostCount === 0) {
             return `
                 <div class="kj-index">
                     <header class="kj-index__header">
@@ -69,6 +69,15 @@ export class KJIndexView extends Component {
                             ${independents.map(kj => this.renderIndependent(kj)).join('')}
                         </ul>
                     </section>
+                ` : ''}
+
+                ${noHostCount > 0 ? `
+                    <p class="kj-index__no-host-link">
+                        <a href="?kj=none">
+                            <i class="fa-solid fa-circle-question"></i>
+                            ${noHostCount} venue${noHostCount !== 1 ? 's' : ''} with no host listed
+                        </a>
+                    </p>
                 ` : ''}
             </div>
         `;
@@ -124,18 +133,25 @@ export class KJIndexView extends Component {
         };
 
         const processHost = (host, venueId) => {
-            if (!host) return;
+            if (!host) return false;
             const affEntry = addAffiliation(host.affiliation, venueId);
             if (affEntry) {
                 addKJUnder(affEntry, host.name, venueId);
-            } else {
-                addIndependent(host.name, venueId);
+                return true;
             }
+            const nm = (host.name || '').trim();
+            if (!nm) return false;
+            addIndependent(host.name, venueId);
+            return true;
         };
 
+        let noHostCount = 0;
         getAllVenues().forEach(v => {
-            processHost(v.host, v.id);
-            (v.schedule || []).forEach(e => processHost(e.host, v.id));
+            let attributed = processHost(v.host, v.id);
+            (v.schedule || []).forEach(e => {
+                if (processHost(e.host, v.id)) attributed = true;
+            });
+            if (!attributed) noHostCount++;
         });
 
         const sortByName = (a, b) =>
@@ -155,7 +171,7 @@ export class KJIndexView extends Component {
             .map(k => ({ name: k.name, venueCount: k.venueIds.size }))
             .sort(sortByName);
 
-        return { affiliations: affiliationList, independents: independentList };
+        return { affiliations: affiliationList, independents: independentList, noHostCount };
     }
 
     renderAffiliation({ name, venueCount, kjs }) {
