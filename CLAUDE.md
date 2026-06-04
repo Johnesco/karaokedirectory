@@ -7,7 +7,8 @@
 **Name:** Austin Karaoke Directory
 **Purpose:** A mobile-friendly web application helping users discover karaoke venues in and around Austin, Texas
 **Target Users:** Karaoke enthusiasts looking for venues, schedules, and event details
-**Live Site:** [Add deployment URL when available]
+**Live Site:** https://www.karaokedirectory.com
+**Analytics:** Microsoft Clarity (project ID `x1sfnv6zu4`) — see snippet before `</body>` on all public HTML pages
 
 ## Architecture
 
