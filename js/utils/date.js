@@ -240,6 +240,26 @@ export function getUpcomingExclusions(venue, days = 60) {
 }
 
 /**
+ * Is this schedule entry a one-time event whose date has already passed?
+ * Recurring entries (`every`, `first`, …) always return `false` — they have
+ * no fixed date to compare. Uses `parseLocalDate` so the YYYY-MM-DD string
+ * is interpreted in the viewer's timezone (matches how the rest of the app
+ * treats schedule dates).
+ *
+ * @param {Object} entry - Schedule entry (may be any frequency)
+ * @param {Date} [asOf] - "Now" reference; defaults to today at local midnight
+ * @returns {boolean} True if entry is a past one-time event
+ */
+export function isPastOnceEvent(entry, asOf) {
+    if (entry?.frequency !== 'once' || !entry.date) return false;
+    const today = asOf ? new Date(asOf) : new Date();
+    today.setHours(0, 0, 0, 0);
+    const entryDate = parseLocalDate(entry.date);
+    entryDate.setHours(0, 0, 0, 0);
+    return entryDate < today;
+}
+
+/**
  * Convert 24-hour time to 12-hour format
  * @param {string} time24 - Time in 24-hour format (e.g., "21:00")
  * @returns {string} Time in 12-hour format (e.g., "9:00 PM")

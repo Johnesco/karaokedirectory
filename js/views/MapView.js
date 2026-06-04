@@ -13,7 +13,7 @@ import { escapeHtml } from '../utils/string.js';
 import { buildDirectionsUrl, shareVenue } from '../utils/url.js';
 import { renderTags } from '../utils/tags.js';
 import { renderScheduleCompact, renderVenueDetailSections } from '../utils/render.js';
-import { getVenueExclusionForDate } from '../utils/date.js';
+import { getVenueExclusionForDate, isPastOnceEvent } from '../utils/date.js';
 
 export class MapView extends Component {
     init() {
@@ -378,7 +378,10 @@ export class MapView extends Component {
         const cardEl = this.$('#map-venue-card');
         if (!cardEl || !venue) return;
 
-        const scheduleHtml = renderScheduleCompact(venue.schedule);
+        // The map card is a forward-looking snapshot: past one-time events are
+        // clutter here even though they're still part of the venue's schedule.
+        const upcomingSchedule = (venue.schedule || []).filter(s => !isPastOnceEvent(s));
+        const scheduleHtml = renderScheduleCompact(upcomingSchedule);
 
         // Build directions URL
         const directionsUrl = buildDirectionsUrl(venue.address, venue.name);
@@ -422,6 +425,13 @@ export class MapView extends Component {
 
         const tagsHtml = renderTags(venue.tags, { dedicated: venue.dedicated });
 
+        // Strip past one-time events from the schedule table — the map detail
+        // view, like the compact card, is forward-looking.
+        const venueForDisplay = {
+            ...venue,
+            schedule: (venue.schedule || []).filter(s => !isPastOnceEvent(s))
+        };
+
         cardEl.innerHTML = `
             <button class="map-venue-card__close" data-action="close-card" type="button" aria-label="Close">
                 <i class="fa-solid fa-xmark"></i>
@@ -434,7 +444,7 @@ export class MapView extends Component {
             </div>
             ${tagsHtml}
             <div class="map-venue-card__detail-content">
-                ${renderVenueDetailSections(venue, { classPrefix: 'map-venue-card', hostSocialSize: '' })}
+                ${renderVenueDetailSections(venueForDisplay, { classPrefix: 'map-venue-card', hostSocialSize: '' })}
             </div>
         `;
 

@@ -245,6 +245,7 @@ A card that appears over the map when a marker is selected. Has two states:
 - "Details" button expands the card and shows a back arrow
 - "Back to Summary" returns to compact view
 - Clicking the map background (not a marker or card) dismisses the card
+- **Past one-time events are hidden** — `frequency: "once"` entries dated before today are filtered out of both the summary and detail schedule. Recurring entries always show; the modal/pane surfaces opened from the calendar view still display the full schedule unfiltered.
 - **Sizing:** full-width bottom sheet on mobile; on desktop (≥1024px) a fixed 350px-wide card anchored right (explicit width so it doesn't shrink to its content). The floating "Hide Dedicated" map control and the analytics consent-banner buttons are ≥44px tall (touch targets).
 
 ### Exclusion Dates on the Map
@@ -1261,6 +1262,7 @@ Each public page includes a `<link rel="canonical">` tag pointing to its canonic
 | 2026-02 | 1.0.21 | Shareable venue links: URL hash syncs with venue selection (`#venue={id}`), share button on all detail surfaces (modal, pane, map card) with Web Share API / clipboard fallback. Added `shareVenue()` to `url.js`. Updated Sections 4, 7, 21. | Claude Code |
 | 2026-02 | 1.0.22 | SEO quick wins: Added meta descriptions, Open Graph tags, Twitter Card tags, and canonical URLs to all 5 public pages. Created `robots.txt` and `sitemap.xml`. Added `noindex` to `editor.html`. New Section 22. Renumbered Sections 22–23 → 23–24. | Claude Code |
 | 2026-06 | 1.0.23 | Exclusion Dates feature (#3–#8): recurring shows can be marked closed on specific dates via `schedule[].exclusions` (`"YYYY-MM-DD"` shorthand or `{date, reason}`). Weekly cards dim with a "Closed" banner; Map dims the marker and shows a "Closed Today" card banner; detail modal/pane/map-expanded show a "Closed Today" banner plus an "Upcoming closures" list (next 60 days). Added `getVenueExclusionForDate()` and `getUpcomingExclusions()` to `date.js`. New §11 "Schedule Exclusions"; updated §2, §4, §7, §8. | Claude Code |
+| 2026-07 | 1.0.24 | #88: Map venue card now hides `frequency: "once"` entries dated before today (both summary and detail schedule). Added `isPastOnceEvent()` helper to `js/utils/date.js`. VenueModal and VenueDetailPane unchanged. Updated Section 4. | Claude Code |
 
 ---
 
