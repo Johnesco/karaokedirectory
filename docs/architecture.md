@@ -492,7 +492,6 @@ graph LR
 | `about.html` | base, layout, components, views |
 | `submit.html` | base, layout, components, views, submit |
 | `bingo.html` | base, layout, components, bingo |
-| `editor.html` | base, layout, components, editor |
 
 ### CSS Variable Hierarchy
 

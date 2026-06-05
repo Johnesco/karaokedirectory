@@ -23,7 +23,6 @@ const VIEWS = 'views.css';
 const PAGE_SPECIFIC = {
     'submit.html': 'submit.css',
     'bingo.html': 'bingo.css',
-    'editor.html': 'editor.css',
 };
 
 function extractCssOrder(html) {

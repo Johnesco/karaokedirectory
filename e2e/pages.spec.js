@@ -23,10 +23,4 @@ test.describe('Secondary pages load correctly', () => {
     expect(text.toLowerCase()).toContain('venue');
   });
 
-  test('editor page loads editor layout', async ({ page }) => {
-    await page.goto('/editor.html');
-    const editorMain = page.locator('.editor-main');
-    await expect(editorMain).toBeVisible({ timeout: 10000 });
-  });
-
 });

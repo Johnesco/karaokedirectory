@@ -16,7 +16,6 @@ A mobile-friendly web application for discovering karaoke venues in and around A
 - **Dedicated Venue Filter** — Toggle to show only dedicated karaoke bars
 - **Karaoke Bingo** — A fun bingo card game with karaoke-themed scenarios
 - **Venue Submissions** — Community-driven venue suggestions via web form
-- **Venue Editor** — Full-featured editor tool with live preview, tag management, and address geocoding
 - **Debug Mode** — Schedule troubleshooting overlay via `?debug=1` URL parameter
 
 ## Tech Stack
@@ -59,14 +58,12 @@ Deploy to any static hosting service (GitHub Pages, Netlify, Vercel, etc.) — j
 ├── about.html          # About page
 ├── bingo.html          # Karaoke bingo game
 ├── submit.html         # Venue submission form
-├── editor.html         # Venue data editor tool
 ├── css/
 │   ├── base.css        # CSS variables, reset, typography
 │   ├── layout.css      # Header, navigation, page structure
 │   ├── components.css  # Buttons, cards, modals, forms, search
 │   ├── views.css       # View-specific styles (weekly, map, etc.)
 │   ├── bingo.css       # Bingo game styles
-│   ├── editor.css      # Editor page styles
 │   └── submit.css      # Submission form styles
 ├── js/
 │   ├── app.js          # Application entry point
@@ -77,8 +74,6 @@ Deploy to any static hosting service (GitHub Pages, Netlify, Vercel, etc.) — j
 │   ├── views/          # View controllers (Weekly, Alphabetical, Map)
 │   ├── services/       # Data services (venue search, filtering)
 │   └── utils/          # Utilities (date, string, tags, url, render, debug, validation)
-├── editor/
-│   └── editor.js       # Venue editor functionality
 ├── scripts/            # Developer tools
 │   ├── geocode-venues.js   # Batch geocode venues (Node.js)
 │   └── validate-data.js    # Validate venue data integrity
@@ -90,9 +85,8 @@ Deploy to any static hosting service (GitHub Pages, Netlify, Vercel, etc.) — j
 Know a karaoke spot that's missing? You can:
 
 1. Use the [submission form](submit.html) on the site
-2. Use the [venue editor](editor.html) to create and export venue JSON
-3. Open an issue with the venue details
-4. Submit a PR with the venue added to `js/data.js`
+2. Open an issue with the venue details
+3. Submit a PR with the venue added to `js/data.js`
 
 ### Venue Data Format
 
@@ -177,19 +171,6 @@ Tags are defined in `js/data.js` with custom colors. Search works with both tag 
 | `craft-cocktails` | Craft Cocktails | Upscale craft cocktail bar |
 | `neighborhood` | Neighborhood Bar | Casual neighborhood bar |
 | `special-event` | Special Event | One-time special events |
-
-## Venue Editor
-
-The editor tool (`editor.html`) provides a full GUI for managing venue data:
-
-- **Venue list sidebar** with search
-- **Complete form editor** for all venue fields
-- **Schedule management** with support for recurring and one-time events
-- **Tag selector** with visual checkboxes
-- **Tag definitions editor** for adding/modifying/removing tags
-- **Address geocoding** via Nominatim/OpenStreetMap API (no API key needed)
-- **Live preview** with Card, Modal, and JSON tabs
-- **JSON export** (Copy to Clipboard) and **draft saving** (localStorage)
 
 ## Debug Mode
 
