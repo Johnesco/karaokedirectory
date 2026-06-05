@@ -13,6 +13,9 @@ let venues = [];
 let tagDefinitions = {};
 let selectedVenueId = null;
 let hasUnsavedChanges = false;
+// Mode: 'master' if _curator/data.js loaded (curatorMasterData defined), else 'public'.
+// Master mode shows curator fields and emits _curatorMeta in JSON output.
+let mode = 'public';
 const STORAGE_KEY = 'karaoke-editor-draft';
 const PREVIEW_STATE_KEY = 'karaoke-editor-preview';
 
@@ -90,20 +93,44 @@ function init() {
 }
 
 /**
- * Load venue data
+ * Load venue data. Prefers curatorMasterData (master mode, when _curator/data.js
+ * is present) over karaokeData (public mode, fallback).
  */
 function loadData() {
-    if (typeof karaokeData !== 'undefined') {
-        venues = karaokeData.listings || [];
-        tagDefinitions = karaokeData.tagDefinitions || {};
-        initTagConfig(tagDefinitions);
-        renderVenueList();
-        updateVenueCount();
-        renderTagSelector();
-        renderTagDefinitionsEditor();
-    } else {
+    const masterData = (typeof curatorMasterData !== 'undefined') ? curatorMasterData : null;
+    const publicData = (typeof karaokeData !== 'undefined') ? karaokeData : null;
+    const source = masterData || publicData;
+
+    if (!source) {
         showToast('Failed to load venue data', 'error');
+        return;
     }
+
+    mode = masterData ? 'master' : 'public';
+    venues = source.listings || [];
+    tagDefinitions = source.tagDefinitions || {};
+    initTagConfig(tagDefinitions);
+    applyMode();
+    renderVenueList();
+    updateVenueCount();
+    renderTagSelector();
+    renderTagDefinitionsEditor();
+}
+
+/**
+ * Reflect the current mode in the UI: badge text/color, curator fieldset visibility.
+ */
+function applyMode() {
+    const badge = document.getElementById('editor-mode-badge');
+    if (badge) {
+        badge.dataset.mode = mode;
+        badge.textContent = mode === 'master' ? 'Master mode (local)' : 'Public mode';
+        badge.title = mode === 'master'
+            ? 'Editing the gitignored curator master. _curatorMeta is included in Copy JSON output.'
+            : 'Editing public data. Curator fields are hidden; _curatorMeta is never emitted.';
+    }
+    const fieldset = document.getElementById('curator-fieldset');
+    if (fieldset) fieldset.hidden = (mode !== 'master');
 }
 
 /**
@@ -278,6 +305,57 @@ function fillForm(venue) {
     // Active Period
     document.getElementById('active-period-start').value = venue.activePeriod?.start || '';
     document.getElementById('active-period-end').value = venue.activePeriod?.end || '';
+
+    // Curator Notes (master mode only — fields are hidden in public mode)
+    fillCuratorFields(venue._curatorMeta);
+}
+
+/**
+ * Populate the curator-notes fieldset from a venue's _curatorMeta.
+ * Always called; in public mode the fieldset is hidden anyway, so writes are harmless.
+ */
+function fillCuratorFields(meta) {
+    const m = meta || {};
+    const c = m.contact || {};
+    document.getElementById('curator-source').value = m.source || '';
+    document.getElementById('curator-source-notes').value = m.sourceNotes || '';
+    document.getElementById('curator-contact-name').value = c.name || '';
+    document.getElementById('curator-contact-role').value = c.role || '';
+    document.getElementById('curator-contact-phone').value = c.phone || '';
+    document.getElementById('curator-contact-email').value = c.email || '';
+    document.getElementById('curator-notes').value = m.notes || '';
+    document.getElementById('curator-last-verified').value = m.lastVerified || '';
+}
+
+/**
+ * Read curator fields back into a _curatorMeta object.
+ * Returns null if all fields are empty (so the venue stays clean of an empty meta).
+ * Caller is responsible for only attaching this in master mode.
+ */
+function readCuratorFields() {
+    const source = document.getElementById('curator-source').value.trim();
+    const sourceNotes = document.getElementById('curator-source-notes').value.trim();
+    const contactName = document.getElementById('curator-contact-name').value.trim();
+    const contactRole = document.getElementById('curator-contact-role').value.trim();
+    const contactPhone = document.getElementById('curator-contact-phone').value.trim();
+    const contactEmail = document.getElementById('curator-contact-email').value.trim();
+    const notes = document.getElementById('curator-notes').value.trim();
+    const lastVerified = document.getElementById('curator-last-verified').value;
+
+    const contact = {};
+    if (contactName) contact.name = contactName;
+    if (contactRole) contact.role = contactRole;
+    if (contactPhone) contact.phone = contactPhone;
+    if (contactEmail) contact.email = contactEmail;
+
+    const meta = {};
+    if (source) meta.source = source;
+    if (sourceNotes) meta.sourceNotes = sourceNotes;
+    if (Object.keys(contact).length) meta.contact = contact;
+    if (notes) meta.notes = notes;
+    if (lastVerified) meta.lastVerified = lastVerified;
+
+    return Object.keys(meta).length ? meta : null;
 }
 
 /**
@@ -445,6 +523,15 @@ function getFormData() {
     // Include active period if set
     if (activePeriod) {
         result.activePeriod = activePeriod;
+    }
+
+    // Curator notes — only in master mode, only if any field is non-empty.
+    // Public mode NEVER emits _curatorMeta, which is the structural leak guard:
+    // even if a curator opens the deployed editor.html and hits Copy JSON, the
+    // output is incapable of containing private fields.
+    if (mode === 'master') {
+        const curatorMeta = readCuratorFields();
+        if (curatorMeta) result._curatorMeta = curatorMeta;
     }
 
     return result;
@@ -631,10 +718,16 @@ function markVenueUnsaved() {
 }
 
 /**
- * Copy JSON to clipboard
+ * Copy JSON to clipboard. Output format depends on mode:
+ * - master: const curatorMasterData = {...}; + dual export footer → paste into _curator/data.js
+ * - public: const karaokeData = {...};                           → paste into js/data.js
+ *
+ * In master mode, sorted venues may carry _curatorMeta. In public mode they cannot
+ * (getFormData() does not emit it), so a master accidentally copy-pasted into the
+ * wrong file is not a leak — but it would null out _curatorMeta entries that did
+ * exist. Mode badge keeps that confusion visible.
  */
 function copyJson() {
-    // Sort venues alphabetically (ignoring articles) before export
     const sortedVenues = [...venues].sort((a, b) => {
         const nameA = getSortableName(a.name).toLowerCase();
         const nameB = getSortableName(b.name).toLowerCase();
@@ -647,8 +740,20 @@ function copyJson() {
     };
     const json = JSON.stringify(output, null, 2);
 
-    navigator.clipboard.writeText(`const karaokeData = ${json};`).then(() => {
-        showToast('JSON copied to clipboard!', 'success');
+    let payload;
+    if (mode === 'master') {
+        payload =
+            'const curatorMasterData = ' + json + ';\n' +
+            '\n' +
+            'if (typeof window !== \'undefined\') window.curatorMasterData = curatorMasterData;\n' +
+            'if (typeof module !== \'undefined\') module.exports = curatorMasterData;\n';
+    } else {
+        payload = 'const karaokeData = ' + json + ';';
+    }
+
+    navigator.clipboard.writeText(payload).then(() => {
+        const target = mode === 'master' ? '_curator/data.js' : 'js/data.js';
+        showToast('JSON copied — paste into ' + target, 'success');
     }).catch(() => {
         showToast('Failed to copy to clipboard', 'error');
     });

@@ -35,7 +35,7 @@
 - Event bus for component communication (`js/core/events.js`)
 
 ### 5. Data Layer
-- All venue data in `js/data.js` (currently 79 venues) — the active runtime source, plus canonical authoring source
+- Public venue data in `js/data.js` (currently 77 venues) — the runtime source for the deployed site. **Generated** by `scripts/build-public-data.js` from the gitignored curator master (`_curator/data.js`). See ADR-005.
 - Supabase wiring exists (`js/services/supabase.js`, JSONB-heavy 2-table schema in `supabase/migrations/`) but is currently **disabled** via `useSupabase: false` in `js/config.js`. See spec §11 *Storage and Data Flow*.
 - Service layer abstracts data access (`js/services/venues.js`) — data-source agnostic, so the swap is a one-flag change
 - Schedule matching logic handles complex recurrence patterns
@@ -144,9 +144,22 @@ karaokedirectory/
 │   └── editor.js          # Venue editor functionality
 │
 ├── scripts/               # Developer tools
-│   ├── geocode-venues.js  # Add coordinates to venues
-│   ├── validate-data.js   # Validate venue data integrity
-│   └── audit-for-supabase.js  # Pre-seed validation against logical rules
+│   ├── geocode-venues.js       # Add coordinates to venues
+│   ├── validate-data.js        # Validate venue data integrity
+│   ├── audit-for-supabase.js   # Pre-seed validation against logical rules
+│   ├── build-public-data.js    # Curator master → js/data.js (strips _curatorMeta; ADR-005)
+│   ├── bootstrap-curator.js    # One-time: js/data.js → _curator/data.js
+│   ├── install-hooks.js        # Installs the pre-commit hook (one-time per checkout)
+│   ├── precommit.js            # Pre-commit hook callback (runs the build, stages js/data.js)
+│   └── watch-master.js         # Optional: rebuild on master save during a curation session
+│
+├── _curator.example/      # Curator dashboard template (committed; copy to _curator/ on bootstrap)
+│   ├── index.html              # Plain data-table dashboard (NOT styled like the public app)
+│   ├── data.js                 # Empty master template
+│   └── README.md               # Bootstrap + day-to-day cycle docs
+│
+├── _curator/              # Curator master + dashboard instance (gitignored — see ADR-005)
+│   └── data.js                 # Authoritative venue data + private _curatorMeta annotations
 │
 ├── supabase/              # Supabase schema + seed pipeline
 │   ├── migrations/        # SQL migrations (001–004; 004 is the current JSONB schema)
@@ -166,7 +179,7 @@ karaokedirectory/
 
 ## Venue Data Format
 
-When adding or modifying venues in `js/data.js`, follow this structure:
+When adding or modifying venues in the curator master (`_curator/data.js` — see ADR-005), follow this structure. The same shape applies to public listings in the generated `js/data.js`; the only difference is that master entries may carry an optional `_curatorMeta` field that the build strips.
 
 ```javascript
 {
@@ -220,6 +233,29 @@ When adding or modifying venues in `js/data.js`, follow this structure:
     tiktok: "https://tiktok.com/...",
     youtube: "https://youtube.com/...",
     bluesky: "https://bsky.app/..."
+  }
+}
+```
+
+### Curator metadata (master-only, never published)
+
+In the master (`_curator/data.js`) only, a listing may carry an optional `_curatorMeta` field. The build script strips this from `js/data.js` and refuses to write if any `_curatorMeta` slips through. Never edit this in `js/data.js` directly — it has no business being there.
+
+```javascript
+{
+  id: "venue-slug",
+  // ...all the public fields above...
+  _curatorMeta: {                  // optional, master-only
+    source: "https://...",         // URL where you learned about this venue
+    sourceNotes: "Saw March post", // free-text qualifier
+    contact: {                     // all sub-fields optional
+      name: "Sarah Manager",
+      role: "Owner",
+      phone: "512-555-1234",
+      email: "sarah@example.com"
+    },
+    notes: "Quiet on holidays. Best to call to confirm.",
+    lastVerified: "2026-05-15"     // YYYY-MM-DD; dashboard flags rows past the overdue threshold
   }
 }
 ```
@@ -350,10 +386,34 @@ Use these semantic elements consistently:
 ## Common Development Tasks
 
 ### Adding a New Venue
-1. Edit `js/data.js` (or use the venue editor at `editor.html`)
-2. Add venue object to `listings` array
-3. Run `scripts/validate-data.js` to check format
-4. Add coordinates using the "Geocode Address" button in the editor, or via `scripts/geocode-venues.js` (Node.js batch)
+
+**Edit the curator master**, not `js/data.js` directly. `js/data.js` is now a generated artifact (see ADR-005).
+
+1. Open `editor.html` locally — it auto-detects Master mode when `_curator/data.js` is present (badge in the header reads "Master mode (local)").
+2. Fill in venue fields. Add source / contact / notes in the Curator Notes fieldset if you have them.
+3. Click "Copy JSON" — output is wrapped as `const curatorMasterData = ...` with the dual-export footer.
+4. Paste into `_curator/data.js`, overwriting the file.
+5. Run `node scripts/build-public-data.js` (or let the pre-commit hook do it) — `js/data.js` is regenerated with `_curatorMeta` stripped.
+6. Reload `localhost:8000/index.html` to verify the public app renders correctly.
+7. `git commit` — hook re-runs the build for safety and stages `js/data.js`.
+
+**On the deployed site**, `editor.html` lands in Public mode (no `_curator/data.js` to load), curator fields hide, and "Copy JSON" emits a public-only object — exactly as before ADR-005.
+
+For batch coordinate updates, `scripts/geocode-venues.js` still works (it modifies `js/data.js` in place); after running it, copy the changed listings back into `_curator/data.js` to keep the master in sync.
+
+### Curator master / build step (read before editing js/data.js)
+
+Per [ADR-005](docs/adr/005-curator-master-build-step.md), `js/data.js` is now a **generated artifact**. The authoritative venue data — public fields plus optional private `_curatorMeta` per listing — lives in a gitignored `_curator/data.js`. A Node script regenerates `js/data.js` from the master with `_curatorMeta` stripped and validates strictly before writing.
+
+Key implications for any session that touches venue data:
+
+- **Don't hand-edit `js/data.js`.** Edits will be clobbered by the next build. Edit `_curator/data.js` (master) instead. The exception is `scripts/geocode-venues.js` (the existing batch tool); after it runs, re-sync coordinates back into the master.
+- **`editor.html` auto-detects mode** by checking whether `window.curatorMasterData` is defined. Master mode (local, `_curator/data.js` present) shows the Curator Notes fieldset and emits `_curatorMeta`. Public mode (deployed site, no master) hides curator fields and never emits private fields — even if the curator-fieldset DOM is forced visible via DevTools.
+- **A pre-commit hook** (`.git/hooks/pre-commit`, installed by `node scripts/install-hooks.js`) runs the build on every commit. It blocks the commit if validation fails, and stages `js/data.js` if it changed.
+- **Curator dashboard** at `_curator/index.html` is a plain table view for scanning sources / contacts / overdue verifications. Deliberately NOT styled like the public app. Read-only — editing happens in `editor.html`.
+- **Safety guarantees**: the build's safety check (`if serialized output contains "_curatorMeta", refuse to write`) is structural — not procedural discipline. Combined with `/_curator/` in `.gitignore`, private data has no path to the public repo.
+
+Bootstrap a new checkout: `node scripts/bootstrap-curator.js` then `node scripts/install-hooks.js`. See `_curator.example/README.md` for the day-to-day cycle.
 
 ### Adding a New View
 1. Create `js/views/NewView.js` extending Component
@@ -455,6 +515,7 @@ Current ADRs:
 - [ADR-002](docs/adr/002-vanilla-js-no-build.md) — Vanilla JS, no framework, no build step
 - [ADR-003](docs/adr/003-github-pages-deploy.md) — GitHub Pages as deploy target
 - [ADR-004](docs/adr/004-parallel-data-source-flag.md) — Parallel data source via URL flag
+- [ADR-005](docs/adr/005-curator-master-build-step.md) — Curator-side data transformation; deploy stays build-free
 
 ## Security Considerations
 - Always use `escapeHtml()` when rendering user-provided content

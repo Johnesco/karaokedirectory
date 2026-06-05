@@ -2182,7 +2182,10 @@ const karaokeData = {
           "startTime": "21:00",
           "endTime": "00:00",
           "exclusions": [
-            { "date": "2026-06-12", "reason": "Private event" }
+            {
+              "date": "2026-06-12",
+              "reason": "Private event"
+            }
           ]
         }
       ],

@@ -1,5 +1,8 @@
 js/data.js.backup
 
+# Curator master data (private — gitignored, derives js/data.js via build script)
+/_curator/
+
 # Taiga export archive
 taigaexport/
 

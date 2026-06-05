@@ -15,6 +15,7 @@
 <body>
     <header class="editor-header">
         <h1><i class="fa-solid fa-pen-to-square"></i> Venue Editor</h1>
+        <span id="editor-mode-badge" class="editor-mode-badge" data-mode="public">Public mode</span>
         <div class="editor-header__actions">
             <button id="btn-toggle-preview" class="btn btn--secondary" title="Toggle preview panel">
                 <i class="fa-solid fa-eye"></i> <span class="btn-label">Preview</span>
@@ -227,6 +228,66 @@
                     </div>
                 </fieldset>
 
+                <!-- Curator Notes (Master mode only) -->
+                <fieldset class="form-section form-section--curator" id="curator-fieldset" hidden>
+                    <legend><i class="fa-solid fa-clipboard"></i> Curator Notes <span class="curator-badge">local only</span></legend>
+                    <p class="form-hint">Private notes for this venue. Stripped before publish; never reaches the public site.</p>
+
+                    <div class="form-row">
+                        <div class="form-group form-group--wide">
+                            <label for="curator-source">Source URL</label>
+                            <input type="url" id="curator-source" name="_curatorMeta.source"
+                                   placeholder="https://facebook.com/venue/posts/...">
+                            <small>Where you found out about this venue</small>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group form-group--wide">
+                            <label for="curator-source-notes">Source notes</label>
+                            <input type="text" id="curator-source-notes" name="_curatorMeta.sourceNotes"
+                                   placeholder="Saw their March 2025 post; manager DM, etc.">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="curator-contact-name">Contact name</label>
+                            <input type="text" id="curator-contact-name" name="_curatorMeta.contact.name"
+                                   placeholder="Sarah Manager">
+                        </div>
+                        <div class="form-group">
+                            <label for="curator-contact-role">Role</label>
+                            <input type="text" id="curator-contact-role" name="_curatorMeta.contact.role"
+                                   placeholder="Owner / Manager / KJ / etc.">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="curator-contact-phone">Phone</label>
+                            <input type="tel" id="curator-contact-phone" name="_curatorMeta.contact.phone"
+                                   placeholder="512-555-1234">
+                        </div>
+                        <div class="form-group">
+                            <label for="curator-contact-email">Email</label>
+                            <input type="email" id="curator-contact-email" name="_curatorMeta.contact.email"
+                                   placeholder="contact@example.com">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group form-group--wide">
+                            <label for="curator-notes">Notes</label>
+                            <textarea id="curator-notes" name="_curatorMeta.notes" rows="3"
+                                      placeholder="Quiet on holidays. Best to call to confirm. Manager's birthday in October."></textarea>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="curator-last-verified">Last verified</label>
+                            <input type="date" id="curator-last-verified" name="_curatorMeta.lastVerified">
+                            <small>When did you last confirm this info?</small>
+                        </div>
+                    </div>
+                </fieldset>
+
                 <!-- Venue Socials -->
                 <fieldset class="form-section">
                     <legend><i class="fa-solid fa-share-nodes"></i> Venue Social Links</legend>
@@ -320,6 +381,8 @@
         <span class="editor-footer__copyright">&copy; 2025 Austin Karaoke Directory</span>
     </footer>
 
+    <!-- Curator master (gitignored). 404s silently on the public deploy; editor falls back to Public mode. -->
+    <script src="_curator/data.js" onerror="void 0"></script>
     <script src="js/data.js"></script>
     <script type="module" src="editor/editor.js"></script>
     <script src="js/analytics.js" defer></script>
