@@ -192,7 +192,12 @@ When adding or modifying venues in `js/data.js`, follow this structure:
       day: "Friday",          // Full day name, capitalized
       startTime: "21:00",     // 24-hour format
       endTime: "01:00",       // Can cross midnight
-      eventUrl: "https://..." // Optional: link to event page
+      eventUrl: "https://...", // Optional: link to event page
+      host: {                 // Optional: overrides venue-level host for this show only
+        name: "Guest KJ",     // See "Per-show host override" below
+        affiliation: "Some Karaoke Co",
+        website: "https://..."
+      }
     },
     {
       frequency: "once",      // One-time special event
@@ -207,9 +212,9 @@ When adding or modifying venues in `js/data.js`, follow this structure:
     start: "2026-06-01",      // Venue only appears within this range
     end: "2026-08-31"
   },
-  host: {                     // Optional
+  host: {                     // Optional: default host for shows that don't override
     name: "KJ Name",
-    company: "Company Name",
+    affiliation: "Karaoke Company Name", // Use "affiliation", not "company"
     website: "https://..."    // Optional: host/KJ website
   },
   socials: {                  // All optional
@@ -223,6 +228,21 @@ When adding or modifying venues in `js/data.js`, follow this structure:
   }
 }
 ```
+
+### Per-show host override
+
+The `host` field on a schedule entry overrides the venue-level `host` for that show only. Useful when one venue runs different recurring shows with different KJs (e.g., Stardust on Monday with KJ A, Saturday with KJ B). Existing venues with a single host need no change.
+
+Inheritance rules:
+- Schedule entry without `host` → inherits the venue-level `host`.
+- Schedule entry with `host` → that's the show's host.
+- Partial overrides: `entry.host.name` overrides; missing fields (`affiliation`, `website`) fall back to the venue host.
+- A venue may have NO venue-level `host` if every schedule entry specifies its own (The Highball is the current example).
+
+Where this is consumed:
+- `js/utils/render.js` → `resolveHostFor(venue, scheduleEntry)` returns the effective host. `renderScheduleTable()` adds a "Host" column whenever any entry has its own host.
+- `js/views/KJIndexView.js` → walks both `venue.host` and `schedule[].host` when enumerating KJs.
+- `js/services/venues.js` → `venueMatchesHost()` matches at either level.
 
 ### Venue Tags
 

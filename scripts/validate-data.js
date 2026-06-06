@@ -45,7 +45,7 @@ const VALID_TAGS = Object.keys(data.tagDefinitions || {});
 // Empty strings should be either omitted or set to null.
 const NO_EMPTY_STRING_FIELDS = [
     ['host', 'name'],
-    ['host', 'company'],
+    ['host', 'affiliation'],
     ['host', 'website'],
     ['address', 'neighborhood'],
     ['activePeriod', 'start'],
@@ -143,7 +143,7 @@ for (const venue of data.listings) {
 
             // Per-show host (multi-host venues) — same empty-string rules as venue-level host
             if (entry.host) {
-                for (const f of ['name', 'company', 'website']) {
+                for (const f of ['name', 'affiliation', 'website']) {
                     if (entry.host[f] === '') fail(venue, `${prefix} host.${f} is an empty string — omit the field instead`);
                 }
             }
