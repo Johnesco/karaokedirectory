@@ -2182,7 +2182,10 @@ const karaokeData = {
           "startTime": "21:00",
           "endTime": "00:00",
           "exclusions": [
-            { "date": "2026-06-12", "reason": "Private event" }
+            {
+              "date": "2026-06-12",
+              "reason": "Private event"
+            }
           ]
         }
       ],
@@ -2635,7 +2638,6 @@ const karaokeData = {
     {
       "id": "the-stardust-club",
       "name": "The Stardust Club",
-      "active": true,
       "dedicated": false,
       "address": {
         "street": "11940 Menchaca Rd. Suite 114",
@@ -2655,9 +2657,16 @@ const karaokeData = {
           "day": "Wednesday",
           "startTime": "21:00",
           "endTime": "01:00"
+        },
+        {
+          "frequency": "every",
+          "day": "Saturday",
+          "startTime": "21:00",
+          "endTime": "01:00"
         }
       ],
       "host": {
+        "name": "Baby Jesus",
         "affiliation": "By Request Karaoke",
         "website": "https://www.facebook.com/brkaraoke"
       },
