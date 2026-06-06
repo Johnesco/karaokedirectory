@@ -38,7 +38,6 @@ Karaoke enthusiasts looking for venues, schedules, and event details in the grea
 | About | `about.html` | Project info, feature overview, contact |
 | Bingo | `bingo.html` | Karaoke bingo game |
 | Submit | `submit.html` | Venue submission form |
-| Editor | `editor.html` | Venue data editing tool |
 | Spec viewer | `docs/index.html` | Docsify-powered documentation portal (renders this spec) |
 
 ---
@@ -841,7 +840,7 @@ The form is structured as a short required-fields zone, then a single `<details>
 | Notes | Free-text textarea |
 | Your Contact Info | Submitter name (required if KJ); contact methods checkboxes (email, phone text, phone call, other), each reveals its input on check |
 
-**Removed from the form (handled by curator in editor.html):**
+**Removed from the form (handled by curator out-of-band):**
 
 - Coordinates (lat/lng) — geocoded by curator
 - Neighborhood — only ~50% filled in current data; curator adds when relevant
@@ -880,101 +879,11 @@ Hidden honeypot field `website_url` (positioned offscreen via `.hp-field` CSS) w
 
 ---
 
-## 16 Venue Editor
+## 16 Venue Editing (out of scope for this repo)
 
-**Files:** `editor.html`, `editor/editor.js`, `css/editor.css`
+**Status:** The in-repo `editor.html` was removed. Venue editing now happens in a **local-only curator tool** maintained by the project owner outside this repo. That tool is a single-page HTML app that holds the venue data plus private curator metadata (sources, contacts, notes, last-verified dates), and exports a public-stripped `js/data.js` to publish.
 
-A development tool for editing venue data with live preview.
-
-### Core Workflow
-
-1. Load venues from `js/data.js` on page load
-2. Select a venue from the sidebar list (or create new)
-3. Edit fields in the form
-4. Preview changes in real-time (card preview, modal preview, or JSON)
-5. Save to in-memory array
-6. Copy full JSON output for pasting into `js/data.js`
-
-### Sidebar — Venue List
-
-- Searchable by name or city
-- Sorted alphabetically (ignoring articles)
-- Shows active/inactive and unsaved indicators
-- Venue count displayed
-- Click to select and load venue into form
-
-### Form Fields
-
-All fields from the venue data model are editable:
-- **Basic:** ID, Name, Dedicated checkbox, Active checkbox
-- **Tags:** Dynamic checkboxes from tag definitions
-- **Address:** Street, City, State (default TX), ZIP, Neighborhood
-- **Coordinates:** Latitude, Longitude + "Geocode Address" button
-- **Schedule:** Dynamic entries with add/remove
-  - Frequency select (including "once")
-  - Day select (hidden for "once" entries)
-  - Date picker and event name (shown for "once" entries)
-  - Start/end time inputs
-  - Event URL
-- **Host:** Name, Company, Website
-- **Socials:** Website, Facebook, Instagram, Twitter, TikTok, YouTube, Bluesky
-- **Active Period:** Start and end dates limiting when venue appears
-
-### Geocoding
-
-"Geocode Address" button in the coordinates section:
-- Uses Nominatim (OpenStreetMap) Geocoder API (free, public, CORS-enabled)
-- Reads street, city, state, and ZIP from the form
-- Populates latitude and longitude fields on success
-- Shows status: "Looking up...", success with coordinates, or error message
-
-### Preview Panel
-
-Toggleable panel (eye icon) with three tabs:
-
-| Tab | Content |
-|-----|---------|
-| Card Preview | Live compact venue card rendering |
-| Modal Preview | Simulated detail view |
-| JSON Preview | Formatted JSON with copy button |
-
-- Default: hidden on mobile, visible on desktop (1200px+)
-- Visibility state saved to localStorage
-- Updates in real-time as form fields change
-
-### Tag Definitions Editor
-
-Collapsible sidebar section for managing the tag system itself:
-- Add new tags (prompted for ID, label auto-generated)
-- Edit existing: label, background color, text color (color pickers)
-- Remove tags (with confirmation; cascading removal from all venues)
-- Changes propagate immediately to tag selector and preview
-
-### Validation
-
-- ID: required, lowercase/numbers/hyphens only, no duplicates
-- Name: required
-- Address: street and city required
-- Schedule: at least 1 entry required
-- Inline error messages on validation failure
-
-### Save & Export
-
-- **Save button** — persists changes to in-memory array, clears unsaved indicator
-- **Copy JSON button** — exports ALL venues as `const karaokeData = { tagDefinitions, listings }` ready to paste into `data.js`. Venues sorted alphabetically.
-
-### Draft Management
-
-- Auto-saves form state to localStorage on changes
-- Manual "Save Local" button
-- On startup, prompts to load draft if found (shows timestamp)
-- Draft includes: all venues, tag definitions, selected venue ID
-
-### Unsaved Changes
-
-- Visual "unsaved" dot on sidebar venue items
-- `window.beforeunload` warning if unsaved
-- Prompt when switching venues with unsaved changes
+This spec section previously described the in-repo editor's UI in detail; that content is no longer applicable. If you're a contributor who needs to add or modify a venue and don't have access to the curator tool, edit `js/data.js` directly per the schema in §11 and open a PR — the owner will reconcile your change with the curator master.
 
 ---
 
@@ -1201,20 +1110,18 @@ Each public page includes a `<link rel="canonical">` tag pointing to its canonic
 
 **`robots.txt`** (project root):
 - Allows all crawlers to index public pages
-- Disallows `/editor.html` and `/docs/` (internal tools)
+- Disallows `/docs/` (internal tools)
 - References `sitemap.xml`
 
 **`sitemap.xml`** (project root):
 - Lists all 5 public pages for search engine discovery
-- Does not include `editor.html` or `docs/`
+- Does not include `docs/`
 
-**`editor.html`** has an additional `<meta name="robots" content="noindex, nofollow">` tag as a belt-and-suspenders measure alongside `robots.txt`.
 
 ### Pages Excluded from Indexing
 
 | Page | Reason | Mechanism |
 |------|--------|-----------|
-| `editor.html` | Internal dev tool | `robots.txt` + `noindex` meta tag |
 | `docs/index.html` | Developer documentation (Docsify) | `robots.txt` |
 
 ---

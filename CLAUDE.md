@@ -90,7 +90,6 @@ karaokedirectory/
 ├── about.html             # About page
 ├── bingo.html             # Karaoke bingo game
 ├── submit.html            # Venue submission form (mobile-first, single-flow)
-├── editor.html            # Venue data editor tool
 │
 ├── css/
 │   ├── base.css           # CSS variables, reset, typography (ALWAYS FIRST)
@@ -98,7 +97,6 @@ karaokedirectory/
 │   ├── components.css     # Buttons, cards, modals, forms
 │   ├── views.css          # View-specific styles (weekly, map, etc.)
 │   ├── bingo.css          # Bingo game styles (extends components)
-│   ├── editor.css         # Editor page styles (extends components)
 │   ├── submit.css         # Submission form styles (extends components)
 │   └── snowflakes.css     # Seasonal snowfall animation (disabled, commented out in index.html)
 │
@@ -139,9 +137,6 @@ karaokedirectory/
 │       ├── tags.js        # Venue tag rendering and configuration
 │       ├── url.js         # URL building, sanitization
 │       └── validation.js  # Form validation
-│
-├── editor/
-│   └── editor.js          # Venue editor functionality
 │
 ├── scripts/               # Developer tools
 │   ├── geocode-venues.js  # Add coordinates to venues
@@ -319,7 +314,6 @@ All pages should load CSS in this order for consistency:
 | about.html | base, layout, components, views |
 | submit.html | base, layout, components, views, submit |
 | bingo.html | base, layout, components, bingo |
-| editor.html | base, layout, components, editor |
 | bday.html | base, layout, components (inline `<style>` for the rest) |
 
 Enforced by `scripts/check-css-load-order.js` — run it before merging any change that touches `<link>` tags. Exits non-zero on violation.
@@ -350,10 +344,17 @@ Use these semantic elements consistently:
 ## Common Development Tasks
 
 ### Adding a New Venue
-1. Edit `js/data.js` (or use the venue editor at `editor.html`)
-2. Add venue object to `listings` array
-3. Run `scripts/validate-data.js` to check format
-4. Add coordinates using the "Geocode Address" button in the editor, or via `scripts/geocode-venues.js` (Node.js batch)
+
+`js/data.js` is **maintained externally** by the project owner. Day-to-day venue edits happen in a local-only curator tool that lives outside this repo (at the owner's `~/karaoke-curator/`). That tool exports a public-stripped `js/data.js` whenever the owner is ready to publish.
+
+If you're a contributor (or a Claude session that needs to add a venue inside this repo):
+
+1. Edit `js/data.js` directly. Add the venue object to the `listings` array, following the schema in the "Venue Data Format" section below.
+2. Run `scripts/validate-data.js` to check format.
+3. Add coordinates via `scripts/geocode-venues.js` (Node.js batch).
+4. Open a PR. The owner will reconcile your change with their curator master before merging or after.
+
+Do not look for or attempt to use `editor.html` — it was removed in favor of the external curator tool.
 
 ### Adding a New View
 1. Create `js/views/NewView.js` extending Component
@@ -441,7 +442,6 @@ GitHub Projects field IDs and option IDs for this project. Used by Claude when s
 | Venue Cards & Detail | 6, 7, 8 | Compact/full cards, mobile modal, desktop pane |
 | Navigation & Layout | 5, 19 | Nav controls, responsive design, week navigation |
 | Venue Data & Tags | 11, 12 | Data model, tag system |
-| Venue Editor | 16 | Editor tool with live preview and geocoding |
 | Karaoke Bingo | 14 | Bingo game |
 | Supabase Migration | — | Schema + parallel data source (see ADR-001, ADR-004) |
 | About & Infrastructure | 17, 18, 20, 21 | About page, debug mode, security, state management |

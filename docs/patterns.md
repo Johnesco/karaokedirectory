@@ -2,6 +2,8 @@
 
 > Annotated recipes for common implementation tasks. Each recipe lists the files involved, step-by-step instructions, real code examples, and common gotchas.
 
+> **Note (2026-06):** `editor.html` and `editor/editor.js` were removed. Older recipes below still reference them as examples of where to add a form field or wire up new data. The pattern still applies — substitute "the external curator tool" wherever you see `editor.html`/`editor.js`, and substitute "data shape" wherever you see "form field." See `functional-spec.md` §16 for context.
+
 ---
 
 ## Recipe: Add a New Venue
