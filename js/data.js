@@ -1205,7 +1205,6 @@ const karaokeData = {
     {
       "id": "the-highball",
       "name": "The Highball",
-      "active": true,
       "dedicated": false,
       "address": {
         "street": "1120 S Lamar Blvd",
@@ -1292,6 +1291,28 @@ const karaokeData = {
           "host": {
             "affiliation": "Story-Oke Austin",
             "website": "https://www.storyokeaustin.com/"
+          }
+        },
+        {
+          "frequency": "once",
+          "date": "2026-06-27",
+          "startTime": "19:30",
+          "endTime": "21:00",
+          "eventName": "Story-Oke: Pride",
+          "host": {
+            "name": "Mike",
+            "affiliation": "Story-Oke Austin",
+            "website": "https://www.storyokeaustin.com/"
+          }
+        },
+        {
+          "frequency": "once",
+          "date": "2026-06-27",
+          "startTime": "19:00",
+          "endTime": "01:00",
+          "host": {
+            "name": "Xpider Cantu",
+            "website": "https://www.xpidermagic.com/karaoke"
           }
         }
       ],

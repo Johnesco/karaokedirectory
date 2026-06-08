@@ -20,6 +20,7 @@ import {
     parseLocalDate,
     WEEKDAYS
 } from '../utils/date.js';
+import { resolveHostFor } from '../utils/render.js';
 
 export class KJDossierView extends Component {
     init() {
@@ -132,25 +133,27 @@ export class KJDossierView extends Component {
     /**
      * Find venues this KJ hosts at; for each, separate the schedule into
      * recurring slots and upcoming one-time events that belong to this KJ.
-     * Multi-host venues: only the entries with a matching per-show host count.
+     *
+     * Per-show host overrides take precedence: an entry with its own `host`
+     * uses that host's name/affiliation, not the venue's. So a venue whose
+     * venue-level host matches the queried KJ still excludes any schedule
+     * entry that has been overridden to a different KJ. (Earlier this
+     * shortcut-included every entry whenever the venue-level host matched,
+     * which produced phantom dossier rows under the venue's "default" KJ.)
      */
     getMatches(kjName) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        const venueLevelHost = (v) =>
-            containsIgnoreCase(v.host?.name, kjName) ||
-            containsIgnoreCase(v.host?.affiliation, kjName);
-
         const matches = getAllVenues()
             .filter(v => venueMatchesHost(v, kjName))
             .map(v => {
-                const venueLevel = venueLevelHost(v);
                 const kjEntries = (v.schedule || []).filter(e => {
-                    if (venueLevel) return true;
+                    const eff = resolveHostFor(v, e);
+                    if (!eff) return false;
                     return (
-                        containsIgnoreCase(e.host?.name, kjName) ||
-                        containsIgnoreCase(e.host?.affiliation, kjName)
+                        containsIgnoreCase(eff.name, kjName) ||
+                        containsIgnoreCase(eff.affiliation, kjName)
                     );
                 });
 
