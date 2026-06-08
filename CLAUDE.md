@@ -233,10 +233,9 @@ When adding or modifying venues in `js/data.js`, follow this structure:
 
 The `host` field on a schedule entry overrides the venue-level `host` for that show only. Useful when one venue runs different recurring shows with different KJs (e.g., Stardust on Monday with KJ A, Saturday with KJ B). Existing venues with a single host need no change.
 
-Inheritance rules:
+Inheritance rules (per `resolveHostFor` in `js/utils/render.js`):
 - Schedule entry without `host` → inherits the venue-level `host`.
-- Schedule entry with `host` → that's the show's host.
-- Partial overrides: `entry.host.name` overrides; missing fields (`affiliation`, `website`) fall back to the venue host.
+- Schedule entry with `host` → that's the show's host. **Full object swap, not field-level merge** — if you set `entry.host`, the venue's `name`, `affiliation`, and `website` are NOT inherited for that show. Set whichever fields you want present on the override.
 - A venue may have NO venue-level `host` if every schedule entry specifies its own (The Highball is the current example).
 
 Where this is consumed:
