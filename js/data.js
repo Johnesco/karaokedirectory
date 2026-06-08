@@ -1215,70 +1215,13 @@ const karaokeData = {
       "schedule": [
         {
           "frequency": "once",
-          "date": "2026-05-08",
+          "date": "2026-06-27",
           "startTime": "19:00",
           "endTime": "01:00",
           "eventName": "Karaoke with Xpider @ Highball!",
           "host": {
             "name": "Xpider Cantu",
             "website": "https://www.xpidermagic.com/karaoke"
-          }
-        },
-        {
-          "frequency": "once",
-          "date": "2026-05-09",
-          "startTime": "19:00",
-          "endTime": "01:00",
-          "eventName": "Karaoke with Xpider @ Highball!",
-          "host": {
-            "name": "Xpider Cantu",
-            "website": "https://www.xpidermagic.com/karaoke"
-          }
-        },
-        {
-          "frequency": "once",
-          "date": "2026-05-30",
-          "startTime": "21:00",
-          "endTime": "01:00",
-          "eventName": "Karaoke with Xpider @ Highball!",
-          "host": {
-            "name": "Xpider Cantu",
-            "website": "https://www.xpidermagic.com/karaoke"
-          }
-        },
-        {
-          "frequency": "once",
-          "date": "2026-06-04",
-          "startTime": "19:00",
-          "endTime": "01:00",
-          "eventName": "Karaoke with Xpider @ Highball!",
-          "host": {
-            "name": "Xpider Cantu",
-            "website": "https://www.xpidermagic.com/karaoke"
-          }
-        },
-        {
-          "frequency": "once",
-          "date": "2026-02-28",
-          "startTime": "19:30",
-          "endTime": "21:00",
-          "eventName": "Story-Oke: Breakups @ Highball!",
-          "eventUrl": "https://fb.me/e/5vGkMpOuE",
-          "host": {
-            "affiliation": "Story-Oke Austin",
-            "website": "https://www.storyokeaustin.com/"
-          }
-        },
-        {
-          "frequency": "once",
-          "date": "2026-04-25",
-          "startTime": "19:30",
-          "endTime": "21:00",
-          "eventName": "Story-Oke: Soundtracks @ Highball!",
-          "eventUrl": "https://www.facebook.com/share/1CUHiRCZAH/",
-          "host": {
-            "affiliation": "Story-Oke Austin",
-            "website": "https://www.storyokeaustin.com/"
           }
         },
         {
@@ -1299,20 +1242,10 @@ const karaokeData = {
           "startTime": "19:30",
           "endTime": "21:00",
           "eventName": "Story-Oke: Pride",
+          "eventUrl": "https://www.facebook.com/share/1CgUshRwYX/",
           "host": {
-            "name": "Mike",
             "affiliation": "Story-Oke Austin",
             "website": "https://www.storyokeaustin.com/"
-          }
-        },
-        {
-          "frequency": "once",
-          "date": "2026-06-27",
-          "startTime": "19:00",
-          "endTime": "01:00",
-          "host": {
-            "name": "Xpider Cantu",
-            "website": "https://www.xpidermagic.com/karaoke"
           }
         }
       ],
