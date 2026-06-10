@@ -335,7 +335,7 @@ All pages should load CSS in this order for consistency:
 | bingo.html | base, layout, components, bingo |
 | bday.html | base, layout, components (inline `<style>` for the rest) |
 
-Enforced by `scripts/check-css-load-order.js` — run it before merging any change that touches `<link>` tags. Exits non-zero on violation.
+Enforced by `scripts/check-css-load-order.js` — also run automatically in CI on every PR (`.github/workflows/ci.yml`). Exits non-zero on violation.
 
 ### BEM Naming
 - Block: `.venue-card`
@@ -369,7 +369,7 @@ Use these semantic elements consistently:
 If you're a contributor (or a Claude session that needs to add a venue inside this repo):
 
 1. Edit `js/data.js` directly. Add the venue object to the `listings` array, following the schema in the "Venue Data Format" section below.
-2. Run `scripts/validate-data.js` to check format.
+2. Run `node scripts/validate-data.js` to check format. CI also runs this on every PR — see `.github/workflows/ci.yml`.
 3. Add coordinates via `scripts/geocode-venues.js` (Node.js batch).
 4. Open a PR. The owner will reconcile your change with their curator master before merging or after.
 
