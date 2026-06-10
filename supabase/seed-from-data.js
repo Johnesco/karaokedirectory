@@ -14,18 +14,9 @@
 const fs = require('fs');
 const path = require('path');
 
-// Read data.js and evaluate it to get the object
-const dataPath = path.join(__dirname, '..', 'js', 'data.js');
-const dataSource = fs.readFileSync(dataPath, 'utf-8');
-
-// data.js assigns to `const karaokeData = { ... };` — extract the object
-const match = dataSource.match(/const\s+karaokeData\s*=\s*(\{[\s\S]*\});?\s*$/);
-if (!match) {
-  console.error('Could not parse karaokeData from data.js');
-  process.exit(1);
-}
-
-const karaokeData = eval(`(${match[1]})`);
+// js/data.json is canonical (#102) — read it directly.
+const dataPath = path.join(__dirname, '..', 'js', 'data.json');
+const karaokeData = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
 
 // ---- Helpers ----
 

@@ -182,23 +182,16 @@ function sleep(ms) {
  * Main function
  */
 async function main() {
-    // Read data.js
-    const dataPath = path.join(__dirname, '..', 'js', 'data.js');
+    // js/data.json is canonical (#102). data.js is regenerated from it
+    // by scripts/sync-data-js.js, so we patch data.json then sync.
+    const dataPath = path.join(__dirname, '..', 'js', 'data.json');
     console.log('Reading:', dataPath);
 
-    let content = fs.readFileSync(dataPath, 'utf8');
-
-    // Extract the data object
     let data;
     try {
-        const match = content.match(/const\s+karaokeData\s*=\s*(\{[\s\S]*\});?\s*$/);
-        if (match) {
-            data = JSON.parse(match[1]);
-        } else {
-            throw new Error('Could not parse data.js');
-        }
+        data = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
     } catch (e) {
-        console.error('Error parsing data.js:', e.message);
+        console.error('Error parsing data.json:', e.message);
         process.exit(1);
     }
 
@@ -280,18 +273,20 @@ async function main() {
         });
     }
 
-    // Write back to data.js
+    // Write back to data.json (canonical) and regenerate data.js.
+    // Because data.json is round-tripped through JSON.parse/stringify and
+    // key insertion order is preserved, the diff is exactly the new
+    // coordinates blocks — no whole-file reflow.
     if (geocoded > 0) {
-        const newContent = `const karaokeData = ${JSON.stringify(data, null, 2)};\n`;
-
-        // Backup original
-        const backupPath = dataPath + '.backup';
-        fs.writeFileSync(backupPath, content);
-        console.log(`\nBackup saved to: ${backupPath}`);
-
-        // Write new data
-        fs.writeFileSync(dataPath, newContent);
+        fs.writeFileSync(dataPath, JSON.stringify(data, null, 2) + '\n');
         console.log(`Updated: ${dataPath}`);
+
+        // Keep js/data.js (the browser runtime artifact) in sync.
+        const { execSync } = require('child_process');
+        execSync('node scripts/sync-data-js.js', {
+            cwd: path.join(__dirname, '..'),
+            stdio: 'inherit',
+        });
     } else {
         console.log('\nNo changes made.');
     }

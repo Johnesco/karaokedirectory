@@ -9,30 +9,15 @@
 const fs = require('fs');
 const path = require('path');
 
-const dataPath = path.join(__dirname, '..', 'js', 'data.js');
+const dataPath = path.join(__dirname, '..', 'js', 'data.json');
 console.log('Reading:', dataPath);
-
-const content = fs.readFileSync(dataPath, 'utf8');
-
-const match = content.match(/const\s+karaokeData\s*=\s*(\{[\s\S]*\})\s*;?\s*$/);
-if (!match) {
-    console.log('ERROR: Could not extract JSON from data.js');
-    process.exit(1);
-}
 
 let data;
 try {
-    data = JSON.parse(match[1]);
+    data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
     console.log('JSON is valid!\n');
 } catch (e) {
     console.log('JSON PARSE ERROR:', e.message);
-    const posMatch = e.message.match(/position (\d+)/);
-    if (posMatch) {
-        const pos = parseInt(posMatch[1]);
-        const lines = match[1].substring(0, pos).split('\n');
-        console.log('Approximate line in JSON:', lines.length);
-        console.log('Context:', match[1].substring(pos - 30, pos + 30));
-    }
     process.exit(1);
 }
 

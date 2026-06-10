@@ -12,3 +12,5 @@ Format and threshold rule: see [sdlc-baseline `docs/adrs.md`](https://github.com
 | [002](002-vanilla-js-no-build.md) | Vanilla JS, no framework, no build step | Accepted |
 | [003](003-github-pages-deploy.md) | GitHub Pages as deploy target | Accepted |
 | [004](004-parallel-data-source-flag.md) | Parallel data source via URL flag — production stays on JSON | Accepted |
+| [005](005-venue-json-schema.md) | Venue JSON Schema as single source of truth | Accepted |
+| [006](006-data-json-canonical.md) | `js/data.json` canonical, `js/data.js` auto-generated | Accepted |
