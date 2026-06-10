@@ -1,0 +1,202 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://karaokedirectory.com/schemas/venue.schema.json",
+  "title": "Karaoke Venue Database",
+  "description": "Schema for js/data.js — the full venue listings database. Single source of truth for validate-data.js (CI), submit.html payload shape, the external curator tool, and future Supabase JSONB rows. Cross-reference constraints (e.g. tags must exist in tagDefinitions) are enforced as supplementary checks in scripts/validate-data.js since JSON Schema cannot express them.",
+  "type": "object",
+  "required": ["tagDefinitions", "listings"],
+  "additionalProperties": false,
+  "properties": {
+    "tagDefinitions": {
+      "description": "Map of tag id → { label, color, textColor }. Tag ids referenced by venue.tags[].",
+      "type": "object",
+      "patternProperties": {
+        "^[a-z0-9][a-z0-9-]*$": { "$ref": "#/$defs/tagDefinition" },
+        "^[0-9]+\\+$": { "$ref": "#/$defs/tagDefinition" }
+      },
+      "additionalProperties": false
+    },
+    "listings": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/venue" }
+    }
+  },
+  "$defs": {
+    "tagDefinition": {
+      "type": "object",
+      "required": ["label", "color", "textColor"],
+      "additionalProperties": false,
+      "properties": {
+        "label": { "type": "string", "minLength": 1 },
+        "color": { "type": "string", "pattern": "^#[0-9a-fA-F]{3,8}$" },
+        "textColor": { "type": "string", "pattern": "^#[0-9a-fA-F]{3,8}$" }
+      }
+    },
+    "venue": {
+      "type": "object",
+      "required": ["id", "name", "address", "schedule"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$",
+          "description": "Lowercase, hyphenated slug, unique across listings."
+        },
+        "name": { "type": "string", "minLength": 1 },
+        "active": {
+          "type": "boolean",
+          "description": "False to hide venue from all pages. Default true when omitted."
+        },
+        "dedicated": {
+          "type": "boolean",
+          "description": "True for karaoke-only venues. Auto-adds the 'dedicated' tag at render time."
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true,
+          "description": "Tag ids. Each must exist as a key in tagDefinitions (enforced in validate-data.js)."
+        },
+        "address": { "$ref": "#/$defs/address" },
+        "coordinates": { "$ref": "#/$defs/coordinates" },
+        "schedule": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/scheduleEntry" }
+        },
+        "activePeriod": { "$ref": "#/$defs/activePeriod" },
+        "host": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/host" }
+          ]
+        },
+        "socials": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/socials" }
+          ]
+        }
+      }
+    },
+    "address": {
+      "type": "object",
+      "required": ["street", "city", "state", "zip"],
+      "additionalProperties": false,
+      "properties": {
+        "street": { "type": "string", "minLength": 1 },
+        "city": { "type": "string", "minLength": 1 },
+        "state": { "type": "string", "minLength": 2, "maxLength": 2 },
+        "zip": { "type": "string", "pattern": "^\\d{5}(-\\d{4})?$" },
+        "neighborhood": { "type": "string", "minLength": 1 }
+      }
+    },
+    "coordinates": {
+      "type": "object",
+      "required": ["lat", "lng"],
+      "additionalProperties": false,
+      "properties": {
+        "lat": { "type": "number" },
+        "lng": { "type": "number" }
+      }
+    },
+    "activePeriod": {
+      "type": "object",
+      "required": ["start"],
+      "additionalProperties": false,
+      "description": "Window during which the venue is active. 'end' is optional for open-ended seasonal venues (e.g. 'opened in March, no scheduled end').",
+      "properties": {
+        "start": { "type": "string", "format": "date" },
+        "end": { "type": "string", "format": "date" }
+      }
+    },
+    "scheduleEntry": {
+      "type": "object",
+      "required": ["frequency", "startTime"],
+      "additionalProperties": false,
+      "properties": {
+        "frequency": {
+          "type": "string",
+          "enum": ["every", "first", "second", "third", "fourth", "fifth", "last", "once"]
+        },
+        "day": {
+          "type": "string",
+          "enum": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+        },
+        "date": {
+          "type": "string",
+          "format": "date",
+          "description": "Required when frequency is 'once'."
+        },
+        "startTime": { "$ref": "#/$defs/timeOfDay" },
+        "endTime": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/timeOfDay" }
+          ],
+          "description": "Null when the venue only advertises a start time."
+        },
+        "eventName": { "type": "string", "minLength": 1 },
+        "eventUrl": { "type": "string", "format": "uri" },
+        "host": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/host" }
+          ]
+        },
+        "exclusions": {
+          "type": "array",
+          "description": "One-off dates on which the recurring event does not happen (e.g. private events, holidays).",
+          "items": {
+            "type": "object",
+            "required": ["date"],
+            "additionalProperties": false,
+            "properties": {
+              "date": { "type": "string", "format": "date" },
+              "reason": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "frequency": { "const": "once" } }, "required": ["frequency"] },
+          "then": { "required": ["date"] },
+          "else": { "required": ["day"] }
+        }
+      ]
+    },
+    "timeOfDay": {
+      "type": "string",
+      "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+      "description": "HH:MM in 24-hour format."
+    },
+    "host": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "affiliation": { "type": "string", "minLength": 1 },
+        "website": { "type": "string", "format": "uri" }
+      },
+      "anyOf": [
+        { "required": ["name"] },
+        { "required": ["affiliation"] }
+      ]
+    },
+    "socials": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "website": { "type": "string", "format": "uri" },
+        "facebook": { "type": "string", "format": "uri" },
+        "instagram": { "type": "string", "format": "uri" },
+        "twitter": { "type": "string", "format": "uri" },
+        "tiktok": { "type": "string", "format": "uri" },
+        "youtube": { "type": "string", "format": "uri" },
+        "bluesky": { "type": "string", "format": "uri" }
+      }
+    }
+  }
+}

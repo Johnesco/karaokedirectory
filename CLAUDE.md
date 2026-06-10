@@ -140,8 +140,11 @@ karaokedirectory/
 │
 ├── scripts/               # Developer tools
 │   ├── geocode-venues.js  # Add coordinates to venues
-│   ├── validate-data.js   # Validate venue data integrity
+│   ├── validate-data.js   # Validate venue data integrity (Ajv + supplementary checks)
 │   └── audit-for-supabase.js  # Pre-seed validation against logical rules
+│
+├── schema/
+│   └── venue.schema.json  # Authoritative venue schema (ADR-005)
 │
 ├── supabase/              # Supabase schema + seed pipeline
 │   ├── migrations/        # SQL migrations (001–004; 004 is the current JSONB schema)
@@ -160,6 +163,10 @@ karaokedirectory/
 ```
 
 ## Venue Data Format
+
+**Authoritative schema:** [`schema/venue.schema.json`](schema/venue.schema.json) — single source of truth, enforced by CI via Ajv. Curator targets it; submit.html emits venue partials against it; future Supabase JSONB mirrors it. See [ADR-005](docs/adr/005-venue-json-schema.md).
+
+The shape below is a human-readable summary. When the two disagree, the schema wins.
 
 When adding or modifying venues in `js/data.js`, follow this structure:
 
