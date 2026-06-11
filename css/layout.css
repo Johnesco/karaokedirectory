@@ -247,7 +247,6 @@
     padding: var(--spacing-xl) var(--spacing-md);
     text-align: center;
     border-top: 1px solid var(--border-color);
-    margin-top: var(--spacing-2xl);
 }
 
 .site-footer__social h2 {
@@ -433,7 +432,6 @@ body.view--map .fab-group {
 
     .site-footer {
         padding: var(--spacing-xl) var(--spacing-xs);
-        margin-top: var(--spacing-lg);
     }
 
     .site-footer__links {
