@@ -182,59 +182,10 @@
                                         <small>Pick whatever fits.</small>
                                     </div>
                                 </div>
-                                <div class="tag-checkbox-grid">
-                                    <label class="tag-checkbox-option">
-                                        <input type="checkbox" name="tag-lgbtq" value="lgbtq">
-                                        <span class="tag-badge" data-tag="lgbtq">LGBTQ+</span>
-                                    </label>
-                                    <label class="tag-checkbox-option">
-                                        <input type="checkbox" name="tag-dive" value="dive">
-                                        <span class="tag-badge" data-tag="dive">Dive Bar</span>
-                                    </label>
-                                    <label class="tag-checkbox-option">
-                                        <input type="checkbox" name="tag-sports-bar" value="sports-bar">
-                                        <span class="tag-badge" data-tag="sports-bar">Sports Bar</span>
-                                    </label>
-                                    <label class="tag-checkbox-option">
-                                        <input type="checkbox" name="tag-country-bar" value="country-bar">
-                                        <span class="tag-badge" data-tag="country-bar">Country Bar</span>
-                                    </label>
-                                    <label class="tag-checkbox-option">
-                                        <input type="checkbox" name="tag-restaurant" value="restaurant">
-                                        <span class="tag-badge" data-tag="restaurant">Restaurant</span>
-                                    </label>
-                                    <label class="tag-checkbox-option">
-                                        <input type="checkbox" name="tag-brewery" value="brewery">
-                                        <span class="tag-badge" data-tag="brewery">Brewery</span>
-                                    </label>
-                                    <label class="tag-checkbox-option">
-                                        <input type="checkbox" name="tag-craft-cocktails" value="craft-cocktails">
-                                        <span class="tag-badge" data-tag="craft-cocktails">Craft Cocktails</span>
-                                    </label>
-                                    <label class="tag-checkbox-option">
-                                        <input type="checkbox" name="tag-neighborhood" value="neighborhood">
-                                        <span class="tag-badge" data-tag="neighborhood">Neighborhood Bar</span>
-                                    </label>
-                                    <label class="tag-checkbox-option">
-                                        <input type="checkbox" name="tag-live-band-karaoke" value="live-band-karaoke">
-                                        <span class="tag-badge" data-tag="live-band-karaoke">Live Band Karaoke</span>
-                                    </label>
-                                    <label class="tag-checkbox-option">
-                                        <input type="checkbox" name="tag-outdoor" value="outdoor">
-                                        <span class="tag-badge" data-tag="outdoor">Outdoor / Patio</span>
-                                    </label>
-                                    <label class="tag-checkbox-option">
-                                        <input type="checkbox" name="tag-games" value="games">
-                                        <span class="tag-badge" data-tag="games">Games / Arcade</span>
-                                    </label>
-                                    <label class="tag-checkbox-option">
-                                        <input type="checkbox" name="tag-billiards" value="billiards">
-                                        <span class="tag-badge" data-tag="billiards">Billiards</span>
-                                    </label>
-                                    <label class="tag-checkbox-option">
-                                        <input type="checkbox" name="tag-smoking-inside" value="smoking-inside">
-                                        <span class="tag-badge" data-tag="smoking-inside">Smoking Inside</span>
-                                    </label>
+                                <div class="tag-checkbox-grid" id="tag-checkbox-grid">
+                                    <!-- Populated from karaokeData.tagDefinitions at load.
+                                         System tags (dedicated, special-event) and age tags
+                                         are excluded — see populateTagCheckboxes() below. -->
                                 </div>
                                 <div class="form-row" style="margin-top: var(--spacing-md);">
                                     <div class="form-group form-group--full">
@@ -417,15 +368,42 @@
 
     <script src="js/data.js"></script>
     <script>
-        // Hydrate tag-badge colors from tagDefinitions (single source of truth in data.js)
-        (function hydrateTagBadgeColors() {
+        // Tag ids that are *not* user-selectable as checkboxes:
+        //   - 'dedicated' is set by venue.dedicated:true at the curator level
+        //   - 'special-event' is auto-applied to schedule entries with frequency:"once"
+        //   - age tags ('21+', '18+', 'all-ages', 'family-friendly') have their own
+        //     radio group below the checkbox grid and merge into the tags array
+        //     at submit time.
+        const TAG_GRID_EXCLUDE = new Set([
+            'dedicated', 'special-event',
+            '21+', '18+', 'all-ages', 'family-friendly',
+        ]);
+
+        function getUserSelectableTagIds() {
             const defs = (typeof karaokeData !== 'undefined' && karaokeData.tagDefinitions) || {};
-            document.querySelectorAll('.tag-badge[data-tag]').forEach(el => {
-                const def = defs[el.dataset.tag];
-                if (!def) return;
-                el.style.background = def.color;
-                el.style.color = def.textColor;
-            });
+            return Object.keys(defs).filter(id => !TAG_GRID_EXCLUDE.has(id));
+        }
+
+        // Generate the tag-checkbox grid from karaokeData.tagDefinitions so that
+        // adding a tag in data.js auto-surfaces in the submit form — no parallel
+        // hardcoded list to keep in sync (#101).
+        (function populateTagCheckboxes() {
+            const grid = document.getElementById('tag-checkbox-grid');
+            const defs = (typeof karaokeData !== 'undefined' && karaokeData.tagDefinitions) || {};
+            if (!grid) return;
+
+            const html = getUserSelectableTagIds().map(id => {
+                const def = defs[id];
+                const safeLabel = def.label
+                    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                return `
+                    <label class="tag-checkbox-option">
+                        <input type="checkbox" name="tag-${id}" value="${id}">
+                        <span class="tag-badge" data-tag="${id}"
+                              style="background:${def.color};color:${def.textColor}">${safeLabel}</span>
+                    </label>`;
+            }).join('');
+            grid.innerHTML = html;
         })();
 
         // Rate limiting configuration
@@ -742,55 +720,58 @@
                 }
             });
 
-            // Collect tags
+            // Collect tags — iterate the same id list used to render the grid
+            // so adding a tag in data.js flows through both directions automatically.
             const tags = [];
-            const tagNames = [
-                'lgbtq', 'dive', 'sports-bar', 'country-bar', 'restaurant',
-                'brewery', 'craft-cocktails', 'neighborhood', 'live-band-karaoke',
-                'outdoor', 'games', 'billiards', 'smoking-inside'
-            ];
-            tagNames.forEach(tag => {
+            getUserSelectableTagIds().forEach(tag => {
                 if (formData.get(`tag-${tag}`)) tags.push(tag);
             });
 
-            // Age restriction as tag
+            // Age restriction is a radio, but it merges into the tags array — the
+            // schema represents age as a tag, not a separate field (#101 shape parity).
             const ageRestriction = formData.get('age-restriction');
             if (ageRestriction) tags.push(ageRestriction);
 
-            // Build venue object in standard format
+            // Build venue object matching schema/venue.schema.json. Required
+            // fields (street, city, zip) are guarded by validation before this
+            // function runs, so we don't fall back to empty strings — that would
+            // emit a shape the curator and CI would reject.
             const venue = {
                 id: generateVenueId(venueName),
                 name: venueName,
-                dedicated: formData.get('dedicated') ? true : false,
-                tags: tags.length > 0 ? tags : undefined,
                 address: {
-                    street: formData.get('street')?.trim() || '',
-                    city: formData.get('city')?.trim() || 'Austin',
-                    state: formData.get('state')?.trim() || 'TX',
-                    zip: formData.get('zip')?.trim() || '',
-                    neighborhood: formData.get('neighborhood')?.trim() || ''
+                    street: formData.get('street').trim(),
+                    city: formData.get('city').trim() || 'Austin',
+                    state: (formData.get('state')?.trim() || 'TX'),
+                    zip: formData.get('zip').trim(),
                 },
                 schedule: schedule
             };
 
-            // Optional: Active period
+            // Optional fields — only set when there's something to set so the
+            // emitted shape contains no empty strings or empty arrays.
+            const neighborhood = formData.get('neighborhood')?.trim();
+            if (neighborhood) venue.address.neighborhood = neighborhood;
+
+            if (tags.length > 0) venue.tags = tags;
+
+            // activePeriod inputs aren't in the slim submit form (curator handles
+            // seasonal windows) — leaving the read in case they come back later.
             const activePeriodStart = formData.get('active-period-start')?.trim();
             const activePeriodEnd = formData.get('active-period-end')?.trim();
-            if (activePeriodStart || activePeriodEnd) {
-                venue.activePeriod = {};
-                if (activePeriodStart) venue.activePeriod.start = activePeriodStart;
+            if (activePeriodStart) {
+                venue.activePeriod = { start: activePeriodStart };
                 if (activePeriodEnd) venue.activePeriod.end = activePeriodEnd;
             }
 
-            // Remove undefined tags field from JSON output
-            if (!venue.tags) delete venue.tags;
-
-            // Optional: Host info
+            // Optional: Host info. Schema requires name OR affiliation when host
+            // exists, so we don't emit a website-only host — the curator would
+            // need at least one identifying field to do anything with it.
             const hostName = formData.get('host-name')?.trim();
             const affiliation = formData.get('affiliation')?.trim();
             const hostWebsite = formData.get('host-website')?.trim();
 
-            if (hostName || affiliation || hostWebsite) {
+            if (hostName || affiliation) {
                 venue.host = {};
                 if (hostName) venue.host.name = hostName;
                 if (affiliation) venue.host.affiliation = affiliation;

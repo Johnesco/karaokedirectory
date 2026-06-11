@@ -834,7 +834,7 @@ The form is structured as a short required-fields zone, then a single `<details>
 
 | Section | Fields |
 |---------|--------|
-| Tags | 13 tag checkboxes (chip-style), age restriction radio (not sure / 21+ / 18+ / all-ages / family-friendly) |
+| Tags | Tag checkboxes (chip-style) generated at load from `karaokeData.tagDefinitions` — adding a tag to data.js auto-surfaces here, no parallel hardcoded list. System tags (`dedicated`, `special-event`) and age tags are excluded from the grid; age restriction is its own radio (not sure / 21+ / 18+ / all-ages / family-friendly) whose value joins the `tags: []` array at submit time, matching the schema's "age is a tag" shape. |
 | Host / KJ Info | Host name, company, host website |
 | Venue Social Links | Website, Facebook, Instagram (3 fields — other platforms intentionally cut to reduce friction; curator can add via editor) |
 | Notes | Free-text textarea |
@@ -876,6 +876,10 @@ Hidden honeypot field `website_url` (positioned offscreen via `.hp-field` CSS) w
 ### Email body format
 
 `formatEmailBody()` produces a structured plaintext email containing the full venue object as JSON between two `----...----` delimiter lines, plus submitter metadata and a TODO checklist (verify info, geocode, add to data.js). The JSON block is intended to be copy-paste-ready for the curator's editor workflow.
+
+### Payload shape contract (#101)
+
+The `venue` object inside the Apps Script payload validates against [`schema/venue.schema.json`](../schema/venue.schema.json) as a **partial venue** — the same schema the curator targets and CI enforces (ADR-005). Fields submit does not collect (coordinates, neighborhood, activePeriod, per-show host override, the four less-common social platforms, `dedicated`) are simply absent; the schema marks them optional. Empty-string defaults and `null` placeholders are suppressed at assembly time so the curator never has to translate "blank" into "absent". A future ticket may add an Ajv-based pre-send check in the browser; today the shape is verified end-to-end by piping the captured payload through the schema in a Node script (see issue #101).
 
 ---
 

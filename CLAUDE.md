@@ -143,8 +143,11 @@ karaokedirectory/
 ├── scripts/               # Developer tools
 │   ├── geocode-venues.js  # Add coordinates to venues (patches data.json + syncs data.js)
 │   ├── sync-data-js.js    # Regenerate js/data.js from js/data.json (CI gate)
-│   ├── validate-data.js   # Validate venue data integrity
+│   ├── validate-data.js   # Validate venue data integrity (Ajv + supplementary checks)
 │   └── audit-for-supabase.js  # Pre-seed validation against logical rules
+│
+├── schema/
+│   └── venue.schema.json  # Authoritative venue schema (ADR-005)
 │
 ├── supabase/              # Supabase schema + seed pipeline
 │   ├── migrations/        # SQL migrations (001–004; 004 is the current JSONB schema)
@@ -163,6 +166,10 @@ karaokedirectory/
 ```
 
 ## Venue Data Format
+
+**Authoritative schema:** [`schema/venue.schema.json`](schema/venue.schema.json) — single source of truth, enforced by CI via Ajv. Curator targets it; submit.html emits venue partials against it; future Supabase JSONB mirrors it. See [ADR-005](docs/adr/005-venue-json-schema.md).
+
+The shape below is a human-readable summary. When the two disagree, the schema wins.
 
 When adding or modifying venues in `js/data.js`, follow this structure:
 
@@ -338,7 +345,7 @@ All pages should load CSS in this order for consistency:
 | bingo.html | base, layout, components, bingo |
 | bday.html | base, layout, components (inline `<style>` for the rest) |
 
-Enforced by `scripts/check-css-load-order.js` — run it before merging any change that touches `<link>` tags. Exits non-zero on violation.
+Enforced by `scripts/check-css-load-order.js` — also run automatically in CI on every PR (`.github/workflows/ci.yml`). Exits non-zero on violation.
 
 ### BEM Naming
 - Block: `.venue-card`
@@ -373,7 +380,7 @@ If you're a contributor (or a Claude session that needs to add a venue inside th
 
 1. Edit `js/data.json` directly. Add the venue object to the `listings` array, following the schema in the "Venue Data Format" section below.
 2. Run `node scripts/sync-data-js.js` to regenerate `js/data.js`.
-3. Run `node scripts/validate-data.js` to check format. CI runs both on every PR.
+3. Run `node scripts/validate-data.js` to check format. CI runs both on every PR — see `.github/workflows/ci.yml`.
 4. Add coordinates via `node scripts/geocode-venues.js` (Node.js batch) — patches `data.json` and re-syncs `data.js` automatically.
 5. Open a PR. The owner will reconcile your change with their curator master before merging or after.
 
