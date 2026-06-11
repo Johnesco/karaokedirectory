@@ -78,6 +78,7 @@ Each day card header displays:
 When expanded, shows:
 - One venue card per **matching schedule entry** (a venue with two events on the same date renders two cards, each showing its own event name, time, and host)
 - Footer with **unique venue count** (e.g., "14 venues" even if 15 cards rendered because one venue had two events)
+- **Venue card layout:** single column on mobile (≤768px); at 769px+ cards flow into a responsive grid (`repeat(auto-fill, minmax(320px, 1fr))` — 2 columns at ~1024px, up to 4 on large screens). Cards in the same grid row stretch to equal height. The same grid applies to letter cards in the Alphabetical view.
 
 ### Sorting
 
@@ -942,8 +943,8 @@ Includes a "Documentation" link to `docs/index.html`.
 | Width | Behavior |
 |-------|----------|
 | Base (mobile) | Single column, modal for venue details, stacked navigation |
-| 768px+ | Enhanced spacing and layout |
-| 1024px+ | Wider cards, more horizontal space |
+| 769px+ | Venue cards flow into a multi-column grid (`auto-fill, minmax(320px, 1fr)`) inside day/letter cards; labeled nav buttons |
+| 1024px+ | More grid columns as space allows |
 | 1200px+ | Side-by-side layouts where applicable |
 | 1400px+ | Desktop venue detail pane visible alongside main content; mobile modal suppressed |
 

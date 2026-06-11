@@ -403,6 +403,27 @@
     background: var(--color-gray-700);
 }
 
+/* Desktop: venues flow into a multi-column grid. A single column stretches
+   one card across the full content width (~1300px on large screens). */
+@media (min-width: 769px) {
+    .day-card__venues,
+    .letter-card__venues {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    }
+
+    /* Equal-height cards within a grid row */
+    .day-card__venue-item,
+    .letter-card__venue-item {
+        display: flex;
+    }
+
+    .day-card__venue-item .venue-card,
+    .letter-card__venue-item .venue-card {
+        flex: 1;
+    }
+}
+
 @media (max-width: 768px) {
     .day-card {
         scroll-margin-top: var(--nav-height);
