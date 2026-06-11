@@ -1,4 +1,4 @@
-const karaokeData = {
+{
   "tagDefinitions": {
     "dedicated": {
       "label": "Dedicated",
@@ -3028,4 +3028,4 @@ const karaokeData = {
       }
     }
   ]
-};
+}

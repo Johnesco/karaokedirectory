@@ -515,9 +515,9 @@ Venues with an `activePeriod` field only appear when the current date falls with
 
 ## 11 Venue Data Model
 
-**Source files:** `js/data.js` (canonical authoring source + offline fallback), Supabase tables `venues` and `tags` (runtime source of truth).
+**Source files:** `js/data.json` (canonical authoring source — #102, ADR-006), `js/data.js` (browser runtime wrapper, auto-generated from `data.json` by `scripts/sync-data-js.js`), Supabase tables `venues` and `tags` (future runtime source of truth — currently disabled). Dev scripts read `data.json` directly; CI fails if `data.js` is out of sync.
 
-The shape `{ tagDefinitions, listings }` is the contract — both the local file and the Supabase service expose data this way. See [Storage and Data Flow](#storage-and-data-flow) below for how the two stay in sync.
+The shape `{ tagDefinitions, listings }` is the contract — both the local file and the Supabase service expose data this way. See [Storage and Data Flow](#storage-and-data-flow) below for how the two stay in sync. The full venue object schema lives in [`schema/venue.schema.json`](../schema/venue.schema.json) — see ADR-005.
 
 ### Venue Object Schema
 

@@ -35,7 +35,8 @@
 - Event bus for component communication (`js/core/events.js`)
 
 ### 5. Data Layer
-- All venue data in `js/data.js` (currently 79 venues) — the active runtime source, plus canonical authoring source
+- **Canonical source: `js/data.json`** (#102). Dev scripts and the curator read/write this.
+- **Browser runtime: `js/data.js`** — a one-line wrapper (`const karaokeData = ...;`) generated from `data.json` by `scripts/sync-data-js.js`. CI enforces sync via `node scripts/sync-data-js.js --check`.
 - Supabase wiring exists (`js/services/supabase.js`, JSONB-heavy 2-table schema in `supabase/migrations/`) but is currently **disabled** via `useSupabase: false` in `js/config.js`. See spec §11 *Storage and Data Flow*.
 - Service layer abstracts data access (`js/services/venues.js`) — data-source agnostic, so the swap is a one-flag change
 - Schedule matching logic handles complex recurrence patterns
@@ -102,7 +103,8 @@ karaokedirectory/
 │
 ├── js/
 │   ├── app.js             # Application entry point
-│   ├── data.js            # Venue database (DO NOT COMMIT SECRETS)
+│   ├── data.json          # Venue database — CANONICAL (#102, edit this)
+│   ├── data.js            # Browser runtime wrapper — generated from data.json
 │   ├── bingo.js           # Bingo game logic
 │   │
 │   ├── core/
@@ -139,7 +141,8 @@ karaokedirectory/
 │       └── validation.js  # Form validation
 │
 ├── scripts/               # Developer tools
-│   ├── geocode-venues.js  # Add coordinates to venues
+│   ├── geocode-venues.js  # Add coordinates to venues (patches data.json + syncs data.js)
+│   ├── sync-data-js.js    # Regenerate js/data.js from js/data.json (CI gate)
 │   ├── validate-data.js   # Validate venue data integrity (Ajv + supplementary checks)
 │   └── audit-for-supabase.js  # Pre-seed validation against logical rules
 │
@@ -371,14 +374,15 @@ Use these semantic elements consistently:
 
 ### Adding a New Venue
 
-`js/data.js` is **maintained externally** by the project owner. Day-to-day venue edits happen in a local-only curator tool that lives outside this repo (at the owner's `~/karaoke-curator/`). That tool exports a public-stripped `js/data.js` whenever the owner is ready to publish.
+`js/data.json` is **maintained externally** by the project owner. Day-to-day venue edits happen in a local-only curator tool that lives outside this repo (at the owner's `~/karaoke-curator/`). That tool writes `js/data.json` and runs `scripts/sync-data-js.js` to regenerate the browser wrapper `js/data.js`.
 
 If you're a contributor (or a Claude session that needs to add a venue inside this repo):
 
-1. Edit `js/data.js` directly. Add the venue object to the `listings` array, following the schema in the "Venue Data Format" section below.
-2. Run `node scripts/validate-data.js` to check format. CI also runs this on every PR — see `.github/workflows/ci.yml`.
-3. Add coordinates via `scripts/geocode-venues.js` (Node.js batch).
-4. Open a PR. The owner will reconcile your change with their curator master before merging or after.
+1. Edit `js/data.json` directly. Add the venue object to the `listings` array, following the schema in the "Venue Data Format" section below.
+2. Run `node scripts/sync-data-js.js` to regenerate `js/data.js`.
+3. Run `node scripts/validate-data.js` to check format. CI runs both on every PR — see `.github/workflows/ci.yml`.
+4. Add coordinates via `node scripts/geocode-venues.js` (Node.js batch) — patches `data.json` and re-syncs `data.js` automatically.
+5. Open a PR. The owner will reconcile your change with their curator master before merging or after.
 
 Do not look for or attempt to use `editor.html` — it was removed in favor of the external curator tool.
 

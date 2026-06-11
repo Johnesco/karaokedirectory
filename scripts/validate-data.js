@@ -1,14 +1,12 @@
 #!/usr/bin/env node
 /**
- * Validate js/data.js against schema/venue.schema.json (via Ajv) plus the
+ * Validate js/data.json against schema/venue.schema.json (via Ajv) plus the
  * supplementary checks JSON Schema cannot express: cross-row constraints
  * (unique venue ids, tag-id cross-reference) and data-quality heuristics
  * (minute-typo detection, noon end-time after evening start).
  *
  * Exits non-zero on failure — suitable as a pre-commit / CI gate. Enforced
  * by .github/workflows/ci.yml.
- *
- * The regex parse of data.js will go away once #102 lands (data.json).
  */
 
 const fs = require('fs');
@@ -18,28 +16,23 @@ const addFormats = require('ajv-formats');
 
 const ROOT = path.resolve(__dirname, '..');
 const SCHEMA_PATH = path.join(ROOT, 'schema', 'venue.schema.json');
-const DATA_PATH = path.join(ROOT, 'js', 'data.js');
+const DATA_PATH = path.join(ROOT, 'js', 'data.json');
 
 console.log('Reading:', DATA_PATH);
 
 const src = fs.readFileSync(DATA_PATH, 'utf-8');
-const match = src.match(/const\s+karaokeData\s*=\s*(\{[\s\S]*\})\s*;?\s*$/);
-if (!match) {
-    console.log('ERROR: Could not extract JSON from data.js');
-    process.exit(1);
-}
 
 let data;
 try {
-    data = JSON.parse(match[1]);
+    data = JSON.parse(src);
 } catch (e) {
     console.log('JSON PARSE ERROR:', e.message);
     const posMatch = e.message.match(/position (\d+)/);
     if (posMatch) {
         const pos = parseInt(posMatch[1], 10);
-        const lines = match[1].substring(0, pos).split('\n');
+        const lines = src.substring(0, pos).split('\n');
         console.log('Approximate line in JSON:', lines.length);
-        console.log('Context:', match[1].substring(pos - 30, pos + 30));
+        console.log('Context:', src.substring(pos - 30, pos + 30));
     }
     process.exit(1);
 }

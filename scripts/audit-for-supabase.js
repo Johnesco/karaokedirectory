@@ -11,11 +11,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const dataPath = path.join(__dirname, '..', 'js', 'data.js');
-const dataSource = fs.readFileSync(dataPath, 'utf-8');
-const match = dataSource.match(/const\s+karaokeData\s*=\s*(\{[\s\S]*\});?\s*$/);
-if (!match) { console.error('Could not parse data.js'); process.exit(1); }
-const data = eval(`(${match[1]})`);
+const dataPath = path.join(__dirname, '..', 'js', 'data.json');
+const data = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
 
 const VALID_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const VALID_FREQUENCIES = ['every', 'first', 'second', 'third', 'fourth', 'last', 'once'];
