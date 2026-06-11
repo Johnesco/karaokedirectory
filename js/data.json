@@ -1216,7 +1216,7 @@
         {
           "frequency": "once",
           "date": "2026-06-27",
-          "startTime": "19:00",
+          "startTime": "21:00",
           "endTime": "01:00",
           "eventName": "Karaoke with Xpider @ Highball!",
           "host": {
@@ -1967,15 +1967,14 @@
         {
           "frequency": "every",
           "day": "Friday",
-          "startTime": "18:00",
-          "endTime": "21:00"
+          "startTime": "19:00",
+          "endTime": "22:00"
         }
       ],
-      "host": null,
       "socials": {
+        "website": "https://www.milliesonmainetx.com/",
         "facebook": "https://www.facebook.com/milliesonmainetx",
         "instagram": "https://www.instagram.com/milliesonmainetx",
-        "website": "https://www.milliesonmainetx.com/",
         "tiktok": "https://www.tiktok.com/@millies.on.main.e"
       },
       "coordinates": {
