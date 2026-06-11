@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    name: Validate data and CSS load order
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Validate venue data (js/data.js)
+        run: node scripts/validate-data.js
+
+      - name: Check CSS load order across HTML pages
+        run: node scripts/check-css-load-order.js
