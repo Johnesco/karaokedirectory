@@ -1,0 +1,20 @@
+{
+  "name": "austin-karaoke-directory",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Austin Karaoke Directory - Find karaoke venues in Austin, TX",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
+    "test:ui": "npx playwright test --ui",
+    "validate": "node scripts/validate-data.js",
+    "validate:css": "node scripts/check-css-load-order.js",
+    "validate:all": "npm run validate && npm run validate:css"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
+    "serve": "^14.2.4"
+  }
+}
