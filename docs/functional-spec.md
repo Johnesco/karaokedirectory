@@ -78,6 +78,7 @@ Each day card header displays:
 When expanded, shows:
 - One venue card per **matching schedule entry** (a venue with two events on the same date renders two cards, each showing its own event name, time, and host)
 - Footer with **unique venue count** (e.g., "14 venues" even if 15 cards rendered because one venue had two events)
+- **Venue card layout:** single column on mobile (≤768px); at 769px+ cards flow into a responsive grid (`repeat(auto-fill, minmax(320px, 1fr))` — 2 columns at ~1024px, up to 4 on large screens). Cards in the same grid row stretch to equal height. The same grid applies to letter cards in the Alphabetical view.
 
 ### Sorting
 
@@ -170,6 +171,8 @@ Browse all venues alphabetically, grouped by first letter.
 
 - The letter index bar sticks to the top during scroll
 - Its height is tracked via `ResizeObserver` and stored as CSS variable `--az-index-height` so letter headings can stick below it
+- **Desktop (769px+):** letters wrap across rows, centered
+- **Mobile (≤768px):** letters stay on a single horizontally-scrollable row (~54px tall vs. ~131px wrapped), with 40px touch targets; the `--az-index-height` observer keeps letter headings pinned directly below the strip regardless of its height
 
 > **Implementation note:** Alphabetical sorting uses `getSortableName()` from `js/utils/string.js`, which strips leading articles ("The", "A", "An", etc.) for sort ordering while preserving the original name for display. The sticky index height is dynamically measured via `ResizeObserver` and written to `--az-index-height` so CSS can position letter group headings below it without hardcoding pixel values.
 
@@ -293,11 +296,23 @@ Only visible when `view === 'weekly'`:
 
 ### Search Input
 
-Always visible. See Section 9 (Search) for full behavior.
+Visible inline on desktop **and phablets** (561px+). On phones (≤560px) the input collapses behind a magnifying-glass toggle button — see Section 9 (Search) for full behavior.
 
 ### Dedicated Venue Filter
 
-Always visible. See Section 10 (Filtering) for full behavior.
+Always visible. Label reads "Show dedicated venues" on desktop/phablet, compact "Dedicated" on phones (≤560px). See Section 10 (Filtering) for full behavior.
+
+### Responsive Layout Tiers
+
+The navigation has three tiers, sharing the desktop markup:
+
+| Tier | Width | Layout |
+|------|-------|--------|
+| **Desktop** | 769px+ | Single roomy bar; labeled tabs; inline search; full toggle label |
+| **Phablet** | 561–768px | Desktop-style labeled nav — tabs + week nav on row one, inline search + toggle on row two (~115–130px) |
+| **Phone** | ≤560px | Compact two rows (~102px, sticky): icon-only tabs (40px min-height) on row one; week nav + compact "Dedicated" toggle + search toggle button on row two (wraps to a third row when the "Today" button is present) |
+
+On phones, the search toggle button (40×40, `aria-expanded`) expands the search input as a full-width row and focuses it. The row stays open while a query is active (including across re-renders). Collapsing via the toggle also **clears any active query** so a filter can never remain applied while its input is hidden.
 
 ### Navigation Height Tracking
 
@@ -431,10 +446,11 @@ The app includes a global search bar that filters venues across all views.
 
 ### Search Input
 
-Located in the Navigation component. Always visible.
+Located in the Navigation component. Visible inline on desktop and phablets (561px+); on phones (≤560px) hidden behind a magnifying-glass toggle button in the navigation bar.
 - **Placeholder:** "Search venues, tags, hosts..."
 - **Clear button** (X icon) appears when search has text; clicking clears input and refocuses it
 - Typing updates the `searchQuery` state and emits `FILTER_CHANGED`
+- **Phone toggle (≤560px):** opening expands the input as a full-width row and focuses it; closing the toggle while a query is active clears the query (prevents invisible active filters). The row stays expanded while a query is active.
 
 ### What Search Matches Against
 
@@ -916,6 +932,10 @@ Includes a "Documentation" link to `docs/index.html`.
 - Tagline: "NOTE HOLIDAY MAY CHANGE AVAILABILITY, CALL VENUE FIRST"
 - Navigation link back to `index.html`
 
+### Reading Measure
+
+The `<body>` carries the `page--readable` class, which constrains `.main-content` to a 600px max-width (centered) so running prose holds a comfortable ~74-character line length instead of the app's 1400px grid width (~165 chars). The class is reusable for any future content/prose page.
+
 ---
 
 ## 18 Debug Mode
@@ -941,9 +961,10 @@ Includes a "Documentation" link to `docs/index.html`.
 
 | Width | Behavior |
 |-------|----------|
-| Base (mobile) | Single column, modal for venue details, stacked navigation |
-| 768px+ | Enhanced spacing and layout |
-| 1024px+ | Wider cards, more horizontal space |
+| Phone (≤560px) | Single column, modal for venue details; compact two-row navigation (~102px sticky) with collapsible search; single-row scrollable A–Z index |
+| Phablet (561–768px) | Desktop-style labeled navigation with inline search (~115–130px); single column content |
+| 769px+ | Venue cards flow into a multi-column grid (`auto-fill, minmax(320px, 1fr)`) inside day/letter cards; labeled nav buttons |
+| 1024px+ | More grid columns as space allows |
 | 1200px+ | Side-by-side layouts where applicable |
 | 1400px+ | Desktop venue detail pane visible alongside main content; mobile modal suppressed |
 

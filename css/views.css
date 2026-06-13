@@ -338,6 +338,36 @@
     text-decoration: none;
 }
 
+/* Mobile: the A-Z index becomes a single horizontally-scrollable row
+   instead of wrapping to ~3 rows (cuts sticky chrome from ~131px to
+   ~56px). The --az-index-height ResizeObserver in AlphabeticalView.js
+   keeps the letter-card headers pinned directly below the strip.
+   overflow-x lives on the sticky element itself (not an ancestor), so
+   it doesn't break the sticky positioning. */
+@media (max-width: 768px) {
+    .alphabetical-view__index {
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        overflow-x: auto;
+        overflow-y: hidden;
+        gap: var(--spacing-sm);
+        padding: var(--spacing-sm);
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none; /* Firefox */
+    }
+
+    /* Hide the horizontal scrollbar (base.css sets a global 8px one) */
+    .alphabetical-view__index::-webkit-scrollbar {
+        display: none;
+    }
+
+    .alphabetical-view__index-link {
+        flex: 0 0 auto; /* keep tap size; never shrink to fit */
+        width: 40px;
+        height: 40px;
+    }
+}
+
 .alphabetical-view__list {
     display: flex;
     flex-direction: column;
@@ -401,6 +431,27 @@
 
 .letter-card__venue-item .venue-card {
     background: var(--color-gray-700);
+}
+
+/* Desktop: venues flow into a multi-column grid. A single column stretches
+   one card across the full content width (~1300px on large screens). */
+@media (min-width: 769px) {
+    .day-card__venues,
+    .letter-card__venues {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    }
+
+    /* Equal-height cards within a grid row */
+    .day-card__venue-item,
+    .letter-card__venue-item {
+        display: flex;
+    }
+
+    .day-card__venue-item .venue-card,
+    .letter-card__venue-item .venue-card {
+        flex: 1;
+    }
 }
 
 @media (max-width: 768px) {
@@ -614,15 +665,26 @@
     }
 }
 
-/* Responsive navigation */
-@media (max-width: 768px) {
+/* Responsive navigation — PHONES ONLY (<=560px).
+   Phablets/small tablets (561-768px) have room for the desktop-style
+   labeled nav with inline search, so the aggressive compaction stops at
+   560px (see the search-collapse rules in components.css, scoped to match). */
+@media (max-width: 560px) {
+    /* Two compact rows instead of four stacked ones: view tabs on top;
+       week nav + dedicated toggle + search toggle share the second row
+       (wrapping gracefully when cramped, e.g. with the "Today" button) */
     .navigation {
-        flex-direction: column;
-        align-items: stretch;
+        justify-content: center;
+        gap: var(--spacing-sm) var(--spacing-md);
     }
 
     .navigation__views {
+        flex-basis: 100%;
         justify-content: center;
+    }
+
+    .navigation__views .nav-btn {
+        min-height: 40px;
     }
 
     .navigation__week {
