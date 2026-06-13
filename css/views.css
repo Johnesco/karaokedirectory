@@ -338,6 +338,36 @@
     text-decoration: none;
 }
 
+/* Mobile: the A-Z index becomes a single horizontally-scrollable row
+   instead of wrapping to ~3 rows (cuts sticky chrome from ~131px to
+   ~56px). The --az-index-height ResizeObserver in AlphabeticalView.js
+   keeps the letter-card headers pinned directly below the strip.
+   overflow-x lives on the sticky element itself (not an ancestor), so
+   it doesn't break the sticky positioning. */
+@media (max-width: 768px) {
+    .alphabetical-view__index {
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        overflow-x: auto;
+        overflow-y: hidden;
+        gap: var(--spacing-sm);
+        padding: var(--spacing-sm);
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none; /* Firefox */
+    }
+
+    /* Hide the horizontal scrollbar (base.css sets a global 8px one) */
+    .alphabetical-view__index::-webkit-scrollbar {
+        display: none;
+    }
+
+    .alphabetical-view__index-link {
+        flex: 0 0 auto; /* keep tap size; never shrink to fit */
+        width: 40px;
+        height: 40px;
+    }
+}
+
 .alphabetical-view__list {
     display: flex;
     flex-direction: column;

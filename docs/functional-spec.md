@@ -171,6 +171,8 @@ Browse all venues alphabetically, grouped by first letter.
 
 - The letter index bar sticks to the top during scroll
 - Its height is tracked via `ResizeObserver` and stored as CSS variable `--az-index-height` so letter headings can stick below it
+- **Desktop (769px+):** letters wrap across rows, centered
+- **Mobile (≤768px):** letters stay on a single horizontally-scrollable row (~54px tall vs. ~131px wrapped), with 40px touch targets; the `--az-index-height` observer keeps letter headings pinned directly below the strip regardless of its height
 
 > **Implementation note:** Alphabetical sorting uses `getSortableName()` from `js/utils/string.js`, which strips leading articles ("The", "A", "An", etc.) for sort ordering while preserving the original name for display. The sticky index height is dynamically measured via `ResizeObserver` and written to `--az-index-height` so CSS can position letter group headings below it without hardcoding pixel values.
 
