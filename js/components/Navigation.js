@@ -70,9 +70,13 @@ export class Navigation extends Component {
 
         const weekRange = formatWeekRange(getWeekStart(weekStart));
         const isCurrentWeek = this.isCurrentWeek(weekStart);
+        // Mobile: search collapses to an icon button. Keep the row expanded
+        // across re-renders while toggled open or while a query is active.
+        const searchQuery = getState('searchQuery') || '';
+        const searchOpen = this.searchOpen || !!searchQuery;
 
         return `
-            <nav class="navigation">
+            <nav class="navigation${searchOpen ? ' navigation--search-open' : ''}">
                 ${this.renderViewSwitcher({ view, kjIndexActive: false })}
 
                 ${view === 'weekly' ? `
@@ -92,7 +96,7 @@ export class Navigation extends Component {
                     </div>
                 ` : ''}
 
-                <div class="navigation__search">
+                <div class="navigation__search" id="navigation-search">
                     <div class="search-input">
                         <i class="fa-solid fa-magnifying-glass search-input__icon"></i>
                         <input
@@ -100,9 +104,9 @@ export class Navigation extends Component {
                             class="search-input__field"
                             placeholder="Search venues, tags, hosts..."
                             data-search="query"
-                            value="${getState('searchQuery') || ''}"
+                            value="${searchQuery}"
                         >
-                        ${getState('searchQuery') ? `
+                        ${searchQuery ? `
                             <button class="search-input__clear" data-search="clear" type="button" title="Clear search">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
@@ -117,9 +121,22 @@ export class Navigation extends Component {
                             ${showDedicated ? 'checked' : ''}
                             data-filter="dedicated"
                         >
-                        <span>Show dedicated venues</span>
+                        <span class="navigation__toggle-text--long">Show dedicated venues</span>
+                        <span class="navigation__toggle-text--short">Dedicated</span>
                     </label>
                 </div>
+
+                <button
+                    class="nav-btn nav-btn--icon navigation__search-toggle"
+                    data-search="toggle"
+                    type="button"
+                    title="Search"
+                    aria-label="Search"
+                    aria-controls="navigation-search"
+                    aria-expanded="${searchOpen}"
+                >
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
 
             </nav>
         `;
@@ -221,6 +238,27 @@ export class Navigation extends Component {
                 }
             } else if (!query && clearBtn) {
                 clearBtn.remove();
+            }
+        });
+
+        // Mobile search toggle: expands the search row. Collapsing also
+        // clears any active query so a filter can't stay applied while hidden.
+        this.delegate('click', '[data-search="toggle"]', (e, target) => {
+            const nav = this.container.querySelector('.navigation');
+            const opening = !nav.classList.contains('navigation--search-open');
+            this.searchOpen = opening;
+            nav.classList.toggle('navigation--search-open', opening);
+            target.setAttribute('aria-expanded', String(opening));
+            if (opening) {
+                const input = this.container.querySelector('[data-search="query"]');
+                if (input) input.focus();
+            } else if (getState('searchQuery')) {
+                const input = this.container.querySelector('[data-search="query"]');
+                if (input) input.value = '';
+                const clearBtn = this.container.querySelector('[data-search="clear"]');
+                if (clearBtn) clearBtn.remove();
+                setState({ searchQuery: '' });
+                emit(Events.FILTER_CHANGED, { searchQuery: '' });
             }
         });
 

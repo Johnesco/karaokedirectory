@@ -423,7 +423,7 @@ body.view--map .fab-group {
     }
 
     .navigation-container {
-        padding: var(--spacing-md) var(--spacing-xs);
+        padding: var(--spacing-sm) var(--spacing-xs);
     }
 
     .main-content {

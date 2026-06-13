@@ -294,11 +294,19 @@ Only visible when `view === 'weekly'`:
 
 ### Search Input
 
-Always visible. See Section 9 (Search) for full behavior.
+Always visible on desktop (769px+). On mobile (≤768px) the input collapses behind a magnifying-glass toggle button — see Section 9 (Search) for full behavior.
 
 ### Dedicated Venue Filter
 
-Always visible. See Section 10 (Filtering) for full behavior.
+Always visible. Label reads "Show dedicated venues" on desktop, compact "Dedicated" on mobile (≤768px). See Section 10 (Filtering) for full behavior.
+
+### Mobile Layout (≤768px)
+
+The navigation compresses to two rows (~102px total, sticky):
+1. **View tabs** (icon-only, 40px min-height)
+2. **Week navigation + Dedicated toggle + search toggle button** (wraps to a third row when the "Today" button is present)
+
+The search toggle button (40×40, `aria-expanded`) expands the search input as a full-width row and focuses it. The row stays open while a query is active (including across re-renders). Collapsing via the toggle also **clears any active query** so a filter can never remain applied while its input is hidden.
 
 ### Navigation Height Tracking
 
@@ -432,10 +440,11 @@ The app includes a global search bar that filters venues across all views.
 
 ### Search Input
 
-Located in the Navigation component. Always visible.
+Located in the Navigation component. Always visible on desktop (769px+); on mobile (≤768px) hidden behind a magnifying-glass toggle button in the navigation bar.
 - **Placeholder:** "Search venues, tags, hosts..."
 - **Clear button** (X icon) appears when search has text; clicking clears input and refocuses it
 - Typing updates the `searchQuery` state and emits `FILTER_CHANGED`
+- **Mobile toggle:** opening expands the input as a full-width row and focuses it; closing the toggle while a query is active clears the query (prevents invisible active filters). The row stays expanded while a query is active.
 
 ### What Search Matches Against
 
@@ -942,7 +951,7 @@ Includes a "Documentation" link to `docs/index.html`.
 
 | Width | Behavior |
 |-------|----------|
-| Base (mobile) | Single column, modal for venue details, stacked navigation |
+| Base (mobile) | Single column, modal for venue details; compact two-row navigation (~102px sticky) with collapsible search |
 | 769px+ | Venue cards flow into a multi-column grid (`auto-fill, minmax(320px, 1fr)`) inside day/letter cards; labeled nav buttons |
 | 1024px+ | More grid columns as space allows |
 | 1200px+ | Side-by-side layouts where applicable |

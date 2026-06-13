@@ -637,13 +637,21 @@
 
 /* Responsive navigation */
 @media (max-width: 768px) {
+    /* Two compact rows instead of four stacked ones: view tabs on top;
+       week nav + dedicated toggle + search toggle share the second row
+       (wrapping gracefully when cramped, e.g. with the "Today" button) */
     .navigation {
-        flex-direction: column;
-        align-items: stretch;
+        justify-content: center;
+        gap: var(--spacing-sm) var(--spacing-md);
     }
 
     .navigation__views {
+        flex-basis: 100%;
         justify-content: center;
+    }
+
+    .navigation__views .nav-btn {
+        min-height: 40px;
     }
 
     .navigation__week {
