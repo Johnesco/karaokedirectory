@@ -196,6 +196,15 @@
     min-height: calc(100vh - 300px);
 }
 
+/* Prose / content pages (about, etc.): the app's 1400px content width is
+   meant for venue grids — for running text it produces ~165-char lines.
+   Constrain to a comfortable reading measure (~74ch at the longest line);
+   ~matches submit.html's form width for cross-page consistency. Centered
+   via the inherited margin: 0 auto. */
+.page--readable .main-content {
+    max-width: 600px;
+}
+
 /* Two-Pane Layout for Wide Screens */
 .app-layout {
     display: block; /* Default: single column */

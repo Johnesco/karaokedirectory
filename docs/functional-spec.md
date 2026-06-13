@@ -928,6 +928,10 @@ Includes a "Documentation" link to `docs/index.html`.
 - Tagline: "NOTE HOLIDAY MAY CHANGE AVAILABILITY, CALL VENUE FIRST"
 - Navigation link back to `index.html`
 
+### Reading Measure
+
+The `<body>` carries the `page--readable` class, which constrains `.main-content` to a 600px max-width (centered) so running prose holds a comfortable ~74-character line length instead of the app's 1400px grid width (~165 chars). The class is reusable for any future content/prose page.
+
 ---
 
 ## 18 Debug Mode
