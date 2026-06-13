@@ -296,19 +296,23 @@ Only visible when `view === 'weekly'`:
 
 ### Search Input
 
-Always visible on desktop (769px+). On mobile (≤768px) the input collapses behind a magnifying-glass toggle button — see Section 9 (Search) for full behavior.
+Visible inline on desktop **and phablets** (561px+). On phones (≤560px) the input collapses behind a magnifying-glass toggle button — see Section 9 (Search) for full behavior.
 
 ### Dedicated Venue Filter
 
-Always visible. Label reads "Show dedicated venues" on desktop, compact "Dedicated" on mobile (≤768px). See Section 10 (Filtering) for full behavior.
+Always visible. Label reads "Show dedicated venues" on desktop/phablet, compact "Dedicated" on phones (≤560px). See Section 10 (Filtering) for full behavior.
 
-### Mobile Layout (≤768px)
+### Responsive Layout Tiers
 
-The navigation compresses to two rows (~102px total, sticky):
-1. **View tabs** (icon-only, 40px min-height)
-2. **Week navigation + Dedicated toggle + search toggle button** (wraps to a third row when the "Today" button is present)
+The navigation has three tiers, sharing the desktop markup:
 
-The search toggle button (40×40, `aria-expanded`) expands the search input as a full-width row and focuses it. The row stays open while a query is active (including across re-renders). Collapsing via the toggle also **clears any active query** so a filter can never remain applied while its input is hidden.
+| Tier | Width | Layout |
+|------|-------|--------|
+| **Desktop** | 769px+ | Single roomy bar; labeled tabs; inline search; full toggle label |
+| **Phablet** | 561–768px | Desktop-style labeled nav — tabs + week nav on row one, inline search + toggle on row two (~115–130px) |
+| **Phone** | ≤560px | Compact two rows (~102px, sticky): icon-only tabs (40px min-height) on row one; week nav + compact "Dedicated" toggle + search toggle button on row two (wraps to a third row when the "Today" button is present) |
+
+On phones, the search toggle button (40×40, `aria-expanded`) expands the search input as a full-width row and focuses it. The row stays open while a query is active (including across re-renders). Collapsing via the toggle also **clears any active query** so a filter can never remain applied while its input is hidden.
 
 ### Navigation Height Tracking
 
@@ -442,11 +446,11 @@ The app includes a global search bar that filters venues across all views.
 
 ### Search Input
 
-Located in the Navigation component. Always visible on desktop (769px+); on mobile (≤768px) hidden behind a magnifying-glass toggle button in the navigation bar.
+Located in the Navigation component. Visible inline on desktop and phablets (561px+); on phones (≤560px) hidden behind a magnifying-glass toggle button in the navigation bar.
 - **Placeholder:** "Search venues, tags, hosts..."
 - **Clear button** (X icon) appears when search has text; clicking clears input and refocuses it
 - Typing updates the `searchQuery` state and emits `FILTER_CHANGED`
-- **Mobile toggle:** opening expands the input as a full-width row and focuses it; closing the toggle while a query is active clears the query (prevents invisible active filters). The row stays expanded while a query is active.
+- **Phone toggle (≤560px):** opening expands the input as a full-width row and focuses it; closing the toggle while a query is active clears the query (prevents invisible active filters). The row stays expanded while a query is active.
 
 ### What Search Matches Against
 
@@ -957,7 +961,8 @@ The `<body>` carries the `page--readable` class, which constrains `.main-content
 
 | Width | Behavior |
 |-------|----------|
-| Base (mobile) | Single column, modal for venue details; compact two-row navigation (~102px sticky) with collapsible search |
+| Phone (≤560px) | Single column, modal for venue details; compact two-row navigation (~102px sticky) with collapsible search; single-row scrollable A–Z index |
+| Phablet (561–768px) | Desktop-style labeled navigation with inline search (~115–130px); single column content |
 | 769px+ | Venue cards flow into a multi-column grid (`auto-fill, minmax(320px, 1fr)`) inside day/letter cards; labeled nav buttons |
 | 1024px+ | More grid columns as space allows |
 | 1200px+ | Side-by-side layouts where applicable |

@@ -665,8 +665,11 @@
     }
 }
 
-/* Responsive navigation */
-@media (max-width: 768px) {
+/* Responsive navigation — PHONES ONLY (<=560px).
+   Phablets/small tablets (561-768px) have room for the desktop-style
+   labeled nav with inline search, so the aggressive compaction stops at
+   560px (see the search-collapse rules in components.css, scoped to match). */
+@media (max-width: 560px) {
     /* Two compact rows instead of four stacked ones: view tabs on top;
        week nav + dedicated toggle + search toggle share the second row
        (wrapping gracefully when cramped, e.g. with the "Today" button) */
