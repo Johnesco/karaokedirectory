@@ -22,6 +22,7 @@ export class Component {
         this.state = {};
         this._subscriptions = [];
         this._eventListeners = [];
+        this._delegates = new Map();
         this._isMounted = false;
 
         this.init();
@@ -118,6 +119,18 @@ export class Component {
      * @param {Function} handler - Event handler
      */
     delegate(event, selector, handler) {
+        // afterRender() runs on every render, so re-binding the same
+        // event+selector must replace the previous listener — stacking
+        // duplicates would fire the handler N times per interaction
+        // (breaks non-idempotent handlers like toggles).
+        const key = `${event}::${selector}`;
+        const prev = this._delegates.get(key);
+        if (prev) {
+            this.container?.removeEventListener(event, prev);
+            const index = this._eventListeners.findIndex(l => l.handler === prev);
+            if (index !== -1) this._eventListeners.splice(index, 1);
+        }
+
         const delegatedHandler = (e) => {
             const target = e.target.closest(selector);
             if (target && this.container?.contains(target)) {
@@ -125,6 +138,7 @@ export class Component {
             }
         };
 
+        this._delegates.set(key, delegatedHandler);
         this.container?.addEventListener(event, delegatedHandler);
         this._eventListeners.push({
             element: this.container,
@@ -203,6 +217,7 @@ export class Component {
             element?.removeEventListener(event, handler, options);
         });
         this._eventListeners = [];
+        this._delegates.clear();
 
         // Unsubscribe from state/events
         this._subscriptions.forEach(unsubscribe => {
