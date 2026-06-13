@@ -1039,6 +1039,10 @@
 }
 
 .consent-banner__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--size-icon-lg); /* 44px touch target — first thing a new visitor taps */
     padding: var(--spacing-xs) var(--spacing-md);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);

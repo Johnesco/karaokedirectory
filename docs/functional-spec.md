@@ -243,6 +243,7 @@ A card that appears over the map when a marker is selected. Has two states:
 - "Details" button expands the card and shows a back arrow
 - "Back to Summary" returns to compact view
 - Clicking the map background (not a marker or card) dismisses the card
+- **Sizing:** full-width bottom sheet on mobile; on desktop (≥1024px) a fixed 350px-wide card anchored right (explicit width so it doesn't shrink to its content). The floating "Hide Dedicated" map control and the analytics consent-banner buttons are ≥44px tall (touch targets).
 
 ### Floating Controls
 
@@ -823,6 +824,8 @@ Automatically restored on page load.
 **File:** `submit.html`
 
 Single-purpose mobile-first form for community submissions of new karaoke venues. Optimized for KJs/fans on a phone with limited time. Single column on mobile (<768px), multi-column on tablet+. Touch targets ≥44×44 px, native input types for keyboard intent (`type="time"`, `type="url"`, `type="email"`, `type="tel"`, `inputmode="numeric"` on ZIP), 16px input font-size to prevent iOS auto-zoom, sticky submit button always reachable.
+
+The City / State / ZIP row uses an explicit `2fr 1fr 1fr` template at ≥561px (City wider; State/ZIP narrow, with `min-width: 0` so they shrink below the inputs' intrinsic width rather than clamping equal), stacking to one column below that. This keeps the three fields on one row without orphaning ZIP — the generic `auto-fit` floor otherwise fit only two columns and its min-content overflowed the form near 760px.
 
 ### Required vs optional split
 
