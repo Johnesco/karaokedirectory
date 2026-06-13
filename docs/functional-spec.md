@@ -125,6 +125,7 @@ Below the current 7-day week, three additional collapsible sections display venu
 - Each section has a header showing title and venue count badge
 - Sections are collapsible — click header to toggle
 - Collapse state persists in `localStorage` (key: `extendedSection_{title-slug}_collapsed`)
+- **Default collapse state is viewport-dependent:** on small screens (≤768px) sections start **collapsed** (they otherwise add ~20,000px to an already-tall single-column page); on desktop they start **expanded**. A stored choice always wins over the default, so toggling a section once makes that choice stick on every screen. The toggle stores the section's *actual* resulting state (DOM is the source of truth), since the displayed state may originate from the viewport default rather than storage.
 - Empty sections (no venues in date range) are not rendered
 - Day cards within sections use the same format as the current week
 - Maximum lookahead is 60 days from today

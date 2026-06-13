@@ -49,22 +49,42 @@ function migrateStorageKeys() {
 migrateStorageKeys();
 
 /**
- * Check if section should be collapsed
+ * Whether sections default to collapsed when the user has made no explicit
+ * choice. On small screens (≤768px, single-column) the extended sections add
+ * ~20,000px to an already-tall calendar page, so they start collapsed there;
+ * desktop (multi-column, roomier) starts expanded.
+ * @returns {boolean}
+ */
+function defaultCollapsedForViewport() {
+    return typeof window !== 'undefined'
+        && typeof window.matchMedia === 'function'
+        && window.matchMedia('(max-width: 768px)').matches;
+}
+
+/**
+ * Check if section should be collapsed. An explicit stored choice always wins;
+ * otherwise fall back to the viewport-dependent default (collapsed on mobile).
  * @param {string} title - Section title
  * @returns {boolean} True if collapsed
  */
 function isCollapsed(title) {
-    return localStorage.getItem(getStorageKey(title)) === 'true';
+    const stored = localStorage.getItem(getStorageKey(title));
+    if (stored !== null) {
+        return stored === 'true';
+    }
+    return defaultCollapsedForViewport();
 }
 
 /**
- * Toggle collapse state
+ * Persist an explicit collapse choice.
+ * Stores the actual resulting state rather than deriving it from the previous
+ * stored value — the displayed state may come from the viewport default (no
+ * stored value yet), so the DOM, not localStorage, is the source of truth.
  * @param {string} title - Section title
+ * @param {boolean} collapsed - The new collapsed state
  */
-function toggleCollapsed(title) {
-    const key = getStorageKey(title);
-    const current = localStorage.getItem(key) === 'true';
-    localStorage.setItem(key, (!current).toString());
+function setCollapsed(title, collapsed) {
+    localStorage.setItem(getStorageKey(title), collapsed.toString());
 }
 
 /**
@@ -178,9 +198,10 @@ export function attachExtendedSectionListeners(container) {
             const section = e.target.closest('.extended-section');
             if (section) {
                 const title = section.dataset.sectionTitle;
-                toggleCollapsed(title);
-                section.classList.toggle('extended-section--collapsed');
-                button.classList.toggle('extended-section__toggle--expanded');
+                // Toggle the DOM first; its result is the authoritative new state
+                const nowCollapsed = section.classList.toggle('extended-section--collapsed');
+                button.classList.toggle('extended-section__toggle--expanded', !nowCollapsed);
+                setCollapsed(title, nowCollapsed);
             }
         });
     });
