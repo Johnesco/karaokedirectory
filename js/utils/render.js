@@ -56,15 +56,17 @@ export function renderScheduleTable(venue, classPrefix) {
             : '';
 
         const hostCell = showHostColumn
-            ? `<td>${escapeHtml(formatHostDisplay(resolveHostFor(venue, entry)))}</td>`
+            ? `<td data-label="Host">${escapeHtml(formatHostDisplay(resolveHostFor(venue, entry)))}</td>`
             : '';
 
+        // data-label drives the stacked card layout on small phones (<480px),
+        // where the table collapses to label/value rows — see components.css.
         return `
             <tr>
-                <td>${dayLabel}${eventLink}</td>
-                <td>${formatted.time}</td>
+                <td data-label="Day">${dayLabel}${eventLink}</td>
+                <td data-label="Time">${formatted.time}</td>
                 ${hostCell}
-                ${entry.note ? `<td class="schedule-note">${escapeHtml(entry.note)}</td>` : '<td></td>'}
+                ${entry.note ? `<td class="schedule-note" data-label="Note">${escapeHtml(entry.note)}</td>` : '<td data-label="Note"></td>'}
             </tr>
         `;
     }).join('');

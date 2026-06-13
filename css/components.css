@@ -706,6 +706,55 @@
     .venue-modal__map-links {
         flex-direction: column;
     }
+
+    /* Stack the schedule table into label/value cards on small phones — a
+       4-column table (Day/Time/Host/Note) is too cramped here. data-label
+       attributes come from renderScheduleTable() in js/utils/render.js. */
+    .venue-modal__schedule-table,
+    .venue-modal__schedule-table tbody {
+        display: block;
+    }
+
+    .venue-modal__schedule-table thead {
+        display: none;
+    }
+
+    .venue-modal__schedule-table tr {
+        display: block;
+        padding: var(--spacing-sm) 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .venue-modal__schedule-table td {
+        display: flex;
+        gap: var(--spacing-sm);
+        padding: var(--spacing-2xs) 0;
+        border: none;
+    }
+
+    /* Empty cells (e.g. a show with no note) collapse instead of showing a bare label */
+    .venue-modal__schedule-table td:empty {
+        display: none;
+    }
+
+    /* Label column from data-label */
+    .venue-modal__schedule-table td::before {
+        content: attr(data-label);
+        flex: 0 0 4.5em;
+        color: var(--text-muted);
+        font-size: var(--font-size-sm);
+        font-weight: 500;
+    }
+
+    /* The day cell is the card's title — bold, no label */
+    .venue-modal__schedule-table td:first-child {
+        font-weight: 600;
+        font-size: var(--font-size-base);
+    }
+
+    .venue-modal__schedule-table td:first-child::before {
+        content: none;
+    }
 }
 
 /* Special Event card accent */

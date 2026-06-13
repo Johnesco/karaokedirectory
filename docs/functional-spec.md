@@ -399,6 +399,8 @@ The modal opens only when ALL of these conditions are met:
 
 Schedule tables, host sections, and active period notices are rendered using shared utilities from `js/utils/render.js`.
 
+On small phones (≤480px) the modal's schedule table collapses from a 4-column grid (Day/Time/Host/Note) into stacked label/value cards: the thead is hidden, each row becomes a block, the day cell is the bold title, and Time/Host/Note are labeled via `data-label` (`::before`). Empty cells (e.g. a show with no note) are hidden rather than showing a bare label. Above 480px it renders as a normal table. `data-label` attributes are emitted by `renderScheduleTable()` for all surfaces but only consumed by this modal breakpoint.
+
 ### Close Triggers
 
 1. Click the close button (X)
