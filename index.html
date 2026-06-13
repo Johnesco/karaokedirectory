@@ -94,6 +94,38 @@
                     Loading venues...
                 </div>
             </main>
+
+            <!-- Footer lives inside the scrolling list column so the two-pane
+                 layout (>=1400px) has a single scroll context: at those widths
+                 .app-layout is a fixed-height grid, so a body-level footer would
+                 overflow the body and create a second outer scrollbar. Below
+                 1400px the list is plain block flow, so the footer still sits at
+                 the bottom of the page exactly as before. -->
+            <footer class="site-footer">
+                <div class="site-footer__social">
+                    <h2>Follow Us</h2>
+                    <div class="social-links">
+                        <a href="https://www.facebook.com/groups/2494105004273043"
+                           target="_blank" rel="noopener noreferrer" title="Facebook">
+                            <i class="fa-brands fa-facebook fa-lg"></i>
+                        </a>
+                        <a href="https://www.instagram.com/karaokedirectory/"
+                           target="_blank" rel="noopener noreferrer" title="Instagram">
+                            <i class="fa-brands fa-instagram fa-lg"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="site-footer__links">
+                    <a href="about.html">About Us</a>
+                    <a href="submit.html">Submit Venue</a>
+                    <a href="docs/index.html">Documentation</a>
+                </div>
+
+                <p class="site-footer__copyright">
+                    &copy; 2025 Austin Karaoke Directory
+                </p>
+            </footer>
         </div>
 
         <!-- Desktop venue detail pane (>=1400px). Hidden on mobile; replaced by venue-modal. -->
@@ -102,32 +134,6 @@
 
     <!-- Mobile venue detail modal mount point. Populated by VenueModal.js. -->
     <div id="venue-modal"></div>
-
-    <footer class="site-footer">
-        <div class="site-footer__social">
-            <h2>Follow Us</h2>
-            <div class="social-links">
-                <a href="https://www.facebook.com/groups/2494105004273043"
-                   target="_blank" rel="noopener noreferrer" title="Facebook">
-                    <i class="fa-brands fa-facebook fa-lg"></i>
-                </a>
-                <a href="https://www.instagram.com/karaokedirectory/"
-                   target="_blank" rel="noopener noreferrer" title="Instagram">
-                    <i class="fa-brands fa-instagram fa-lg"></i>
-                </a>
-            </div>
-        </div>
-
-        <div class="site-footer__links">
-            <a href="about.html">About Us</a>
-            <a href="submit.html">Submit Venue</a>
-            <a href="docs/index.html">Documentation</a>
-        </div>
-
-        <p class="site-footer__copyright">
-            &copy; 2025 Austin Karaoke Directory
-        </p>
-    </footer>
 
     <div class="fab-group">
         <button id="jump-to-today"

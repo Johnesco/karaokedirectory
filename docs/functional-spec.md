@@ -984,6 +984,7 @@ The `<body>` carries the `page--readable` class, which constrains `.main-content
 - Venue detail pane as sticky right sidebar
 - Modal suppressed (pane used instead)
 - Wider cards and multi-column layouts
+- The two-pane `.app-layout` is a fixed-height grid (`calc(100vh - 140px)`) whose list and detail columns each scroll internally. The footer lives **inside the scrolling list column** (not as a body-level sibling) so there is a single scroll context — a body-level footer would overflow the fixed-height layout and produce a second outer scrollbar. Below 1400px the list is plain block flow, so the footer sits at the page bottom as normal.
 
 ### Map View
 
