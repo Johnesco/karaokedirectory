@@ -125,6 +125,7 @@ Below the current 7-day week, three additional collapsible sections display venu
 - Each section has a header showing title and venue count badge
 - Sections are collapsible — click header to toggle
 - Collapse state persists in `localStorage` (key: `extendedSection_{title-slug}_collapsed`)
+- **Default collapse state is viewport-dependent:** on small screens (≤768px) sections start **collapsed** (they otherwise add ~20,000px to an already-tall single-column page); on desktop they start **expanded**. A stored choice always wins over the default, so toggling a section once makes that choice stick on every screen. The toggle stores the section's *actual* resulting state (DOM is the source of truth), since the displayed state may originate from the viewport default rather than storage.
 - Empty sections (no venues in date range) are not rendered
 - Day cards within sections use the same format as the current week
 - Maximum lookahead is 60 days from today
@@ -243,6 +244,7 @@ A card that appears over the map when a marker is selected. Has two states:
 - "Details" button expands the card and shows a back arrow
 - "Back to Summary" returns to compact view
 - Clicking the map background (not a marker or card) dismisses the card
+- **Sizing:** full-width bottom sheet on mobile; on desktop (≥1024px) a fixed 350px-wide card anchored right (explicit width so it doesn't shrink to its content). The floating "Hide Dedicated" map control and the analytics consent-banner buttons are ≥44px tall (touch targets).
 
 ### Floating Controls
 
@@ -396,6 +398,8 @@ The modal opens only when ALL of these conditions are met:
 | Contact | Phone number link (if venue has phone field) |
 
 Schedule tables, host sections, and active period notices are rendered using shared utilities from `js/utils/render.js`.
+
+On small phones (≤480px) the modal's schedule table collapses from a 4-column grid (Day/Time/Host/Note) into stacked label/value cards: the thead is hidden, each row becomes a block, the day cell is the bold title, and Time/Host/Note are labeled via `data-label` (`::before`). Empty cells (e.g. a show with no note) are hidden rather than showing a bare label. Above 480px it renders as a normal table. `data-label` attributes are emitted by `renderScheduleTable()` for all surfaces but only consumed by this modal breakpoint.
 
 ### Close Triggers
 
@@ -824,6 +828,8 @@ Automatically restored on page load.
 
 Single-purpose mobile-first form for community submissions of new karaoke venues. Optimized for KJs/fans on a phone with limited time. Single column on mobile (<768px), multi-column on tablet+. Touch targets ≥44×44 px, native input types for keyboard intent (`type="time"`, `type="url"`, `type="email"`, `type="tel"`, `inputmode="numeric"` on ZIP), 16px input font-size to prevent iOS auto-zoom, sticky submit button always reachable.
 
+The City / State / ZIP row uses an explicit `2fr 1fr 1fr` template at ≥561px (City wider; State/ZIP narrow, with `min-width: 0` so they shrink below the inputs' intrinsic width rather than clamping equal), stacking to one column below that. This keeps the three fields on one row without orphaning ZIP — the generic `auto-fit` floor otherwise fit only two columns and its min-content overflowed the form near 760px.
+
 ### Required vs optional split
 
 The form is structured as a short required-fields zone, then a single `<details>` toggle ("Add more details") containing everything optional. Selecting "I'm the KJ/Host" auto-expands the details and scrolls the contact section into view.
@@ -980,6 +986,7 @@ The `<body>` carries the `page--readable` class, which constrains `.main-content
 - Venue detail pane as sticky right sidebar
 - Modal suppressed (pane used instead)
 - Wider cards and multi-column layouts
+- The two-pane `.app-layout` is a fixed-height grid (`calc(100vh - 140px)`) whose list and detail columns each scroll internally. The footer lives **inside the scrolling list column** (not as a body-level sibling) so there is a single scroll context — a body-level footer would overflow the fixed-height layout and produce a second outer scrollbar. Below 1400px the list is plain block flow, so the footer sits at the page bottom as normal.
 
 ### Map View
 

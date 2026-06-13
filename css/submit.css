@@ -89,6 +89,26 @@
     margin-bottom: 0;
 }
 
+/* Address: City / State / ZIP read as one unit. The generic auto-fit floor
+   (200px) only fits 2 columns in the ~600px form (orphaning ZIP), and its
+   min-content can overflow the section near 760px. Override with explicit
+   tracks: stacked on phones, City-wide 3-up once there's room. min-width: 0
+   lets State/ZIP shrink below the input's intrinsic width so the 2:1:1 ratio
+   holds instead of clamping all three to min-content (equal) width. */
+.form-row--address {
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 561px) {
+    .form-row--address {
+        grid-template-columns: 2fr 1fr 1fr;
+    }
+
+    .form-row--address .form-group {
+        min-width: 0;
+    }
+}
+
 .form-group {
     display: flex;
     flex-direction: column;
