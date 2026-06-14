@@ -885,24 +885,8 @@ body.view--map .app-layout__detail {
     margin-bottom: var(--spacing-sm);
 }
 
-/* "Closed today" notice — venue has an excluded occurrence on the current date.
-   Mirrors the weekly-view .venue-card__exclusion-banner treatment. */
-.map-venue-card__exclusion-banner {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    margin-bottom: var(--spacing-sm);
-    padding: var(--spacing-xs) var(--spacing-sm);
-    background: var(--color-warning);
-    color: var(--color-gray-900);
-    font-size: var(--font-size-sm);
-    font-weight: 600;
-    border-radius: var(--border-radius-sm);
-}
-
-.map-venue-card__exclusion-banner i {
-    font-size: var(--font-size-xs);
-}
+/* Closure notices (.map-venue-card__exclusion-banner / __upcoming-closures) are
+   styled with the modal + pane variants in components.css. */
 
 .map-venue-card__title {
     font-size: var(--font-size-lg);

@@ -4,7 +4,7 @@
  */
 
 import { escapeHtml } from './string.js';
-import { formatScheduleEntry, formatActivePeriodText, scheduleMatchesDate, WEEKDAYS } from './date.js';
+import { formatScheduleEntry, formatActivePeriodText, scheduleMatchesDate, WEEKDAYS, getVenueExclusionForDate, getUpcomingExclusions, parseLocalDate } from './date.js';
 import { buildMapUrl, buildDirectionsUrl, createSocialLinks, formatAddress, sanitizeUrl } from './url.js';
 
 /**
@@ -116,6 +116,26 @@ export function renderActivePeriod(activePeriod, classPrefix) {
     if (!text) return '';
 
     return `<p class="${classPrefix}__active-period"><i class="fa-solid fa-calendar-check"></i> ${text}</p>`;
+}
+
+/**
+ * Render an "Upcoming closures" line listing a venue's exclusion dates within
+ * the next 60 days (e.g. "Dec 25 (Christmas), Dec 26 (Repairs)"). Returns an
+ * empty string when there are none.
+ * @param {Object} venue - Venue object (needs .schedule)
+ * @param {string} classPrefix - CSS class prefix
+ * @returns {string} HTML string or empty
+ */
+export function renderUpcomingClosures(venue, classPrefix) {
+    const upcoming = getUpcomingExclusions(venue, 60);
+    if (!upcoming.length) return '';
+
+    const list = upcoming.map(ex => {
+        const label = parseLocalDate(ex.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        return ex.reason ? `${escapeHtml(label)} (${escapeHtml(ex.reason)})` : escapeHtml(label);
+    }).join(', ');
+
+    return `<p class="${classPrefix}__upcoming-closures"><i class="fa-solid fa-ban"></i> Upcoming closures: ${list}</p>`;
 }
 
 /**
@@ -282,7 +302,14 @@ export function renderVenueDetailSections(venue, { classPrefix, hostSocialSize =
     const directionsUrl = buildDirectionsUrl(venue.address, venue.name);
     const socialLinksHtml = createSocialLinks(venue.socials, { size: 'fa-lg' });
 
+    // "Closed today" banner when a recurring show is excluded on the current date
+    const todayExclusion = getVenueExclusionForDate(venue, new Date());
+    const exclusionBanner = todayExclusion
+        ? `<div class="${classPrefix}__exclusion-banner"><i class="fa-solid fa-ban"></i> Closed Today${todayExclusion.reason ? `: ${escapeHtml(todayExclusion.reason)}` : ''}</div>`
+        : '';
+
     return `
+        ${exclusionBanner}
         <section class="${classPrefix}__section">
             <h3><i class="fa-solid fa-location-dot"></i> Location</h3>
             <address class="${classPrefix}__address">${addressHtml}</address>
@@ -303,6 +330,7 @@ export function renderVenueDetailSections(venue, { classPrefix, hostSocialSize =
             <h3><i class="fa-regular fa-calendar"></i> Schedule</h3>
             ${renderScheduleTable(venue, classPrefix)}
             ${renderActivePeriod(venue.activePeriod, classPrefix)}
+            ${renderUpcomingClosures(venue, classPrefix)}
         </section>
 
         ${renderHostSection(venue.host, classPrefix, { socialSize: hostSocialSize })}

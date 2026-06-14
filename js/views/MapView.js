@@ -13,7 +13,7 @@ import { escapeHtml } from '../utils/string.js';
 import { buildDirectionsUrl, shareVenue } from '../utils/url.js';
 import { renderTags } from '../utils/tags.js';
 import { renderScheduleCompact, renderVenueDetailSections } from '../utils/render.js';
-import { scheduleMatchesDate, getScheduleExclusion } from '../utils/date.js';
+import { getVenueExclusionForDate } from '../utils/date.js';
 
 export class MapView extends Component {
     init() {
@@ -51,14 +51,7 @@ export class MapView extends Component {
      * @returns {{date: string, reason: string|null}|null}
      */
     getTodaysExclusion(venue) {
-        const today = new Date();
-        for (const entry of venue.schedule || []) {
-            if (scheduleMatchesDate(entry, today)) {
-                const exclusion = getScheduleExclusion(entry, today);
-                if (exclusion) return exclusion;
-            }
-        }
-        return null;
+        return getVenueExclusionForDate(venue, new Date());
     }
 
     template() {

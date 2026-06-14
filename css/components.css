@@ -693,6 +693,48 @@
     font-size: var(--font-size-lg);
 }
 
+/* Exclusion (closure) notices — shared across the three detail surfaces
+   (modal, desktop pane, map expanded card). The "Closed today" banner mirrors
+   the weekly-view .venue-card__exclusion-banner; the upcoming-closures line
+   lists exclusion dates within the next 60 days. */
+.venue-modal__exclusion-banner,
+.detail-pane__exclusion-banner,
+.map-venue-card__exclusion-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--color-warning);
+    color: var(--color-gray-900);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    border-radius: var(--border-radius-sm);
+}
+
+.venue-modal__exclusion-banner i,
+.detail-pane__exclusion-banner i,
+.map-venue-card__exclusion-banner i {
+    font-size: var(--font-size-xs);
+}
+
+.venue-modal__upcoming-closures,
+.detail-pane__upcoming-closures,
+.map-venue-card__upcoming-closures {
+    display: flex;
+    align-items: baseline;
+    gap: var(--spacing-xs);
+    margin: var(--spacing-sm) 0 0;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.venue-modal__upcoming-closures i,
+.detail-pane__upcoming-closures i,
+.map-venue-card__upcoming-closures i {
+    color: var(--color-warning);
+}
+
 /* Responsive modal */
 @media (max-width: 480px) {
     .venue-modal__content {
