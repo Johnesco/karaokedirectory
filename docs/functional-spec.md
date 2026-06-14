@@ -79,6 +79,7 @@ When expanded, shows:
 - One venue card per **matching schedule entry** (a venue with two events on the same date renders two cards, each showing its own event name, time, and host)
 - Footer with **unique venue count** (e.g., "14 venues" even if 15 cards rendered because one venue had two events)
 - **Venue card layout:** single column on mobile (≤768px); at 769px+ cards flow into a responsive grid (`repeat(auto-fill, minmax(320px, 1fr))` — 2 columns at ~1024px, up to 4 on large screens). Cards in the same grid row stretch to equal height. The same grid applies to letter cards in the Alphabetical view.
+- **Closures:** a card whose date is excluded (§11 Schedule Exclusions) keeps its place but is dimmed with a strikethrough name and a bright "Closed" banner (`.venue-card--excluded`), so the venue is still findable rather than silently dropped.
 
 ### Sorting
 
@@ -246,6 +247,15 @@ A card that appears over the map when a marker is selected. Has two states:
 - Clicking the map background (not a marker or card) dismisses the card
 - **Sizing:** full-width bottom sheet on mobile; on desktop (≥1024px) a fixed 350px-wide card anchored right (explicit width so it doesn't shrink to its content). The floating "Hide Dedicated" map control and the analytics consent-banner buttons are ≥44px tall (touch targets).
 
+### Exclusion Dates on the Map
+
+When a venue has a recurring show that is **excluded on the current date** (a holiday/private-event closure — see the `exclusions` field, [Section 11](#11-venue-data-model)):
+
+- Its **marker is dimmed** (`.map-marker--excluded`, reduced opacity) but stays visible and clickable. The dimming persists through select/deselect (selection still recolors it).
+- Its **floating card shows a "Closed Today: [reason]" banner** (warning-colored), mirroring the Weekly view's closure banner. The reason is shown when present.
+
+The map isn't date-scoped, so "today" (`new Date()`) is the reference date. `MapView.getTodaysExclusion(venue)` walks the schedule and returns the first entry that matches today *and* carries an exclusion for it (via `scheduleMatchesDate` + `getScheduleExclusion`).
+
 ### Floating Controls
 
 | Control | Position | Contents |
@@ -390,9 +400,10 @@ The modal opens only when ALL of these conditions are met:
 
 | Section | Content |
 |---------|---------|
+| Closure banner | "Closed Today: [reason]" warning banner at the top, shown only when the venue is excluded on the current date (§11 Schedule Exclusions) |
 | Header | Venue name, event name (if special event), tags |
 | Location | Full address, "View Map" button, "Directions" button, "Share" button |
-| Schedule | Schedule table (all entries) + active period notice if applicable |
+| Schedule | Schedule table (all entries) + active period notice + "Upcoming closures" list (exclusion dates within the next 60 days) if applicable |
 | Host | Host name, company, website, social links |
 | Social Media | Venue social links (if any) |
 | Contact | Phone number link (if venue has phone field) |
@@ -430,7 +441,7 @@ Visible when window width is **1400px or wider**. Hidden on smaller screens via 
 
 ### Content
 
-Same sections as the mobile modal (Location, Schedule, Host, Social Media, Contact).
+Same sections as the mobile modal (closure banner, Location, Schedule, Host, Social Media, Contact) — both are built by the shared `renderVenueDetailSections()`, so the "Closed Today" banner and "Upcoming closures" list (§7, §11) appear identically here.
 
 ### Empty State
 
@@ -568,6 +579,7 @@ The shape `{ tagDefinitions, listings }` is the contract — both the local file
       startTime         string        24-hour format "HH:MM"
       endTime           string|null   24-hour format "HH:MM" or null (open-ended)
       eventUrl          string        OPTIONAL  Link to event page
+      exclusions        array         OPTIONAL  Dates this show is skipped (see "Schedule Exclusions")
 
     One-time entry:
       frequency         string        "once"
@@ -598,6 +610,24 @@ The shape `{ tagDefinitions, listings }` is the contract — both the local file
   phone                 string        OPTIONAL  Venue phone number (displayed in detail views)
 }
 ```
+
+### Schedule Exclusions
+
+A recurring schedule entry may carry an `exclusions` array listing dates on which that show does **not** happen (holiday closures, private events, one-off cancellations). Each item is either a shorthand date string or an object with an optional reason:
+
+```
+exclusions: [
+  "2026-12-25",                              // shorthand — no reason
+  { date: "2026-12-26", reason: "Repairs" }  // object form with a reason
+]
+```
+
+- An exclusion **suppresses** the recurring occurrence on that date, but the schedule still "matches" the date — so the venue renders with a **closure indicator** rather than disappearing (users hunting for it still find it in place).
+- Helpers in `js/utils/date.js`: `getScheduleExclusion(entry, date)` (per-entry), `getVenueExclusionForDate(venue, date)` (venue-level — is it closed on a given date?), and `getUpcomingExclusions(venue, days)` (future closures within a window, today excluded).
+- **Display by surface:**
+  - **Weekly calendar** (§2) — dimmed card with a "Closed" banner on the excluded date
+  - **Map** (§4) — dimmed marker; "Closed Today: [reason]" banner in the floating card
+  - **Detail modal / desktop pane / map expanded card** (§7, §8) — "Closed Today: [reason]" banner plus an "Upcoming closures" list (next 60 days, e.g. "Jun 20 (Holiday), Jun 27")
 
 ### Venue Count
 
@@ -1197,6 +1227,7 @@ Each public page includes a `<link rel="canonical">` tag pointing to its canonic
 | 2026-02 | 1.0.20 | #32: Replaced "+N more" with smart "Also [days]" / "Everyday" schedule indicator on compact venue cards. Added `buildAlsoText()` and `abbreviateDay()` helpers in `render.js`. Updated Section 6. | Claude Code |
 | 2026-02 | 1.0.21 | Shareable venue links: URL hash syncs with venue selection (`#venue={id}`), share button on all detail surfaces (modal, pane, map card) with Web Share API / clipboard fallback. Added `shareVenue()` to `url.js`. Updated Sections 4, 7, 21. | Claude Code |
 | 2026-02 | 1.0.22 | SEO quick wins: Added meta descriptions, Open Graph tags, Twitter Card tags, and canonical URLs to all 5 public pages. Created `robots.txt` and `sitemap.xml`. Added `noindex` to `editor.html`. New Section 22. Renumbered Sections 22–23 → 23–24. | Claude Code |
+| 2026-06 | 1.0.23 | Exclusion Dates feature (#3–#8): recurring shows can be marked closed on specific dates via `schedule[].exclusions` (`"YYYY-MM-DD"` shorthand or `{date, reason}`). Weekly cards dim with a "Closed" banner; Map dims the marker and shows a "Closed Today" card banner; detail modal/pane/map-expanded show a "Closed Today" banner plus an "Upcoming closures" list (next 60 days). Added `getVenueExclusionForDate()` and `getUpcomingExclusions()` to `date.js`. New §11 "Schedule Exclusions"; updated §2, §4, §7, §8. | Claude Code |
 
 ---
 

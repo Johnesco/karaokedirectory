@@ -13,6 +13,7 @@ import { escapeHtml } from '../utils/string.js';
 import { buildDirectionsUrl, shareVenue } from '../utils/url.js';
 import { renderTags } from '../utils/tags.js';
 import { renderScheduleCompact, renderVenueDetailSections } from '../utils/render.js';
+import { getVenueExclusionForDate } from '../utils/date.js';
 
 export class MapView extends Component {
     init() {
@@ -32,14 +33,25 @@ export class MapView extends Component {
      * Create a custom marker icon
      * @param {boolean} isSelected - Whether the marker is selected
      */
-    createMarkerIcon(isSelected = false) {
+    createMarkerIcon(isSelected = false, isExcluded = false) {
         return L.divIcon({
-            className: `map-marker ${isSelected ? 'map-marker--selected' : ''}`,
+            className: `map-marker ${isSelected ? 'map-marker--selected' : ''}${isExcluded ? ' map-marker--excluded' : ''}`,
             html: `<div class="map-marker__pin"></div>`,
             iconSize: [30, 40],
             iconAnchor: [15, 40],
             popupAnchor: [0, -40]
         });
+    }
+
+    /**
+     * Return today's exclusion for a venue, if any — a recurring show that would
+     * normally run today but is suppressed (holiday, private event, cancellation).
+     * The map isn't date-scoped, so "today" is the relevant date for a closure cue.
+     * @param {Object} venue
+     * @returns {{date: string, reason: string|null}|null}
+     */
+    getTodaysExclusion(venue) {
+        return getVenueExclusionForDate(venue, new Date());
     }
 
     template() {
@@ -300,13 +312,17 @@ export class MapView extends Component {
 
         // Add markers to cluster group
         venues.forEach(venue => {
+            // Dim the marker if the venue is closed today (excluded occurrence)
+            const isExcludedToday = !!this.getTodaysExclusion(venue);
             const marker = L.marker(
                 [venue.coordinates.lat, venue.coordinates.lng],
-                { icon: this.createMarkerIcon(false) }
+                { icon: this.createMarkerIcon(false, isExcludedToday) }
             );
 
             // Store venue data on marker for cluster tooltip access
             marker.venueData = venue;
+            // Remember exclusion state so it survives select/deselect re-icons
+            marker.isExcluded = isExcludedToday;
 
             // Hover tooltip showing venue name
             marker.bindTooltip(escapeHtml(venue.name), {
@@ -345,18 +361,18 @@ export class MapView extends Component {
     }
 
     showVenueCard(venue, marker) {
-        // Reset previously selected marker
+        // Reset previously selected marker (keeping its excluded dimming)
         if (this.selectedMarker) {
-            this.selectedMarker.setIcon(this.createMarkerIcon(false));
+            this.selectedMarker.setIcon(this.createMarkerIcon(false, this.selectedMarker.isExcluded));
         }
 
         // Set new selected marker
         this.selectedVenue = venue;
         this.selectedMarker = marker;
 
-        // Highlight the selected marker
+        // Highlight the selected marker (preserving excluded state)
         if (marker) {
-            marker.setIcon(this.createMarkerIcon(true));
+            marker.setIcon(this.createMarkerIcon(true, marker.isExcluded));
         }
 
         const cardEl = this.$('#map-venue-card');
@@ -370,6 +386,12 @@ export class MapView extends Component {
         // Build tags HTML (includes dedicated tag if applicable)
         const tagsHtml = renderTags(venue.tags, { dedicated: venue.dedicated });
 
+        // "Closed today" notice when a recurring show is excluded on the current date
+        const exclusion = this.getTodaysExclusion(venue);
+        const exclusionBanner = exclusion
+            ? `<div class="map-venue-card__exclusion-banner"><i class="fa-solid fa-ban"></i> Closed Today${exclusion.reason ? `: ${escapeHtml(exclusion.reason)}` : ''}</div>`
+            : '';
+
         cardEl.innerHTML = `
             <button class="map-venue-card__close" data-action="close-card" type="button" aria-label="Close">
                 <i class="fa-solid fa-xmark"></i>
@@ -378,6 +400,7 @@ export class MapView extends Component {
                 <h3 class="map-venue-card__title">${escapeHtml(venue.name)}</h3>
                 ${tagsHtml}
             </div>
+            ${exclusionBanner}
             <div class="map-venue-card__schedule">${scheduleHtml}</div>
             <div class="map-venue-card__actions">
                 <a href="${directionsUrl}" target="_blank" rel="noopener noreferrer" class="btn btn--secondary btn--small">
@@ -425,9 +448,9 @@ export class MapView extends Component {
     }
 
     hideVenueCard() {
-        // Reset the selected marker's icon
+        // Reset the selected marker's icon (keeping its excluded dimming)
         if (this.selectedMarker) {
-            this.selectedMarker.setIcon(this.createMarkerIcon(false));
+            this.selectedMarker.setIcon(this.createMarkerIcon(false, this.selectedMarker.isExcluded));
             this.selectedMarker = null;
         }
 

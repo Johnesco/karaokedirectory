@@ -190,6 +190,56 @@ export function getScheduleExclusion(schedule, date) {
 }
 
 /**
+ * Whether a venue is closed on a given date — a recurring show that matches the
+ * date but is suppressed by an exclusion. Walks every schedule entry; returns
+ * the first matching exclusion, or null.
+ * @param {Object} venue - Venue object (needs .schedule)
+ * @param {Date} date - Date to check
+ * @returns {{date: string, reason: string|null}|null}
+ */
+export function getVenueExclusionForDate(venue, date) {
+    for (const entry of venue?.schedule || []) {
+        if (scheduleMatchesDate(entry, date)) {
+            const exclusion = getScheduleExclusion(entry, date);
+            if (exclusion) return exclusion;
+        }
+    }
+    return null;
+}
+
+/**
+ * Collect a venue's exclusion dates strictly after today, within `days` from
+ * today, de-duplicated across schedule entries and sorted chronologically.
+ * Today is excluded — a closure today is surfaced separately as a "Closed today"
+ * notice (see getVenueExclusionForDate), so it shouldn't repeat in this list.
+ * @param {Object} venue - Venue object (needs .schedule)
+ * @param {number} [days=60] - Look-ahead window in days
+ * @returns {Array<{date: string, reason: string|null}>}
+ */
+export function getUpcomingExclusions(venue, days = 60) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const horizon = new Date(today);
+    horizon.setDate(horizon.getDate() + days);
+
+    const seen = new Set();
+    const upcoming = [];
+    for (const entry of venue?.schedule || []) {
+        for (const ex of entry.exclusions || []) {
+            const dateStr = typeof ex === 'string' ? ex : ex?.date;
+            if (!dateStr || seen.has(dateStr)) continue;
+            const d = parseLocalDate(dateStr);
+            if (d > today && d <= horizon) {
+                seen.add(dateStr);
+                upcoming.push({ date: dateStr, reason: typeof ex === 'string' ? null : (ex.reason || null) });
+            }
+        }
+    }
+    upcoming.sort((a, b) => a.date.localeCompare(b.date));
+    return upcoming;
+}
+
+/**
  * Convert 24-hour time to 12-hour format
  * @param {string} time24 - Time in 24-hour format (e.g., "21:00")
  * @returns {string} Time in 12-hour format (e.g., "9:00 PM")

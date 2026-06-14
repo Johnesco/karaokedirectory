@@ -618,6 +618,12 @@
     box-shadow: 0 3px 10px rgba(229, 57, 53, 0.4);
 }
 
+/* Excluded (closed today) marker - dimmed so it reads as inactive while
+   staying visible/clickable. Selection still overrides the color above. */
+.map-marker--excluded .map-marker__pin {
+    opacity: 0.45;
+}
+
 /* Map Cluster Icons - override MarkerCluster defaults with app theme */
 .map-cluster {
     border-radius: 50%;
@@ -878,6 +884,9 @@ body.view--map .app-layout__detail {
     padding-right: var(--spacing-xl);
     margin-bottom: var(--spacing-sm);
 }
+
+/* Closure notices (.map-venue-card__exclusion-banner / __upcoming-closures) are
+   styled with the modal + pane variants in components.css. */
 
 .map-venue-card__title {
     font-size: var(--font-size-lg);
