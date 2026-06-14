@@ -246,6 +246,15 @@ A card that appears over the map when a marker is selected. Has two states:
 - Clicking the map background (not a marker or card) dismisses the card
 - **Sizing:** full-width bottom sheet on mobile; on desktop (≥1024px) a fixed 350px-wide card anchored right (explicit width so it doesn't shrink to its content). The floating "Hide Dedicated" map control and the analytics consent-banner buttons are ≥44px tall (touch targets).
 
+### Exclusion Dates on the Map
+
+When a venue has a recurring show that is **excluded on the current date** (a holiday/private-event closure — see the `exclusions` field, [Section 11](#11-venue-data-model)):
+
+- Its **marker is dimmed** (`.map-marker--excluded`, reduced opacity) but stays visible and clickable. The dimming persists through select/deselect (selection still recolors it).
+- Its **floating card shows a "Closed Today: [reason]" banner** (warning-colored), mirroring the Weekly view's closure banner. The reason is shown when present.
+
+The map isn't date-scoped, so "today" (`new Date()`) is the reference date. `MapView.getTodaysExclusion(venue)` walks the schedule and returns the first entry that matches today *and* carries an exclusion for it (via `scheduleMatchesDate` + `getScheduleExclusion`).
+
 ### Floating Controls
 
 | Control | Position | Contents |

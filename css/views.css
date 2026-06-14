@@ -618,6 +618,12 @@
     box-shadow: 0 3px 10px rgba(229, 57, 53, 0.4);
 }
 
+/* Excluded (closed today) marker - dimmed so it reads as inactive while
+   staying visible/clickable. Selection still overrides the color above. */
+.map-marker--excluded .map-marker__pin {
+    opacity: 0.45;
+}
+
 /* Map Cluster Icons - override MarkerCluster defaults with app theme */
 .map-cluster {
     border-radius: 50%;
@@ -877,6 +883,25 @@ body.view--map .app-layout__detail {
 .map-venue-card__header {
     padding-right: var(--spacing-xl);
     margin-bottom: var(--spacing-sm);
+}
+
+/* "Closed today" notice — venue has an excluded occurrence on the current date.
+   Mirrors the weekly-view .venue-card__exclusion-banner treatment. */
+.map-venue-card__exclusion-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--color-warning);
+    color: var(--color-gray-900);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    border-radius: var(--border-radius-sm);
+}
+
+.map-venue-card__exclusion-banner i {
+    font-size: var(--font-size-xs);
 }
 
 .map-venue-card__title {
