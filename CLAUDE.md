@@ -21,7 +21,7 @@
 
 ### 2. Mobile-First Responsive Design
 - Base styles target mobile devices
-- Media queries enhance for larger screens (768px, 1024px, 1400px breakpoints)
+- Media queries enhance for larger screens (560px, 768px, 1024px, 1400px breakpoints); 560px splits phone vs phablet nav, 769px+ enables multi-column venue grids (see spec §19)
 - Modal for venue details on mobile, side pane on desktop (1400px+)
 
 ### 3. Separation of Concerns
@@ -198,6 +198,9 @@ When adding or modifying venues in `js/data.js`, follow this structure:
       startTime: "21:00",     // 24-hour format
       endTime: "01:00",       // Can cross midnight
       eventUrl: "https://...", // Optional: link to event page
+      exclusions: [           // Optional: dates this recurring show is skipped (holiday/closure)
+        { date: "2026-12-25", reason: "Holiday" }  // reason optional; "2026-12-25" shorthand also accepted
+      ],
       host: {                 // Optional: overrides venue-level host for this show only
         name: "Guest KJ",     // See "Per-show host override" below
         affiliation: "Some Karaoke Co",
@@ -463,7 +466,7 @@ GitHub Projects field IDs and option IDs for this project. Used by Claude when s
 | Milestone | Spec Sections | Description |
 |-----------|---------------|-------------|
 | Documentation Portal | — | Documentation site navigation and landing pages |
-| Exclusion Dates | — (future) | Venue closure/exclusion dates feature |
+| Exclusion Dates | 4, 11 | Venue closure/exclusion dates (`schedule[].exclusions`). Shipped: matching logic, Weekly + Map display. Pending: detail-view notice, full docs |
 | Form Parity | 15 | Submit form UX (intentionally a slim subset of editor; curator handles the rest) |
 | Weekly Calendar View | 2, 13 | Weekly schedule grid, day cards, schedule matching |
 | Alphabetical View | 3 | A-Z venue listing |
@@ -502,5 +505,5 @@ Current ADRs:
 
 ---
 
-*Last updated: February 2026*
+*Last updated: June 2026*
 *Maintained by: Project contributors and Claude Code sessions*
