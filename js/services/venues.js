@@ -17,6 +17,7 @@
 import { scheduleMatchesDate, isDateInRange } from '../utils/date.js';
 import { getSortableName, containsIgnoreCase } from '../utils/string.js';
 import { getTagConfig } from '../utils/tags.js';
+import { getVenueHosts } from '../utils/render.js';
 
 let venues = [];
 
@@ -101,17 +102,9 @@ export function venueMatchesHost(venue, query) {
     if (!query?.trim()) return true;
     const q = query.toLowerCase().trim();
 
-    if (containsIgnoreCase(venue.host?.name, q)) return true;
-    if (containsIgnoreCase(venue.host?.affiliation, q)) return true;
-
-    if (Array.isArray(venue.schedule)) {
-        for (const entry of venue.schedule) {
-            if (containsIgnoreCase(entry.host?.name, q)) return true;
-            if (containsIgnoreCase(entry.host?.affiliation, q)) return true;
-        }
-    }
-
-    return false;
+    return getVenueHosts(venue).some(({ host }) =>
+        containsIgnoreCase(host.name, q) || containsIgnoreCase(host.affiliation, q)
+    );
 }
 
 /**

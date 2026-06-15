@@ -19,6 +19,7 @@
 
 import { Component } from '../components/Component.js';
 import { getAllVenues } from '../services/venues.js';
+import { getVenueHosts } from '../utils/render.js';
 import { escapeHtml } from '../utils/string.js';
 
 export class KJIndexView extends Component {
@@ -147,10 +148,10 @@ export class KJIndexView extends Component {
 
         let noHostCount = 0;
         getAllVenues().forEach(v => {
-            let attributed = processHost(v.host, v.id);
-            (v.schedule || []).forEach(e => {
-                if (processHost(e.host, v.id)) attributed = true;
-            });
+            let attributed = false;
+            for (const { host } of getVenueHosts(v)) {
+                if (processHost(host, v.id)) attributed = true;
+            }
             if (!attributed) noHostCount++;
         });
 
