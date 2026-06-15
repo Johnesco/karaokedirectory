@@ -294,7 +294,7 @@ export function getScheduleContext(venue, schedule, currentDate = null) {
  * @param {string} [options.hostSocialSize='fa-lg'] - Font Awesome size class for host socials ('' for compact)
  * @returns {string} HTML string of <section> elements
  */
-export function renderVenueDetailSections(venue, { classPrefix, hostSocialSize = 'fa-lg' }) {
+export function renderVenueDetailSections(venue, { classPrefix, hostSocialSize = 'fa-lg', actions = true }) {
     const addressHtml = formatAddress(venue.address);
     const mapUrl = buildMapUrl(venue.address, venue.name);
     const directionsUrl = buildDirectionsUrl(venue.address, venue.name);
@@ -311,7 +311,7 @@ export function renderVenueDetailSections(venue, { classPrefix, hostSocialSize =
         <section class="${classPrefix}__section">
             <h3><i class="fa-solid fa-location-dot"></i> Location</h3>
             <address class="${classPrefix}__address">${addressHtml}</address>
-            <div class="${classPrefix}__map-links">
+            ${actions ? `<div class="${classPrefix}__map-links">
                 <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" class="btn btn--secondary">
                     <i class="fa-solid fa-map"></i> View Map
                 </a>
@@ -321,7 +321,7 @@ export function renderVenueDetailSections(venue, { classPrefix, hostSocialSize =
                 <button class="btn btn--secondary ${classPrefix}__share" type="button">
                     <i class="fa-solid fa-share-from-square"></i> Share
                 </button>
-            </div>
+            </div>` : ''}
         </section>
 
         <section class="${classPrefix}__section">

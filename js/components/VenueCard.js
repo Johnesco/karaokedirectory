@@ -5,12 +5,12 @@
 
 import { Component } from './Component.js';
 import { escapeHtml } from '../utils/string.js';
-import { formatTimeRange, formatScheduleEntry, scheduleMatchesDate, getScheduleExclusion } from '../utils/date.js';
-import { buildMapUrl, createSocialLinks, formatAddress, sanitizeUrl } from '../utils/url.js';
+import { formatTimeRange, scheduleMatchesDate, getScheduleExclusion } from '../utils/date.js';
+import { buildMapUrl, formatAddress, sanitizeUrl } from '../utils/url.js';
 import { emit, Events } from '../core/events.js';
 import { isDebugMode, getDebugHtml } from '../utils/debug.js';
 import { renderTags } from '../utils/tags.js';
-import { formatHostDisplay, renderScheduleContext } from '../utils/render.js';
+import { formatHostDisplay, renderScheduleContext, renderVenueDetailSections } from '../utils/render.js';
 
 export class VenueCard extends Component {
     /**
@@ -115,11 +115,12 @@ export class VenueCard extends Component {
     }
 
     fullTemplate(venue) {
-        const addressHtml = formatAddress(venue.address);
-        const mapUrl = buildMapUrl(venue.address, venue.name);
-        const socialLinksHtml = createSocialLinks(venue.socials);
-        const hostSocialsHtml = venue.host?.socials ? createSocialLinks(venue.host.socials) : '';
-
+        // Inline-expanded card for the Alphabetical view. Delegates to the same
+        // shared section renderer the modal/pane/map detail use, so the A–Z card
+        // shows the same facts (per-show hosts, exclusions, upcoming closures,
+        // active period). `actions: false` drops the View Map / Directions / Share
+        // button row to keep the long A–Z list light — full actions live in the
+        // detail pane/modal opened on click.
         return `
             <div class="venue-card venue-card--full" data-venue-id="${escapeHtml(venue.id)}">
                 <div class="venue-card__header">
@@ -128,63 +129,11 @@ export class VenueCard extends Component {
                             ${escapeHtml(venue.name)}
                         </button>
                     </h3>
+                    ${renderTags(venue.tags, { dedicated: venue.dedicated })}
                 </div>
-
-                <div class="venue-card__address">
-                    <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" class="venue-card__map-link">
-                        <i class="fa-solid fa-location-dot"></i>
-                        ${addressHtml}
-                    </a>
-                </div>
-
-                <div class="venue-card__schedule">
-                    <h4>Schedule</h4>
-                    ${this.renderScheduleList(venue.schedule)}
-                </div>
-
-                ${venue.host ? `
-                    <div class="venue-card__host">
-                        <h4>Host</h4>
-                        ${venue.host.name ? `<div class="venue-card__host-name">${escapeHtml(venue.host.name)}</div>` : ''}
-                        ${venue.host.affiliation ? `<div class="venue-card__host-affiliation">${escapeHtml(venue.host.affiliation)}</div>` : ''}
-                        ${hostSocialsHtml ? `<div class="venue-card__host-socials">${hostSocialsHtml}</div>` : ''}
-                    </div>
-                ` : ''}
-
-                ${socialLinksHtml ? `
-                    <div class="venue-card__socials">
-                        ${socialLinksHtml}
-                    </div>
-                ` : ''}
-                ${renderTags(venue.tags, { dedicated: venue.dedicated })}
+                ${renderVenueDetailSections(venue, { classPrefix: 'venue-card', actions: false })}
             </div>
         `;
-    }
-
-    renderScheduleList(schedule) {
-        if (!schedule || schedule.length === 0) {
-            return '<p class="venue-card__no-schedule">No schedule available</p>';
-        }
-
-        const items = schedule.map(entry => {
-            const formatted = formatScheduleEntry(entry, { showEvery: false });
-
-            // For one-time events, show the frequencyPrefix (event name) and day (date)
-            const dayLabel = entry.frequency === 'once'
-                ? `${formatted.frequencyPrefix} — ${formatted.day}`
-                : `${formatted.frequencyPrefix}${formatted.day}`;
-
-            const eventLink = entry.eventUrl ? `<a href="${escapeHtml(sanitizeUrl(entry.eventUrl) || '')}" target="_blank" rel="noopener noreferrer" class="venue-card__event-link" title="Event page"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : '';
-
-            return `
-                <li class="venue-card__schedule-item">
-                    <span class="venue-card__schedule-day">${dayLabel}${eventLink}</span>
-                    <span class="venue-card__schedule-time">${formatted.time}</span>
-                </li>
-            `;
-        }).join('');
-
-        return `<ul class="venue-card__schedule-list">${items}</ul>`;
     }
 
     getScheduleForDate(venue, date) {

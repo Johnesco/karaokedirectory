@@ -411,36 +411,6 @@
     color: var(--color-primary-light);
 }
 
-.venue-card__schedule h4,
-.venue-card__host h4 {
-    font-size: var(--font-size-sm);
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: var(--spacing-sm);
-}
-
-.venue-card__schedule-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
-}
-
-.venue-card__schedule-item {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-sm);
-    font-size: var(--font-size-sm);
-}
-
-.venue-card__schedule-day {
-    font-weight: 500;
-}
-
-.venue-card__schedule-time {
-    color: var(--text-secondary);
-}
-
 .venue-card__host {
     margin-top: var(--spacing-md);
 }
@@ -776,6 +746,130 @@
     }
 
     .venue-modal__schedule-table td:first-child::before {
+        content: none;
+    }
+}
+
+/* Alphabetical full card reuses the shared detail-section renderer
+   (renderVenueDetailSections, classPrefix 'venue-card', actions omitted).
+   These mirror the .venue-modal__/.detail-pane__ section styles for the classes
+   not already defined above (__address, __host, __host-name, __host-affiliation,
+   __socials, __exclusion-banner are shared with the compact/weekly card). */
+.venue-card__section {
+    margin-bottom: var(--spacing-lg);
+}
+
+.venue-card__section h3 {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: var(--font-size-base);
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-sm);
+}
+
+.venue-card__section h3 i {
+    color: var(--color-primary-light);
+}
+
+.venue-card__schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.venue-card__schedule-table th,
+.venue-card__schedule-table td {
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    padding: var(--spacing-sm);
+}
+
+.venue-card__schedule-table th {
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: var(--font-size-sm);
+}
+
+.venue-card__active-period {
+    color: var(--color-warning);
+    font-size: var(--font-size-sm);
+    margin-top: var(--spacing-sm);
+}
+
+.venue-card__host-website {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.venue-card__socials-label {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    margin-top: var(--spacing-md);
+    margin-bottom: var(--spacing-xs);
+}
+
+.venue-card__host-socials {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.venue-card__upcoming-closures {
+    display: flex;
+    align-items: baseline;
+    gap: var(--spacing-xs);
+    margin: var(--spacing-sm) 0 0;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.venue-card__upcoming-closures i {
+    color: var(--color-warning);
+}
+
+/* Stack the inline schedule table into label/value rows on small phones,
+   mirroring the modal (data-label comes from renderScheduleTable). */
+@media (max-width: 480px) {
+    .venue-card__schedule-table,
+    .venue-card__schedule-table tbody {
+        display: block;
+    }
+
+    .venue-card__schedule-table thead {
+        display: none;
+    }
+
+    .venue-card__schedule-table tr {
+        display: block;
+        padding: var(--spacing-sm) 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .venue-card__schedule-table td {
+        display: flex;
+        gap: var(--spacing-sm);
+        padding: var(--spacing-2xs) 0;
+        border: none;
+    }
+
+    .venue-card__schedule-table td:empty {
+        display: none;
+    }
+
+    .venue-card__schedule-table td::before {
+        content: attr(data-label);
+        flex: 0 0 4.5em;
+        color: var(--text-muted);
+        font-size: var(--font-size-sm);
+        font-weight: 500;
+    }
+
+    .venue-card__schedule-table td:first-child {
+        font-weight: 600;
+        font-size: var(--font-size-base);
+    }
+
+    .venue-card__schedule-table td:first-child::before {
         content: none;
     }
 }
