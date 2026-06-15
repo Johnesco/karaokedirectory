@@ -52,6 +52,36 @@ function getActiveVenues() {
 }
 
 /**
+ * Shared filter predicate for the public venue lists: a venue "passes" when it
+ * isn't hidden by the dedicated toggle, matches the search query (if any), and
+ * is within its activePeriod on the relevant date. Callers start from
+ * getActiveVenues() (the `active` flag) and layer on their own date/coords
+ * checks. Single source of truth for the dedicated + search + activePeriod gate.
+ * @param {Object} venue - Venue object
+ * @param {Object} [ctx]
+ * @param {Date} [ctx.date] - Date for the activePeriod check (defaults to today)
+ * @param {boolean} [ctx.includeDedicated=true]
+ * @param {string} [ctx.searchQuery='']
+ * @returns {boolean}
+ */
+export function venuePasses(venue, { date = null, includeDedicated = true, searchQuery = '' } = {}) {
+    if (!includeDedicated && venue.dedicated) return false;
+    if (searchQuery && !venueMatchesSearch(venue, searchQuery)) return false;
+    if (!isVenueActiveOn(venue, date || new Date())) return false;
+    return true;
+}
+
+/**
+ * Alphabetical comparator on sortable venue name (leading articles ignored).
+ * @param {Object} a - Venue object
+ * @param {Object} b - Venue object
+ * @returns {number}
+ */
+export function byName(a, b) {
+    return getSortableName(a.name).toLowerCase().localeCompare(getSortableName(b.name).toLowerCase());
+}
+
+/**
  * Initialize venues from data
  * @param {Object} data - Karaoke data object
  */
@@ -157,25 +187,19 @@ export function venueMatchesSearch(venue, query) {
  * @returns {Object[]} Matching venues
  */
 export function getVenuesForDate(date, options = {}) {
-    const { includeDedicated = true, searchQuery = '' } = options;
-
-    return getActiveVenues().filter(venue => {
-        if (!includeDedicated && venue.dedicated) return false;
-        if (searchQuery && !venueMatchesSearch(venue, searchQuery)) return false;
-        if (!isVenueActiveOn(venue, date)) return false;
-        return venue.schedule.some(sched => scheduleMatchesDate(sched, date));
-    }).sort((a, b) => {
-        // Special events sort to top
-        const aSpecial = a.schedule?.some(s => s.frequency === 'once' && scheduleMatchesDate(s, date));
-        const bSpecial = b.schedule?.some(s => s.frequency === 'once' && scheduleMatchesDate(s, date));
-        if (aSpecial && !bSpecial) return -1;
-        if (!aSpecial && bSpecial) return 1;
-
-        // Then alphabetical
-        const nameA = getSortableName(a.name).toLowerCase();
-        const nameB = getSortableName(b.name).toLowerCase();
-        return nameA.localeCompare(nameB);
-    });
+    // Derive unique venues from the per-event list: getVenueEventsForDate already
+    // applies the shared filter and sorts specials-first then alphabetically, so
+    // taking each venue's first appearance preserves that order without
+    // duplicating the filter/sort logic here.
+    const seen = new Set();
+    const result = [];
+    for (const { venue } of getVenueEventsForDate(date, options)) {
+        if (!seen.has(venue.id)) {
+            seen.add(venue.id);
+            result.push(venue);
+        }
+    }
+    return result;
 }
 
 /**
@@ -201,9 +225,7 @@ export function getVenueEventsForDate(date, options = {}) {
 
     const events = [];
     for (const venue of getActiveVenues()) {
-        if (!includeDedicated && venue.dedicated) continue;
-        if (searchQuery && !venueMatchesSearch(venue, searchQuery)) continue;
-        if (!isVenueActiveOn(venue, date)) continue;
+        if (!venuePasses(venue, { date, includeDedicated, searchQuery })) continue;
 
         for (const schedule of venue.schedule) {
             if (scheduleMatchesDate(schedule, date)) {
@@ -213,19 +235,15 @@ export function getVenueEventsForDate(date, options = {}) {
     }
 
     return events.sort((a, b) => {
-        // Special events sort to top
+        // Special one-time events sort to the top
         const aSpecial = a.schedule.frequency === 'once';
         const bSpecial = b.schedule.frequency === 'once';
-        if (aSpecial && !bSpecial) return -1;
-        if (!aSpecial && bSpecial) return 1;
+        if (aSpecial !== bSpecial) return aSpecial ? -1 : 1;
 
-        // Then alphabetical by venue name
-        const nameA = getSortableName(a.venue.name).toLowerCase();
-        const nameB = getSortableName(b.venue.name).toLowerCase();
-        const nameCmp = nameA.localeCompare(nameB);
+        // Then alphabetical by venue name, ties broken by start time so multiple
+        // events at one venue read chronologically
+        const nameCmp = byName(a.venue, b.venue);
         if (nameCmp !== 0) return nameCmp;
-
-        // Ties broken by startTime so multiple events at one venue read chronologically
         return (a.schedule.startTime || '').localeCompare(b.schedule.startTime || '');
     });
 }
@@ -239,23 +257,9 @@ export function getVenueEventsForDate(date, options = {}) {
  */
 export function getVenuesSorted(options = {}) {
     const { includeDedicated = true, searchQuery = '' } = options;
-    const today = new Date();
-
-    let result = getActiveVenues().filter(v => isVenueActiveOn(v, today));
-
-    if (!includeDedicated) {
-        result = result.filter(v => !v.dedicated);
-    }
-
-    if (searchQuery) {
-        result = result.filter(v => venueMatchesSearch(v, searchQuery));
-    }
-
-    return [...result].sort((a, b) => {
-        const nameA = getSortableName(a.name).toLowerCase();
-        const nameB = getSortableName(b.name).toLowerCase();
-        return nameA.localeCompare(nameB);
-    });
+    return getActiveVenues()
+        .filter(v => venuePasses(v, { includeDedicated, searchQuery }))
+        .sort(byName);
 }
 
 /**
@@ -306,22 +310,16 @@ export function searchVenues(query, options = {}) {
 
     const q = query.toLowerCase().trim();
     const { includeDedicated = true } = options;
-    const today = new Date();
 
-    return getActiveVenues().filter(venue => {
-        if (!includeDedicated && venue.dedicated) return false;
-        if (!isVenueActiveOn(venue, today)) return false;
-        return venueMatchesSearch(venue, q);
-    }).sort((a, b) => {
-        // Prioritize name matches
-        const aNameMatch = containsIgnoreCase(a.name, q);
-        const bNameMatch = containsIgnoreCase(b.name, q);
-        if (aNameMatch && !bNameMatch) return -1;
-        if (!aNameMatch && bNameMatch) return 1;
-
-        // Then sort alphabetically
-        return getSortableName(a.name).localeCompare(getSortableName(b.name));
-    });
+    return getActiveVenues()
+        .filter(venue => venuePasses(venue, { includeDedicated, searchQuery: q }))
+        .sort((a, b) => {
+            // Prioritize name matches, then alphabetical
+            const aNameMatch = containsIgnoreCase(a.name, q);
+            const bNameMatch = containsIgnoreCase(b.name, q);
+            if (aNameMatch !== bNameMatch) return aNameMatch ? -1 : 1;
+            return byName(a, b);
+        });
 }
 
 /**
@@ -424,15 +422,10 @@ export function getNeighborhoods() {
  */
 export function getVenuesWithCoordinates(options = {}) {
     const { includeDedicated = true, searchQuery = '' } = options;
-    const today = new Date();
-
-    return getActiveVenues().filter(v => {
-        if (!v.coordinates?.lat || !v.coordinates?.lng) return false;
-        if (!includeDedicated && v.dedicated) return false;
-        if (!isVenueActiveOn(v, today)) return false;
-        if (searchQuery && !venueMatchesSearch(v, searchQuery)) return false;
-        return true;
-    });
+    return getActiveVenues().filter(v =>
+        v.coordinates?.lat && v.coordinates?.lng &&
+        venuePasses(v, { includeDedicated, searchQuery })
+    );
 }
 
 export { venues };
