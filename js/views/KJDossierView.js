@@ -16,7 +16,6 @@ import { getAllVenues, venueMatchesHost } from '../services/venues.js';
 import { escapeHtml, containsIgnoreCase, getSortableName } from '../utils/string.js';
 import {
     formatScheduleEntry,
-    formatTimeRange,
     parseLocalDate,
     WEEKDAYS
 } from '../utils/date.js';
@@ -208,11 +207,7 @@ export class KJDossierView extends Component {
     }
 
     renderOneTime(entry) {
-        const dateObj = parseLocalDate(entry.date);
-        const dateStr = dateObj.toLocaleDateString('en-US', {
-            weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
-        });
-        const time = formatTimeRange(entry.startTime, entry.endTime);
+        const { day: dateStr, time } = formatScheduleEntry(entry, { weekday: true });
         return `
             <li class="kj-dossier__show kj-dossier__show--once">
                 <span class="kj-dossier__show-when">

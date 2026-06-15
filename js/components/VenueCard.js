@@ -5,7 +5,7 @@
 
 import { Component } from './Component.js';
 import { escapeHtml } from '../utils/string.js';
-import { formatTimeRange, scheduleMatchesDate, getScheduleExclusion } from '../utils/date.js';
+import { formatTimeRange, scheduleMatchesDate, getScheduleExclusion, getDayName } from '../utils/date.js';
 import { buildMapUrl, formatAddress, sanitizeUrl } from '../utils/url.js';
 import { emit, Events } from '../core/events.js';
 import { isDebugMode, getDebugHtml } from '../utils/debug.js';
@@ -145,8 +145,8 @@ export class VenueCard extends Component {
         );
         if (onceEntry) return onceEntry;
 
-        // Fall back to recurring match
-        const dayName = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+        // Fall back to the recurring entry for this weekday
+        const dayName = getDayName(date);
         return venue.schedule.find(s => s.day?.toLowerCase() === dayName) || venue.schedule[0];
     }
 

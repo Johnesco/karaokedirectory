@@ -329,15 +329,19 @@ export function isDateInRange(date, startDate, endDate) {
  * @param {Object} entry - Schedule entry with day, frequency, startTime, endTime
  * @param {Object} options - Formatting options
  * @param {boolean} options.showEvery - Whether to show "Every" prefix (default: true)
+ * @param {boolean} [options.weekday] - Include the weekday in one-time date labels (default: false)
  * @returns {Object} Formatted schedule parts { day, frequencyPrefix, time, fullText }
  */
 export function formatScheduleEntry(entry, options = {}) {
-    const { showEvery = true } = options;
+    const { showEvery = true, weekday = false } = options;
 
     // One-time special event
     if (entry.frequency === 'once') {
-        const dateObj = new Date(entry.date + 'T12:00:00');
-        const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        const dateObj = parseLocalDate(entry.date);
+        const dateStr = dateObj.toLocaleDateString('en-US', {
+            ...(weekday ? { weekday: 'short' } : {}),
+            month: 'short', day: 'numeric', year: 'numeric'
+        });
         const time = formatTimeRange(entry.startTime, entry.endTime);
         const label = entry.eventName ? `${entry.eventName} — ${dateStr}` : `Special Event — ${dateStr}`;
         return { day: dateStr, frequencyPrefix: entry.eventName || 'Special Event', time, fullText: `${label}: ${time}` };
