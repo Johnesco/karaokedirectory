@@ -19,11 +19,33 @@ export function resolveHostFor(venue, scheduleEntry) {
 }
 
 /**
+ * Enumerate every host associated with a venue: the venue-level host (if any)
+ * plus each schedule entry that carries its own per-show host. Single source of
+ * truth for "who hosts here" — consumed by host search (venueMatchesHost), the
+ * KJ index, and the KJ dossier.
+ *
+ * Full-object override semantics mean a per-show host does not inherit the venue
+ * host; both still appear here because both are genuinely associated with the
+ * venue (the venue host covers the non-overridden shows).
+ *
+ * @param {Object} venue
+ * @returns {Array<{ host: Object, scope: 'venue'|'show', scheduleEntry: Object|null }>}
+ */
+export function getVenueHosts(venue) {
+    const hosts = [];
+    if (venue?.host) hosts.push({ host: venue.host, scope: 'venue', scheduleEntry: null });
+    for (const entry of venue?.schedule || []) {
+        if (entry.host) hosts.push({ host: entry.host, scope: 'show', scheduleEntry: entry });
+    }
+    return hosts;
+}
+
+/**
  * @param {Object} venue
  * @returns {boolean} True if any schedule entry carries its own host
  */
 function hasPerShowHosts(venue) {
-    return Array.isArray(venue?.schedule) && venue.schedule.some(e => e.host);
+    return getVenueHosts(venue).some(h => h.scope === 'show');
 }
 
 /**
