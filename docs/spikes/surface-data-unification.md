@@ -142,12 +142,14 @@ estimate to be replaced with "Actual" as each issue lands. S2 and S3 overlap on
 
 | Seam | Issue | Implementations today | Baseline dup LOC | Projected net LOC | Actual | Status |
 |---|---|---|---|---|---|---|
-| S1 host walk | #114 | 4 walks | ~100 | −40 … −60 | — | Not started |
+| S1 host walk | #114 | 4 walks | ~100 | −40 … −60 | net **+10** (+40/−30); `getVenueHosts` ~24 LOC offsets per-consumer savings; **4 walks → 1** | ✅ `114-get-venue-hosts`, pending Verify |
 | S2 schedule render | #115 | 6 formatters | ~93 | −15 … −30 (converge) | — | Not started |
-| S3 alpha detail parity | #116 | 2 detail renderers | 72 (`fullTemplate` 46 + `renderScheduleList` 26) | −55 … −60 | — | Not started |
+| S3 alpha detail parity | #116 | 2 detail renderers | 72 (`fullTemplate` 46 + `renderScheduleList` 26) | −55 … −60 | JS net **−57**; CSS **+95** (venue-card section styles) → net **+43**; **facts parity achieved** | ✅ `116-alphabetical-detail-parity`, pending Verify |
 | S4 service predicate/sort | #117 | 6 copies | ~50 | −30 … −50 | — | Not started |
 | S5 schema↔render | #118 | 3 phantom fields | ~18 | −18 (delete) / +schema (promote) | note −26 (render+CSS+debug); schema +18 (phone, host+event socials); **phantom 3→0** | ✅ Implemented on `118-schema-rendered-fields`, pending human Verify |
 | **Total** | (parent #113) | | **~330** | **−160 … −220** | | |
+
+**Actuals to date (S5, S1, S3 implemented).** Raw LOC is running **net-positive (~+45)**, not the projected −160…−220 — the projections under-counted the cost of the new *shared* code (the `getVenueHosts` primitive in S1; the `venue-card__*` section CSS in S3, which partly mirrors the modal/pane values). The realized value is **structural dedup + cross-surface consistency** (Alphabetical now shows per-show hosts / closures / active period it previously omitted), not raw line deletion. The largest *raw* reductions remain in S2 (converge 6 schedule renderers) and S4 (collapse 6 service predicates).
 
 Structural wins (independent of LOC):
 - host-walk implementations **4 → 1**
