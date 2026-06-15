@@ -66,7 +66,6 @@ export function renderScheduleTable(venue, classPrefix) {
                 <td data-label="Day">${dayLabel}${eventLink}</td>
                 <td data-label="Time">${formatted.time}</td>
                 ${hostCell}
-                ${entry.note ? `<td class="schedule-note" data-label="Note">${escapeHtml(entry.note)}</td>` : '<td data-label="Note"></td>'}
             </tr>
         `;
     }).join('');
@@ -78,7 +77,6 @@ export function renderScheduleTable(venue, classPrefix) {
                     <th>Day</th>
                     <th>Time</th>
                     ${showHostColumn ? '<th>Host</th>' : ''}
-                    <th>Note</th>
                 </tr>
             </thead>
             <tbody>

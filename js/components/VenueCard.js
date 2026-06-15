@@ -95,7 +95,6 @@ export class VenueCard extends Component {
                     <div class="venue-card__time">
                         <i class="fa-regular fa-clock"></i> ${frequencyHtml}${timeDisplay}
                         ${!eventName && schedule?.eventUrl ? `<a href="${escapeHtml(sanitizeUrl(schedule.eventUrl) || '')}" target="_blank" rel="noopener noreferrer" class="venue-card__event-link" title="Event page"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : ''}
-                        ${schedule?.note ? `<span class="venue-card__note">${escapeHtml(schedule.note)}</span>` : ''}
                     </div>
                 ` : ''}
                 ${showSchedule ? moreNightsHtml : ''}
@@ -181,7 +180,6 @@ export class VenueCard extends Component {
                 <li class="venue-card__schedule-item">
                     <span class="venue-card__schedule-day">${dayLabel}${eventLink}</span>
                     <span class="venue-card__schedule-time">${formatted.time}</span>
-                    ${entry.note ? `<span class="venue-card__schedule-note">${escapeHtml(entry.note)}</span>` : ''}
                 </li>
             `;
         }).join('');

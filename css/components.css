@@ -334,12 +334,6 @@
     color: var(--text-secondary);
 }
 
-.venue-card__note {
-    font-style: italic;
-    opacity: 0.8;
-    margin-left: var(--spacing-sm);
-}
-
 .venue-card__more-nights {
     display: flex;
     align-items: center;
@@ -445,12 +439,6 @@
 
 .venue-card__schedule-time {
     color: var(--text-secondary);
-}
-
-.venue-card__schedule-note {
-    color: var(--text-muted);
-    font-style: italic;
-    width: 100%;
 }
 
 .venue-card__host {
@@ -634,13 +622,6 @@
     font-size: var(--font-size-sm);
 }
 
-.venue-modal__schedule-table .schedule-note,
-.detail-pane__schedule-table .schedule-note {
-    color: var(--text-muted);
-    font-style: italic;
-    font-size: var(--font-size-sm);
-}
-
 .venue-modal__active-period,
 .detail-pane__active-period {
     color: var(--color-warning);
@@ -750,7 +731,7 @@
     }
 
     /* Stack the schedule table into label/value cards on small phones — a
-       4-column table (Day/Time/Host/Note) is too cramped here. data-label
+       3-column table (Day/Time/Host) is too cramped here. data-label
        attributes come from renderScheduleTable() in js/utils/render.js. */
     .venue-modal__schedule-table,
     .venue-modal__schedule-table tbody {
@@ -774,7 +755,7 @@
         border: none;
     }
 
-    /* Empty cells (e.g. a show with no note) collapse instead of showing a bare label */
+    /* Empty cells (e.g. a show with no host) collapse instead of showing a bare label */
     .venue-modal__schedule-table td:empty {
         display: none;
     }

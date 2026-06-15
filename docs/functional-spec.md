@@ -580,6 +580,7 @@ The shape `{ tagDefinitions, listings }` is the contract — both the local file
       endTime           string|null   24-hour format "HH:MM" or null (open-ended)
       eventUrl          string        OPTIONAL  Link to event page
       exclusions        array         OPTIONAL  Dates this show is skipped (see "Schedule Exclusions")
+      socials           object|null   OPTIONAL  Event-level social links (same shape as venue `socials`)
 
     One-time entry:
       frequency         string        "once"
@@ -588,6 +589,7 @@ The shape `{ tagDefinitions, listings }` is the contract — both the local file
       endTime           string|null   24-hour format "HH:MM" or null
       eventName         string        OPTIONAL  Display name for the event
       eventUrl          string        OPTIONAL  Link to event page
+      socials           object|null   OPTIONAL  Event-level social links (same shape as venue `socials`)
 
   activePeriod          object        OPTIONAL  Limits when venue appears
     activePeriod.start  string        "YYYY-MM-DD"
@@ -597,6 +599,7 @@ The shape `{ tagDefinitions, listings }` is the contract — both the local file
     host.name           string        OPTIONAL  Individual KJ name
     host.affiliation    string        OPTIONAL  Parent company/org (e.g. "Starling Karaoke")
     host.website        string        OPTIONAL  Host/KJ personal website
+    host.socials        object|null   OPTIONAL  KJ/host social links (same shape as venue `socials`)
 
   socials               object|null   OPTIONAL
     socials.website     string        OPTIONAL
@@ -607,7 +610,7 @@ The shape `{ tagDefinitions, listings }` is the contract — both the local file
     socials.youtube     string        OPTIONAL
     socials.bluesky     string        OPTIONAL
 
-  phone                 string        OPTIONAL  Venue phone number (displayed in detail views)
+  phone                 string        OPTIONAL  Venue's public phone — tel: link in detail views (venue line only, not KJ/host or curator-internal)
 }
 ```
 
