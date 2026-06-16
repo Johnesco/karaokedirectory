@@ -19,11 +19,33 @@ export function resolveHostFor(venue, scheduleEntry) {
 }
 
 /**
+ * Enumerate every host associated with a venue: the venue-level host (if any)
+ * plus each schedule entry that carries its own per-show host. Single source of
+ * truth for "who hosts here" — consumed by host search (venueMatchesHost), the
+ * KJ index, and the KJ dossier.
+ *
+ * Full-object override semantics mean a per-show host does not inherit the venue
+ * host; both still appear here because both are genuinely associated with the
+ * venue (the venue host covers the non-overridden shows).
+ *
+ * @param {Object} venue
+ * @returns {Array<{ host: Object, scope: 'venue'|'show', scheduleEntry: Object|null }>}
+ */
+export function getVenueHosts(venue) {
+    const hosts = [];
+    if (venue?.host) hosts.push({ host: venue.host, scope: 'venue', scheduleEntry: null });
+    for (const entry of venue?.schedule || []) {
+        if (entry.host) hosts.push({ host: entry.host, scope: 'show', scheduleEntry: entry });
+    }
+    return hosts;
+}
+
+/**
  * @param {Object} venue
  * @returns {boolean} True if any schedule entry carries its own host
  */
 function hasPerShowHosts(venue) {
-    return Array.isArray(venue?.schedule) && venue.schedule.some(e => e.host);
+    return getVenueHosts(venue).some(h => h.scope === 'show');
 }
 
 /**
@@ -66,7 +88,6 @@ export function renderScheduleTable(venue, classPrefix) {
                 <td data-label="Day">${dayLabel}${eventLink}</td>
                 <td data-label="Time">${formatted.time}</td>
                 ${hostCell}
-                ${entry.note ? `<td class="schedule-note" data-label="Note">${escapeHtml(entry.note)}</td>` : '<td data-label="Note"></td>'}
             </tr>
         `;
     }).join('');
@@ -78,7 +99,6 @@ export function renderScheduleTable(venue, classPrefix) {
                     <th>Day</th>
                     <th>Time</th>
                     ${showHostColumn ? '<th>Host</th>' : ''}
-                    <th>Note</th>
                 </tr>
             </thead>
             <tbody>
@@ -296,7 +316,7 @@ export function getScheduleContext(venue, schedule, currentDate = null) {
  * @param {string} [options.hostSocialSize='fa-lg'] - Font Awesome size class for host socials ('' for compact)
  * @returns {string} HTML string of <section> elements
  */
-export function renderVenueDetailSections(venue, { classPrefix, hostSocialSize = 'fa-lg' }) {
+export function renderVenueDetailSections(venue, { classPrefix, hostSocialSize = 'fa-lg', actions = true }) {
     const addressHtml = formatAddress(venue.address);
     const mapUrl = buildMapUrl(venue.address, venue.name);
     const directionsUrl = buildDirectionsUrl(venue.address, venue.name);
@@ -313,7 +333,7 @@ export function renderVenueDetailSections(venue, { classPrefix, hostSocialSize =
         <section class="${classPrefix}__section">
             <h3><i class="fa-solid fa-location-dot"></i> Location</h3>
             <address class="${classPrefix}__address">${addressHtml}</address>
-            <div class="${classPrefix}__map-links">
+            ${actions ? `<div class="${classPrefix}__map-links">
                 <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" class="btn btn--secondary">
                     <i class="fa-solid fa-map"></i> View Map
                 </a>
@@ -323,7 +343,7 @@ export function renderVenueDetailSections(venue, { classPrefix, hostSocialSize =
                 <button class="btn btn--secondary ${classPrefix}__share" type="button">
                     <i class="fa-solid fa-share-from-square"></i> Share
                 </button>
-            </div>
+            </div>` : ''}
         </section>
 
         <section class="${classPrefix}__section">

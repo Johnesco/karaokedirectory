@@ -73,7 +73,6 @@ export function getVenueDebugInfo(venue, date) {
                     day: sched.date,
                     startTime: sched.startTime,
                     endTime: sched.endTime,
-                    note: sched.note,
                     eventName: sched.eventName
                 });
             }
@@ -89,8 +88,7 @@ export function getVenueDebugInfo(venue, date) {
                 frequency: sched.frequency,
                 day: sched.day,
                 startTime: sched.startTime,
-                endTime: sched.endTime,
-                note: sched.note
+                endTime: sched.endTime
             });
         }
     }

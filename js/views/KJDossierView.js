@@ -13,14 +13,13 @@ import { Component } from '../components/Component.js';
 import { getState } from '../core/state.js';
 import { on, Events } from '../core/events.js';
 import { getAllVenues, venueMatchesHost } from '../services/venues.js';
-import { escapeHtml, containsIgnoreCase } from '../utils/string.js';
+import { escapeHtml, containsIgnoreCase, getSortableName } from '../utils/string.js';
 import {
     formatScheduleEntry,
-    formatTimeRange,
     parseLocalDate,
     WEEKDAYS
 } from '../utils/date.js';
-import { resolveHostFor } from '../utils/render.js';
+import { resolveHostFor, getVenueHosts } from '../utils/render.js';
 
 export class KJDossierView extends Component {
     init() {
@@ -96,18 +95,12 @@ export class KJDossierView extends Component {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        const hasAnyHost = (host) => {
-            if (!host) return false;
-            const name = host.name?.trim();
-            const aff = host.affiliation?.trim();
-            return !!(name || aff);
-        };
+        const hasNamedHost = (v) => getVenueHosts(v).some(({ host }) =>
+            host.name?.trim() || host.affiliation?.trim()
+        );
 
         return getAllVenues()
-            .filter(v => {
-                if (hasAnyHost(v.host)) return false;
-                return !(v.schedule || []).some(e => hasAnyHost(e.host));
-            })
+            .filter(v => !hasNamedHost(v))
             .map(v => {
                 const recurring = (v.schedule || [])
                     .filter(e => e.frequency !== 'once')
@@ -127,7 +120,7 @@ export class KJDossierView extends Component {
             // Show every hostless venue — including ones with no upcoming events.
             // These are exactly the records a curator wants to audit, so don't hide
             // stale ones (unlike the KJ-dossier path, which filters out stale-only).
-            .sort((a, b) => a.venue.name.localeCompare(b.venue.name));
+            .sort((a, b) => getSortableName(a.venue.name).localeCompare(getSortableName(b.venue.name)));
     }
 
     /**
@@ -173,7 +166,7 @@ export class KJDossierView extends Component {
                 return { venue: v, recurring, oneTimes };
             })
             .filter(m => m.recurring.length > 0 || m.oneTimes.length > 0)
-            .sort((a, b) => a.venue.name.localeCompare(b.venue.name));
+            .sort((a, b) => getSortableName(a.venue.name).localeCompare(getSortableName(b.venue.name)));
 
         return matches;
     }
@@ -214,11 +207,7 @@ export class KJDossierView extends Component {
     }
 
     renderOneTime(entry) {
-        const dateObj = parseLocalDate(entry.date);
-        const dateStr = dateObj.toLocaleDateString('en-US', {
-            weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
-        });
-        const time = formatTimeRange(entry.startTime, entry.endTime);
+        const { day: dateStr, time } = formatScheduleEntry(entry, { weekday: true });
         return `
             <li class="kj-dossier__show kj-dossier__show--once">
                 <span class="kj-dossier__show-when">

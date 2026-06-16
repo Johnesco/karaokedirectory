@@ -76,6 +76,11 @@
             { "type": "null" },
             { "$ref": "#/$defs/socials" }
           ]
+        },
+        "phone": {
+          "type": "string",
+          "pattern": "^[-0-9+(). ]{7,}$",
+          "description": "Public phone number for the venue, rendered as a tel: link in detail views. The venue's line only — not a KJ/host or curator-internal number."
         }
       }
     },
@@ -156,6 +161,12 @@
               "reason": { "type": "string", "minLength": 1 }
             }
           }
+        },
+        "socials": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/socials" }
+          ]
         }
       },
       "allOf": [
@@ -177,7 +188,13 @@
       "properties": {
         "name": { "type": "string", "minLength": 1 },
         "affiliation": { "type": "string", "minLength": 1 },
-        "website": { "type": "string", "format": "uri" }
+        "website": { "type": "string", "format": "uri" },
+        "socials": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/socials" }
+          ]
+        }
       },
       "anyOf": [
         { "required": ["name"] },
