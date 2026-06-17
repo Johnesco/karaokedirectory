@@ -7,7 +7,7 @@ A mobile-friendly web application for discovering karaoke venues in and around A
 - **Weekly Calendar View** — See which venues have karaoke each night across a 7-day schedule with week navigation, plus extended sections showing Next Week, This Month, and Next Month
 - **Alphabetical Listing** — Browse all 70+ venues sorted A-Z with letter index for quick jumps
 - **Interactive Map** — Full-screen immersive map with floating controls and venue cards (Leaflet.js)
-- **Global Search** — Filter venues by name, city, neighborhood, host, company, or tags across all views
+- **Global Search** — Filter venues by name, city, neighborhood, host, affiliation, or tags across all views
 - **Venue Details** — View addresses, schedules, host/KJ info, and social media links (mobile modal / desktop side pane)
 - **Venue Tags** — 19 color-coded badges showing venue characteristics (LGBTQ+, 21+, Dive Bar, Live Band, etc.)
 - **Special Events** — One-time karaoke events with specific dates, event names, and event page links
@@ -123,7 +123,8 @@ Know a karaoke spot that's missing? You can:
       startTime: "20:00",
       endTime: "23:00",
       eventName: "Karaoke Night",  // Optional: event display name
-      eventUrl: "https://..."      // Optional: event page link
+      eventUrl: "https://...",     // Optional: event page link
+      socials: { instagram: "https://..." } // Optional: event-level social links
     }
   ],
   activePeriod: {             // Optional: limits when venue appears
@@ -132,8 +133,9 @@ Know a karaoke spot that's missing? You can:
   },
   host: {                     // Optional
     name: "KJ Name",
-    company: "Company Name",
-    website: "https://..."    // Optional: host/KJ website
+    affiliation: "Company Name", // Parent company/org (field is "affiliation")
+    website: "https://...",   // Optional: host/KJ website
+    socials: { instagram: "https://..." } // Optional: KJ/host social links
   },
   socials: {                  // All optional
     website: "https://...",
@@ -143,7 +145,8 @@ Know a karaoke spot that's missing? You can:
     tiktok: "https://tiktok.com/...",
     youtube: "https://youtube.com/...",
     bluesky: "https://bsky.app/..."
-  }
+  },
+  phone: "512-555-1234"       // Optional: venue's public phone
 }
 ```
 

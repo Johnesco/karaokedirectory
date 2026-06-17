@@ -213,7 +213,8 @@ When adding or modifying venues in `js/data.js`, follow this structure:
       startTime: "20:00",
       endTime: "23:00",
       eventName: "Event Name", // Optional: display name for the event
-      eventUrl: "https://..."  // Optional: link to event page
+      eventUrl: "https://...", // Optional: link to event page
+      socials: { instagram: "https://..." } // Optional: event-level social links (same shape as venue socials)
     }
   ],
   activePeriod: {             // Optional: limits when venue appears
@@ -223,7 +224,8 @@ When adding or modifying venues in `js/data.js`, follow this structure:
   host: {                     // Optional: default host for shows that don't override
     name: "KJ Name",
     affiliation: "Karaoke Company Name", // Use "affiliation", not "company"
-    website: "https://..."    // Optional: host/KJ website
+    website: "https://...",   // Optional: host/KJ website
+    socials: { instagram: "https://..." } // Optional: KJ/host social links (same shape as venue socials)
   },
   socials: {                  // All optional
     website: "https://...",
@@ -233,7 +235,8 @@ When adding or modifying venues in `js/data.js`, follow this structure:
     tiktok: "https://tiktok.com/...",
     youtube: "https://youtube.com/...",
     bluesky: "https://bsky.app/..."
-  }
+  },
+  phone: "512-555-1234"       // Optional: venue's public phone (tel: link in detail views)
 }
 ```
 
