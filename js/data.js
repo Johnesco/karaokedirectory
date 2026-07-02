@@ -1171,8 +1171,8 @@ const karaokeData = {
       "id": "hard-count-kitchen-and-cocktails",
       "name": "Hard Count Kitchen & Cocktails",
       "tags": [
-        "restaurant",
-        "sports-bar"
+        "sports-bar",
+        "restaurant"
       ],
       "dedicated": false,
       "address": {
@@ -1193,14 +1193,15 @@ const karaokeData = {
         "affiliation": "Diamond Karaoke Austin"
       },
       "socials": {
+        "website": "https://hardcountgtown.com/",
         "facebook": "https://www.facebook.com/hardcountgtown/?ref=page_internal",
-        "instagram": "https://www.instagram.com/hardcountgtown/",
-        "website": "https://hardcountgtown.com/"
+        "instagram": "https://www.instagram.com/hardcountgtown/"
       },
       "coordinates": {
         "lat": 30.649202770037,
         "lng": -97.687912262317
-      }
+      },
+      "active": false
     },
     {
       "id": "the-highball",
