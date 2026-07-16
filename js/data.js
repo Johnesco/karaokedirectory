@@ -3027,6 +3027,41 @@ const karaokeData = {
         "lat": 30.0866036,
         "lng": -97.8359963
       }
+    },
+    {
+      "id": "austin-deaf-club",
+      "name": "Austin Deaf Club",
+      "dedicated": false,
+      "address": {
+        "street": "8818 Cullen Ln",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78748"
+      },
+      "schedule": [
+        {
+          "frequency": "once",
+          "date": "2026-08-22",
+          "startTime": "16:00",
+          "endTime": "00:00",
+          "eventName": "Rainbow Party: Colors of Love",
+          "eventUrl": "https://www.facebook.com/photo/?fbid=1721649292771052"
+        }
+      ],
+      "socials": {
+        "website": "https://www.austindeafclub.org/",
+        "facebook": "https://www.facebook.com/AustinDeafClub/",
+        "instagram": "https://www.instagram.com/austindeafclub",
+        "youtube": "https://www.youtube.com/@austindeafclub"
+      },
+      "coordinates": {
+        "lat": 30.1703466,
+        "lng": -97.7935715
+      },
+      "tags": [
+        "lgbtq",
+        "special-event"
+      ]
     }
   ]
 };
