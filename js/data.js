@@ -3062,6 +3062,66 @@ const karaokeData = {
         "lgbtq",
         "special-event"
       ]
+    },
+    {
+      "id": "crow-bar",
+      "name": "Crow Bar",
+      "dedicated": false,
+      "address": {
+        "street": "523 Thompson Lane",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78742"
+      },
+      "schedule": [
+        {
+          "frequency": "every",
+          "day": "Tuesday",
+          "startTime": "21:00",
+          "endTime": null
+        }
+      ],
+      "socials": {
+        "facebook": "https://www.facebook.com/102026119842120",
+        "instagram": "https://www.instagram.com/crowbaraustin"
+      },
+      "host": {
+        "affiliation": "Poppin' Off with Poppy Karaoke"
+      },
+      "coordinates": {
+        "lat": 30.2369131,
+        "lng": -100.1241795
+      }
+    },
+    {
+      "id": "wanderlust-wine-shady",
+      "name": "Wanderlust Wine (Shady Ln)",
+      "dedicated": false,
+      "address": {
+        "street": "702 Shady Lane",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78702"
+      },
+      "schedule": [
+        {
+          "frequency": "once",
+          "date": "2026-07-25",
+          "startTime": "19:00",
+          "endTime": "22:00",
+          "eventName": "Joy Resistance Presents"
+        }
+      ],
+      "coordinates": {
+        "lat": 30.2541011,
+        "lng": -97.7000387
+      },
+      "tags": [
+        "lgbtq"
+      ],
+      "host": {
+        "affiliation": "Starling Karaoke"
+      }
     }
   ]
 };
