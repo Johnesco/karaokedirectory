@@ -133,6 +133,7 @@ karaokedirectory/
 │   └── utils/
 │       ├── date.js        # Date formatting, schedule matching
 │       ├── debug.js       # Debug mode utilities
+│       ├── hosts.js       # Host ref hydration (kjs/companies registries, ADR-007)
 │       ├── render.js      # Shared rendering (schedule table, host section, active period)
 │       ├── string.js      # Text manipulation, escaping
 │       ├── tags.js        # Venue tag rendering and configuration
@@ -251,6 +252,25 @@ Where this is consumed:
 - `js/utils/render.js` → `resolveHostFor(venue, scheduleEntry)` returns the effective host. `renderScheduleTable()` adds a "Host" column whenever any entry has its own host.
 - `js/views/KJIndexView.js` → walks both `venue.host` and `schedule[].host` when enumerating KJs.
 - `js/services/venues.js` → `venueMatchesHost()` matches at either level.
+
+### Host registries (ADR-007)
+
+Hosts are being normalized out of inline objects into two top-level registries, referenced by id — the same indirection `tags[]` uses:
+
+```javascript
+kjs: { "kj-stephanie": { name: "KJ Stephanie" } },          // people and named acts
+companies: { "starling-karaoke": { name: "Starling Karaoke", website: "https://..." } },
+listings: [
+  { id: "some-bar", host: { kjId: "kj-stephanie", companyId: "starling-karaoke" } }
+]
+```
+
+- A **host ref** is `{ kjId?, companyId? }` with at least one id: company-only (a company runs it, KJ rotates/unknown), KJ-only (independent), or both. Valid at venue level and per schedule entry, with the same full-swap override rule.
+- **The KJ↔company link lives on the show, not on the entities** — no company on a KJ, no roster on a company. Rosters and the KJ index are derived by scanning shows, so they can't go stale, and a KJ can work under different companies at different venues.
+- `hydrateVenues()` in `js/utils/hosts.js` resolves refs inside `initVenues()` into the legacy display shape (KJ fields win, company fills gaps), so nothing downstream needs to know which form was stored.
+- **Both forms are accepted during the migration window.** `data.json` is not yet migrated (that's #124 Phase 2); `submit.html` still emits the legacy inline shape for curator reconciliation. `validate-data.js` fails on unresolvable ids and warns on unreferenced or same-named registry entries.
+
+Full detail: [functional spec §11 "Host Registries"](docs/functional-spec.md).
 
 ### Venue Tags
 
@@ -488,6 +508,10 @@ Current ADRs:
 - [ADR-002](docs/adr/002-vanilla-js-no-build.md) — Vanilla JS, no framework, no build step
 - [ADR-003](docs/adr/003-github-pages-deploy.md) — GitHub Pages as deploy target
 - [ADR-004](docs/adr/004-parallel-data-source-flag.md) — Parallel data source via URL flag
+- [ADR-005](docs/adr/005-venue-json-schema.md) — Venue JSON Schema as single source of truth
+- [ADR-006](docs/adr/006-data-json-canonical.md) — `js/data.json` canonical, `js/data.js` auto-generated
+- [ADR-007](docs/adr/007-host-registry-normalization.md) — Host normalization: KJ and company registries referenced by shows
+- [ADR-008](docs/adr/008-fetch-data-json-directly.md) — Browser fetches `js/data.json`, removing the generated `data.js` wrapper
 
 ## Security Considerations
 - Always use `escapeHtml()` when rendering user-provided content

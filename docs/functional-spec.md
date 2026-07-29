@@ -595,11 +595,15 @@ The shape `{ tagDefinitions, listings }` is the contract — both the local file
     activePeriod.start  string        "YYYY-MM-DD"
     activePeriod.end    string        "YYYY-MM-DD"
 
-  host                  object|null   OPTIONAL
-    host.name           string        OPTIONAL  Individual KJ name
-    host.affiliation    string        OPTIONAL  Parent company/org (e.g. "Starling Karaoke")
-    host.website        string        OPTIONAL  Host/KJ personal website
-    host.socials        object|null   OPTIONAL  KJ/host social links (same shape as venue `socials`)
+  host                  object|null   OPTIONAL  Two accepted forms — see "Host Registries" below
+    Registry ref (preferred, ADR-007) — at least one id required:
+      host.kjId         string        OPTIONAL  Key into the top-level `kjs` map
+      host.companyId    string        OPTIONAL  Key into the top-level `companies` map
+    Legacy inline (accepted during the migration window):
+      host.name         string        OPTIONAL  Individual KJ name
+      host.affiliation  string        OPTIONAL  Parent company/org (e.g. "Starling Karaoke")
+      host.website      string        OPTIONAL  Host/KJ personal website
+      host.socials      object|null   OPTIONAL  KJ/host social links (same shape as venue `socials`)
 
   socials               object|null   OPTIONAL
     socials.website     string        OPTIONAL
@@ -613,6 +617,31 @@ The shape `{ tagDefinitions, listings }` is the contract — both the local file
   phone                 string        OPTIONAL  Venue's public phone — tel: link in detail views (venue line only, not KJ/host or curator-internal)
 }
 ```
+
+### Host Registries
+
+Who runs a show is stored once, in two top-level maps alongside `tagDefinitions`, and referenced by id — the same indirection `tags[]` already uses. See [ADR-007](adr/007-host-registry-normalization.md).
+
+```
+kjs                     object        OPTIONAL  id → { name, website?, socials? }   People and named acts
+companies               object        OPTIONAL  id → { name, website?, socials? }   Karaoke companies
+```
+
+A **host ref** is the pair `{ kjId?, companyId? }`, with at least one id present:
+
+| Recorded as | Means |
+|---|---|
+| `companyId` only | A company runs the night; the KJ is unrecorded or rotates |
+| `kjId` only | An independent KJ |
+| both | That KJ, working under that company, at that show |
+
+**The KJ↔company association lives on the show, never on the registry entries.** A KJ has no stored company and a company has no stored roster, so one person can work under different companies at different venues, and "which KJs does this company field?" is derived by scanning shows. Derived rollups can go stale only when the shows do, which matches the directory's "the week is the heartbeat" stance.
+
+**Specificity overrides:** a ref on a schedule entry fully replaces the venue-level ref for that show (no field-level merge), the same rule the legacy inline host already followed. Effective host = `entry.host ?? venue.host`.
+
+**Hydration:** `hydrateVenues()` in `js/utils/hosts.js` resolves refs at load time inside `initVenues()`, producing the legacy display shape `{ name, affiliation, website, socials }` — KJ fields win, the company fills gaps (a KJ with no website of their own shows the company's). Views, components, search, and the KJ pages therefore only ever see one host shape. The resolved object also carries `kjId`/`companyId` for id-aware consumers.
+
+**Transition window:** the schema accepts either form, and venues carrying no refs pass through hydration untouched, so `data.json`, the external curator, and `submit.html` can migrate independently. `submit.html` emits the legacy inline shape for curator reconciliation. Unresolvable ids fail `validate-data.js` (and warn in the console at runtime, rendering what resolved rather than dropping the host block). Unreferenced or same-named registry entries are reported as non-fatal validator warnings.
 
 ### Schedule Exclusions
 
