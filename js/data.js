@@ -3089,8 +3089,8 @@ const karaokeData = {
         "affiliation": "Poppin' Off with Poppy Karaoke"
       },
       "coordinates": {
-        "lat": 30.2369131,
-        "lng": -100.1241795
+        "lat": 30.2385305,
+        "lng": -97.6839639
       }
     },
     {
