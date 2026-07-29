@@ -1171,8 +1171,8 @@
       "id": "hard-count-kitchen-and-cocktails",
       "name": "Hard Count Kitchen & Cocktails",
       "tags": [
-        "restaurant",
-        "sports-bar"
+        "sports-bar",
+        "restaurant"
       ],
       "dedicated": false,
       "address": {
@@ -1193,14 +1193,15 @@
         "affiliation": "Diamond Karaoke Austin"
       },
       "socials": {
+        "website": "https://hardcountgtown.com/",
         "facebook": "https://www.facebook.com/hardcountgtown/?ref=page_internal",
-        "instagram": "https://www.instagram.com/hardcountgtown/",
-        "website": "https://hardcountgtown.com/"
+        "instagram": "https://www.instagram.com/hardcountgtown/"
       },
       "coordinates": {
         "lat": 30.649202770037,
         "lng": -97.687912262317
-      }
+      },
+      "active": false
     },
     {
       "id": "the-highball",
@@ -3025,6 +3026,101 @@
       "coordinates": {
         "lat": 30.0866036,
         "lng": -97.8359963
+      }
+    },
+    {
+      "id": "austin-deaf-club",
+      "name": "Austin Deaf Club",
+      "dedicated": false,
+      "address": {
+        "street": "8818 Cullen Ln",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78748"
+      },
+      "schedule": [
+        {
+          "frequency": "once",
+          "date": "2026-08-22",
+          "startTime": "16:00",
+          "endTime": "00:00",
+          "eventName": "Rainbow Party: Colors of Love",
+          "eventUrl": "https://www.facebook.com/photo/?fbid=1721649292771052"
+        }
+      ],
+      "socials": {
+        "website": "https://www.austindeafclub.org/",
+        "facebook": "https://www.facebook.com/AustinDeafClub/",
+        "instagram": "https://www.instagram.com/austindeafclub",
+        "youtube": "https://www.youtube.com/@austindeafclub"
+      },
+      "coordinates": {
+        "lat": 30.1703466,
+        "lng": -97.7935715
+      },
+      "tags": [
+        "lgbtq",
+        "special-event"
+      ]
+    },
+    {
+      "id": "crow-bar",
+      "name": "Crow Bar",
+      "dedicated": false,
+      "address": {
+        "street": "523 Thompson Lane",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78742"
+      },
+      "schedule": [
+        {
+          "frequency": "every",
+          "day": "Tuesday",
+          "startTime": "21:00",
+          "endTime": null
+        }
+      ],
+      "socials": {
+        "facebook": "https://www.facebook.com/102026119842120",
+        "instagram": "https://www.instagram.com/crowbaraustin"
+      },
+      "host": {
+        "affiliation": "Poppin' Off with Poppy Karaoke"
+      },
+      "coordinates": {
+        "lat": 30.2369131,
+        "lng": -100.1241795
+      }
+    },
+    {
+      "id": "wanderlust-wine-shady",
+      "name": "Wanderlust Wine (Shady Ln)",
+      "dedicated": false,
+      "address": {
+        "street": "702 Shady Lane",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78702"
+      },
+      "schedule": [
+        {
+          "frequency": "once",
+          "date": "2026-07-25",
+          "startTime": "19:00",
+          "endTime": "22:00",
+          "eventName": "Joy Resistance Presents"
+        }
+      ],
+      "coordinates": {
+        "lat": 30.2541011,
+        "lng": -97.7000387
+      },
+      "tags": [
+        "lgbtq"
+      ],
+      "host": {
+        "affiliation": "Starling Karaoke"
       }
     }
   ]
