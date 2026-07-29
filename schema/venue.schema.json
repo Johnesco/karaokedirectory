@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://karaokedirectory.com/schemas/venue.schema.json",
   "title": "Karaoke Venue Database",
-  "description": "Schema for js/data.js — the full venue listings database. Single source of truth for validate-data.js (CI), submit.html payload shape, the external curator tool, and future Supabase JSONB rows. Cross-reference constraints (e.g. tags must exist in tagDefinitions) are enforced as supplementary checks in scripts/validate-data.js since JSON Schema cannot express them.",
+  "description": "Schema for js/data.json — the full venue listings database. Single source of truth for validate-data.js (CI), submit.html payload shape, the external curator tool, and future Supabase JSONB rows. Cross-reference constraints (e.g. tags must exist in tagDefinitions) are enforced as supplementary checks in scripts/validate-data.js since JSON Schema cannot express them.",
   "type": "object",
   "required": ["tagDefinitions", "listings"],
   "additionalProperties": false,

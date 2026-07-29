@@ -44,7 +44,7 @@ export class KJDossierView extends Component {
                     </header>
                     ${!isNone ? `
                         <p class="kj-dossier__empty-hint">
-                            Nothing matches that KJ name in <code>js/data.js</code>.
+                            Nothing matches that KJ name in the directory data.
                             Check spelling or contact the directory maintainer to get your venues listed.
                         </p>
                     ` : `

@@ -1,15 +1,15 @@
 /**
  * Tag configuration and rendering utilities
  * Tags provide descriptive information about venue characteristics (type, policies, amenities)
- * Configuration is loaded from data.js at runtime
+ * Configuration is loaded from js/data.json at runtime
  */
 
-// Tag configuration - initialized from data.js
+// Tag configuration - initialized from js/data.json
 let tagConfig = {};
 
 /**
  * Initialize tag configuration from data
- * @param {Object} definitions - Tag definitions from karaokeData.tagDefinitions
+ * @param {Object} definitions - Tag definitions from the data file's tagDefinitions
  */
 export function initTagConfig(definitions) {
     tagConfig = definitions || {};

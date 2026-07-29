@@ -3,7 +3,7 @@
  * Handles loading, filtering, sorting, and querying venue data.
  *
  * Key exports:
- * - initVenues(data): Initialize venue data from data.js
+ * - initVenues(data): Initialize venue data from js/data.json
  * - getAllVenues(): Get all active venues
  * - getVenueById(id): Get single venue by ID
  * - getVenuesForDate(date, options): Get venues with karaoke on a specific date
