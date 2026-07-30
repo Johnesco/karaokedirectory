@@ -35,8 +35,8 @@
 - Event bus for component communication (`js/core/events.js`)
 
 ### 5. Data Layer
-- **Canonical source: `js/data.json`** (#102). Dev scripts and the curator read/write this.
-- **Browser runtime: `js/data.js`** — a one-line wrapper (`const karaokeData = ...;`) generated from `data.json` by `scripts/sync-data-js.js`. CI enforces sync via `node scripts/sync-data-js.js --check`.
+- **Single source: `js/data.json`** (#102, ADR-006). Dev scripts, the curator, and the browser all read this one file — the browser fetches it at runtime (ADR-008), so there is no generated copy to keep in sync.
+- Because data arrives by `fetch`, the site must be served over http(s). Opening `index.html` from disk won't work (`fetch` is blocked on `file://`).
 - Supabase wiring exists (`js/services/supabase.js`, JSONB-heavy 2-table schema in `supabase/migrations/`) but is currently **disabled** via `useSupabase: false` in `js/config.js`. See spec §11 *Storage and Data Flow*.
 - Service layer abstracts data access (`js/services/venues.js`) — data-source agnostic, so the swap is a one-flag change
 - Schedule matching logic handles complex recurrence patterns
@@ -103,8 +103,7 @@ karaokedirectory/
 │
 ├── js/
 │   ├── app.js             # Application entry point
-│   ├── data.json          # Venue database — CANONICAL (#102, edit this)
-│   ├── data.js            # Browser runtime wrapper — generated from data.json
+│   ├── data.json          # Venue database — the single source (edit this)
 │   ├── bingo.js           # Bingo game logic
 │   │
 │   ├── core/
@@ -134,6 +133,7 @@ karaokedirectory/
 │   └── utils/
 │       ├── date.js        # Date formatting, schedule matching
 │       ├── debug.js       # Debug mode utilities
+│       ├── hosts.js       # Host ref hydration (kjs/companies registries, ADR-007)
 │       ├── render.js      # Shared rendering (schedule table, host section, active period)
 │       ├── string.js      # Text manipulation, escaping
 │       ├── tags.js        # Venue tag rendering and configuration
@@ -141,8 +141,7 @@ karaokedirectory/
 │       └── validation.js  # Form validation
 │
 ├── scripts/               # Developer tools
-│   ├── geocode-venues.js  # Add coordinates to venues (patches data.json + syncs data.js)
-│   ├── sync-data-js.js    # Regenerate js/data.js from js/data.json (CI gate)
+│   ├── geocode-venues.js  # Add coordinates to venues (patches data.json)
 │   ├── validate-data.js   # Validate venue data integrity (Ajv + supplementary checks)
 │   └── audit-for-supabase.js  # Pre-seed validation against logical rules
 │
@@ -151,7 +150,7 @@ karaokedirectory/
 │
 ├── supabase/              # Supabase schema + seed pipeline
 │   ├── migrations/        # SQL migrations (001–004; 004 is the current JSONB schema)
-│   ├── seed-from-data.js  # Generates seed.sql from js/data.js
+│   ├── seed-from-data.js  # Generates seed.sql from js/data.json
 │   └── seed.sql           # Generated INSERT statements for venues + tags
 │
 ├── assets/images/         # Static images
@@ -171,7 +170,7 @@ karaokedirectory/
 
 The shape below is a human-readable summary. When the two disagree, the schema wins.
 
-When adding or modifying venues in `js/data.js`, follow this structure:
+When adding or modifying venues in `js/data.json`, follow this structure:
 
 ```javascript
 {
@@ -254,9 +253,28 @@ Where this is consumed:
 - `js/views/KJIndexView.js` → walks both `venue.host` and `schedule[].host` when enumerating KJs.
 - `js/services/venues.js` → `venueMatchesHost()` matches at either level.
 
+### Host registries (ADR-007)
+
+Hosts are being normalized out of inline objects into two top-level registries, referenced by id — the same indirection `tags[]` uses:
+
+```javascript
+kjs: { "kj-stephanie": { name: "KJ Stephanie" } },          // people and named acts
+companies: { "starling-karaoke": { name: "Starling Karaoke", website: "https://..." } },
+listings: [
+  { id: "some-bar", host: { kjId: "kj-stephanie", companyId: "starling-karaoke" } }
+]
+```
+
+- A **host ref** is `{ kjId?, companyId? }` with at least one id: company-only (a company runs it, KJ rotates/unknown), KJ-only (independent), or both. Valid at venue level and per schedule entry, with the same full-swap override rule.
+- **The KJ↔company link lives on the show, not on the entities** — no company on a KJ, no roster on a company. Rosters and the KJ index are derived by scanning shows, so they can't go stale, and a KJ can work under different companies at different venues.
+- `hydrateVenues()` in `js/utils/hosts.js` resolves refs inside `initVenues()` into the legacy display shape (KJ fields win, company fills gaps), so nothing downstream needs to know which form was stored.
+- **Both forms are accepted during the migration window.** `data.json` is not yet migrated (that's #124 Phase 2); `submit.html` still emits the legacy inline shape for curator reconciliation. `validate-data.js` fails on unresolvable ids and warns on unreferenced or same-named registry entries.
+
+Full detail: [functional spec §11 "Host Registries"](docs/functional-spec.md).
+
 ### Venue Tags
 
-Tags are defined in `tagDefinitions` at the top of `js/data.js`. Each tag has:
+Tags are defined in `tagDefinitions` at the top of `js/data.json`. Each tag has:
 - **id** (key): Machine-readable identifier
 - **label**: Human-readable display name
 - **color**: Background color (hex)
@@ -380,15 +398,14 @@ Use these semantic elements consistently:
 
 ### Adding a New Venue
 
-`js/data.json` is **maintained externally** by the project owner. Day-to-day venue edits happen in a local-only curator tool that lives outside this repo (at the owner's `~/karaoke-curator/`). That tool writes `js/data.json` and runs `scripts/sync-data-js.js` to regenerate the browser wrapper `js/data.js`.
+`js/data.json` is **maintained externally** by the project owner. Day-to-day venue edits happen in a local-only curator tool that lives outside this repo (at the owner's `~/karaoke-curator/`). That tool writes `js/data.json`, which is the only venue data file (ADR-008).
 
 If you're a contributor (or a Claude session that needs to add a venue inside this repo):
 
 1. Edit `js/data.json` directly. Add the venue object to the `listings` array, following the schema in the "Venue Data Format" section below.
-2. Run `node scripts/sync-data-js.js` to regenerate `js/data.js`.
-3. Run `node scripts/validate-data.js` to check format. CI runs both on every PR — see `.github/workflows/ci.yml`.
-4. Add coordinates via `node scripts/geocode-venues.js` (Node.js batch) — patches `data.json` and re-syncs `data.js` automatically.
-5. Open a PR. The owner will reconcile your change with their curator master before merging or after.
+2. Run `node scripts/validate-data.js` to check format. CI runs it on every PR — see `.github/workflows/ci.yml`.
+3. Add coordinates via `node scripts/geocode-venues.js` (Node.js batch) — patches `data.json`.
+4. Open a PR. The owner will reconcile your change with their curator master before merging or after.
 
 Do not look for or attempt to use `editor.html` — it was removed in favor of the external curator tool.
 
@@ -491,6 +508,10 @@ Current ADRs:
 - [ADR-002](docs/adr/002-vanilla-js-no-build.md) — Vanilla JS, no framework, no build step
 - [ADR-003](docs/adr/003-github-pages-deploy.md) — GitHub Pages as deploy target
 - [ADR-004](docs/adr/004-parallel-data-source-flag.md) — Parallel data source via URL flag
+- [ADR-005](docs/adr/005-venue-json-schema.md) — Venue JSON Schema as single source of truth
+- [ADR-006](docs/adr/006-data-json-canonical.md) — `js/data.json` canonical, `js/data.js` auto-generated
+- [ADR-007](docs/adr/007-host-registry-normalization.md) — Host normalization: KJ and company registries referenced by shows
+- [ADR-008](docs/adr/008-fetch-data-json-directly.md) — Browser fetches `js/data.json`, removing the generated `data.js` wrapper
 
 ## Security Considerations
 - Always use `escapeHtml()` when rendering user-provided content

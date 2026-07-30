@@ -26,7 +26,7 @@ Karaoke enthusiasts looking for venues, schedules, and event details in the grea
 
 - **Vanilla JavaScript** (ES6 modules), HTML5, CSS3 — currently no build step
 - **Mobile-first responsive design** — base styles target mobile, enhanced for larger screens
-- **Data layer** — all venue data in a single JavaScript file (`js/data.js`), currently 79 venues; Supabase wiring exists but is dormant (see §11 *Storage and Data Flow*)
+- **Data layer** — all venue data in a single JSON file (`js/data.json`), currently 80 venues; Supabase wiring exists but is dormant (see §11 *Storage and Data Flow*)
 - **Component-based** — `Component` base class with state management and event bus
 - **Balanced calendar visibility** — daily venues must not overwhelm less frequent shows in the weekly calendar view; Alphabetical and Map views show everything equally
 
@@ -546,7 +546,7 @@ Venues with an `activePeriod` field only appear when the current date falls with
 
 ## 11 Venue Data Model
 
-**Source files:** `js/data.json` (canonical authoring source — #102, ADR-006), `js/data.js` (browser runtime wrapper, auto-generated from `data.json` by `scripts/sync-data-js.js`), Supabase tables `venues` and `tags` (future runtime source of truth — currently disabled). Dev scripts read `data.json` directly; CI fails if `data.js` is out of sync.
+**Source files:** `js/data.json` (the single venue data file — #102/ADR-006, fetched directly by the browser per ADR-008), Supabase tables `venues` and `tags` (future runtime source of truth — currently disabled). Dev scripts, the curator, and the browser all read `data.json`.
 
 The shape `{ tagDefinitions, listings }` is the contract — both the local file and the Supabase service expose data this way. See [Storage and Data Flow](#storage-and-data-flow) below for how the two stay in sync. The full venue object schema lives in [`schema/venue.schema.json`](../schema/venue.schema.json) — see ADR-005.
 
@@ -595,11 +595,15 @@ The shape `{ tagDefinitions, listings }` is the contract — both the local file
     activePeriod.start  string        "YYYY-MM-DD"
     activePeriod.end    string        "YYYY-MM-DD"
 
-  host                  object|null   OPTIONAL
-    host.name           string        OPTIONAL  Individual KJ name
-    host.affiliation    string        OPTIONAL  Parent company/org (e.g. "Starling Karaoke")
-    host.website        string        OPTIONAL  Host/KJ personal website
-    host.socials        object|null   OPTIONAL  KJ/host social links (same shape as venue `socials`)
+  host                  object|null   OPTIONAL  Two accepted forms — see "Host Registries" below
+    Registry ref (preferred, ADR-007) — at least one id required:
+      host.kjId         string        OPTIONAL  Key into the top-level `kjs` map
+      host.companyId    string        OPTIONAL  Key into the top-level `companies` map
+    Legacy inline (accepted during the migration window):
+      host.name         string        OPTIONAL  Individual KJ name
+      host.affiliation  string        OPTIONAL  Parent company/org (e.g. "Starling Karaoke")
+      host.website      string        OPTIONAL  Host/KJ personal website
+      host.socials      object|null   OPTIONAL  KJ/host social links (same shape as venue `socials`)
 
   socials               object|null   OPTIONAL
     socials.website     string        OPTIONAL
@@ -613,6 +617,31 @@ The shape `{ tagDefinitions, listings }` is the contract — both the local file
   phone                 string        OPTIONAL  Venue's public phone — tel: link in detail views (venue line only, not KJ/host or curator-internal)
 }
 ```
+
+### Host Registries
+
+Who runs a show is stored once, in two top-level maps alongside `tagDefinitions`, and referenced by id — the same indirection `tags[]` already uses. See [ADR-007](adr/007-host-registry-normalization.md).
+
+```
+kjs                     object        OPTIONAL  id → { name, website?, socials? }   People and named acts
+companies               object        OPTIONAL  id → { name, website?, socials? }   Karaoke companies
+```
+
+A **host ref** is the pair `{ kjId?, companyId? }`, with at least one id present:
+
+| Recorded as | Means |
+|---|---|
+| `companyId` only | A company runs the night; the KJ is unrecorded or rotates |
+| `kjId` only | An independent KJ |
+| both | That KJ, working under that company, at that show |
+
+**The KJ↔company association lives on the show, never on the registry entries.** A KJ has no stored company and a company has no stored roster, so one person can work under different companies at different venues, and "which KJs does this company field?" is derived by scanning shows. Derived rollups can go stale only when the shows do, which matches the directory's "the week is the heartbeat" stance.
+
+**Specificity overrides:** a ref on a schedule entry fully replaces the venue-level ref for that show (no field-level merge), the same rule the legacy inline host already followed. Effective host = `entry.host ?? venue.host`.
+
+**Hydration:** `hydrateVenues()` in `js/utils/hosts.js` resolves refs at load time inside `initVenues()`, producing the legacy display shape `{ name, affiliation, website, socials }` — KJ fields win, the company fills gaps (a KJ with no website of their own shows the company's). Views, components, search, and the KJ pages therefore only ever see one host shape. The resolved object also carries `kjId`/`companyId` for id-aware consumers.
+
+**Transition window:** the schema accepts either form, and venues carrying no refs pass through hydration untouched, so `data.json`, the external curator, and `submit.html` can migrate independently. `submit.html` emits the legacy inline shape for curator reconciliation. Unresolvable ids fail `validate-data.js` (and warn in the console at runtime, rendering what resolved rather than dropping the host block). Unreferenced or same-named registry entries are reported as non-fatal validator warnings.
 
 ### Schedule Exclusions
 
@@ -646,19 +675,20 @@ The `getSortableName()` utility strips leading articles for sorting purposes. "T
 
 ### Storage and Data Flow
 
-Venue data is stored in two places:
+Venue data lives in one file:
 
-- **`js/data.js`** — the canonical authoring source AND the **currently active runtime source**. Hand-edited or written by the venue editor.
+- **`js/data.json`** — the canonical authoring source AND the **currently active runtime source**. Written by the external curator; also edited directly by contributors. The browser fetches it at runtime (ADR-008); there is no generated copy.
 - **Supabase** — fully wired but **currently disabled** via `useSupabase: false` in `js/config.js`. The infrastructure (schema migrations, seed pipeline, service layer) is in place for when expansion (#17 National Expansion) requires it. See issue #47 for the JSONB redesign that's ready to push.
 
 Runtime fetch priority (configured in `js/config.js` via the `useSupabase` flag):
 
 1. `sessionStorage` cache (30-minute TTL)
 2. Supabase via `js/services/supabase.js` `fetchVenueData()`
-3. `window.karaokeData` global from `js/data.js` script tag (fallback)
-4. ES module import of `js/data.js` (legacy fallback)
+3. `fetch` of `js/data.json`
 
-The debug indicator (`?debug=1`) shows which source served the current page: `cache`, `supabase`, or `local-fallback`.
+The debug indicator (`?debug=1`) shows which source served the current page: `cache`, `supabase`, or `local-json`.
+
+Because the data arrives by `fetch`, the site must be served over http(s) — opening `index.html` from the filesystem will not work, as `fetch` is blocked on `file://` origins. Use `python -m http.server` or `npx serve` (see README).
 
 #### Supabase Schema (issue #47 — JSONB redesign)
 
@@ -675,25 +705,25 @@ RLS: tags publicly readable; venues filtered to `active = true` for anonymous ac
 
 Migration history: `001_initial_schema.sql` (original 5-table normalized model), `002_rls_policies.sql`, `003_scale_indexes.sql`, `004_jsonb_redesign.sql` (current — collapses to 2 tables).
 
-#### Reseeding from data.js
+#### Reseeding from data.json
 
-When `js/data.js` changes, regenerate Supabase from it:
+When `js/data.json` changes, regenerate Supabase from it:
 
-1. `node scripts/audit-for-supabase.js` — validates data.js against logical rules (duplicate IDs, valid tag refs, schedule shape, etc.)
+1. `node scripts/audit-for-supabase.js` — validates data.json against logical rules (duplicate IDs, valid tag refs, schedule shape, etc.)
 2. `node supabase/seed-from-data.js > supabase/seed.sql` — emits `INSERT INTO tags` + `INSERT INTO venues (id, name, active, data) VALUES (..., '{json}'::jsonb)` rows
 3. Run `004_jsonb_redesign.sql` followed by the regenerated `seed.sql` in the Supabase SQL editor (the migration drops + recreates tables, so the seed runs against an empty schema)
 
-There is no automatic sync. data.js → Supabase is a manual push by an authorized editor.
+There is no automatic sync. data.json → Supabase is a manual push by an authorized editor.
 
 ---
 
 ## 12 Tag System
 
-**Files:** `js/data.js` (definitions), `js/utils/tags.js` (rendering)
+**Files:** `js/data.json` (definitions), `js/utils/tags.js` (rendering)
 
 ### Tag Definitions
 
-Tags are defined in the `tagDefinitions` object in `js/data.js`. Each tag has:
+Tags are defined in the `tagDefinitions` object in `js/data.json`. Each tag has:
 - **id** (object key) — machine-readable identifier
 - **label** — human-readable display name
 - **color** — badge background color (hex)
@@ -889,7 +919,7 @@ The form is structured as a short required-fields zone, then a single `<details>
 
 | Section | Fields |
 |---------|--------|
-| Tags | Tag checkboxes (chip-style) generated at load from `karaokeData.tagDefinitions` — adding a tag to data.js auto-surfaces here, no parallel hardcoded list. System tags (`dedicated`, `special-event`) and age tags are excluded from the grid; age restriction is its own radio (not sure / 21+ / 18+ / all-ages / family-friendly) whose value joins the `tags: []` array at submit time, matching the schema's "age is a tag" shape. |
+| Tags | Tag checkboxes (chip-style) generated at load by fetching `tagDefinitions` from `js/data.json` — adding a tag there auto-surfaces here, no parallel hardcoded list. System tags (`dedicated`, `special-event`) and age tags are excluded from the grid; age restriction is its own radio (not sure / 21+ / 18+ / all-ages / family-friendly) whose value joins the `tags: []` array at submit time, matching the schema's "age is a tag" shape. |
 | Host / KJ Info | Host name, company, host website |
 | Venue Social Links | Website, Facebook, Instagram (3 fields — other platforms intentionally cut to reduce friction; curator can add via editor) |
 | Notes | Free-text textarea |
@@ -930,7 +960,7 @@ Hidden honeypot field `website_url` (positioned offscreen via `.hp-field` CSS) w
 
 ### Email body format
 
-`formatEmailBody()` produces a structured plaintext email containing the full venue object as JSON between two `----...----` delimiter lines, plus submitter metadata and a TODO checklist (verify info, geocode, add to data.js). The JSON block is intended to be copy-paste-ready for the curator's editor workflow.
+`formatEmailBody()` produces a structured plaintext email containing the full venue object as JSON between two `----...----` delimiter lines, plus submitter metadata and a TODO checklist (verify info, geocode, add to data.json). The JSON block is intended to be copy-paste-ready for the curator's editor workflow.
 
 ### Payload shape contract (#101)
 

@@ -173,13 +173,16 @@ async function init() {
 }
 
 /**
- * Load venue data — tries Supabase first, falls back to local data.js
+ * Load venue data — tries Supabase first, falls back to the local JSON file
  *
  * Data source priority:
  *   1. sessionStorage cache (if fresh and useSupabase enabled)
  *   2. Supabase fetch (if useSupabase enabled)
- *   3. karaokeData global (from data.js script tag — fallback)
- *   4. Dynamic import of data.js (legacy fallback)
+ *   3. fetch of js/data.json — the canonical local file
+ *
+ * The local path needs the page served over http(s): fetch is blocked on
+ * file:// origins, so opening index.html straight from disk won't work. Run a
+ * local server (see README). ADR-008.
  */
 async function loadData() {
     try {
@@ -196,27 +199,16 @@ async function loadData() {
             }
         }
 
-        // Fallback: global variable from data.js script tag
-        if (!data && typeof karaokeData !== 'undefined') {
-            data = karaokeData;
-            dataSource = 'local-fallback';
-            console.log('Data source: local-fallback (global)');
-        }
-
-        // Fallback: dynamic import
+        // Fallback: the canonical local file. Resolved against this module's URL
+        // rather than the document's, so it holds wherever the page is served from.
         if (!data) {
-            try {
-                const dataModule = await import('./data.js');
-                data = dataModule.karaokeData || dataModule.default;
-                dataSource = 'local-fallback';
-                console.log('Data source: local-fallback (module)');
-            } catch (importError) {
-                console.warn('Could not import data.js as module:', importError);
+            const response = await fetch(new URL('data.json', import.meta.url));
+            if (!response.ok) {
+                throw new Error(`Could not load js/data.json (HTTP ${response.status})`);
             }
-        }
-
-        if (!data) {
-            throw new Error('No venue data found. Make sure data.js is loaded.');
+            data = await response.json();
+            dataSource = 'local-json';
+            console.log('Data source: local-json');
         }
 
         // Initialize tag configuration from data
