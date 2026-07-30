@@ -273,20 +273,13 @@ async function main() {
         });
     }
 
-    // Write back to data.json (canonical) and regenerate data.js.
+    // Write back to data.json — the only venue data file (ADR-008).
     // Because data.json is round-tripped through JSON.parse/stringify and
     // key insertion order is preserved, the diff is exactly the new
     // coordinates blocks — no whole-file reflow.
     if (geocoded > 0) {
         fs.writeFileSync(dataPath, JSON.stringify(data, null, 2) + '\n');
         console.log(`Updated: ${dataPath}`);
-
-        // Keep js/data.js (the browser runtime artifact) in sync.
-        const { execSync } = require('child_process');
-        execSync('node scripts/sync-data-js.js', {
-            cwd: path.join(__dirname, '..'),
-            stdio: 'inherit',
-        });
     } else {
         console.log('\nNo changes made.');
     }

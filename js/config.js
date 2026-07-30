@@ -10,5 +10,5 @@ export const config = {
     cache: {
         ttlMs: 30 * 60 * 1000 // 30 minutes
     },
-    useSupabase: false // Feature flag — set true to activate Supabase as runtime source. Currently OFF: site reads from js/data.js. See spec §11 and issue #47.
+    useSupabase: false // Feature flag — set true to activate Supabase as runtime source. Currently OFF: site reads from js/data.json. See spec §11 and issue #47.
 };

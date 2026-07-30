@@ -183,7 +183,7 @@
                                     </div>
                                 </div>
                                 <div class="tag-checkbox-grid" id="tag-checkbox-grid">
-                                    <!-- Populated from karaokeData.tagDefinitions at load.
+                                    <!-- Populated from js/data.json tagDefinitions at load.
                                          System tags (dedicated, special-event) and age tags
                                          are excluded — see populateTagCheckboxes() below. -->
                                 </div>
@@ -366,7 +366,6 @@
         </p>
     </footer>
 
-    <script src="js/data.js"></script>
     <script>
         // Tag ids that are *not* user-selectable as checkboxes:
         //   - 'dedicated' is set by venue.dedicated:true at the curator level
@@ -379,21 +378,34 @@
             '21+', '18+', 'all-ages', 'family-friendly',
         ]);
 
+        // Tag definitions are fetched from js/data.json (ADR-008) and cached here,
+        // so the submit handler can read the same id list without refetching.
+        // Only tagDefinitions is used — the venue listings are never needed here.
+        let tagDefinitions = {};
+
         function getUserSelectableTagIds() {
-            const defs = (typeof karaokeData !== 'undefined' && karaokeData.tagDefinitions) || {};
-            return Object.keys(defs).filter(id => !TAG_GRID_EXCLUDE.has(id));
+            return Object.keys(tagDefinitions).filter(id => !TAG_GRID_EXCLUDE.has(id));
         }
 
-        // Generate the tag-checkbox grid from karaokeData.tagDefinitions so that
-        // adding a tag in data.js auto-surfaces in the submit form — no parallel
+        // Generate the tag-checkbox grid from data.json's tagDefinitions so that
+        // adding a tag there auto-surfaces in the submit form — no parallel
         // hardcoded list to keep in sync (#101).
-        (function populateTagCheckboxes() {
+        (async function populateTagCheckboxes() {
             const grid = document.getElementById('tag-checkbox-grid');
-            const defs = (typeof karaokeData !== 'undefined' && karaokeData.tagDefinitions) || {};
             if (!grid) return;
 
-            const html = getUserSelectableTagIds().map(id => {
-                const def = defs[id];
+            try {
+                const response = await fetch('js/data.json');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                tagDefinitions = (await response.json()).tagDefinitions || {};
+            } catch (error) {
+                console.error('Could not load tag definitions from js/data.json:', error);
+                grid.innerHTML = '<p class="validation-error">Could not load the tag list. Everything else on this form still works.</p>';
+                return;
+            }
+
+            grid.innerHTML = getUserSelectableTagIds().map(id => {
+                const def = tagDefinitions[id];
                 const safeLabel = def.label
                     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
                 return `
@@ -403,7 +415,6 @@
                               style="background:${def.color};color:${def.textColor}">${safeLabel}</span>
                     </label>`;
             }).join('');
-            grid.innerHTML = html;
         })();
 
         // Rate limiting configuration

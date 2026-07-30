@@ -10,16 +10,14 @@
 
 **When:** A new karaoke venue needs to be added to the directory.
 
-**Files:** `js/data.js`, optionally `editor.html`
+**Files:** `js/data.json`
 
 ### Steps
 
-1. Open `js/data.js` and find the `listings` array inside the `karaokeData` object.
+1. Open `js/data.json` and find the `listings` array.
 2. Add a new venue object (see format below). Insert alphabetically by venue name for consistency.
 3. Run `node scripts/validate-data.js` to check the data format.
-4. If the venue needs map coordinates, either:
-   - Use the editor (`editor.html`) — click "Geocode Address" button
-   - Run `node scripts/geocode-venues.js` to batch-geocode all venues missing coordinates
+4. If the venue needs map coordinates, run `node scripts/geocode-venues.js` to batch-geocode all venues missing coordinates.
 
 ### Code
 
@@ -299,31 +297,32 @@ export function renderNewComponent(data) {
 
 **When:** A new category badge is needed for venues (e.g., "Pool Party", "Karaoke Contest").
 
-**Files:** `js/data.js` (tagDefinitions), optionally venues in the listings array
+**Files:** `js/data.json` (tagDefinitions), optionally venues in the listings array
 
 ### Steps
 
-1. Add the tag definition to `tagDefinitions` in `js/data.js`.
+1. Add the tag definition to `tagDefinitions` in `js/data.json`.
 2. Add the tag ID to relevant venues' `tags` arrays.
 3. That's it — rendering and search matching are automatic.
 
 ### Code
 
-**Step 1 — Define the tag in `js/data.js`:**
+**Step 1 — Define the tag in `js/data.json`:**
 
-```javascript
-const karaokeData = {
-    tagDefinitions: {
-        // ... existing tags ...
-        'pool-party': {
-            label: 'Pool Party',
-            color: '#00bcd4',       // Badge background color
-            textColor: '#ffffff'     // Badge text color
-        }
-    },
-    listings: [ /* ... */ ]
-};
+```json
+{
+  "tagDefinitions": {
+    "pool-party": {
+      "label": "Pool Party",
+      "color": "#00bcd4",
+      "textColor": "#ffffff"
+    }
+  },
+  "listings": []
+}
 ```
+
+(`color` is the badge background, `textColor` the badge text.)
 
 **Step 2 — Apply to venues:**
 
@@ -490,7 +489,7 @@ init() {
 
 1. Open `js/utils/date.js` and find the `scheduleMatchesDate()` function.
 2. Add a new case to handle your frequency.
-3. Update `js/data.js` venue schedules to use the new frequency.
+3. Update `js/data.json` venue schedules to use the new frequency.
 4. Update the editor frequency dropdown if applicable.
 
 ### Code
@@ -555,12 +554,12 @@ case 'alternate':
 
 **When:** A new social media platform needs to be supported (e.g., Threads, Mastodon).
 
-**Files:** `js/utils/url.js`, `js/data.js` (venue socials), `editor/editor.js`, `editor.html`, `submit.html`
+**Files:** `js/utils/url.js`, `js/data.json` (venue socials), `submit.html`
 
 ### Steps
 
 1. Add the platform to `SOCIAL_PLATFORMS` in `url.js`.
-2. Add the field to venue socials in `js/data.js`.
+2. Add the field to venue socials in `js/data.json`.
 3. Add the form field to `editor.html` and `submit.html`.
 4. Update `editor.js` to read/write the new field.
 
@@ -581,7 +580,7 @@ export const SOCIAL_PLATFORMS = {
 
 The `createSocialLinks(socials)` function iterates over `SOCIAL_PLATFORMS` and generates link HTML for any matching key in the venue's `socials` object. No additional code changes needed in that function.
 
-**Step 2 — Add to venue data in `js/data.js`:**
+**Step 2 — Add to venue data in `js/data.json`:**
 
 ```javascript
 socials: {

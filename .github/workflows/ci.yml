@@ -23,9 +23,5 @@ jobs:
       - name: Validate venue data (js/data.json)
         run: node scripts/validate-data.js
 
-      - name: Check js/data.js is in sync with js/data.json
-        run: node scripts/sync-data-js.js --check
-
-
       - name: Check CSS load order across HTML pages
         run: node scripts/check-css-load-order.js

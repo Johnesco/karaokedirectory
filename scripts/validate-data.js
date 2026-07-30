@@ -2,8 +2,11 @@
 /**
  * Validate js/data.json against schema/venue.schema.json (via Ajv) plus the
  * supplementary checks JSON Schema cannot express: cross-row constraints
- * (unique venue ids, tag-id cross-reference) and data-quality heuristics
- * (minute-typo detection, noon end-time after evening start).
+ * (unique venue ids, tag-id and host-ref cross-reference) and data-quality
+ * heuristics (minute-typo detection, noon end-time after evening start).
+ *
+ * Registry hygiene (unreferenced or same-named kjs/companies entries) is
+ * reported as warnings — worth a look, but not a build failure.
  *
  * Exits non-zero on failure — suitable as a pre-commit / CI gate. Enforced
  * by .github/workflows/ci.yml.
@@ -16,7 +19,11 @@ const addFormats = require('ajv-formats');
 
 const ROOT = path.resolve(__dirname, '..');
 const SCHEMA_PATH = path.join(ROOT, 'schema', 'venue.schema.json');
-const DATA_PATH = path.join(ROOT, 'js', 'data.json');
+// Defaults to the canonical data file; an explicit path lets the migration
+// script validate a candidate file before it overwrites anything.
+const DATA_PATH = process.argv[2]
+    ? path.resolve(process.argv[2])
+    : path.join(ROOT, 'js', 'data.json');
 
 console.log('Reading:', DATA_PATH);
 
@@ -46,6 +53,7 @@ const validate = ajv.compile(schema);
 const schemaOk = validate(data);
 
 const issues = [];
+const warnings = [];
 
 function venueLabel(idx) {
     const v = data.listings[idx];
@@ -67,9 +75,33 @@ if (!schemaOk) {
 
 // ---- Supplementary checks ----
 const VALID_TAGS = Object.keys(data.tagDefinitions || {});
+const KJS = data.kjs || {};
+const COMPANIES = data.companies || {};
+
+// Registry ids actually pointed at by a host, so unused entries can be reported.
+const referenced = { kjs: new Set(), companies: new Set() };
 
 function fail(venue, msg) {
     issues.push(`${venue.name || 'index ?'} (${venue.id || '?'}): ${msg}`);
+}
+
+/**
+ * Host ref cross-reference: kjId/companyId must resolve in the registries —
+ * the same class of check as tag ids against tagDefinitions (ADR-007). Legacy
+ * inline hosts carry neither id and are skipped.
+ */
+function checkHostRef(venue, host, where) {
+    for (const [key, registry, label] of [
+        ['kjId', KJS, 'kjs'],
+        ['companyId', COMPANIES, 'companies'],
+    ]) {
+        const id = host?.[key];
+        if (!id) continue;
+        referenced[label].add(id);
+        if (!(id in registry)) {
+            fail(venue, `${where} ${key} "${id}" is not defined in ${label}`);
+        }
+    }
 }
 
 const idCounts = {};
@@ -85,9 +117,12 @@ for (const venue of data.listings) {
         }
     }
 
+    checkHostRef(venue, venue.host, 'host');
+
     if (Array.isArray(venue.schedule)) {
         venue.schedule.forEach((entry, i) => {
             const prefix = `schedule[${i}]`;
+            checkHostRef(venue, entry.host, `${prefix}.host`);
 
             // Minute-typo heuristic — start times should land on :00/:15/:30/:45.
             // Catches things like 17:03 that should have been 17:00.
@@ -114,17 +149,53 @@ for (const [id, count] of Object.entries(idCounts)) {
     if (count > 1) issues.push(`Duplicate ID: ${id} (${count} times)`);
 }
 
+// ---- Registry hygiene (warnings — bad smells, not broken data) ----
+// An unreferenced entry is dead weight; two entries with the same name are the
+// duplication ADR-007 exists to remove, creeping back in.
+for (const [label, registry] of [['kjs', KJS], ['companies', COMPANIES]]) {
+    const namesSeen = new Map();
+
+    for (const [id, entry] of Object.entries(registry)) {
+        if (!referenced[label].has(id)) {
+            warnings.push(`${label}["${id}"] (${entry.name}) is never referenced by a host`);
+        }
+
+        const key = (entry.name || '').trim().toLowerCase();
+        if (!key) continue;
+        if (!namesSeen.has(key)) namesSeen.set(key, []);
+        namesSeen.get(key).push(id);
+    }
+
+    for (const [, ids] of namesSeen) {
+        if (ids.length > 1) {
+            warnings.push(`${label} entries share the name "${registry[ids[0]].name}": ${ids.join(', ')} — merge?`);
+        }
+    }
+}
+
 // ---- Output ----
 console.log('=== Summary ===');
 console.log('Total venues:', data.listings.length);
 const withCoords = data.listings.filter(v => v.coordinates?.lat && v.coordinates?.lng).length;
 console.log('With coordinates:', withCoords);
 
+const kjCount = Object.keys(KJS).length;
+const companyCount = Object.keys(COMPANIES).length;
+if (kjCount || companyCount) {
+    console.log('Registered KJs:', kjCount);
+    console.log('Registered companies:', companyCount);
+}
+
 if (issues.length > 0) {
     console.log(`\n=== ${issues.length} Issue(s) Found ===`);
     issues.forEach(issue => console.log('- ' + issue));
 } else {
     console.log('\nNo issues found!');
+}
+
+if (warnings.length > 0) {
+    console.log(`\n=== ${warnings.length} Warning(s) — not fatal ===`);
+    warnings.forEach(warning => console.log('- ' + warning));
 }
 
 console.log('\n=== Data Quality (informational) ===');

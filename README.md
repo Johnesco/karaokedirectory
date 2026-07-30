@@ -48,6 +48,8 @@ The site is currently served as static files.
 
 3. Open `http://localhost:8000` in your browser
 
+> The site must be served over http(s) — opening `index.html` directly from the filesystem won't work, because venue data is fetched from `js/data.json` and browsers block `fetch` on `file://` origins.
+
 ### Deployment
 
 Deploy to any static hosting service (GitHub Pages, Netlify, Vercel, etc.) — just upload the files as-is.
@@ -68,7 +70,7 @@ Deploy to any static hosting service (GitHub Pages, Netlify, Vercel, etc.) — j
 │   └── submit.css      # Submission form styles
 ├── js/
 │   ├── app.js          # Application entry point
-│   ├── data.js         # Venue database (70+ venues)
+│   ├── data.json       # Venue database (80 venues)
 │   ├── bingo.js        # Bingo game logic
 │   ├── core/           # State management & event bus
 │   ├── components/     # UI components (Navigation, DayCard, VenueCard, etc.)
@@ -87,7 +89,7 @@ Know a karaoke spot that's missing? You can:
 
 1. Use the [submission form](submit.html) on the site
 2. Open an issue with the venue details
-3. Submit a PR with the venue added to `js/data.js`
+3. Submit a PR with the venue added to `js/data.json`
 
 ### Venue Data Format
 
@@ -152,7 +154,7 @@ Know a karaoke spot that's missing? You can:
 
 ### Available Tags
 
-Tags are defined in `js/data.js` with custom colors. Search works with both tag IDs and display labels.
+Tags are defined in `js/data.json` with custom colors. Search works with both tag IDs and display labels.
 
 | Tag ID | Display Label | Description |
 |--------|---------------|-------------|

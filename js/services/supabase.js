@@ -1,8 +1,8 @@
 /**
  * Supabase data service
  * Fetches venue data from Supabase (JSONB schema — issue #47) and returns
- * it in the same shape as karaokeData from data.js, so venues.js, views,
- * and components require zero changes.
+ * it in the same shape as js/data.json, so venues.js, views, and components
+ * require zero changes.
  *
  * Data flow:
  *   Supabase query → transformVenue() → { tagDefinitions, listings } → initTagConfig + initVenues
@@ -58,7 +58,7 @@ function setCache(data) {
     }
 }
 
-// ---- Transform: Supabase row → data.js venue shape ----
+// ---- Transform: Supabase row → data.json venue shape ----
 
 function transformVenue(raw) {
     // The JSONB `data` column already holds the venue shape verbatim.
@@ -86,7 +86,7 @@ function transformTagDefinitions(tags) {
 
 /**
  * Fetch venue data from Supabase, with sessionStorage caching.
- * Returns data in the same shape as karaokeData from data.js:
+ * Returns data in the same shape as js/data.json:
  *   { tagDefinitions: {...}, listings: [...] }
  *
  * @returns {Promise<{tagDefinitions: Object, listings: Object[], source: string}>}

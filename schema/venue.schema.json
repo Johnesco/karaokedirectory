@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://karaokedirectory.com/schemas/venue.schema.json",
   "title": "Karaoke Venue Database",
-  "description": "Schema for js/data.js — the full venue listings database. Single source of truth for validate-data.js (CI), submit.html payload shape, the external curator tool, and future Supabase JSONB rows. Cross-reference constraints (e.g. tags must exist in tagDefinitions) are enforced as supplementary checks in scripts/validate-data.js since JSON Schema cannot express them.",
+  "description": "Schema for js/data.json — the full venue listings database. Single source of truth for validate-data.js (CI), submit.html payload shape, the external curator tool, and future Supabase JSONB rows. Cross-reference constraints (e.g. tags must exist in tagDefinitions) are enforced as supplementary checks in scripts/validate-data.js since JSON Schema cannot express them.",
   "type": "object",
   "required": ["tagDefinitions", "listings"],
   "additionalProperties": false,
@@ -13,6 +13,22 @@
       "patternProperties": {
         "^[a-z0-9][a-z0-9-]*$": { "$ref": "#/$defs/tagDefinition" },
         "^[0-9]+\\+$": { "$ref": "#/$defs/tagDefinition" }
+      },
+      "additionalProperties": false
+    },
+    "kjs": {
+      "description": "Map of KJ id → { name, website?, socials? }. Referenced by host.kjId (ADR-007). A duo or named act is a single entry. Optional while the data migrates off inline hosts.",
+      "type": "object",
+      "patternProperties": {
+        "^[a-z0-9][a-z0-9-]*$": { "$ref": "#/$defs/registryEntry" }
+      },
+      "additionalProperties": false
+    },
+    "companies": {
+      "description": "Map of company id → { name, website?, socials? }. Referenced by host.companyId (ADR-007). Optional while the data migrates off inline hosts.",
+      "type": "object",
+      "patternProperties": {
+        "^[a-z0-9][a-z0-9-]*$": { "$ref": "#/$defs/registryEntry" }
       },
       "additionalProperties": false
     },
@@ -66,10 +82,8 @@
         },
         "activePeriod": { "$ref": "#/$defs/activePeriod" },
         "host": {
-          "oneOf": [
-            { "type": "null" },
-            { "$ref": "#/$defs/host" }
-          ]
+          "$ref": "#/$defs/hostAssignment",
+          "description": "Default host for shows that don't override it."
         },
         "socials": {
           "oneOf": [
@@ -144,10 +158,8 @@
         "eventName": { "type": "string", "minLength": 1 },
         "eventUrl": { "type": "string", "format": "uri" },
         "host": {
-          "oneOf": [
-            { "type": "null" },
-            { "$ref": "#/$defs/host" }
-          ]
+          "$ref": "#/$defs/hostAssignment",
+          "description": "Host for this show only. Fully replaces the venue-level host — fields are not merged."
         },
         "exclusions": {
           "type": "array",
@@ -182,9 +194,47 @@
       "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
       "description": "HH:MM in 24-hour format."
     },
+    "hostAssignment": {
+      "description": "Who runs a show. Either a registry ref pair (preferred, ADR-007) or the legacy inline object still accepted during the migration window. The two shapes are mutually exclusive — each forbids the other's properties — so oneOf is unambiguous.",
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/hostRef" },
+        { "$ref": "#/$defs/host" }
+      ]
+    },
+    "hostRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Reference into the kjs/companies registries. At least one id required: companyId alone (a company runs the night, KJ unrecorded or rotating), kjId alone (independent), or both. The KJ↔company association lives here, on the show — never on the registry entries — so rosters stay derived and cannot go stale (ADR-007).",
+      "properties": {
+        "kjId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+        "companyId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" }
+      },
+      "anyOf": [
+        { "required": ["kjId"] },
+        { "required": ["companyId"] }
+      ]
+    },
+    "registryEntry": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "description": "One KJ or one company. Shared shape for both registries.",
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "website": { "type": "string", "format": "uri" },
+        "socials": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/socials" }
+          ]
+        }
+      }
+    },
     "host": {
       "type": "object",
       "additionalProperties": false,
+      "description": "Legacy inline host, accepted during the migration window and emitted by submit.html for curator reconciliation. Superseded by hostRef.",
       "properties": {
         "name": { "type": "string", "minLength": 1 },
         "affiliation": { "type": "string", "minLength": 1 },
