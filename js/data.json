@@ -428,7 +428,7 @@
         }
       ],
       "host": {
-        "name": "KJ Average Joe",
+        "name": "Average Joe",
         "affiliation": "Starling Karaoke"
       },
       "socials": {
@@ -1160,7 +1160,7 @@
         }
       ],
       "host": {
-        "name": "Marshall Joshua Entertainment"
+        "affiliation": "Marshall Joshua Entertainment"
       },
       "coordinates": {
         "lat": 30.2453635,
@@ -1547,7 +1547,7 @@
         }
       ],
       "host": {
-        "affiliation": "The Karaoke Underground"
+        "affiliation": "Karaoke Underground"
       },
       "socials": {
         "facebook": "https://www.facebook.com/NomadBarATX",
@@ -2434,7 +2434,7 @@
         }
       ],
       "host": {
-        "name": "Marshall Joshua Entertainment"
+        "affiliation": "Marshall Joshua Entertainment"
       },
       "socials": {
         "facebook": "https://www.facebook.com/RoundRockTavern/",

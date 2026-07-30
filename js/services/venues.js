@@ -3,7 +3,7 @@
  * Handles loading, filtering, sorting, and querying venue data.
  *
  * Key exports:
- * - initVenues(data): Initialize venue data from js/data.json
+ * - initVenues(data): Initialize venue data from js/data.json (resolves host refs)
  * - getAllVenues(): Get all active venues
  * - getVenueById(id): Get single venue by ID
  * - getVenuesForDate(date, options): Get venues with karaoke on a specific date
@@ -18,6 +18,7 @@ import { scheduleMatchesDate, isDateInRange } from '../utils/date.js';
 import { getSortableName, containsIgnoreCase } from '../utils/string.js';
 import { getTagConfig } from '../utils/tags.js';
 import { getVenueHosts } from '../utils/render.js';
+import { hydrateVenues } from '../utils/hosts.js';
 
 let venues = [];
 
@@ -92,7 +93,9 @@ export function initVenues(data) {
         return;
     }
 
-    venues = data.listings;
+    // Resolve any { kjId, companyId } host refs against the kjs/companies
+    // registries so everything downstream sees one host shape (ADR-007).
+    venues = hydrateVenues(data);
     const activeCount = getActiveVenues().length;
     const inactiveCount = venues.length - activeCount;
     console.log(`Loaded ${venues.length} venues (${activeCount} active, ${inactiveCount} inactive)`);
