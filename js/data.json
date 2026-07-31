@@ -2631,7 +2631,10 @@
           "frequency": "every",
           "day": "Saturday",
           "startTime": "21:00",
-          "endTime": "00:00"
+          "endTime": "00:00",
+          "exclusions": [
+            { "date": "2026-08-08" }
+          ]
         }
       ],
       "host": {
