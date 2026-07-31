@@ -5,8 +5,9 @@
  * (unique venue ids, tag-id and host-ref cross-reference) and data-quality
  * heuristics (minute-typo detection, noon end-time after evening start).
  *
- * Registry hygiene (unreferenced or same-named kjs/companies entries) is
- * reported as warnings — worth a look, but not a build failure.
+ * Registry hygiene (unreferenced or same-named kjs/companies entries) and
+ * stale venues (active, but every event is in the past) are reported as
+ * warnings — worth a look, but not a build failure.
  *
  * Exits non-zero on failure — suitable as a pre-commit / CI gate. Enforced
  * by .github/workflows/ci.yml.
@@ -171,6 +172,32 @@ for (const [label, registry] of [['kjs', KJS], ['companies', COMPANIES]]) {
             warnings.push(`${label} entries share the name "${registry[ids[0]].name}": ${ids.join(', ')} — merge?`);
         }
     }
+}
+
+// ---- Stale venue check (#135) ----
+// An active venue whose events are all in the past has nothing to advertise, but
+// still renders a marker on the map and a card in the A-Z listing. Warned rather
+// than failed: the fix needs real-world knowledge (did they stop hosting, or is
+// our data just behind?), and only the curator can tell those apart.
+const TODAY = new Date();
+TODAY.setHours(0, 0, 0, 0);
+
+for (const venue of data.listings) {
+    if (venue.active === false) continue;
+    const schedule = Array.isArray(venue.schedule) ? venue.schedule : [];
+
+    const hasRecurring = schedule.some(e => e.frequency !== 'once');
+    const hasUpcoming = schedule.some(e => {
+        if (e.frequency !== 'once' || !e.date) return false;
+        return new Date(e.date + 'T00:00:00') >= TODAY;
+    });
+    if (hasRecurring || hasUpcoming) continue;
+
+    const lastDate = schedule.map(e => e.date).filter(Boolean).sort().pop();
+    warnings.push(
+        `${venue.name} (${venue.id}) is active but has no upcoming events` +
+        (lastDate ? ` — most recent was ${lastDate}` : ' — no dated entries at all')
+    );
 }
 
 // ---- Output ----
