@@ -270,7 +270,8 @@ listings: [
 - **The KJ↔company link lives on the show, not on the entities** — no company on a KJ, no roster on a company. Rosters and the KJ index are derived by scanning shows, so they can't go stale, and a KJ can work under different companies at different venues.
 - `hydrateVenues()` in `js/utils/hosts.js` resolves refs inside `initVenues()` into the legacy display shape (KJ fields win, company fills gaps), so nothing downstream needs to know which form was stored.
 - **`data.json` is migrated** (#124 Phase 2) — 24 KJs and 18 companies, every host stored as a ref. `scripts/migrate-hosts.js` performed the one-time conversion and is kept for reference.
-- **The legacy inline shape is still accepted** by schema and hydration: `submit.html` emits it for curator reconciliation, and the curator may still write it. `validate-data.js` fails on unresolvable ids and warns on unreferenced or same-named registry entries.
+- **The curator is registry-aware** (#124 Phase 4). Its master is migrated, hosts are picked from dropdowns rather than typed, and a website field edits the shared registry record — so it exports refs, not inline objects.
+- **The legacy inline shape is still accepted** by schema and hydration, because `submit.html` emits it for curator reconciliation (#124 Phase 3 remains open). `validate-data.js` fails on unresolvable ids and warns on unreferenced or same-named registry entries.
 
 Full detail: [functional spec §11 "Host Registries"](docs/functional-spec.md).
 
