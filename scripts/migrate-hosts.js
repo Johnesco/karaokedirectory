@@ -52,10 +52,13 @@ const data = JSON.parse(rawSource);
 // changes rather than every line.
 const usesCrlf = rawSource.includes('\r\n');
 
-const kjs = {};        // id → { name, website?, socials? }
-const companies = {};
-const kjIdByName = new Map();      // lowercased name → id
-const companyIdByName = new Map();
+// Seed from any registries already in the file, so re-running on partly-migrated
+// data (e.g. a branch that added inline hosts after the first pass) tops it up
+// instead of rebuilding the registries from only the leftovers.
+const kjs = { ...(data.kjs || {}) };        // id → { name, website?, socials? }
+const companies = { ...(data.companies || {}) };
+const kjIdByName = new Map(Object.entries(kjs).map(([id, e]) => [(e.name || '').toLowerCase(), id]));
+const companyIdByName = new Map(Object.entries(companies).map(([id, e]) => [(e.name || '').toLowerCase(), id]));
 const report = { kjMerges: [], companyMerges: [], conflicts: [], ambiguous: [] };
 
 /** Register a name in a registry, reusing the id on an exact case-insensitive match. */

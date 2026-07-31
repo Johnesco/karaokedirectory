@@ -1387,8 +1387,7 @@
           "endTime": "01:00",
           "eventName": "Karaoke with Xpider @ Highball!",
           "host": {
-            "name": "Xpider Cantu",
-            "website": "https://www.xpidermagic.com/karaoke"
+            "kjId": "xpider-cantu"
           }
         },
         {
@@ -1398,8 +1397,7 @@
           "endTime": "01:00",
           "eventName": "Karaoke with Xpider @ Highball!",
           "host": {
-            "name": "Xpider Cantu",
-            "website": "https://www.xpidermagic.com/karaoke"
+            "kjId": "xpider-cantu"
           }
         },
         {
@@ -1409,8 +1407,7 @@
           "endTime": "01:00",
           "eventName": "Karaoke with Xpider @ Highball!",
           "host": {
-            "name": "Xpider Cantu",
-            "website": "https://www.xpidermagic.com/karaoke"
+            "kjId": "xpider-cantu"
           }
         }
       ],
