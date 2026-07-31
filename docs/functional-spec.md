@@ -926,7 +926,7 @@ The form is structured as a short required-fields zone, then a single `<details>
 | Section | Fields |
 |---------|--------|
 | Tags | Tag checkboxes (chip-style) generated at load by fetching `tagDefinitions` from `js/data.json` — adding a tag there auto-surfaces here, no parallel hardcoded list. System tags (`dedicated`, `special-event`) and age tags are excluded from the grid; age restriction is its own radio (not sure / 21+ / 18+ / all-ages / family-friendly) whose value joins the `tags: []` array at submit time, matching the schema's "age is a tag" shape. |
-| Host / KJ Info | Host name, company, host website |
+| Who runs it | KJ name, company, website — either or both, mirroring the host model (§11). Both text inputs carry a `<datalist>` of names from the `kjs` / `companies` registries in `js/data.json`, so typing suggests hosts already in the directory. See "Host matching on submit" below. |
 | Venue Social Links | Website, Facebook, Instagram (3 fields — other platforms intentionally cut to reduce friction; curator can add via editor) |
 | Notes | Free-text textarea |
 | Your Contact Info | Submitter name (required if KJ); contact methods checkboxes (email, phone text, phone call, other), each reveals its input on check |
@@ -967,6 +967,19 @@ Hidden honeypot field `website_url` (positioned offscreen via `.hp-field` CSS) w
 ### Email body format
 
 `formatEmailBody()` produces a structured plaintext email containing the full venue object as JSON between two `----...----` delimiter lines, plus submitter metadata and a TODO checklist (verify info, geocode, add to data.json). The JSON block is intended to be copy-paste-ready for the curator's editor workflow.
+
+### Host matching on submit (#124 Phase 3)
+
+The form can't ask a visitor for a registry id, so both host fields stay free text — but they carry a `<datalist>` of every name in `kjs` and `companies`, so typing suggests hosts already in the directory and most submissions land on an exact name.
+
+At submit time each typed name is matched against its registry, exact and case-insensitive:
+
+- **Both sides resolve** (or one resolves and the other is blank) → the payload carries a **`{ kjId?, companyId? }` ref**, ready for the curator to accept as-is.
+- **Anything unrecognised** → the whole host falls back to the **legacy inline shape** for reconciliation. It's all-or-nothing per host, because the schema's `oneOf` forbids mixing ids with free text.
+
+The **host website** is dropped from the ref form deliberately: it belongs on the registry record rather than the venue, and a submitter can't say which of the two it's for. It's carried in the email body instead so nothing is lost.
+
+The email body gains a **HOST** section stating which path was taken — either the ids that matched, or which name is new and needs a registry entry created first.
 
 ### Payload shape contract (#101)
 
@@ -1270,6 +1283,7 @@ Each public page includes a `<link rel="canonical">` tag pointing to its canonic
 | 2026-07 | 1.0.24 | #88: Map venue card now hides `frequency: "once"` entries dated before today (both summary and detail schedule). Added `isPastOnceEvent()` helper to `js/utils/date.js`. VenueModal and VenueDetailPane unchanged. Updated Section 4. | Claude Code |
 | 2026-07 | 1.0.25 | #137: Compact card "Also …" indicator now omits past one-time events, reusing `isPastOnceEvent()`. Recurring entries unaffected; a venue whose only other entries are past shows no "Also" line. Updated Sections 2 and 6. | Claude Code |
 | 2026-07 | 1.0.26 | #131: KJ index gains a filter box matching KJ *and* company names, and sorts on `getSortableHostName()` so stage titles (KJ/DJ/MC) no longer scatter names alphabetically. "Affiliations" section renamed "Companies". Updated Section 10. | Claude Code |
+| 2026-07 | 1.0.27 | #124 Phase 3: submit form's host fields suggest known KJs/companies from the registries and emit a `{kjId, companyId}` ref when both sides match, falling back to the inline shape otherwise. Email body gains a HOST section saying which it was. Updated Section 15. | Claude Code |
 
 ---
 
