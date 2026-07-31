@@ -521,6 +521,9 @@ Venues with an `activePeriod` field only appear when the current date falls with
 - **URL-driven:** `index.html?kj=all` renders `KJIndexView` — an alphabetical directory of every unique KJ name in the dataset.
 - **Source:** Walks every active venue and collects names from `venue.host.{name,company}` and per-show `schedule[N].host.{name,company}`. Case-insensitive de-dupe (display name preserved from first occurrence).
 - **Each entry:** KJ name + venue count, linking to `?kj=<encoded name>` (real anchor — page reloads into `KJDossierView`).
+- **Two sections:** "Companies" (each a clickable parent with its KJs nested beneath) and "Independent KJs" (no company recorded).
+- **Sorting ignores stage titles.** Entries sort on `getSortableHostName()` from `js/utils/string.js`, which strips a leading `KJ`/`DJ`/`MC` and then applies the same article handling as venue names. Display is unchanged — this is the sort key only. Without it, sorting is literal and scatters people by prefix: "KJ Armando and Paola" lands eight rows from "Armando", and "DJ Cysum & Mo" files under D instead of C.
+- **Filter box:** matches **both** KJ and company names as you type, so either half of what a visitor remembers finds the row. A company stays visible if it matches *or* any of its KJs does; when only a KJ matches, the company is shown with just that KJ beneath it (searching "Stephanie" surfaces her via Starling Karaoke). Sections with no surviving rows hide entirely; when nothing matches, "No KJ or company matches that." Filtering is done in the DOM rather than by re-rendering, so the input keeps focus and caret position between keystrokes.
 - **Chip:** Reads "All KJs" (special-cased) instead of the literal "all". × exits to weekly view.
 - **Empty state:** "No KJs found in the directory." (renders when data has zero host fields populated).
 
@@ -1266,6 +1269,7 @@ Each public page includes a `<link rel="canonical">` tag pointing to its canonic
 | 2026-06 | 1.0.23 | Exclusion Dates feature (#3–#8): recurring shows can be marked closed on specific dates via `schedule[].exclusions` (`"YYYY-MM-DD"` shorthand or `{date, reason}`). Weekly cards dim with a "Closed" banner; Map dims the marker and shows a "Closed Today" card banner; detail modal/pane/map-expanded show a "Closed Today" banner plus an "Upcoming closures" list (next 60 days). Added `getVenueExclusionForDate()` and `getUpcomingExclusions()` to `date.js`. New §11 "Schedule Exclusions"; updated §2, §4, §7, §8. | Claude Code |
 | 2026-07 | 1.0.24 | #88: Map venue card now hides `frequency: "once"` entries dated before today (both summary and detail schedule). Added `isPastOnceEvent()` helper to `js/utils/date.js`. VenueModal and VenueDetailPane unchanged. Updated Section 4. | Claude Code |
 | 2026-07 | 1.0.25 | #137: Compact card "Also …" indicator now omits past one-time events, reusing `isPastOnceEvent()`. Recurring entries unaffected; a venue whose only other entries are past shows no "Also" line. Updated Sections 2 and 6. | Claude Code |
+| 2026-07 | 1.0.26 | #131: KJ index gains a filter box matching KJ *and* company names, and sorts on `getSortableHostName()` so stage titles (KJ/DJ/MC) no longer scatter names alphabetically. "Affiliations" section renamed "Companies". Updated Section 10. | Claude Code |
 
 ---
 
