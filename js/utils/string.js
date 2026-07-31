@@ -55,6 +55,33 @@ export function getSortableName(name) {
     return name;
 }
 
+// Stage titles that precede a host's actual name. Sorting on the literal string
+// scatters people by their prefix — "KJ Average Joe" lands under K, eight rows
+// from "Average Joe" — so these are stripped for sort purposes only.
+const HOST_TITLES = ['kj', 'dj', 'mc'];
+
+/**
+ * Get sortable host name: drops a leading stage title, then applies the same
+ * article handling as venue names. Display is never changed — this is the sort
+ * key only.
+ *
+ *   "KJ Average Joe"          → "Average Joe"
+ *   "DJ Cysum & Mo"           → "Cysum & Mo"
+ *   "The Karaoke Underground" → "Karaoke Underground, The"
+ *
+ * @param {string} name - Host or company name
+ * @returns {string} Sortable form
+ */
+export function getSortableHostName(name) {
+    if (!name) return '';
+    const words = name.trim().split(/\s+/);
+    const lead = words[0].toLowerCase().replace(/\./g, '');
+    const withoutTitle = words.length > 1 && HOST_TITLES.includes(lead)
+        ? words.slice(1).join(' ')
+        : name;
+    return getSortableName(withoutTitle);
+}
+
 /**
  * Convert string to URL-safe slug
  * @param {string} str - String to slugify

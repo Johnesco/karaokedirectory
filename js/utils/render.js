@@ -4,7 +4,7 @@
  */
 
 import { escapeHtml } from './string.js';
-import { formatScheduleEntry, formatActivePeriodText, scheduleMatchesDate, WEEKDAYS, getVenueExclusionForDate, getUpcomingExclusions, parseLocalDate } from './date.js';
+import { formatScheduleEntry, formatActivePeriodText, scheduleMatchesDate, WEEKDAYS, getVenueExclusionForDate, getUpcomingExclusions, parseLocalDate, isPastOnceEvent } from './date.js';
 import { buildMapUrl, buildDirectionsUrl, createSocialLinks, formatAddress, sanitizeUrl } from './url.js';
 
 /**
@@ -288,9 +288,15 @@ export function getScheduleContext(venue, schedule, currentDate = null) {
     // provided) isn't a different entry that also matches the same date.
     // The second clause prevents the "Also" list from listing today's other
     // events as if they were on another night.
+    //
+    // Past one-time events are dropped too: "Also May 30" reads as an invitation,
+    // not a record, and there's no way to tell from the text that it's gone. Same
+    // reasoning as the map card (#88). Recurring entries are never affected —
+    // isPastOnceEvent() only ever returns true for `once`.
     const otherEntries = (venue.schedule || []).filter(s => {
         if (s === schedule) return false;
         if (currentDate && scheduleMatchesDate(s, currentDate)) return false;
+        if (isPastOnceEvent(s)) return false;
         return true;
     });
 

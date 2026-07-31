@@ -96,6 +96,142 @@
       "textColor": "#ffffff"
     }
   },
+  "kjs": {
+    "andy-hartsock": {
+      "name": "Andy Hartsock"
+    },
+    "armando": {
+      "name": "Armando"
+    },
+    "average-joe": {
+      "name": "Average Joe"
+    },
+    "baby-jesus": {
+      "name": "Baby Jesus"
+    },
+    "bee-purrs": {
+      "name": "Bee Purrs"
+    },
+    "dan-desetto": {
+      "name": "Dan DeSetto"
+    },
+    "dj-cysum-and-mo": {
+      "name": "DJ Cysum & Mo"
+    },
+    "dj-pnasty": {
+      "name": "DJ P'Nasty"
+    },
+    "erin-hierholzer": {
+      "name": "Erin Hierholzer"
+    },
+    "ill-will": {
+      "name": "Ill Will"
+    },
+    "jason-lynum": {
+      "name": "Jason Lynum"
+    },
+    "jen": {
+      "name": "Jen"
+    },
+    "john-roberts": {
+      "name": "John Roberts"
+    },
+    "keith-ruckus": {
+      "name": "Keith Ruckus"
+    },
+    "kevin": {
+      "name": "Kevin"
+    },
+    "kim": {
+      "name": "Kim"
+    },
+    "kj-armando-and-paola": {
+      "name": "KJ Armando and Paola"
+    },
+    "kj-j3n": {
+      "name": "KJ J3N"
+    },
+    "kj-stephanie": {
+      "name": "KJ Stephanie"
+    },
+    "laura-torrez-studio": {
+      "name": "Laura Torrez Studio"
+    },
+    "murrah": {
+      "name": "Murrah"
+    },
+    "shelly-dowdy": {
+      "name": "Shelly Dowdy"
+    },
+    "tj": {
+      "name": "TJ"
+    },
+    "xpider-cantu": {
+      "name": "Xpider Cantu",
+      "website": "https://www.xpidermagic.com/karaoke"
+    }
+  },
+  "companies": {
+    "all-about-music": {
+      "name": "All About Music"
+    },
+    "by-request-karaoke": {
+      "name": "By Request Karaoke",
+      "website": "https://www.facebook.com/brkaraoke"
+    },
+    "cpr-mobile-djs": {
+      "name": "CPR Mobile DJs"
+    },
+    "diamond-karaoke-austin": {
+      "name": "Diamond Karaoke Austin"
+    },
+    "karaoke-under-the-moon": {
+      "name": "Karaoke Under the Moon"
+    },
+    "karaoke-underground": {
+      "name": "Karaoke Underground",
+      "website": "https://karaokeunderground.com/"
+    },
+    "lions-den-tea": {
+      "name": "Lion's Den Tea"
+    },
+    "live-music-in-austin": {
+      "name": "Live Music In Austin"
+    },
+    "marshall-joshua-entertainment": {
+      "name": "Marshall Joshua Entertainment"
+    },
+    "party-pipes-karaoke": {
+      "name": "Party Pipes Karaoke"
+    },
+    "planet-karaoke": {
+      "name": "Planet Karaoke"
+    },
+    "poppin-off-with-poppy-karaoke": {
+      "name": "Poppin' Off with Poppy Karaoke"
+    },
+    "ruckus-atx": {
+      "name": "Ruckus ATX"
+    },
+    "smart-ass-entertainment": {
+      "name": "Smart Ass Entertainment"
+    },
+    "starling-karaoke": {
+      "name": "Starling Karaoke"
+    },
+    "story-oke-austin": {
+      "name": "Story-Oke Austin",
+      "website": "https://www.storyokeaustin.com/"
+    },
+    "stryke3-karaoke": {
+      "name": "Stryke3 Karaoke",
+      "website": "https://www.austinkaraokeshows.com/"
+    },
+    "texas-live-band-karaoke": {
+      "name": "Texas Live Band Karaoke",
+      "website": "https://www.facebook.com/texaslbk"
+    }
+  },
   "listings": [
     {
       "id": "sociedad",
@@ -125,7 +261,7 @@
         }
       ],
       "host": {
-        "affiliation": "Diamond Karaoke Austin"
+        "companyId": "diamond-karaoke-austin"
       },
       "socials": {
         "facebook": "https://www.facebook.com/AlcoveCantina",
@@ -228,7 +364,7 @@
         }
       ],
       "host": {
-        "name": "DJ Cysum & Mo"
+        "kjId": "dj-cysum-and-mo"
       },
       "socials": {
         "facebook": "https://www.facebook.com/bigeasysaloonpflugerville/",
@@ -290,7 +426,7 @@
         }
       ],
       "host": {
-        "affiliation": "Karaoke Underground"
+        "companyId": "karaoke-underground"
       },
       "socials": {
         "website": "https://www.blacksparrowmusicparlor.com/",
@@ -357,8 +493,8 @@
         }
       ],
       "host": {
-        "name": "Keith Ruckus",
-        "affiliation": "Ruckus ATX"
+        "kjId": "keith-ruckus",
+        "companyId": "ruckus-atx"
       },
       "socials": {
         "facebook": "https://www.facebook.com/theboatatx/#",
@@ -392,8 +528,8 @@
         }
       ],
       "host": {
-        "name": "Ill Will",
-        "affiliation": "Live Music In Austin"
+        "kjId": "ill-will",
+        "companyId": "live-music-in-austin"
       },
       "socials": {
         "facebook": "https://www.facebook.com/bodhishideaway/",
@@ -428,8 +564,8 @@
         }
       ],
       "host": {
-        "name": "Average Joe",
-        "affiliation": "Starling Karaoke"
+        "kjId": "average-joe",
+        "companyId": "starling-karaoke"
       },
       "socials": {
         "facebook": "https://www.facebook.com/boomerzaustin",
@@ -494,7 +630,7 @@
         }
       ],
       "host": {
-        "name": "Bee Purrs"
+        "kjId": "bee-purrs"
       },
       "socials": {
         "instagram": "https://www.instagram.com/bungalowaustin",
@@ -565,7 +701,7 @@
         }
       ],
       "host": {
-        "affiliation": "Diamond Karaoke Austin"
+        "companyId": "diamond-karaoke-austin"
       },
       "socials": {
         "facebook": "https://www.facebook.com/canaryroostatx",
@@ -598,8 +734,8 @@
         }
       ],
       "host": {
-        "name": "Average Joe",
-        "affiliation": "Starling Karaoke"
+        "kjId": "average-joe",
+        "companyId": "starling-karaoke"
       },
       "socials": {
         "instagram": "https://www.instagram.com/coffeehouse/",
@@ -661,8 +797,7 @@
         }
       ],
       "host": {
-        "affiliation": "Karaoke Underground",
-        "website": "https://karaokeunderground.com/"
+        "companyId": "karaoke-underground"
       },
       "socials": {
         "website": "https://cheerupcharlies.com/",
@@ -707,7 +842,7 @@
         }
       ],
       "host": {
-        "name": "Kevin"
+        "kjId": "kevin"
       },
       "socials": null,
       "coordinates": {
@@ -846,7 +981,7 @@
         }
       ],
       "host": {
-        "name": "Xpider Cantu"
+        "kjId": "xpider-cantu"
       },
       "socials": {
         "website": "https://www.coyoteuglysaloon.com/austin/"
@@ -878,7 +1013,7 @@
         }
       ],
       "host": {
-        "name": "Armando"
+        "kjId": "armando"
       },
       "socials": {
         "facebook": "https://www.facebook.com/groups/871341856699010/user/100057382302405/",
@@ -984,7 +1119,7 @@
         }
       ],
       "host": {
-        "name": "KJ Armando and Paola"
+        "kjId": "kj-armando-and-paola"
       },
       "socials": {
         "website": "https://www.feralhousewifewine.com/",
@@ -1015,8 +1150,7 @@
         }
       ],
       "host": {
-        "affiliation": "Texas Live Band Karaoke",
-        "website": "https://www.facebook.com/texaslbk"
+        "companyId": "texas-live-band-karaoke"
       },
       "socials": {
         "website": "https://www.thefieldhousetexas.com/",
@@ -1160,7 +1294,7 @@
         }
       ],
       "host": {
-        "affiliation": "Marshall Joshua Entertainment"
+        "companyId": "marshall-joshua-entertainment"
       },
       "coordinates": {
         "lat": 30.2453635,
@@ -1190,7 +1324,7 @@
         }
       ],
       "host": {
-        "affiliation": "Diamond Karaoke Austin"
+        "companyId": "diamond-karaoke-austin"
       },
       "socials": {
         "website": "https://hardcountgtown.com/",
@@ -1221,8 +1355,7 @@
           "endTime": "01:00",
           "eventName": "Karaoke with Xpider @ Highball!",
           "host": {
-            "name": "Xpider Cantu",
-            "website": "https://www.xpidermagic.com/karaoke"
+            "kjId": "xpider-cantu"
           }
         },
         {
@@ -1233,8 +1366,7 @@
           "eventName": "Story-Oke: Country @ Highball!",
           "eventUrl": "https://www.facebook.com/share/1Cjd681y4d/",
           "host": {
-            "affiliation": "Story-Oke Austin",
-            "website": "https://www.storyokeaustin.com/"
+            "companyId": "story-oke-austin"
           }
         },
         {
@@ -1245,8 +1377,7 @@
           "eventName": "Story-Oke: Pride",
           "eventUrl": "https://www.facebook.com/share/1CgUshRwYX/",
           "host": {
-            "affiliation": "Story-Oke Austin",
-            "website": "https://www.storyokeaustin.com/"
+            "companyId": "story-oke-austin"
           }
         },
         {
@@ -1256,8 +1387,7 @@
           "endTime": "01:00",
           "eventName": "Karaoke with Xpider @ Highball!",
           "host": {
-            "name": "Xpider Cantu",
-            "website": "https://www.xpidermagic.com/karaoke"
+            "kjId": "xpider-cantu"
           }
         },
         {
@@ -1267,8 +1397,7 @@
           "endTime": "01:00",
           "eventName": "Karaoke with Xpider @ Highball!",
           "host": {
-            "name": "Xpider Cantu",
-            "website": "https://www.xpidermagic.com/karaoke"
+            "kjId": "xpider-cantu"
           }
         },
         {
@@ -1278,8 +1407,7 @@
           "endTime": "01:00",
           "eventName": "Karaoke with Xpider @ Highball!",
           "host": {
-            "name": "Xpider Cantu",
-            "website": "https://www.xpidermagic.com/karaoke"
+            "kjId": "xpider-cantu"
           }
         }
       ],
@@ -1324,7 +1452,7 @@
         }
       ],
       "host": {
-        "name": "Andy Hartsock"
+        "kjId": "andy-hartsock"
       },
       "socials": {
         "facebook": "https://www.facebook.com/hiveaustin/",
@@ -1428,8 +1556,8 @@
         }
       ],
       "host": {
-        "name": "Jason Lynum",
-        "affiliation": "CPR Mobile DJs"
+        "kjId": "jason-lynum",
+        "companyId": "cpr-mobile-djs"
       },
       "socials": null,
       "coordinates": {
@@ -1459,7 +1587,7 @@
         }
       ],
       "host": {
-        "name": "Armando"
+        "kjId": "armando"
       },
       "socials": {
         "website": "https://www.hudsonsonmercer.com/",
@@ -1500,8 +1628,8 @@
         }
       ],
       "host": {
-        "name": "Murrah",
-        "affiliation": "Planet Karaoke"
+        "kjId": "murrah",
+        "companyId": "planet-karaoke"
       },
       "socials": {
         "instagram": "https://www.instagram.com/theironbearaustin/",
@@ -1580,7 +1708,7 @@
         }
       ],
       "host": {
-        "affiliation": "Karaoke Underground"
+        "companyId": "karaoke-underground"
       },
       "socials": {
         "facebook": "https://www.facebook.com/NomadBarATX",
@@ -1640,7 +1768,7 @@
         }
       ],
       "host": {
-        "affiliation": "Lion's Den Tea"
+        "companyId": "lions-den-tea"
       },
       "socials": {
         "instagram": "https://www.instagram.com/lionsdentea/",
@@ -1674,7 +1802,7 @@
         }
       ],
       "host": {
-        "name": "Xpider Cantu"
+        "kjId": "xpider-cantu"
       },
       "socials": {
         "website": "https://lonestarbartexas.com/",
@@ -1711,7 +1839,7 @@
         }
       ],
       "host": {
-        "name": "Dan DeSetto"
+        "kjId": "dan-desetto"
       },
       "socials": {
         "facebook": "https://www.facebook.com/ltcornerpub/",
@@ -1840,7 +1968,7 @@
         }
       ],
       "host": {
-        "name": "John Roberts"
+        "kjId": "john-roberts"
       },
       "socials": {
         "facebook": "https://www.facebook.com/ManchacaSpringsSaloon",
@@ -2037,8 +2165,7 @@
         }
       ],
       "host": {
-        "name": "Xpider Cantu",
-        "website": "https://www.xpidermagic.com/karaoke"
+        "kjId": "xpider-cantu"
       },
       "socials": null,
       "coordinates": {
@@ -2068,8 +2195,8 @@
         }
       ],
       "host": {
-        "name": "DJ P'Nasty",
-        "affiliation": "Karaoke Under the Moon"
+        "kjId": "dj-pnasty",
+        "companyId": "karaoke-under-the-moon"
       },
       "socials": {
         "facebook": "https://www.facebook.com/profile.php?id=100064324614170#",
@@ -2104,8 +2231,8 @@
         }
       ],
       "host": {
-        "name": "KJ Stephanie",
-        "affiliation": "Starling Karaoke"
+        "kjId": "kj-stephanie",
+        "companyId": "starling-karaoke"
       },
       "socials": {
         "facebook": "https://www.facebook.com/people/Oak-Hill-Social/61552863291533/",
@@ -2139,7 +2266,7 @@
         }
       ],
       "host": {
-        "affiliation": "Diamond Karaoke Austin"
+        "companyId": "diamond-karaoke-austin"
       },
       "socials": {
         "facebook": "https://www.facebook.com/profile.php?id=61563834987547"
@@ -2177,8 +2304,8 @@
         }
       ],
       "host": {
-        "name": "KJ J3N",
-        "affiliation": "Starling Karaoke"
+        "kjId": "kj-j3n",
+        "companyId": "starling-karaoke"
       },
       "socials": {
         "facebook": "https://www.facebook.com/punchbowlsocial/",
@@ -2213,7 +2340,7 @@
         }
       ],
       "host": {
-        "name": "Laura Torrez Studio"
+        "kjId": "laura-torrez-studio"
       },
       "socials": {
         "website": "https://www.rabbitholetx.com/"
@@ -2246,7 +2373,7 @@
         }
       ],
       "host": {
-        "name": "Shelly Dowdy"
+        "kjId": "shelly-dowdy"
       },
       "socials": {
         "facebook": "https://www.facebook.com/Rabbitholetx/",
@@ -2281,7 +2408,7 @@
         }
       ],
       "host": {
-        "affiliation": "Marshall Joshua Entertainment"
+        "companyId": "marshall-joshua-entertainment"
       },
       "socials": {
         "facebook": "https://www.facebook.com/profile.php?id=100040267276872"
@@ -2313,8 +2440,8 @@
         }
       ],
       "host": {
-        "name": "Jen",
-        "affiliation": "Smart Ass Entertainment"
+        "kjId": "jen",
+        "companyId": "smart-ass-entertainment"
       },
       "socials": {
         "facebook": "https://www.facebook.com/therailhousebartx/",
@@ -2354,8 +2481,8 @@
         }
       ],
       "host": {
-        "name": "Jason Lynum",
-        "affiliation": "CPR Mobile DJs"
+        "kjId": "jason-lynum",
+        "companyId": "cpr-mobile-djs"
       },
       "socials": {
         "facebook": "https://www.facebook.com/tayloricehouse",
@@ -2467,7 +2594,7 @@
         }
       ],
       "host": {
-        "affiliation": "Marshall Joshua Entertainment"
+        "companyId": "marshall-joshua-entertainment"
       },
       "socials": {
         "facebook": "https://www.facebook.com/RoundRockTavern/",
@@ -2502,7 +2629,7 @@
         }
       ],
       "host": {
-        "affiliation": "Poppin' Off with Poppy Karaoke"
+        "companyId": "poppin-off-with-poppy-karaoke"
       },
       "socials": {
         "facebook": "https://www.facebook.com/shootersatx",
@@ -2539,7 +2666,7 @@
         }
       ],
       "host": {
-        "affiliation": "Party Pipes Karaoke"
+        "companyId": "party-pipes-karaoke"
       },
       "socials": {
         "facebook": "https://www.facebook.com/shooterscp",
@@ -2573,7 +2700,7 @@
         }
       ],
       "host": {
-        "name": "Xpider Cantu"
+        "kjId": "xpider-cantu"
       },
       "socials": {
         "facebook": "https://www.facebook.com/snuffys.place/"
@@ -2653,9 +2780,8 @@
         }
       ],
       "host": {
-        "name": "Baby Jesus",
-        "affiliation": "By Request Karaoke",
-        "website": "https://www.facebook.com/brkaraoke"
+        "kjId": "baby-jesus",
+        "companyId": "by-request-karaoke"
       },
       "socials": {
         "website": "https://thestardustclub.com/",
@@ -2699,7 +2825,7 @@
         }
       ],
       "host": {
-        "affiliation": "All About Music"
+        "companyId": "all-about-music"
       },
       "coordinates": {
         "lat": 30.4501661,
@@ -2797,7 +2923,7 @@
         }
       ],
       "host": {
-        "name": "Erin Hierholzer"
+        "kjId": "erin-hierholzer"
       },
       "socials": {
         "instagram": "https://www.instagram.com/the_usual_atx/",
@@ -2828,7 +2954,7 @@
         }
       ],
       "host": {
-        "name": "Xpider Cantu"
+        "kjId": "xpider-cantu"
       },
       "socials": {
         "website": "https://wakesurfsaloon.com/",
@@ -2862,7 +2988,7 @@
         }
       ],
       "host": {
-        "name": "TJ"
+        "kjId": "tj"
       },
       "socials": null,
       "coordinates": {
@@ -2914,8 +3040,7 @@
         }
       ],
       "host": {
-        "affiliation": "Stryke3 Karaoke",
-        "website": "https://www.austinkaraokeshows.com/"
+        "companyId": "stryke3-karaoke"
       },
       "socials": {
         "website": "https://www.austinwatertank.com/",
@@ -2952,7 +3077,7 @@
         }
       ],
       "host": {
-        "affiliation": "Party Pipes Karaoke"
+        "companyId": "party-pipes-karaoke"
       },
       "socials": {
         "facebook": "https://www.facebook.com/thewhiskeygirlssaloon",
@@ -3014,7 +3139,7 @@
         }
       ],
       "host": {
-        "affiliation": "Diamond Karaoke Austin"
+        "companyId": "diamond-karaoke-austin"
       },
       "socials": {
         "facebook": "https://www.facebook.com/profile.php?id=61573452677081",
@@ -3048,8 +3173,8 @@
         }
       ],
       "host": {
-        "name": "Kim",
-        "affiliation": "Smart Ass Entertainment"
+        "kjId": "kim",
+        "companyId": "smart-ass-entertainment"
       },
       "socials": {
         "facebook": "https://www.facebook.com/williesjoint/",
@@ -3119,7 +3244,7 @@
         "instagram": "https://www.instagram.com/crowbaraustin"
       },
       "host": {
-        "affiliation": "Poppin' Off with Poppy Karaoke"
+        "companyId": "poppin-off-with-poppy-karaoke"
       },
       "coordinates": {
         "lat": 30.2385305,
@@ -3153,7 +3278,7 @@
         "lgbtq"
       ],
       "host": {
-        "affiliation": "Starling Karaoke"
+        "companyId": "starling-karaoke"
       }
     }
   ]
