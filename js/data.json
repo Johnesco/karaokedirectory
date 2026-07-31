@@ -1248,6 +1248,39 @@
             "affiliation": "Story-Oke Austin",
             "website": "https://www.storyokeaustin.com/"
           }
+        },
+        {
+          "frequency": "once",
+          "date": "2026-08-01",
+          "startTime": "21:00",
+          "endTime": "01:00",
+          "eventName": "Karaoke with Xpider @ Highball!",
+          "host": {
+            "name": "Xpider Cantu",
+            "website": "https://www.xpidermagic.com/karaoke"
+          }
+        },
+        {
+          "frequency": "once",
+          "date": "2026-08-07",
+          "startTime": "21:00",
+          "endTime": "01:00",
+          "eventName": "Karaoke with Xpider @ Highball!",
+          "host": {
+            "name": "Xpider Cantu",
+            "website": "https://www.xpidermagic.com/karaoke"
+          }
+        },
+        {
+          "frequency": "once",
+          "date": "2026-08-22",
+          "startTime": "21:00",
+          "endTime": "01:00",
+          "eventName": "Karaoke with Xpider @ Highball!",
+          "host": {
+            "name": "Xpider Cantu",
+            "website": "https://www.xpidermagic.com/karaoke"
+          }
         }
       ],
       "socials": {
