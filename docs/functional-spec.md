@@ -91,6 +91,8 @@ When expanded, shows:
 
 Below the time row, each card shows a small calendar icon and an "Also …" line listing the venue's other dates/days. To avoid confusing self-reference, this list **excludes any schedule entry that also matches the current card's date** — so a card rendered for May 30 will never list "May 30" in its Also line, even if the venue has another event that day (which would render as a separate card immediately adjacent).
 
+It also **excludes one-time events whose date has passed**, for the same reason the map card does (§4): "Also May 30" reads as an invitation rather than a record, and nothing in the text marks it as gone. Recurring entries are never affected. When a venue's only other entries are past one-times, no "Also" line renders at all.
+
 ### Interaction
 
 - **Click past day header** — toggles expand/collapse
@@ -349,7 +351,7 @@ Displays:
 - **Frequency + time** — clock icon + frequency label + time range. Format: "Every Friday · 9:00 PM - 1:00 AM" or "First Saturday · 9:00 PM - 1:00 AM". Frequency label is wrapped in `.venue-card__frequency` span with muted color. Skipped for `frequency: "once"` events (they already have event name line). If `eventUrl` is set (and not already shown as special event link), shows arrow link icon.
 - **Additional schedule indicator** — Shows which other days/dates a venue has karaoke, replacing the old "+N more" count. Format depends on schedule composition:
   - **"Everyday"** — When all 7 weekdays are covered by `frequency: "every"` entries. No icon, just the text.
-  - **"Also [days]"** — For 2–6 additional entries. Calendar-days icon + comma-separated abbreviated day names: "Also Tue, Wed". Ordinal frequencies include prefix: "Also 2nd & 4th Fri". One-time events show abbreviated date: "Also Mar 15".
+  - **"Also [days]"** — For 2–6 additional entries. Calendar-days icon + comma-separated abbreviated day names: "Also Tue, Wed". Ordinal frequencies include prefix: "Also 2nd & 4th Fri". One-time events show abbreviated date: "Also Mar 15" — past one-times are omitted (see §2).
   - Same-day ordinals are grouped with "&": "2nd & 4th Fri" instead of "2nd Fri, 4th Fri".
   - Only shown when `showSchedule` is true and venue has more than one schedule entry.
   - CSS class: `.venue-card__more-nights`.
@@ -1263,6 +1265,7 @@ Each public page includes a `<link rel="canonical">` tag pointing to its canonic
 | 2026-02 | 1.0.22 | SEO quick wins: Added meta descriptions, Open Graph tags, Twitter Card tags, and canonical URLs to all 5 public pages. Created `robots.txt` and `sitemap.xml`. Added `noindex` to `editor.html`. New Section 22. Renumbered Sections 22–23 → 23–24. | Claude Code |
 | 2026-06 | 1.0.23 | Exclusion Dates feature (#3–#8): recurring shows can be marked closed on specific dates via `schedule[].exclusions` (`"YYYY-MM-DD"` shorthand or `{date, reason}`). Weekly cards dim with a "Closed" banner; Map dims the marker and shows a "Closed Today" card banner; detail modal/pane/map-expanded show a "Closed Today" banner plus an "Upcoming closures" list (next 60 days). Added `getVenueExclusionForDate()` and `getUpcomingExclusions()` to `date.js`. New §11 "Schedule Exclusions"; updated §2, §4, §7, §8. | Claude Code |
 | 2026-07 | 1.0.24 | #88: Map venue card now hides `frequency: "once"` entries dated before today (both summary and detail schedule). Added `isPastOnceEvent()` helper to `js/utils/date.js`. VenueModal and VenueDetailPane unchanged. Updated Section 4. | Claude Code |
+| 2026-07 | 1.0.25 | #137: Compact card "Also …" indicator now omits past one-time events, reusing `isPastOnceEvent()`. Recurring entries unaffected; a venue whose only other entries are past shows no "Also" line. Updated Sections 2 and 6. | Claude Code |
 
 ---
 
