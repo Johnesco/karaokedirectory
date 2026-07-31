@@ -142,6 +142,7 @@ karaokedirectory/
 │
 ├── scripts/               # Developer tools
 │   ├── geocode-venues.js  # Add coordinates to venues (patches data.json)
+│   ├── migrate-hosts.js   # One-time inline-host → registry migration (ADR-007, done)
 │   ├── validate-data.js   # Validate venue data integrity (Ajv + supplementary checks)
 │   └── audit-for-supabase.js  # Pre-seed validation against logical rules
 │
@@ -268,7 +269,8 @@ listings: [
 - A **host ref** is `{ kjId?, companyId? }` with at least one id: company-only (a company runs it, KJ rotates/unknown), KJ-only (independent), or both. Valid at venue level and per schedule entry, with the same full-swap override rule.
 - **The KJ↔company link lives on the show, not on the entities** — no company on a KJ, no roster on a company. Rosters and the KJ index are derived by scanning shows, so they can't go stale, and a KJ can work under different companies at different venues.
 - `hydrateVenues()` in `js/utils/hosts.js` resolves refs inside `initVenues()` into the legacy display shape (KJ fields win, company fills gaps), so nothing downstream needs to know which form was stored.
-- **Both forms are accepted during the migration window.** `data.json` is not yet migrated (that's #124 Phase 2); `submit.html` still emits the legacy inline shape for curator reconciliation. `validate-data.js` fails on unresolvable ids and warns on unreferenced or same-named registry entries.
+- **`data.json` is migrated** (#124 Phase 2) — 24 KJs and 18 companies, every host stored as a ref. `scripts/migrate-hosts.js` performed the one-time conversion and is kept for reference.
+- **The legacy inline shape is still accepted** by schema and hydration: `submit.html` emits it for curator reconciliation, and the curator may still write it. `validate-data.js` fails on unresolvable ids and warns on unreferenced or same-named registry entries.
 
 Full detail: [functional spec §11 "Host Registries"](docs/functional-spec.md).
 
