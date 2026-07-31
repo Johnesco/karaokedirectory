@@ -217,20 +217,23 @@
                             </fieldset>
 
                             <fieldset class="form-section">
-                                <legend><i class="fa-solid fa-microphone"></i> Host / KJ Info</legend>
+                                <legend><i class="fa-solid fa-microphone"></i> Who runs it</legend>
+                                <p class="form-hint">A KJ, a company, or both — whatever you know. Start typing and we'll suggest hosts already in the directory; picking a suggestion helps us match your submission to the right person.</p>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label for="host-name">Host Name</label>
-                                        <input type="text" id="host-name" name="host-name" autocomplete="off" placeholder="e.g., DJ Mike">
+                                        <label for="host-name">KJ name</label>
+                                        <input type="text" id="host-name" name="host-name" autocomplete="off" list="known-kjs" placeholder="e.g., DJ Mike">
+                                        <datalist id="known-kjs"></datalist>
                                     </div>
                                     <div class="form-group">
-                                        <label for="affiliation">Affiliation</label>
-                                        <input type="text" id="affiliation" name="affiliation" autocomplete="off" placeholder="e.g., Karaoke Kings">
+                                        <label for="affiliation">Company</label>
+                                        <input type="text" id="affiliation" name="affiliation" autocomplete="off" list="known-companies" placeholder="e.g., Karaoke Kings">
+                                        <datalist id="known-companies"></datalist>
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group form-group--full">
-                                        <label for="host-website">Host / Affiliation Website</label>
+                                        <label for="host-website">KJ / company website</label>
                                         <input type="url" id="host-website" name="host-website" inputmode="url" placeholder="https://">
                                     </div>
                                 </div>
@@ -378,13 +381,42 @@
             '21+', '18+', 'all-ages', 'family-friendly',
         ]);
 
-        // Tag definitions are fetched from js/data.json (ADR-008) and cached here,
-        // so the submit handler can read the same id list without refetching.
-        // Only tagDefinitions is used — the venue listings are never needed here.
+        // Tag definitions and the host registries are fetched from js/data.json
+        // (ADR-008) and cached here, so the submit handler can read them without
+        // refetching. The venue listings are never needed on this page.
         let tagDefinitions = {};
+        let knownKjs = {};        // id → { name, ... }  (ADR-007 registries)
+        let knownCompanies = {};
 
         function getUserSelectableTagIds() {
             return Object.keys(tagDefinitions).filter(id => !TAG_GRID_EXCLUDE.has(id));
+        }
+
+        /**
+         * Resolve a typed host name to a registry id, exact and case-insensitive.
+         * A submitter who picks a datalist suggestion lands here; anyone typing a
+         * new name doesn't, and their text is passed through for the curator to
+         * reconcile. Returns null when there's no match.
+         */
+        function matchRegistryId(registry, typed) {
+            const q = (typed || '').trim().toLowerCase();
+            if (!q) return null;
+            const hit = Object.entries(registry).find(([, e]) => (e.name || '').trim().toLowerCase() === q);
+            return hit ? hit[0] : null;
+        }
+
+        /** Fill a <datalist> with the registry's names, so typing suggests known hosts. */
+        function populateHostSuggestions() {
+            for (const [listId, registry] of [['known-kjs', knownKjs], ['known-companies', knownCompanies]]) {
+                const list = document.getElementById(listId);
+                if (!list) continue;
+                list.innerHTML = Object.values(registry)
+                    .map(e => e.name)
+                    .filter(Boolean)
+                    .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }))
+                    .map(n => `<option value="${n.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;')}"></option>`)
+                    .join('');
+            }
         }
 
         // Generate the tag-checkbox grid from data.json's tagDefinitions so that
@@ -397,7 +429,11 @@
             try {
                 const response = await fetch('js/data.json');
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                tagDefinitions = (await response.json()).tagDefinitions || {};
+                const data = await response.json();
+                tagDefinitions = data.tagDefinitions || {};
+                knownKjs = data.kjs || {};
+                knownCompanies = data.companies || {};
+                populateHostSuggestions();
             } catch (error) {
                 console.error('Could not load tag definitions from js/data.json:', error);
                 grid.innerHTML = '<p class="validation-error">Could not load the tag list. Everything else on this form still works.</p>';
@@ -775,18 +811,57 @@
                 if (activePeriodEnd) venue.activePeriod.end = activePeriodEnd;
             }
 
-            // Optional: Host info. Schema requires name OR affiliation when host
+            // Optional: host info. Schema requires name OR affiliation when host
             // exists, so we don't emit a website-only host — the curator would
             // need at least one identifying field to do anything with it.
             const hostName = formData.get('host-name')?.trim();
             const affiliation = formData.get('affiliation')?.trim();
             const hostWebsite = formData.get('host-website')?.trim();
 
+            // Prefer a registry ref (ADR-007) when the typed names resolve to known
+            // hosts — that's a submission the curator can accept as-is. Anything
+            // unrecognised falls back to the legacy inline shape for reconciliation.
+            //
+            // It's all-or-nothing per host: the schema's oneOf forbids mixing ids
+            // with free text, so one new name means the whole host stays inline.
+            const kjId = matchRegistryId(knownKjs, hostName);
+            const companyId = matchRegistryId(knownCompanies, affiliation);
+            const kjResolved = !hostName || kjId;
+            const companyResolved = !affiliation || companyId;
+
+            let hostNote = '';
             if (hostName || affiliation) {
-                venue.host = {};
-                if (hostName) venue.host.name = hostName;
-                if (affiliation) venue.host.affiliation = affiliation;
-                if (hostWebsite) venue.host.website = hostWebsite;
+                if (kjResolved && companyResolved) {
+                    venue.host = {};
+                    if (kjId) venue.host.kjId = kjId;
+                    if (companyId) venue.host.companyId = companyId;
+
+                    const matched = [
+                        kjId ? `KJ "${hostName}" → kjs/${kjId}` : null,
+                        companyId ? `company "${affiliation}" → companies/${companyId}` : null,
+                    ].filter(Boolean).join('\n');
+                    hostNote = `Matched existing registry entries — host can be accepted as-is:\n${matched}`;
+
+                    // The website is deliberately dropped from the JSON: it belongs on
+                    // the registry record, not the venue, and the submitter can't say
+                    // which of the two it's for. Carried here so it isn't lost.
+                    if (hostWebsite) {
+                        hostNote += `\n\nSubmitter also gave a website: ${hostWebsite}`
+                            + `\n(Not in the JSON — add it to whichever registry entry it belongs to.)`;
+                    }
+                } else {
+                    venue.host = {};
+                    if (hostName) venue.host.name = hostName;
+                    if (affiliation) venue.host.affiliation = affiliation;
+                    if (hostWebsite) venue.host.website = hostWebsite;
+
+                    const unknown = [
+                        hostName && !kjId ? `KJ "${hostName}"` : null,
+                        affiliation && !companyId ? `company "${affiliation}"` : null,
+                    ].filter(Boolean).join(' and ');
+                    hostNote = `NOT in the registries yet: ${unknown}.`
+                        + `\nHost is written inline below — create the registry entry (or pick the right existing one) before adding.`;
+                }
             }
 
             // Optional: Venue socials
@@ -838,7 +913,8 @@
                 notes,
                 submitterName,
                 submitterType,
-                contactMethods
+                contactMethods,
+                hostNote
             };
         }
 
@@ -871,6 +947,13 @@
                 });
             }
             body += '\n';
+
+            // Host note: say whether the JSON below carries registry refs (accept
+            // as-is) or free text (needs reconciling), and carry any website that
+            // the ref shape can't hold.
+            if (data.hostNote) {
+                body += 'HOST:\n' + data.hostNote + '\n\n';
+            }
 
             body += 'VENUE JSON (copy/paste ready):\n';
             body += '-'.repeat(40) + '\n';
