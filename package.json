@@ -4,6 +4,7 @@
   "private": true,
   "description": "Austin Karaoke Directory - Find karaoke venues in Austin, TX",
   "scripts": {
+    "dev": "serve . -l 8000 --no-clipboard",
     "test": "npx playwright test",
     "test:headed": "npx playwright test --headed",
     "test:ui": "npx playwright test --ui",

@@ -1,10 +1,11 @@
-js/data.js.backup
-
 # Taiga export archive
 taigaexport/
 
 # Windows artifacts
 nul
+# Stray gh/project dumps written to a mangled path (filename carries a
+# private-use colon char). Safe to delete if you see one.
+*tmp_project.json
 
 # Claude Code temp files
 tmpclaude-*
@@ -13,23 +14,10 @@ tmpclaude-*
 # Dependencies
 node_modules/
 
-# Playwright
+# Playwright output only.
+# playwright.config.js is TRACKED on purpose — without it `npm test` cannot run
+# from a clean clone, which is how the suite rotted unnoticed for five months.
 test-results/
 playwright-report/
 blob-report/
 playwright/.cache/
-e2e/unit/schedule-matching.spec.js
-e2e/e2e/weekly-view.spec.js
-e2e/helpers/evaluate-utils.js
-e2e/unit/date-utils.spec.js
-e2e/unit/time-format.spec.js
-e2e/unit/venue-service.spec.js
-e2e/e2e/map-view.spec.js
-e2e/e2e/search.spec.js
-e2e/e2e/venue-modal.spec.js
-e2e/e2e/view-switching.spec.js
-e2e/e2e/week-navigation.spec.js
-e2e/e2e/alphabetical-view.spec.js
-e2e/e2e/dedicated-filter.spec.js
-playwright.config.js
-Ccodekaraokedirectorytmp_project.json
