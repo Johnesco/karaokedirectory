@@ -42,6 +42,24 @@
 -->
 
     <header class="site-header">
+        <!--
+             Karaoke lyric ticker (DISABLED).
+
+             Cycles song excerpts across the header like a karaoke screen, hiding the
+             title and tagline while a song plays. Driver: the guarded IIFE near the
+             end of this file. Styles: css/layout.css (.karaoke-video-bg,
+             .karaoke-lyrics, .lyric-line, .scanlines) — left in place and inert.
+
+             Parked in a <template> rather than wrapped in an HTML comment (the way the
+             seasonal snowfall block above is) because the markup carries its own
+             per-song comments, and their terminator would close an enclosing comment
+             early — leaving the rest of the lyrics to render as live markup. Template
+             content is parsed but never rendered, and no styles apply to it.
+
+             To re-enable: delete the <template> open and close tags below. The driver
+             guard passes on its own once these nodes are back in the document.
+        -->
+        <template id="karaoke-ticker">
         <div class="karaoke-video-bg">
             <!-- Song 1: "Lights" by Journey -->
             <div class="karaoke-lyrics" data-song="0">
@@ -77,6 +95,7 @@
 
             <div class="scanlines"></div>
         </div>
+        </template>
 
         <div class="site-header__content">
             <h1 class="site-header__title">Greater Austin Karaoke Directory</h1>
@@ -204,11 +223,17 @@
 
     <script>
         // Header karaoke lyrics animation: cycles through 4 songs with the title shown between.
+        // Currently dormant — the markup is parked in the #karaoke-ticker <template>.
         (function() {
             const header = document.querySelector('.site-header');
             const videoBg = document.querySelector('.karaoke-video-bg');
             const songs = document.querySelectorAll('.karaoke-lyrics');
             const TOTAL_SONGS = songs.length;
+
+            // Ticker disabled: the markup lives inside a <template>, so it is not in the
+            // document and these selectors find nothing. Bail out rather than letting the
+            // first timer fire into an empty song list. Unwrap the template to re-enable.
+            if (!videoBg || TOTAL_SONGS === 0) return;
 
             const TITLE_DISPLAY_TIME = 10000;
             const LYRIC_DISPLAY_TIME = 2500;
