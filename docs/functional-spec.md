@@ -715,7 +715,7 @@ Migration history: `001_initial_schema.sql` (original 5-table normalized model),
 
 When `js/data.json` changes, regenerate Supabase from it:
 
-1. `node scripts/audit-for-supabase.js` — validates data.json against logical rules (duplicate IDs, valid tag refs, schedule shape, etc.)
+1. `node scripts/validate-data.js` — validates data.json against `schema/venue.schema.json` via Ajv, plus the cross-row checks a schema cannot express (unique ids, tag and host-ref cross-reference). Supersedes the former `audit-for-supabase.js`, which duplicated roughly 70% of these checks and was registry-blind (ADR-005)
 2. `node supabase/seed-from-data.js > supabase/seed.sql` — emits `INSERT INTO tags` + `INSERT INTO venues (id, name, active, data) VALUES (..., '{json}'::jsonb)` rows
 3. Run `004_jsonb_redesign.sql` followed by the regenerated `seed.sql` in the Supabase SQL editor (the migration drops + recreates tables, so the seed runs against an empty schema)
 

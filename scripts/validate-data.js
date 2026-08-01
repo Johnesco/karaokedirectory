@@ -105,18 +105,86 @@ function checkHostRef(venue, host, where) {
     }
 }
 
+// Generous box around the Austin metro. Every venue in the directory sits well
+// inside it; the point is to catch a sign flip or a wrong-city geocode, not to
+// police the edges of the service area.
+const AUSTIN_BOX = { minLat: 29.0, maxLat: 31.5, minLng: -99.0, maxLng: -96.5 };
+
+/**
+ * Nearest tag id by edit distance, for the "did you mean" hint. Returns null
+ * when nothing is close enough to be a plausible typo — suggesting a wildly
+ * different tag is worse than suggesting nothing.
+ */
+function findClosestTag(input) {
+    const lower = String(input).toLowerCase();
+    let best = null;
+    let bestDist = Infinity;
+    for (const tag of VALID_TAGS) {
+        const dist = levenshtein(lower, tag.toLowerCase());
+        if (dist < bestDist) {
+            bestDist = dist;
+            best = tag;
+        }
+    }
+    return bestDist <= Math.max(2, Math.ceil(lower.length / 3)) ? best : null;
+}
+
+function levenshtein(a, b) {
+    const m = a.length;
+    const n = b.length;
+    const dp = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
+    for (let i = 0; i <= m; i++) dp[i][0] = i;
+    for (let j = 0; j <= n; j++) dp[0][j] = j;
+    for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+            dp[i][j] = Math.min(
+                dp[i - 1][j] + 1,
+                dp[i][j - 1] + 1,
+                dp[i - 1][j - 1] + (a[i - 1] !== b[j - 1] ? 1 : 0)
+            );
+        }
+    }
+    return dp[m][n];
+}
+
 const idCounts = {};
 for (const venue of data.listings) {
     if (venue.id) idCounts[venue.id] = (idCounts[venue.id] || 0) + 1;
 
-    // Tag cross-reference: every tag id must exist in tagDefinitions
+    // Tag cross-reference: every tag id must exist in tagDefinitions.
+    // The nearest-match hint is a real curator affordance — a mistyped tag is
+    // almost always one edit away from a valid one.
     if (Array.isArray(venue.tags)) {
         for (const tag of venue.tags) {
             if (!VALID_TAGS.includes(tag)) {
-                fail(venue, `tag "${tag}" is not defined in tagDefinitions`);
+                const suggestion = findClosestTag(tag);
+                fail(venue, `tag "${tag}" is not defined in tagDefinitions` +
+                    (suggestion ? ` — did you mean "${suggestion}"?` : ''));
             }
         }
     }
+
+    // Coordinate sanity. The frame is fixed at Austin-metro, so anything well
+    // outside it is a transposed sign or a bad geocode (see #127, where a venue
+    // landed 200 miles west). A warning, not a failure — the box is generous
+    // and a legitimate outlying venue should not break the build.
+    if (venue.coordinates) {
+        const { lat, lng } = venue.coordinates;
+        if (typeof lat === 'number' && typeof lng === 'number') {
+            if (lat < AUSTIN_BOX.minLat || lat > AUSTIN_BOX.maxLat) {
+                warnings.push(`${venue.name} (${venue.id}): latitude ${lat} is outside the Austin-metro box`);
+            }
+            if (lng < AUSTIN_BOX.minLng || lng > AUSTIN_BOX.maxLng) {
+                warnings.push(`${venue.name} (${venue.id}): longitude ${lng} is outside the Austin-metro box`);
+            }
+        }
+    }
+
+    // NOTE: audit-for-supabase.js also warned on socials URLs without an http
+    // scheme. Not ported — schema/venue.schema.json types every URL field with
+    // `format: "uri"`, so Ajv already rejects them as hard errors. Verified
+    // against a planted `instagram.com/nope`. Re-adding it as a warning would
+    // duplicate a stronger check with a weaker one.
 
     checkHostRef(venue, venue.host, 'host');
 
