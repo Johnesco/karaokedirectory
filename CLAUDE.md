@@ -142,9 +142,9 @@ karaokedirectory/
 │
 ├── scripts/               # Developer tools
 │   ├── geocode-venues.js  # Add coordinates to venues (patches data.json)
-│   ├── migrate-hosts.js   # One-time inline-host → registry migration (ADR-007, done)
-│   ├── validate-data.js   # Validate venue data integrity (Ajv + supplementary checks)
-│   └── audit-for-supabase.js  # Pre-seed validation against logical rules
+│   ├── validate-data.js   # THE data validator (Ajv + supplementary checks) — CI gate
+│   ├── check-css-load-order.js  # CSS load order across HTML pages — CI gate
+│   └── code-metrics.js    # Line/size snapshot by bucket (manual, writes metrics/snapshots/)
 │
 ├── schema/
 │   └── venue.schema.json  # Authoritative venue schema (ADR-005)
@@ -269,7 +269,7 @@ listings: [
 - A **host ref** is `{ kjId?, companyId? }` with at least one id: company-only (a company runs it, KJ rotates/unknown), KJ-only (independent), or both. Valid at venue level and per schedule entry, with the same full-swap override rule.
 - **The KJ↔company link lives on the show, not on the entities** — no company on a KJ, no roster on a company. Rosters and the KJ index are derived by scanning shows, so they can't go stale, and a KJ can work under different companies at different venues.
 - `hydrateVenues()` in `js/utils/hosts.js` resolves refs inside `initVenues()` into the legacy display shape (KJ fields win, company fills gaps), so nothing downstream needs to know which form was stored.
-- **`data.json` is migrated** (#124 Phase 2) — 24 KJs and 18 companies, every host stored as a ref. `scripts/migrate-hosts.js` performed the one-time conversion and is kept for reference.
+- **`data.json` is migrated** (#124 Phase 2) — 24 KJs and 18 companies, every host stored as a ref. `_deprecated/migrate-hosts.js` performed the one-time conversion and is retained there for reference only.
 - **The curator is registry-aware** (#124 Phase 4). Its master is migrated, hosts are picked from dropdowns rather than typed, and a website field edits the shared registry record — so it exports refs, not inline objects.
 - **The legacy inline shape is still accepted** by schema and hydration, because `submit.html` emits it for curator reconciliation (#124 Phase 3 remains open). `validate-data.js` fails on unresolvable ids and warns on unreferenced or same-named registry entries.
 

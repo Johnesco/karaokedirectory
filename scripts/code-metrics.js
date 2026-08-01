@@ -26,7 +26,9 @@ const BUCKETS = {
   'app-js':   (f) => /^js[\\/]/.test(f) && f.endsWith('.js'),
   'app-css':  (f) => /^css[\\/]/.test(f) && f.endsWith('.css'),
   'app-html': (f) => /^[^\\/]+\.html$/.test(f),
-  'editor':   (f) => /^editor[\\/]/.test(f),
+  // 'editor' bucket removed — editor.html moved to _deprecated/ (#95) and the
+  // editor/ directory it matched never existed at this path.
+  'tests':    (f) => /^(e2e|test)[\\/]/.test(f),
   'scripts':  (f) => /^scripts[\\/]/.test(f),
   'supabase': (f) => /^supabase[\\/]/.test(f),
   'docs':     (f) => /^docs[\\/]/.test(f) || (/^[^\\/]+\.md$/.test(f) && f !== 'CLAUDE.md'),

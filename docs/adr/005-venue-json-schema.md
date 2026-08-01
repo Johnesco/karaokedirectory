@@ -71,3 +71,16 @@ Cross-row constraints and heuristics JSON Schema cannot express:
 - **#99** introduced CI as the gate that runs the schema-driven validator
 - **#101** aligns `submit.html` to emit shapes that validate against this schema
 - **#102** migrates `data.js` → `data.json` so the file gets `"$schema"` for autocomplete and the four scripts that regex-parse it can read JSON directly
+
+## Follow-up (2026-08-01, #151)
+
+The predicted cleanup landed. `scripts/audit-for-supabase.js` was deleted and `scripts/migrate-hosts.js` moved to `_deprecated/`, leaving `validate-data.js` as the only data validator.
+
+Two of the deleted script's checks were genuinely additive and were ported into `validate-data.js` as **warnings**:
+
+- **Nearest-tag hint.** A mistyped tag id now reports `did you mean "lgbtq"?`, bounded by edit distance so an implausible suggestion is withheld.
+- **Austin-metro bounding box.** Coordinates far outside the metro are flagged. A warning rather than a schema `minimum`/`maximum`, because a legitimate outlying venue should not break the build — and because this is the check that would have caught #127.
+
+Its socials-URL check was **not** ported: every URL field in this schema carries `format: "uri"`, so Ajv already rejects a scheme-less URL as a hard error. Re-adding it as a warning would have duplicated a stronger check with a weaker one — the exact pattern this ADR set out to remove.
+
+The rest of the deleted script (frequency, day, date and time format, required fields, duplicate ids) was already covered by the schema. Its `VALID_FREQUENCIES` list had also gone stale — it omitted `fifth`, so a legal fifth-week show would have hard-failed it.
