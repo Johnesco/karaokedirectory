@@ -1674,7 +1674,9 @@
           "endTime": "02:00"
         }
       ],
-      "host": null,
+      "host": {
+        "companyId": "poppin-off-with-poppy-karaoke"
+      },
       "socials": {
         "facebook": "https://www.facebook.com/thejackalopebaratx/",
         "instagram": "https://www.instagram.com/thejackalopebar/",
