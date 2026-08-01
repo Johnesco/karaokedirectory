@@ -37,16 +37,27 @@ The site is currently served as static files.
    cd karaokedirectory
    ```
 
-2. Serve the files with any static server:
+2. Install dependencies and start the dev server:
    ```bash
-   # Using Python
-   python -m http.server 8000
+   npm install
+   npm run dev
+   ```
 
-   # Using Node.js
-   npx serve
+   No Node.js? Any static server works:
+   ```bash
+   python -m http.server 8000
    ```
 
 3. Open `http://localhost:8000` in your browser
+
+### Checks
+
+```bash
+npm run validate:all   # venue data (Ajv schema + heuristics) and CSS load order — both run in CI
+npm test               # Playwright end-to-end suite
+```
+
+`npm test` starts its own server on port 3456, so it does not collide with `npm run dev`.
 
 > The site must be served over http(s) — opening `index.html` directly from the filesystem won't work, because venue data is fetched from `js/data.json` and browsers block `fetch` on `file://` origins.
 
