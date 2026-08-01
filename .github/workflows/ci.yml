@@ -26,6 +26,11 @@ jobs:
       - name: Check CSS load order across HTML pages
         run: node scripts/check-css-load-order.js
 
+      # Pure-module unit tests via the built-in Node runner. Sub-second, no
+      # browser, so they live in the fast job rather than alongside Playwright.
+      - name: Unit tests
+        run: npm run test:unit
+
   e2e:
     name: End-to-end tests
     runs-on: ubuntu-latest

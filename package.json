@@ -8,6 +8,7 @@
     "test": "npx playwright test",
     "test:headed": "npx playwright test --headed",
     "test:ui": "npx playwright test --ui",
+    "test:unit": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"test/**/*.test.mjs\"",
     "validate": "node scripts/validate-data.js",
     "validate:css": "node scripts/check-css-load-order.js",
     "validate:all": "npm run validate && npm run validate:css"
