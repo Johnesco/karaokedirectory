@@ -91,6 +91,13 @@ test.describe('Search & dedicated filter', () => {
   });
 
   test('search persists when switching views', async ({ page }) => {
+    // Baseline the unfiltered A-Z list so the assertion below is relative
+    await page.locator('[data-view="alphabetical"]').click();
+    await expect(page.locator('.alphabetical-view')).toBeVisible();
+    const visibleVenues = page.locator('.venue-card:visible');
+    const unfilteredCount = await visibleVenues.count();
+    await page.locator('[data-view="weekly"]').click();
+
     const searchInput = page.locator('[data-search="query"]');
     await searchInput.fill('Ego');
     await page.waitForTimeout(300);
@@ -103,10 +110,9 @@ test.describe('Search & dedicated filter', () => {
     await expect(searchInput).toHaveValue('Ego');
 
     // Filtered results should show in alphabetical view
-    const visibleVenues = page.locator('.venue-card:visible');
     const count = await visibleVenues.count();
     expect(count).toBeGreaterThan(0);
-    expect(count).toBeLessThan(70);
+    expect(count).toBeLessThan(unfilteredCount);
   });
 
 });

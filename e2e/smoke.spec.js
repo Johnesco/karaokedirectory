@@ -51,16 +51,20 @@ test.describe('Smoke tests', () => {
     const searchInput = page.locator('[data-search="query"]');
     await expect(searchInput).toBeVisible();
 
+    const visibleVenues = page.locator('.venue-card:visible');
+    const unfilteredCount = await visibleVenues.count();
+    expect(unfilteredCount).toBeGreaterThan(0);
+
     // Type a search query — "Ego's" is a well-known Austin karaoke venue
     await searchInput.fill('Ego');
     // Give the filter a moment to apply
     await page.waitForTimeout(300);
 
-    // Visible venue cards should be filtered down
-    const visibleVenues = page.locator('.venue-card:visible');
+    // Filtering must reduce the set, measured against what was actually there
+    // rather than a hard-coded venue count that drifts as the directory grows.
     const count = await visibleVenues.count();
     expect(count).toBeGreaterThan(0);
-    expect(count).toBeLessThan(70);
+    expect(count).toBeLessThan(unfilteredCount);
   });
 
 });
