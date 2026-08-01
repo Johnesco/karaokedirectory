@@ -16,6 +16,7 @@ import { Component } from './Component.js';
 import { getState, setState, subscribe, navigateWeek, goToCurrentWeek } from '../core/state.js';
 import { emit, Events } from '../core/events.js';
 import { formatWeekRange, getWeekStart } from '../utils/date.js';
+import { html } from '../utils/string.js';
 
 export class Navigation extends Component {
     init() {
@@ -51,13 +52,16 @@ export class Navigation extends Component {
                 chipValue = 'No host listed';
                 chipIcon = 'fa-circle-question';
             }
-            return `
+            // chipValue is `?kj=` verbatim (app.js reads it straight off the
+            // query string), so it is the one attacker-reachable value in the
+            // app. The html tag escapes it.
+            return html`
                 <nav class="navigation navigation--dossier">
                     ${this.renderViewSwitcher({ view, kjIndexActive: isIndex })}
                     <div class="navigation__active-filters">
                         <span class="filter-chip" role="status">
                             <i class="fa-solid ${chipIcon}"></i>
-                            ${chipLabel ? `<span class="filter-chip__label">${chipLabel}</span>` : ''}
+                            ${chipLabel ? html`<span class="filter-chip__label">${chipLabel}</span>` : ''}
                             <span class="filter-chip__value">${chipValue}</span>
                             <button class="filter-chip__clear" data-filter="clear-kj" type="button" aria-label="Exit KJ view">
                                 <i class="fa-solid fa-xmark"></i>
@@ -75,11 +79,11 @@ export class Navigation extends Component {
         const searchQuery = getState('searchQuery') || '';
         const searchOpen = this.searchOpen || !!searchQuery;
 
-        return `
+        return html`
             <nav class="navigation${searchOpen ? ' navigation--search-open' : ''}">
                 ${this.renderViewSwitcher({ view, kjIndexActive: false })}
 
-                ${view === 'weekly' ? `
+                ${view === 'weekly' ? html`
                     <div class="navigation__week">
                         <button class="nav-btn nav-btn--icon" data-week="-1" type="button" title="Previous week">
                             <i class="fa-solid fa-chevron-left"></i>
@@ -88,7 +92,7 @@ export class Navigation extends Component {
                         <button class="nav-btn nav-btn--icon" data-week="1" type="button" title="Next week">
                             <i class="fa-solid fa-chevron-right"></i>
                         </button>
-                        ${!isCurrentWeek ? `
+                        ${!isCurrentWeek ? html`
                             <button class="nav-btn nav-btn--small" data-week="today" type="button">
                                 Today
                             </button>
@@ -106,7 +110,7 @@ export class Navigation extends Component {
                             data-search="query"
                             value="${searchQuery}"
                         >
-                        ${searchQuery ? `
+                        ${searchQuery ? html`
                             <button class="search-input__clear" data-search="clear" type="button" title="Clear search">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
@@ -158,7 +162,7 @@ export class Navigation extends Component {
         // still holds the prior selection — the user isn't in those views.
         const inKJMode = !!getState('hostFilter');
         const cls = (active) => `nav-btn nav-btn--labeled${active ? ' nav-btn--active' : ''}`;
-        return `
+        return html`
             <div class="navigation__views">
                 <button class="${cls(!inKJMode && view === 'weekly')}" data-view="weekly" type="button">
                     <i class="fa-regular fa-calendar"></i>
