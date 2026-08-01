@@ -1,34 +1,29 @@
 // @ts-check
 const { test, expect } = require('@playwright/test');
 
+/**
+ * The New Venue / Report Issue tab UI these specs were written against was
+ * removed by the mobile-first redesign — `#new-mode`, `#report-mode`,
+ * `.submission-tab`, `#report-venue-name` and `.quick-report-options` no longer
+ * appear anywhere in submit.html. The four tests covering it are gone.
+ *
+ * The form is now a single flow with optional fields behind a
+ * `<details class="more-details">` disclosure, so anything below "Add more
+ * details" has to be expanded before it can be interacted with.
+ */
+
+/** Expand the optional-fields disclosure. Tags, age, and contact live inside it. */
+async function openMoreDetails(page) {
+  const details = page.locator('details.more-details');
+  await details.locator('summary').click();
+  await expect(details).toHaveAttribute('open', '');
+}
+
 test.describe('Venue submission form', () => {
 
   test.beforeEach(async ({ page }) => {
     await page.goto('/submit.html');
     await expect(page.locator('.submit-form')).toBeVisible({ timeout: 10000 });
-  });
-
-  test('new venue form is shown by default', async ({ page }) => {
-    const newMode = page.locator('#new-mode');
-    await expect(newMode).toHaveClass(/active/);
-
-    const reportMode = page.locator('#report-mode');
-    await expect(reportMode).not.toHaveClass(/active/);
-  });
-
-  test('tab switching — New Venue to Report Issue', async ({ page }) => {
-    // Click report issue tab
-    const reportTab = page.locator('.submission-tab').filter({ hasText: 'Report' });
-    await reportTab.click();
-
-    await expect(page.locator('#report-mode')).toHaveClass(/active/);
-    await expect(page.locator('#new-mode')).not.toHaveClass(/active/);
-
-    // Switch back
-    const newTab = page.locator('.submission-tab').filter({ hasText: 'New' });
-    await newTab.click();
-
-    await expect(page.locator('#new-mode')).toHaveClass(/active/);
   });
 
   test('required fields are present', async ({ page }) => {
@@ -54,27 +49,21 @@ test.describe('Venue submission form', () => {
   });
 
   test('add another schedule entry', async ({ page }) => {
-    // Should start with 1 schedule entry
     const entries = page.locator('.schedule-entry');
     const initialCount = await entries.count();
 
-    // Click add button
-    const addBtn = page.getByText('Add Another Day');
-    await addBtn.click();
+    await page.locator('.add-schedule-btn').click();
 
-    // Should have one more entry
     await expect(entries).toHaveCount(initialCount + 1);
   });
 
   test('remove schedule entry', async ({ page }) => {
-    // Add a second entry first
-    await page.getByText('Add Another Day').click();
     const entries = page.locator('.schedule-entry');
+    await page.locator('.add-schedule-btn').click();
     await expect(entries).toHaveCount(2);
 
-    // Remove the last one
-    const removeBtn = entries.last().locator('button', { hasText: 'Remove' });
-    await removeBtn.click();
+    // Only added entries carry a remove button — the first one cannot be removed
+    await entries.last().locator('.remove-schedule-btn').click();
 
     await expect(entries).toHaveCount(1);
   });
@@ -107,25 +96,29 @@ test.describe('Venue submission form', () => {
   });
 
   test('contact method checkbox reveals input', async ({ page }) => {
-    const emailCheck = page.locator('input[name="contact-email-check"]');
-    await emailCheck.check();
+    await openMoreDetails(page);
 
-    // Email input should become visible
-    const emailInput = page.locator('input[name="contact-email"]');
-    await expect(emailInput).toBeVisible();
+    await page.locator('input[name="contact-email-check"]').check();
+
+    await expect(page.locator('input[name="contact-email"]')).toBeVisible();
   });
 
   test('tag checkboxes can be selected', async ({ page }) => {
-    const tagGrid = page.locator('.tag-checkbox-grid');
-    await expect(tagGrid).toBeVisible();
+    await openMoreDetails(page);
 
-    // Check a tag
-    const lgbtqTag = page.locator('input[value="lgbtq"]');
+    const tagGrid = page.locator('#tag-checkbox-grid');
+    await expect(tagGrid).toBeVisible();
+    // Grid is built from data.json's tagDefinitions at load, so wait for a row
+    await expect(tagGrid.locator('input[type="checkbox"]').first()).toBeAttached();
+
+    const lgbtqTag = page.locator('#tag-checkbox-grid input[value="lgbtq"]');
     await lgbtqTag.check();
     await expect(lgbtqTag).toBeChecked();
   });
 
   test('age restriction radios are mutually exclusive', async ({ page }) => {
+    await openMoreDetails(page);
+
     const radio21 = page.locator('input[name="age-restriction"][value="21+"]');
     const radioAll = page.locator('input[name="age-restriction"][value="all-ages"]');
 
@@ -137,25 +130,14 @@ test.describe('Venue submission form', () => {
     await expect(radio21).not.toBeChecked();
   });
 
-  test('report form has required venue name and issue checkboxes', async ({ page }) => {
-    // Switch to report tab
-    const reportTab = page.locator('.submission-tab').filter({ hasText: 'Report' });
-    await reportTab.click();
-    await expect(page.locator('#report-mode')).toHaveClass(/active/);
+  test('optional fields stay collapsed until the disclosure is opened', async ({ page }) => {
+    const details = page.locator('details.more-details');
+    await expect(details).not.toHaveAttribute('open', '');
+    await expect(page.locator('#tag-checkbox-grid')).not.toBeVisible();
 
-    await expect(page.locator('#report-venue-name')).toBeVisible();
-    await expect(page.locator('.quick-report-options')).toBeVisible();
-  });
+    await openMoreDetails(page);
 
-  test('report issue checkboxes toggle selected state', async ({ page }) => {
-    const reportTab = page.locator('.submission-tab').filter({ hasText: 'Report' });
-    await reportTab.click();
-
-    const option = page.locator('.quick-report-option').first();
-    const checkbox = option.locator('input[type="checkbox"]');
-
-    await option.click();
-    await expect(checkbox).toBeChecked();
+    await expect(page.locator('#tag-checkbox-grid')).toBeVisible();
   });
 
 });
