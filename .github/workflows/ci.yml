@@ -28,6 +28,11 @@ jobs:
 
       # Pure-module unit tests via the built-in Node runner. Sub-second, no
       # browser, so they live in the fast job rather than alongside Playwright.
+      #
+      # `node --test` takes no path on purpose: it discovers test/*.test.mjs by
+      # Node's own naming convention. A glob argument needs Node 21+, and a bare
+      # directory argument stopped working in Node 24 — the no-arg form is the
+      # only one that behaves the same on every version we might run on.
       - name: Unit tests
         run: npm run test:unit
 
