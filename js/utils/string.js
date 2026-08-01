@@ -9,16 +9,105 @@
  */
 export const SORT_ARTICLES = ['a', 'an', 'the', 'le', 'la', 'l\'', 'les', 'un', 'une', 'des', 'el', 'lo', 'los', 'las', 'uno', 'una', 'unos', 'unas', 'il', 'i', 'gli', 'un\'', 'o', 'os', 'as', 'um', 'uma', 'uns', 'umas'];
 
+const HTML_ESCAPES = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+};
+
 /**
- * Escape HTML special characters to prevent XSS
- * @param {string} str - String to escape
- * @returns {string} Escaped string
+ * Escape HTML special characters to prevent XSS.
+ *
+ * Safe in both text and quoted-attribute position — quotes are escaped, which
+ * the previous implementation did not do. It set `textContent` and read back
+ * `innerHTML`, and the HTML serializer only escapes `&`, `<`, `>` in a text
+ * node; `"` and `'` came through untouched. Every
+ * `attr="${escapeHtml(value)}"` site in the app was therefore one quote away
+ * from attribute injection (see the regression cases in e2e/security.spec.js).
+ *
+ * `&quot;` and `&#39;` render as `"` and `'` in text position, so escaping
+ * them costs nothing there.
+ *
+ * @param {*} str - Value to escape; non-strings are coerced
+ * @returns {string} Escaped string, safe to interpolate into markup
  */
 export function escapeHtml(str) {
     if (!str) return '';
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
+    return String(str).replace(/[&<>"']/g, ch => HTML_ESCAPES[ch]);
+}
+
+/**
+ * Marker for values that are already trusted markup.
+ *
+ * `toString()` matters: `html` returns one of these, and `Component.render()`
+ * does `container.innerHTML = this.template()`, which coerces. It also makes
+ * nested `html` templates interpolate verbatim without needing `raw()` — the
+ * outer tag recognises the marker.
+ *
+ * @see raw
+ */
+class RawMarkup {
+    constructor(value) {
+        this.value = value;
+    }
+
+    toString() {
+        return this.value;
+    }
+}
+
+/**
+ * Mark a string as trusted markup so the `html` tag interpolates it verbatim.
+ *
+ * Use for nested template output — never for anything derived from a URL, a
+ * form field, or venue data.
+ *
+ * @param {string} markup - Pre-rendered, already-safe HTML
+ * @returns {RawMarkup}
+ */
+export function raw(markup) {
+    return new RawMarkup(markup == null ? '' : String(markup));
+}
+
+/**
+ * Tagged template that escapes every `${}` by default.
+ *
+ * Inverts the app's default: markup is safe unless a value is explicitly
+ * wrapped in `raw()`, so forgetting to escape is no longer possible — you have
+ * to opt in to danger.
+ *
+ *   html`<span>${userInput}</span>`              // escaped
+ *   html`<div>${html`<b>${x}</b>`}</div>`        // nested: verbatim, x escaped
+ *   html`<div>${raw(legacyStringBuilder())}</div>` // opt out explicitly
+ *
+ * Arrays are joined with no separator, each element escaped unless raw, which
+ * makes `${items.map(...)}` behave as expected without a trailing `.join('')`.
+ *
+ * Only `null` and `undefined` collapse to an empty string. `false` and `0`
+ * render as "false" and "0" — `aria-expanded="${isOpen}"` has to keep working,
+ * so conditionals must be written as explicit ternaries ending in `: ''`,
+ * which is the pattern this codebase already uses.
+ *
+ * @param {TemplateStringsArray} strings
+ * @param {...*} values
+ * @returns {RawMarkup} Assembled markup; stringifies on use
+ */
+export function html(strings, ...values) {
+    return new RawMarkup(strings.reduce((out, chunk, i) => {
+        const value = values[i - 1];
+        return out + interpolate(value) + chunk;
+    }));
+}
+
+function interpolate(value) {
+    if (value instanceof RawMarkup) return value.value;
+    if (Array.isArray(value)) return value.map(interpolate).join('');
+    if (value == null) return '';
+    // String() first: escapeHtml short-circuits on falsy input, so a bare
+    // `false` or `0` would otherwise disappear from the output.
+    return escapeHtml(String(value));
 }
 
 /**
