@@ -3,10 +3,12 @@
  * View toggles, week navigation, search input, and filters.
  *
  * Features:
- * - View switcher buttons (Calendar, A-Z, Map) + Bingo link (separate page)
+ * - View switcher: CAL / A-Z / MAP buttons, plus KJs (?kj=all) and BINGO links.
+ *   All five render from renderViewSwitcher() and are shared with KJ mode.
  * - Week navigation (prev/next/today) - only shown in weekly view
  * - Global search input with clear button
  * - Dedicated venue toggle checkbox
+ * - KJ-mode filter chip (?kj=), with the full switcher so any view exits KJ mode
  *
  * Note: Component does NOT re-render on searchQuery changes to preserve
  * input focus. Clear button visibility is managed via DOM manipulation.

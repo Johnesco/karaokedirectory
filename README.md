@@ -91,7 +91,8 @@ Deploy to any static hosting service (GitHub Pages, Netlify, Vercel, etc.) — j
 ├── scripts/            # Developer tools
 │   ├── geocode-venues.js   # Batch geocode venues (Node.js)
 │   └── validate-data.js    # Validate venue data integrity
-└── assets/images/      # Static images
+├── e2e/                # Playwright end-to-end specs
+└── test/               # node --test unit specs
 ```
 
 ## Adding a Venue
