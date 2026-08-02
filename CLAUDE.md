@@ -37,8 +37,8 @@
 ### 5. Data Layer
 - **Single source: `js/data.json`** (#102, ADR-006). Dev scripts, the curator, and the browser all read this one file — the browser fetches it at runtime (ADR-008), so there is no generated copy to keep in sync.
 - Because data arrives by `fetch`, the site must be served over http(s). Opening `index.html` from disk won't work (`fetch` is blocked on `file://`).
-- Supabase wiring exists (`js/services/supabase.js`, JSONB-heavy 2-table schema in `supabase/migrations/`) but is currently **disabled** via `useSupabase: false` in `js/config.js`. See spec §11 *Storage and Data Flow*.
-- Service layer abstracts data access (`js/services/venues.js`) — data-source agnostic, so the swap is a one-flag change
+- **There is no second data source.** Supabase was parked by [ADR-009](docs/adr/009-park-supabase.md) — the scaffolding lives in `_deprecated/supabase/`, and `js/config.js`, the `useSupabase` flag, and the CDN bundle are gone. Re-entry trigger is written into that ADR: the moment the directory needs a *write* path.
+- Service layer abstracts data access (`js/services/venues.js`). It reads whatever `initVenues()` is handed, so the source is swappable — but there is only one source today (ADR-009)
 - Schedule matching logic handles complex recurrence patterns
 
 ## Display Philosophy
@@ -137,10 +137,7 @@ karaokedirectory/
 │   │   └── KJDossierView.js   # ?kj=<name> — one host's shows across venues
 │   │
 │   ├── services/
-│   │   ├── venues.js      # Venue data operations, search, filtering (data-source agnostic)
-│   │   └── supabase.js    # Supabase client + fetchVenueData() — runtime source
-│   │
-│   ├── config.js          # App config (Supabase URL/key, useSupabase feature flag)
+│   │   └── venues.js      # Venue data operations, search, filtering (data-source agnostic)
 │   │
 │   └── utils/
 │       ├── date.js        # Date formatting, schedule matching
@@ -160,11 +157,6 @@ karaokedirectory/
 │
 ├── schema/
 │   └── venue.schema.json  # Authoritative venue schema (ADR-005)
-│
-├── supabase/              # Supabase schema + seed pipeline
-│   ├── migrations/        # SQL migrations (001–004; 004 is the current JSONB schema)
-│   ├── seed-from-data.js  # Generates seed.sql from js/data.json
-│   └── seed.sql           # Generated INSERT statements for venues + tags
 │
 ├── e2e/                   # Playwright specs (12 files) — run by `npm test`, gated in CI
 ├── test/                  # node --test unit specs — run by `npm run test:unit`
@@ -186,7 +178,7 @@ karaokedirectory/
 └── _deprecated/           # Archived old code (do not use)
 ```
 
-Not in the tree above, but tracked: `notes.jpg` / `notes3.jpg` (`notes3.jpg` is the site background), `.hintrc`, `karaokedirectory.code-workspace`, `js/.gitattributes`, `package-lock.json`, `supabase/poc.html`.
+Not in the tree above, but tracked: `notes.jpg` / `notes3.jpg` (`notes3.jpg` is the site background), `.hintrc`, `karaokedirectory.code-workspace`, `js/.gitattributes`, `package-lock.json`.
 
 There is **no `assets/` directory** — the tree claimed one for months. Creating it is part of the brand-assets work (#163).
 
@@ -559,7 +551,6 @@ gh api "repos/Johnesco/karaokedirectory/milestones?state=all&per_page=50" --jq '
 | SEO & Metadata | 22 | Discoverability, share cards, structured data, canonical host |
 | Design System | 19 | Tokens, shared component blocks, orphan CSS, breakpoints |
 | Accessibility | — | Keyboard operability, focus management, ARIA, contrast |
-| Supabase Migration | 11 | Schema + dormant parallel source (ADR-001, ADR-004). Closes when ADR-009 records the park |
 
 **Closed milestones** — kept for their history, not accepting new issues: Exclusion Dates (complete — the detail-view notice this table used to call "pending" ships at `js/utils/render.js:332`), Venue Editor (`editor.html` retired to `_deprecated/`), Community Accounts and National Expansion (both closed against the fixed single-metro, no-accounts frame).
 
@@ -576,6 +567,7 @@ Current ADRs:
 - [ADR-006](docs/adr/006-data-json-canonical.md) — `js/data.json` canonical, `js/data.js` auto-generated
 - [ADR-007](docs/adr/007-host-registry-normalization.md) — Host normalization: KJ and company registries referenced by shows
 - [ADR-008](docs/adr/008-fetch-data-json-directly.md) — Browser fetches `js/data.json`, removing the generated `data.js` wrapper
+- [ADR-009](docs/adr/009-park-supabase.md) — Park Supabase: remove the dormant runtime path, keep the design
 
 ## Security Considerations
 - Always use `escapeHtml()` when rendering user-provided content

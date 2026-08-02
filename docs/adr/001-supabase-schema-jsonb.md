@@ -1,6 +1,6 @@
 # ADR-001: Supabase schema — JSONB venues over normalized relational
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR-009](009-park-supabase.md) (2026-08)
 - **Date:** 2026-04-28
 - **Landed in:** [`fe548ef`](https://github.com/Johnesco/karaokedirectory/commit/fe548ef) — "Refresh venue data + land Supabase JSONB scaffolding (dormant)"
 - **Issue:** [#47](https://github.com/Johnesco/karaokedirectory/issues/47) (JSONB redesign), [#44](https://github.com/Johnesco/karaokedirectory/issues/44) (parent Supabase spike)

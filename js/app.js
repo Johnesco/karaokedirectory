@@ -17,8 +17,6 @@ import { KJIndexView } from './views/KJIndexView.js';
 import { initDebugMode, isDebugMode } from './utils/debug.js';
 import { initTagConfig } from './utils/tags.js';
 import { getHashParams } from './utils/url.js';
-import { config } from './config.js';
-import { fetchVenueData } from './services/supabase.js';
 
 // View instances
 let navigation = null;
@@ -173,43 +171,27 @@ async function init() {
 }
 
 /**
- * Load venue data — tries Supabase first, falls back to the local JSON file
+ * Load venue data from js/data.json — the single source (ADR-006, ADR-008).
  *
- * Data source priority:
- *   1. sessionStorage cache (if fresh and useSupabase enabled)
- *   2. Supabase fetch (if useSupabase enabled)
- *   3. fetch of js/data.json — the canonical local file
+ * There is no second source. The Supabase path was parked by ADR-009 and its
+ * scaffolding moved to _deprecated/; restore from there if the re-entry
+ * trigger in that ADR ever fires.
  *
- * The local path needs the page served over http(s): fetch is blocked on
- * file:// origins, so opening index.html straight from disk won't work. Run a
- * local server (see README). ADR-008.
+ * Needs the page served over http(s): fetch is blocked on file:// origins, so
+ * opening index.html straight from disk won't work. Run a local server
+ * (`npm run dev`).
  */
 async function loadData() {
     try {
-        let data = null;
-        let dataSource = 'unknown';
-
-        // Try Supabase (or its cache) first
-        if (config.useSupabase) {
-            try {
-                data = await fetchVenueData();
-                dataSource = data.source || 'supabase';
-            } catch (supabaseError) {
-                console.warn('Supabase unavailable, falling back to local data:', supabaseError.message);
-            }
+        // Resolved against this module's URL rather than the document's, so it
+        // holds wherever the page is served from.
+        const response = await fetch(new URL('data.json', import.meta.url));
+        if (!response.ok) {
+            throw new Error(`Could not load js/data.json (HTTP ${response.status})`);
         }
-
-        // Fallback: the canonical local file. Resolved against this module's URL
-        // rather than the document's, so it holds wherever the page is served from.
-        if (!data) {
-            const response = await fetch(new URL('data.json', import.meta.url));
-            if (!response.ok) {
-                throw new Error(`Could not load js/data.json (HTTP ${response.status})`);
-            }
-            data = await response.json();
-            dataSource = 'local-json';
-            console.log('Data source: local-json');
-        }
+        const data = await response.json();
+        const dataSource = 'local-json';
+        console.log('Data source: local-json');
 
         // Initialize tag configuration from data
         initTagConfig(data.tagDefinitions);
