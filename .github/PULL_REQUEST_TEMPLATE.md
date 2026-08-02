@@ -14,7 +14,7 @@ Fixes #<!-- issue number -->
 
 ## Documentation Checklist
 
-- [ ] Project spec updated (if behavior changed)
+- [ ] Project spec updated (if behavior changed) — **including the version/date header and a Change Log row**
 - [ ] CLAUDE.md updated (if architecture/structure changed)
 - [ ] README.md updated (if public-facing features changed)
 - [ ] No documentation updates needed
