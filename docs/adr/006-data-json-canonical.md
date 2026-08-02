@@ -1,6 +1,6 @@
 # ADR-006: `js/data.json` canonical, `js/data.js` auto-generated
 
-**Status:** Accepted
+**Status:** Superseded by [ADR-008](008-fetch-data-json-directly.md) (2026-07)
 **Date:** 2026-06-10
 **Issue:** [#102](https://github.com/Johnesco/karaokedirectory/issues/102)
 **Related:** [ADR-002](002-vanilla-js-no-build.md) (no build step) · [ADR-005](005-venue-json-schema.md) (venue schema) · [ADR-004](004-parallel-data-source-flag.md) (parallel data source)
@@ -66,3 +66,11 @@ The substance of ADR-002 — "files served as-is, no toolchain to learn" — hol
 - **#100 / PR #104** authored the venue schema
 - **#101 / PR #105** aligned `submit.html` to the schema shape
 - This ticket finishes the loop: the canonical artifact becomes JSON, and `submit.html`'s emit step matches what `data.json` stores
+
+## Superseded (2026-07, #126 / ADR-008)
+
+The half of this decision that survives is that **`js/data.json` is canonical** — that still holds and is the basis of everything since.
+
+The half that did not survive is the generated `js/data.js` wrapper. [ADR-008](008-fetch-data-json-directly.md) deleted it: `app.js`'s `loadData()` was already async, so the synchronous-global requirement that justified the wrapper had evaporated, and `submit.html` was downloading ~73 KB of listings to render about thirteen tag checkboxes. With the wrapper gone, the "narrow exception to ADR-002's no-build rule" this ADR carved out is also gone — there is no generation step in the repo at all.
+
+The alternative listed above as *"Browser fetches `data.json` at runtime… saved for a follow-up"* is the one that won.

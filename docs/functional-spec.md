@@ -273,7 +273,7 @@ The map isn't date-scoped, so "today" (`new Date()`) is the reference date. `Map
 
 ### Venue Count Info
 
-Displays "X of Y venues have map coordinates" at the bottom. If some venues lack coordinates, shows a hint to add them via the editor.
+Displays "X of Y venues have map coordinates" at the bottom. If some venues lack coordinates, shows a hint to add them — in practice via `node scripts/geocode-venues.js`, which patches `js/data.json` in place.
 
 ### Filtering
 
@@ -927,7 +927,7 @@ The form is structured as a short required-fields zone, then a single `<details>
 |---------|--------|
 | Tags | Tag checkboxes (chip-style) generated at load by fetching `tagDefinitions` from `js/data.json` — adding a tag there auto-surfaces here, no parallel hardcoded list. System tags (`dedicated`, `special-event`) and age tags are excluded from the grid; age restriction is its own radio (not sure / 21+ / 18+ / all-ages / family-friendly) whose value joins the `tags: []` array at submit time, matching the schema's "age is a tag" shape. |
 | Who runs it | KJ name, company, website — either or both, mirroring the host model (§11). Both text inputs carry a `<datalist>` of names from the `kjs` / `companies` registries in `js/data.json`, so typing suggests hosts already in the directory. See "Host matching on submit" below. |
-| Venue Social Links | Website, Facebook, Instagram (3 fields — other platforms intentionally cut to reduce friction; curator can add via editor) |
+| Venue Social Links | Website, Facebook, Instagram (3 fields — other platforms intentionally cut to reduce friction; the curator tool can add the rest) |
 | Notes | Free-text textarea |
 | Your Contact Info | Submitter name (required if KJ); contact methods checkboxes (email, phone text, phone call, other), each reveals its input on check |
 
@@ -989,9 +989,11 @@ The `venue` object inside the Apps Script payload validates against [`schema/ven
 
 ## 16 Venue Editing (out of scope for this repo)
 
-**Status:** The in-repo `editor.html` was removed. Venue editing now happens in a **local-only curator tool** maintained by the project owner outside this repo. That tool is a single-page HTML app that holds the venue data plus private curator metadata (sources, contacts, notes, last-verified dates), and exports a public-stripped `js/data.js` to publish.
+**Status:** The in-repo `editor.html` was removed. Venue editing now happens in a **local-only curator tool** maintained by the project owner outside this repo. That tool is a single-page HTML app that holds the venue data plus private curator metadata (sources, contacts, notes, last-verified dates), and exports a public-stripped `js/data.json` to publish.
 
-This spec section previously described the in-repo editor's UI in detail; that content is no longer applicable. If you're a contributor who needs to add or modify a venue and don't have access to the curator tool, edit `js/data.js` directly per the schema in §11 and open a PR — the owner will reconcile your change with the curator master.
+This spec section previously described the in-repo editor's UI in detail; that content is no longer applicable. If you're a contributor who needs to add or modify a venue and don't have access to the curator tool, edit `js/data.json` directly per the schema in §11, run `node scripts/validate-data.js`, and open a PR — the owner will reconcile your change with the curator master.
+
+`js/data.js` no longer exists. It was a generated browser wrapper around the same data and was deleted by [ADR-008](adr/008-fetch-data-json-directly.md); the browser now fetches `js/data.json` at runtime. Any instruction elsewhere to edit `data.js` is stale.
 
 ---
 

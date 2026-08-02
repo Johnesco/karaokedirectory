@@ -96,7 +96,7 @@ Rejected because:
 
 ## Implementation notes
 
-- **Entry:** `index.html` loads `js/data.js` as a global, then imports `js/app.js` as a module.
+- **Entry:** `index.html` imports `js/app.js` as a module; `app.js` fetches `js/data.json` at runtime ([ADR-008](008-fetch-data-json-directly.md)). *(Corrected 2026-08 — this line previously described the `js/data.js` global, which ADR-008 removed. The decision itself is unaffected; ADR-008 strengthens it by deleting the one generation step ADR-006 had carved out.)*
 - **Component pattern:** `js/components/Component.js` — base class. Lifecycle: `constructor → init → template → render → afterRender → destroy`.
 - **State:** `js/core/state.js` — `getState`, `setState`, `subscribe` (observer pattern).
 - **Events:** `js/core/events.js` — `emit`, `on` with `Events` constants (pub/sub).

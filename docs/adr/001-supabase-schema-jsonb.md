@@ -8,6 +8,8 @@
 
 ## Context
 
+> **Note (2026-08, #153):** `js/data.js` is referenced throughout this ADR as the static source. It was retired by [ADR-008](008-fetch-data-json-directly.md) — the browser now fetches `js/data.json` directly, and `scripts/audit-for-supabase.js` (cited below as the integrity gate) was deleted by #151, its surviving checks folded into `scripts/validate-data.js`. The prose below is left as written because it records the context at the time. See [ADR-005](005-venue-json-schema.md) for the current validation story.
+
 The project is moving to a Supabase backend in parallel with the static `js/data.js` source (production stays on JSON for Austin; Supabase engages behind a feature flag). Two schema shapes were viable.
 
 Constraints at decision time:
