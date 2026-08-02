@@ -85,12 +85,20 @@ karaokedirectory/
 │       ├── task.yml       # Refactors, deps, tooling template
 │       ├── spike.yml      # Research/investigation template
 │       └── doc.yml        # Documentation-only changes template
+│   └── workflows/
+│       └── ci.yml         # CI: validators + unit tests, and the Playwright e2e job
 ├── CLAUDE.md              # THIS FILE - Claude project memory
 ├── README.md              # Public documentation
+├── Code.gs                # Google Apps Script backend for submit.html (deployed outside this repo)
 ├── index.html             # Main SPA (heavily commented)
 ├── about.html             # About page
 ├── bingo.html             # Karaoke bingo game
 ├── submit.html            # Venue submission form (mobile-first, single-flow)
+├── bday.html              # One-off birthday invite page (public, linked from nowhere)
+├── package.json           # devDependencies + npm scripts (dev, test, test:unit, validate:all)
+├── playwright.config.js   # e2e config — own server on :3456, NOT the dev port
+├── robots.txt             # Crawl rules
+├── sitemap.xml            # Public URL list
 │
 ├── css/
 │   ├── base.css           # CSS variables, reset, typography (ALWAYS FIRST)
@@ -105,6 +113,7 @@ karaokedirectory/
 │   ├── app.js             # Application entry point
 │   ├── data.json          # Venue database — the single source (edit this)
 │   ├── bingo.js           # Bingo game logic
+│   ├── analytics.js       # Consent-gated Microsoft Clarity loader (spec §23)
 │   │
 │   ├── core/
 │   │   ├── state.js       # Centralized state management
@@ -117,12 +126,15 @@ karaokedirectory/
 │   │   ├── ExtendedSection.js  # Extended sections (Next Week, Later in Month, Next Month)
 │   │   ├── VenueCard.js   # Venue listing item
 │   │   ├── VenueModal.js  # Mobile venue detail popup
-│   │   └── VenueDetailPane.js  # Desktop venue detail sidebar
+│   │   ├── VenueDetailPane.js  # Desktop venue detail sidebar
+│   │   └── venue-selection.js  # Shared venue-card click binding
 │   │
 │   ├── views/
 │   │   ├── WeeklyView.js      # 7-day calendar view
 │   │   ├── AlphabeticalView.js # A-Z venue listing
-│   │   └── MapView.js         # Leaflet.js map view
+│   │   ├── MapView.js         # Leaflet.js map view
+│   │   ├── KJIndexView.js     # ?kj=all — directory of every KJ and company
+│   │   └── KJDossierView.js   # ?kj=<name> — one host's shows across venues
 │   │
 │   ├── services/
 │   │   ├── venues.js      # Venue data operations, search, filtering (data-source agnostic)
@@ -154,16 +166,29 @@ karaokedirectory/
 │   ├── seed-from-data.js  # Generates seed.sql from js/data.json
 │   └── seed.sql           # Generated INSERT statements for venues + tags
 │
-├── assets/images/         # Static images
+├── e2e/                   # Playwright specs (12 files) — run by `npm test`, gated in CI
+├── test/                  # node --test unit specs — run by `npm run test:unit`
+│   ├── date.test.mjs      # Schedule matching, exclusions, date ranges
+│   └── venues.test.mjs    # venuePasses, search predicates, host hydration
+│
+├── metrics/snapshots/     # Output of scripts/code-metrics.js (manual, occasional)
 │
 ├── docs/
 │   ├── index.html         # Docsify documentation viewer
 │   ├── functional-spec.md # Functional Specification (authoritative)
+│   ├── architecture.md    # Mermaid diagrams — modules, data flow, events
+│   ├── patterns.md        # 10 annotated implementation recipes
 │   ├── _sidebar.md        # Docsify sidebar navigation
-│   └── .nojekyll          # GitHub Pages underscore file support
+│   ├── .nojekyll          # GitHub Pages underscore file support
+│   ├── adr/               # ADR-001…008 + README index
+│   └── spikes/            # Research write-ups
 │
 └── _deprecated/           # Archived old code (do not use)
 ```
+
+Not in the tree above, but tracked: `notes.jpg` / `notes3.jpg` (`notes3.jpg` is the site background), `.hintrc`, `karaokedirectory.code-workspace`, `js/.gitattributes`, `package-lock.json`, `supabase/poc.html`.
+
+There is **no `assets/` directory** — the tree claimed one for months. Creating it is part of the brand-assets work (#163).
 
 ## Venue Data Format
 
@@ -328,7 +353,8 @@ Tags are rendered as color-coded badges in VenueCard, VenueModal, and VenueDetai
 
 ### Search Feature
 - Navigation updates `searchQuery` state; all views listen for `FILTER_CHANGED` events
-- `venues.js` → `venueMatchesSearch()` matches: name, city, neighborhood, host, tags (ID + label), event names
+- `venues.js` → `venueMatchesSearch()` matches: venue name, city, neighborhood, venue-level host name/affiliation, per-show host name/affiliation, and tags (ID + label)
+- It does **not** match event names. This file claimed otherwise for months; `venueMatchesSearch` never reads `entry.eventName`. Adding it is a one-line change tracked on #37 — until that lands, the omission is the truth
 - Empty results collapse day cards to header-only (`.day-card--empty`)
 
 ### URL Query Params
@@ -425,6 +451,29 @@ Do not look for or attempt to use `editor.html` — it was removed in favor of t
 
 ## Testing
 
+Three gates. All of them run in CI on every PR (`.github/workflows/ci.yml`), in two jobs — the fast one (validators + unit tests) and the Playwright one.
+
+```bash
+npm install          # once
+npm run dev          # serve on http://localhost:8000
+
+npm run validate:all # venue data (Ajv + supplementary checks) and CSS load order
+npm run test:unit    # node --test — pure modules only, ~150ms
+npm test             # Playwright end-to-end, ~1.5 min
+```
+
+| Gate | Covers | Notes |
+|---|---|---|
+| `validate:all` | `js/data.json` against `schema/venue.schema.json`, plus cross-row checks and data-quality warnings; CSS load order on all 5 pages | Non-zero exit fails CI. Warnings are informational and do not fail |
+| `test:unit` | `js/utils/date.js`, `js/utils/hosts.js`, and the pure predicates in `js/services/venues.js` | **Pure modules only.** View classes belong to e2e — do not unit test them |
+| `npm test` | Behaviour across all 5 pages, 12 spec files | Starts its own server on **:3456**, so it will not collide with `npm run dev` |
+
+Notes that will bite you otherwise:
+
+- `node --test` is invoked **with no path argument** on purpose. A glob needs Node 21+; a bare directory stopped working in Node 24. The no-arg form discovers `test/*.test.mjs` identically on 18 through 24.
+- **CI runs Node 20** while local development is typically newer, and nothing declares an `engines` constraint. A test invocation that works locally can still fail in CI — this has already happened once.
+- Unit tests can import `js/services/venues.js` and `js/utils/render.js` only because `escapeHtml()` no longer builds a detached `<div>` (#147). Reverting it to a DOM technique would break them.
+
 ### Debug Mode
 Enable debug mode to see why venues appear on specific dates:
 1. Add `?debug=1` to the URL (e.g., `index.html?debug=1`)
@@ -486,21 +535,33 @@ GitHub Projects field IDs and option IDs for this project. Used by Claude when s
 
 ### Milestones
 
+Reconciled against the repo's live milestones on 2026-08-01. Regenerate with:
+
+```bash
+gh api "repos/Johnesco/karaokedirectory/milestones?state=all&per_page=50" --jq '.[] | "\(.state)\t\(.title)"'
+```
+
 | Milestone | Spec Sections | Description |
 |-----------|---------------|-------------|
-| Documentation Portal | — | Documentation site navigation and landing pages |
-| Exclusion Dates | 4, 11 | Venue closure/exclusion dates (`schedule[].exclusions`). Shipped: matching logic, Weekly + Map display. Pending: detail-view notice, full docs |
-| Form Parity | 15 | Submit form UX (intentionally a slim subset of editor; curator handles the rest) |
+| Technical Foundation | 21 | Routing, state, view registry, service layer — the app's substrate |
 | Weekly Calendar View | 2, 13 | Weekly schedule grid, day cards, schedule matching |
 | Alphabetical View | 3 | A-Z venue listing |
 | Map View | 4 | Interactive Leaflet map, immersive mode |
 | Search & Filtering | 9, 10 | Global search, extended search, dedicated filter |
 | Venue Cards & Detail | 6, 7, 8 | Compact/full cards, mobile modal, desktop pane |
 | Navigation & Layout | 5, 19 | Nav controls, responsive design, week navigation |
-| Venue Data & Tags | 11, 12 | Data model, tag system |
+| Venue Data & Tags | 11, 12 | Data model, tag system, registries |
+| Form Parity | 15 | Submit form UX (intentionally a slim subset; the curator handles the rest) |
 | Karaoke Bingo | 14 | Bingo game |
-| Supabase Migration | — | Schema + parallel data source (see ADR-001, ADR-004) |
-| About & Infrastructure | 17, 18, 20, 21 | About page, debug mode, security, state management |
+| About & Infrastructure | 17, 18, 20, 25 | About page, debug mode, security, docs accuracy |
+| Documentation Portal | — | Documentation site navigation and landing pages |
+| Testing & CI | — | Test suite health, CI gates, dev-environment scripts |
+| SEO & Metadata | 22 | Discoverability, share cards, structured data, canonical host |
+| Design System | 19 | Tokens, shared component blocks, orphan CSS, breakpoints |
+| Accessibility | — | Keyboard operability, focus management, ARIA, contrast |
+| Supabase Migration | 11 | Schema + dormant parallel source (ADR-001, ADR-004). Closes when ADR-009 records the park |
+
+**Closed milestones** — kept for their history, not accepting new issues: Exclusion Dates (complete — the detail-view notice this table used to call "pending" ships at `js/utils/render.js:332`), Venue Editor (`editor.html` retired to `_deprecated/`), Community Accounts and National Expansion (both closed against the fixed single-metro, no-accounts frame).
 
 ### Architecture Decisions
 
