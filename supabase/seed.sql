@@ -1,5 +1,5 @@
 -- ============================================================================
--- Seed data generated from js/data.js (JSONB schema — issue #47)
+-- Seed data generated from js/data.json (JSONB schema — issue #47)
 -- Generated: 2026-05-29T02:00:39.281Z
 -- ============================================================================
 

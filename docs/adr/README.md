@@ -13,6 +13,6 @@ Format and threshold rule: see [sdlc-baseline `docs/adrs.md`](https://github.com
 | [003](003-github-pages-deploy.md) | GitHub Pages as deploy target | Accepted |
 | [004](004-parallel-data-source-flag.md) | Parallel data source via URL flag — production stays on JSON | Accepted |
 | [005](005-venue-json-schema.md) | Venue JSON Schema as single source of truth | Accepted |
-| [006](006-data-json-canonical.md) | `js/data.json` canonical, `js/data.js` auto-generated | Accepted |
+| [006](006-data-json-canonical.md) | `js/data.json` canonical, `js/data.js` auto-generated | Superseded by [008](008-fetch-data-json-directly.md) |
 | [007](007-host-registry-normalization.md) | Host normalization — KJ and company registries referenced by shows | Accepted |
 | [008](008-fetch-data-json-directly.md) | Browser fetches `js/data.json` — remove the generated `js/data.js` wrapper | Accepted |

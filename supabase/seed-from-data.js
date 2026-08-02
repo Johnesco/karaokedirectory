@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Seed script — converts js/data.js into SQL INSERT statements
+ * Seed script — converts js/data.json into SQL INSERT statements
  * for the JSONB-heavy schema defined in migrations/004_jsonb_redesign.sql
  *
  * Each venue becomes a single row: (id, name, active, data JSONB)
@@ -39,7 +39,7 @@ function escJsonb(obj) {
 const lines = [];
 
 lines.push('-- ============================================================================');
-lines.push('-- Seed data generated from js/data.js (JSONB schema — issue #47)');
+lines.push('-- Seed data generated from js/data.json (JSONB schema — issue #47)');
 lines.push(`-- Generated: ${new Date().toISOString()}`);
 lines.push('-- ============================================================================');
 lines.push('');

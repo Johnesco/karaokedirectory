@@ -182,8 +182,9 @@ function sleep(ms) {
  * Main function
  */
 async function main() {
-    // js/data.json is canonical (#102). data.js is regenerated from it
-    // by scripts/sync-data-js.js, so we patch data.json then sync.
+    // js/data.json is the single source (#102, ADR-006) and the browser fetches
+    // it directly (ADR-008), so patching it in place is the whole job — there is
+    // no generated copy to sync.
     const dataPath = path.join(__dirname, '..', 'js', 'data.json');
     console.log('Reading:', dataPath);
 
