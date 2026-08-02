@@ -81,7 +81,7 @@ Deploy to any static hosting service (GitHub Pages, Netlify, Vercel, etc.) — j
 │   └── submit.css      # Submission form styles
 ├── js/
 │   ├── app.js          # Application entry point
-│   ├── data.json       # Venue database (80 venues)
+│   ├── data.json       # Venue database (single source of truth)
 │   ├── bingo.js        # Bingo game logic
 │   ├── core/           # State management & event bus
 │   ├── components/     # UI components (Navigation, DayCard, VenueCard, etc.)

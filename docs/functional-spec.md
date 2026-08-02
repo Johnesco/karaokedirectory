@@ -3,8 +3,8 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0
-**Last updated:** February 2026
+**Version:** 1.0.28
+**Last updated:** August 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
 
@@ -26,7 +26,7 @@ Karaoke enthusiasts looking for venues, schedules, and event details in the grea
 
 - **Vanilla JavaScript** (ES6 modules), HTML5, CSS3 — currently no build step
 - **Mobile-first responsive design** — base styles target mobile, enhanced for larger screens
-- **Data layer** — all venue data in a single JSON file (`js/data.json`), currently 80 venues; Supabase wiring exists but is dormant (see §11 *Storage and Data Flow*)
+- **Data layer** — all venue data in a single JSON file (`js/data.json`); Supabase wiring exists but is dormant (see §11 *Storage and Data Flow*)
 - **Component-based** — `Component` base class with state management and event bus
 - **Balanced calendar visibility** — daily venues must not overwhelm less frequent shows in the weekly calendar view; Alphabetical and Map views show everything equally
 
@@ -669,7 +669,7 @@ exclusions: [
 
 ### Venue Count
 
-As of April 2026: **79 venues** in the listings array.
+The current count is whatever `js/data.json` holds — `node scripts/validate-data.js` prints it. Deliberately not stated here: a hard-coded total goes stale on the next curator edit, and it was previously wrong in four places at once.
 
 ### Active/Inactive
 
@@ -1082,7 +1082,8 @@ Map view is always immersive (full viewport) regardless of screen size, with its
 
 ### XSS Prevention
 
-- All user-provided content rendered through `escapeHtml()` (uses DOM `textContent` technique)
+- All user-provided content rendered through `escapeHtml()`, which escapes `& < > " '` by string replacement — safe in text *and* quoted-attribute position. It previously used the DOM `textContent` technique, which does not escape quotes; see the change log for 1.0.28
+- `js/utils/string.js` also exports an `html` tagged template that escapes every `${}` by default, with `raw()` as the explicit opt-out. `Navigation.js` renders through it; other components still call `escapeHtml()` directly
 - All URLs sanitized through `sanitizeUrl()`:
   - Blocks `javascript:` and `data:` protocol URLs
   - Auto-adds `https://` if no protocol specified
@@ -1099,8 +1100,12 @@ Submission form limits to 3 submissions per hour per browser via `localStorage`.
 ### Data Safety
 
 - No API keys or secrets in code
-- No server-side data storage (data is a static JS file)
+- No server-side data storage — venue data is a static JSON file (`js/data.json`) fetched at runtime
 - Form submissions go to Google Apps Script (no-cors POST)
+
+### Privacy
+
+No analytics tag loads until the visitor consents. See **§23 Analytics and Consent**.
 
 ---
 
@@ -1207,6 +1212,8 @@ The `shareVenue(venue, buttonEl)` utility in `js/utils/url.js` handles both path
 
 Each public-facing page includes a `<meta name="description">` tag with a concise summary (~150 characters) for search engine result snippets.
 
+> **"70+ venues" is a deliberate floor, not a stale count.** It appears in `index.html`'s description, `og:description`, and `twitter:description`, and in the README feature list. A conservative round number stays true as the directory grows and never needs a re-edit; an exact count in a meta tag would be wrong within a week and is invisible to users anyway. Do not "correct" it to the current total.
+
 | Page | Description |
 |------|-------------|
 | `index.html` | "Find karaoke in Austin, TX. Browse 70+ venues by day, search by name or neighborhood, and explore the interactive map." |
@@ -1242,7 +1249,44 @@ Each public page includes a `<link rel="canonical">` tag pointing to its canonic
 
 ---
 
-## 23 Known Discrepancies
+## 23 Analytics and Consent
+
+The site loads **Microsoft Clarity** (project `x1sfnv6zu4`) for anonymous traffic analytics — pageviews, clicks, scroll depth. Clarity sets non-essential cookies, so it is gated behind explicit consent.
+
+Implemented in `js/analytics.js`, loaded with `defer` on all five public pages (`index`, `about`, `submit`, `bingo`, `bday`). It is a standalone IIFE, not an ES module, so it runs independently of `app.js`.
+
+### The guarantee
+
+**No analytics tag is requested before the visitor clicks Accept.** The Clarity script element is created inside `loadClarity()`, which is only reachable from stored consent or from the Accept handler. A visitor who declines, or who never answers, causes zero requests to `clarity.ms`.
+
+### Consent states
+
+Stored in `localStorage` under **`kd_analytics_consent`**:
+
+| Value | Behavior |
+|---|---|
+| `"accepted"` | Clarity loads immediately on every subsequent page load. No banner. |
+| `"declined"` | Clarity never loads. No banner — the choice is not re-asked. |
+| *(absent)* | Banner renders; Clarity does not load until Accept is clicked. |
+
+Reads and writes are wrapped in `try/catch` so private-browsing modes that throw on `localStorage` degrade to "banner shown, nothing loaded" rather than breaking the page.
+
+### The banner
+
+Appended to `<body>` as `.consent-banner`, with `role="dialog"` and `aria-label="Analytics consent"`. Waits for `DOMContentLoaded` when the document is still loading.
+
+Copy: *"This site uses Microsoft Clarity for anonymous traffic analytics (pageviews, clicks, scrolling). No personal information is collected."* — followed by a **Learn more** link to `about.html#privacy`.
+
+Two buttons, **Decline** and **Accept**, handled by one delegated listener reading `data-consent`. Either choice persists the value and removes the banner; only Accept additionally calls `loadClarity()`.
+
+### Related
+
+- §20 *Security* — the privacy guarantee this section details
+- §17 *About Page* — the Privacy section the banner links to
+
+---
+
+## 24 Known Discrepancies
 
 > Items listed here represent differences found between existing documentation and code during the initial spec creation. Each must be validated and resolved.
 
@@ -1254,7 +1298,7 @@ Each public page includes a `<link rel="canonical">` tag pointing to its canonic
 
 ---
 
-## 24 Change Log
+## 25 Change Log
 
 | Date | Version | Change | Author |
 |------|---------|--------|--------|
@@ -1286,6 +1330,7 @@ Each public page includes a `<link rel="canonical">` tag pointing to its canonic
 | 2026-07 | 1.0.25 | #137: Compact card "Also …" indicator now omits past one-time events, reusing `isPastOnceEvent()`. Recurring entries unaffected; a venue whose only other entries are past shows no "Also" line. Updated Sections 2 and 6. | Claude Code |
 | 2026-07 | 1.0.26 | #131: KJ index gains a filter box matching KJ *and* company names, and sorts on `getSortableHostName()` so stage titles (KJ/DJ/MC) no longer scatter names alphabetically. "Affiliations" section renamed "Companies". Updated Section 10. | Claude Code |
 | 2026-07 | 1.0.27 | #124 Phase 3: submit form's host fields suggest known KJs/companies from the registries and emit a `{kjId, companyId}` ref when both sides match, falling back to the inline shape otherwise. Email body gains a HOST section saying which it was. Updated Section 15. | Claude Code |
+| 2026-08 | 1.0.28 | #154: Documented the analytics consent banner as new **Section 23**; Known Discrepancies and Change Log renumbered 23→24 and 24→25. Header version/date corrected — it had read "1.0 / February 2026" since creation while this log ran to 1.0.27. Section 20 corrected: `escapeHtml()` no longer uses the DOM `textContent` technique (#147 — it did not escape quotes) and venue data is a JSON file, not a JS file. Drift-prone prose venue counts removed from Sections 1 and 11. | Claude Code |
 
 ---
 
