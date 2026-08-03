@@ -573,6 +573,7 @@ Current ADRs:
 - [ADR-008](docs/adr/008-fetch-data-json-directly.md) — Browser fetches `js/data.json`, removing the generated `data.js` wrapper
 - [ADR-009](docs/adr/009-park-supabase.md) — Park Supabase: remove the dormant runtime path, keep the design
 - [ADR-010](docs/adr/010-static-on-netlify-only-constraint.md) — **Static output on Netlify is the only architectural constraint** (supersedes 002, 003)
+- [ADR-011](docs/adr/011-entity-link-contract.md) — Entity link contract: every linkable thing is `{type, id}` over a registry with stable ids
 
 ## Security Considerations
 - Always use `escapeHtml()` when rendering user-provided content
