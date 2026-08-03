@@ -18,6 +18,7 @@ import { Component } from './Component.js';
 import { getState, setState, subscribe, navigateWeek, goToCurrentWeek } from '../core/state.js';
 import { emit, Events } from '../core/events.js';
 import { formatWeekRange, getWeekStart, isCurrentWeek } from '../utils/date.js';
+import { resolveView, isKJView } from '../core/router.js';
 import { html } from '../utils/string.js';
 
 export class Navigation extends Component {
@@ -36,20 +37,23 @@ export class Navigation extends Component {
         const showDedicated = getState('showDedicated');
         const hostFilter = getState('hostFilter');
 
-        // KJ mode (dossier or index): show the full view switcher + a filter chip.
-        // CAL/A-Z/MAP click handlers clear hostFilter (see afterRender), so clicking
-        // any of them leaves KJ mode cleanly. The KJs link is active on the index.
-        if (hostFilter) {
-            const lc = hostFilter.toLowerCase();
-            const isIndex = lc === 'all';
-            const isNone = lc === 'none';
+        // KJ mode (dossier, index, or no-host): full view switcher + a filter
+        // chip. CAL/A-Z/MAP click handlers clear hostFilter (see afterRender),
+        // so clicking any of them leaves KJ mode cleanly.
+        //
+        // The router decides which of the three it is — this component no
+        // longer re-derives it from the raw hostFilter string.
+        const resolved = resolveView({ view, hostFilter });
+
+        if (isKJView(resolved)) {
+            const isIndex = resolved === 'kj-index';
             let chipLabel = 'KJ:';
             let chipValue = hostFilter;
             let chipIcon = 'fa-microphone-lines';
             if (isIndex) {
                 chipLabel = '';
                 chipValue = 'All KJs';
-            } else if (isNone) {
+            } else if (resolved === 'kj-none') {
                 chipLabel = '';
                 chipValue = 'No host listed';
                 chipIcon = 'fa-circle-question';
@@ -162,7 +166,10 @@ export class Navigation extends Component {
     renderViewSwitcher({ view, kjIndexActive }) {
         // In KJ mode, CAL/A-Z/MAP shouldn't appear active even though `view`
         // still holds the prior selection — the user isn't in those views.
-        const inKJMode = !!getState('hostFilter');
+        const inKJMode = isKJView(resolveView({
+            view: getState('view'),
+            hostFilter: getState('hostFilter'),
+        }));
         const cls = (active) => `nav-btn nav-btn--labeled${active ? ' nav-btn--active' : ''}`;
         return html`
             <div class="navigation__views">
