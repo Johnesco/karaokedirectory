@@ -205,6 +205,17 @@ describe('rendered pages', () => {
     }
   });
 
+  it('every page declares the favicon set', () => {
+    for (const { e, html } of pages) {
+      assert.ok(html.includes('href="/favicon.svg" type="image/svg+xml"'), `${e.id} svg icon`);
+      assert.ok(html.includes('href="/favicon.ico"'), `${e.id} ico fallback`);
+      assert.ok(html.includes('href="/apple-touch-icon.png"'), `${e.id} apple touch icon`);
+      // Absolute paths matter here: entity pages live at /kj/<id>/, so a
+      // relative "favicon.svg" would resolve inside that directory.
+      assert.equal(/href="favicon\./.test(html), false, `${e.id} relative icon path`);
+    }
+  });
+
   it('every page declares the share image with dimensions and alt text', () => {
     for (const { e, html } of pages) {
       assert.ok(html.includes('<meta property="og:image" content="https://karaokedirectory.com/og.jpg">'), `${e.id} og:image`);

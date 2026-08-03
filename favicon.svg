@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Austin Karaoke Directory">
+  <title>Austin Karaoke Directory</title>
+  <defs>
+    <linearGradient id="mic" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e879f9"/>
+      <stop offset="1" stop-color="#818cf8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Dark ground so the glyph holds on both light and dark browser chrome.
+       Full-bleed rounded square: at 16px a transparent icon loses its silhouette. -->
+  <rect width="32" height="32" rx="7" fill="#12203a"/>
+
+  <!-- Capsule. Deliberately oversized relative to a "realistic" mic — at 16px
+       this is roughly 6px wide, and anything smaller stops reading as a shape. -->
+  <rect x="11" y="4" width="10" height="16" rx="5" fill="url(#mic)"/>
+
+  <!-- Cradle arc. 2.4 stroke so it survives a 2px render at 16px. -->
+  <path d="M7.5 15.5a8.5 8.5 0 0 0 17 0" fill="none" stroke="url(#mic)" stroke-width="2.4" stroke-linecap="round"/>
+
+  <!-- Stem + base, merged into one bold form rather than two thin ones. -->
+  <path d="M16 24v3" stroke="url(#mic)" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M11.5 28h9" stroke="url(#mic)" stroke-width="2.4" stroke-linecap="round"/>
+</svg>
