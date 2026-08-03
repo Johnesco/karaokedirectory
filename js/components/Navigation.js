@@ -17,7 +17,7 @@
 import { Component } from './Component.js';
 import { getState, setState, subscribe, navigateWeek, goToCurrentWeek } from '../core/state.js';
 import { emit, Events } from '../core/events.js';
-import { formatWeekRange, getWeekStart } from '../utils/date.js';
+import { formatWeekRange, getWeekStart, isCurrentWeek } from '../utils/date.js';
 import { html } from '../utils/string.js';
 
 export class Navigation extends Component {
@@ -75,7 +75,7 @@ export class Navigation extends Component {
         }
 
         const weekRange = formatWeekRange(getWeekStart(weekStart));
-        const isCurrentWeek = this.isCurrentWeek(weekStart);
+        const onCurrentWeek = isCurrentWeek(weekStart);
         // Mobile: search collapses to an icon button. Keep the row expanded
         // across re-renders while toggled open or while a query is active.
         const searchQuery = getState('searchQuery') || '';
@@ -94,7 +94,7 @@ export class Navigation extends Component {
                         <button class="nav-btn nav-btn--icon" data-week="1" type="button" title="Next week">
                             <i class="fa-solid fa-chevron-right"></i>
                         </button>
-                        ${!isCurrentWeek ? html`
+                        ${!onCurrentWeek ? html`
                             <button class="nav-btn nav-btn--small" data-week="today" type="button">
                                 Today
                             </button>
@@ -188,13 +188,6 @@ export class Navigation extends Component {
                 </a>
             </div>
         `;
-    }
-
-    isCurrentWeek(weekStart) {
-        const today = new Date();
-        const currentWeekStart = getWeekStart(today);
-        const compareWeekStart = getWeekStart(weekStart);
-        return currentWeekStart.toDateString() === compareWeekStart.toDateString();
     }
 
     afterRender() {

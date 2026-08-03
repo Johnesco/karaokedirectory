@@ -2,6 +2,8 @@
  * URL building and sanitization utilities
  */
 
+import { venueShareUrl } from '../core/router.js';
+
 // Social media platform configurations
 // Note: 'icon' should be full class including prefix (fa-brands or fa-solid)
 export const SOCIAL_PLATFORMS = {
@@ -153,47 +155,13 @@ export function formatAddress(address, multiline = false) {
     return [street, cityStateZip].filter(Boolean).join(separator);
 }
 
-/**
- * Parse hash parameters from URL
- * @returns {Object} Key-value pairs from hash
+/*
+ * getHashParams / setHashParams / updateHashParams lived here and are gone.
+ * URL parsing and writing now belong to js/core/router.js, which is the single
+ * owner of URL <-> state (#155). The setters never had an importer at all —
+ * `window.location.hash = ...` would also have triggered a `hashchange` the
+ * app then had to defend against, which is why nothing used them.
  */
-export function getHashParams() {
-    const hash = window.location.hash.slice(1);
-    if (!hash) return {};
-
-    const params = {};
-    for (const part of hash.split('&')) {
-        const [key, value] = part.split('=');
-        if (key) {
-            params[decodeURIComponent(key)] = value ? decodeURIComponent(value) : true;
-        }
-    }
-    return params;
-}
-
-/**
- * Set hash parameters in URL
- * @param {Object} params - Key-value pairs to set
- */
-export function setHashParams(params) {
-    const parts = Object.entries(params)
-        .filter(([, v]) => v !== null && v !== undefined && v !== '')
-        .map(([k, v]) => {
-            if (v === true) return encodeURIComponent(k);
-            return `${encodeURIComponent(k)}=${encodeURIComponent(v)}`;
-        });
-
-    window.location.hash = parts.join('&');
-}
-
-/**
- * Update specific hash parameters (preserving others)
- * @param {Object} updates - Parameters to update
- */
-export function updateHashParams(updates) {
-    const current = getHashParams();
-    setHashParams({ ...current, ...updates });
-}
 
 /**
  * Share a venue link via Web Share API (mobile) or clipboard copy (desktop)
@@ -201,7 +169,7 @@ export function updateHashParams(updates) {
  * @param {HTMLElement} [buttonEl] - Button element for "Copied!" feedback
  */
 export async function shareVenue(venue, buttonEl) {
-    const url = `${window.location.origin}${window.location.pathname}#view=weekly&venue=${venue.id}`;
+    const url = venueShareUrl(venue.id);
 
     if (navigator.share) {
         try {

@@ -188,47 +188,6 @@
     <!-- Venue data is fetched from js/data.json by app.js (ADR-008). -->
     <script type="module" src="js/app.js"></script>
 
-    <script>
-        // FAB visibility: back-to-top after scroll, jump-to-today when off-week or today is offscreen.
-        const backToTop = document.getElementById('back-to-top');
-        const jumpToTodayBtn = document.getElementById('jump-to-today');
-
-        function updateTodayButtonVisibility() {
-            // Off the current week — always show
-            if (typeof window.isCurrentWeek === 'function' && !window.isCurrentWeek()) {
-                jumpToTodayBtn.hidden = false;
-                return;
-            }
-
-            // On current week — show only when today's card has scrolled out of view
-            const todayCard = document.querySelector('.day-card--today');
-            if (todayCard) {
-                const rect = todayCard.getBoundingClientRect();
-                const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
-                jumpToTodayBtn.hidden = isVisible;
-            } else {
-                jumpToTodayBtn.hidden = true;
-            }
-        }
-
-        window.addEventListener('scroll', () => {
-            backToTop.hidden = window.scrollY < 300;
-            updateTodayButtonVisibility();
-        });
-
-        // Catches week changes without scroll (e.g. Today/prev/next nav)
-        setInterval(updateTodayButtonVisibility, 500);
-
-        backToTop.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-
-        jumpToTodayBtn.addEventListener('click', () => {
-            if (typeof window.jumpToToday === 'function') {
-                window.jumpToToday();
-            }
-        });
-    </script>
 
     <script>
         // Header karaoke lyrics animation: cycles through 4 songs with the title shown between.

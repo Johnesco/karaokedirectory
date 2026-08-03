@@ -16,7 +16,8 @@ import { KJDossierView } from './views/KJDossierView.js';
 import { KJIndexView } from './views/KJIndexView.js';
 import { initDebugMode, isDebugMode } from './utils/debug.js';
 import { initTagConfig } from './utils/tags.js';
-import { getHashParams } from './utils/url.js';
+import { readLocation, writeLocation, onLocationChange, VALID_VIEWS, DEFAULT_VIEW } from './core/router.js';
+import { initFabs } from './components/fabs.js';
 
 // View instances
 let navigation = null;
@@ -76,8 +77,11 @@ async function init() {
             document.querySelectorAll(`[data-venue-id="${venue.id}"]`).forEach(card => {
                 card.classList.add('venue-card--selected');
             });
-            // Update URL hash (replaceState avoids triggering hashchange)
-            history.replaceState(null, '', '#view=weekly&venue=' + venue.id);
+            // The hash records the ACTUAL view, not a hard-coded 'weekly'.
+            // Selecting a venue on the map used to rewrite the URL to
+            // view=weekly, so reloading dropped you somewhere else than where
+            // you were. Sharing still pins weekly — see router.venueShareUrl.
+            writeLocation({ view: getState('view'), venueId: venue.id });
         }
     });
 
@@ -86,8 +90,7 @@ async function init() {
         document.querySelectorAll('.venue-card--selected').forEach(card => {
             card.classList.remove('venue-card--selected');
         });
-        // Clear URL hash
-        history.replaceState(null, '', window.location.pathname + window.location.search);
+        writeLocation({ venueId: null });
     });
 
     // Subscribe to view changes
@@ -95,16 +98,11 @@ async function init() {
         renderView(view);
     });
 
-    // Determine initial view from ?view= query parameter, falling back to 'weekly'
-    const validViews = ['weekly', 'alphabetical', 'map'];
-    const urlParams = new URLSearchParams(window.location.search);
-    const viewParam = urlParams.get('view');
-    const initialView = validViews.includes(viewParam) ? viewParam : 'weekly';
+    const location = readLocation();
+    const initialView = location.view || DEFAULT_VIEW;
 
-    // Read ?kj= for the KJ/host filter (substring match, host fields only)
-    const kjParam = urlParams.get('kj');
-    if (kjParam) {
-        setState({ hostFilter: kjParam });
+    if (location.hostFilter) {
+        setState({ hostFilter: location.hostFilter });
     }
 
     // Sync state to match the URL-driven initial view, then render.
@@ -116,13 +114,7 @@ async function init() {
     // Keep ?kj= in the URL in sync with hostFilter state and re-render the view
     // (toggle between KJDossierView and the regular weekly/alphabetical/map views).
     subscribe('hostFilter', (value) => {
-        const url = new URL(window.location.href);
-        if (value) {
-            url.searchParams.set('kj', value);
-        } else {
-            url.searchParams.delete('kj');
-        }
-        history.replaceState(null, '', url.pathname + url.search + url.hash);
+        writeLocation({ hostFilter: value });
         renderView(getState('view'));
         emit(Events.FILTER_CHANGED, { hostFilter: value });
     });
@@ -135,37 +127,13 @@ async function init() {
         }
     };
 
-    // Expose helper for "Jump to Today" button
-    window.jumpToToday = () => {
-        // Go to current week
-        setState({ view: 'weekly', weekStart: new Date() });
-
-        // Wait for render, then scroll to today
-        setTimeout(() => {
-            const todayCard = document.querySelector('.day-card--today');
-            if (todayCard) {
-                todayCard.scrollIntoView({ behavior: 'instant', block: 'start' });
-            }
-        }, 50);
-    };
+    // Floating action buttons. Previously an inline <script> in index.html that
+    // polled window.isCurrentWeek() every 500ms, because an inline script has no
+    // way to subscribe to state.
+    initFabs();
 
     // Handle initial deep link (e.g. #venue=xyz on page load)
     handleHashChange();
-
-    // Expose helper to check if viewing current week
-    window.isCurrentWeek = () => {
-        const weekStart = getState('weekStart');
-        const today = new Date();
-        const currentWeekStart = new Date(today);
-        currentWeekStart.setDate(today.getDate() - today.getDay());
-        currentWeekStart.setHours(0, 0, 0, 0);
-
-        const viewingWeekStart = new Date(weekStart);
-        viewingWeekStart.setDate(weekStart.getDate() - weekStart.getDay());
-        viewingWeekStart.setHours(0, 0, 0, 0);
-
-        return currentWeekStart.getTime() === viewingWeekStart.getTime();
-    };
 
     console.log('Application initialized');
 }
@@ -271,31 +239,22 @@ function renderView(viewName) {
  * Handle URL hash for deep linking
  */
 function handleHashChange() {
-    const params = getHashParams();
-    const validViews = ['weekly', 'alphabetical', 'map'];
+    // readLocation() already normalises query, hash, and the legacy `#weekly`
+    // form into one shape, so this function no longer parses anything.
+    const { view, venueId } = readLocation();
 
-    // Switch view if specified
-    if (params.view && validViews.includes(params.view)) {
-        if (getState('view') !== params.view) {
-            setState({ view: params.view });
-        }
+    if (view && getState('view') !== view) {
+        setState({ view });
     }
 
-    // Open venue if specified
-    if (params.venue) {
-        const venue = getVenueById(params.venue);
+    if (venueId) {
+        const venue = getVenueById(venueId);
         if (venue) {
-            // Default to weekly view for venue links if no view was specified
-            if (!params.view && getState('view') !== 'weekly') {
-                setState({ view: 'weekly' });
+            // A venue link with no view lands on the calendar.
+            if (!view && getState('view') !== DEFAULT_VIEW) {
+                setState({ view: DEFAULT_VIEW });
             }
             emit(Events.VENUE_SELECTED, venue);
-        }
-    } else if (!params.view) {
-        // Legacy single-value hashes (e.g. #weekly)
-        const hash = window.location.hash.slice(1);
-        if (validViews.includes(hash)) {
-            setState({ view: hash });
         }
     }
 }
@@ -307,8 +266,9 @@ if (document.readyState === 'loading') {
     init();
 }
 
-// Handle hash changes for deep linking
-window.addEventListener('hashchange', handleHashChange);
+// Browser-driven location changes (back/forward, manual edits). replaceState
+// does not fire this, so writeLocation cannot feed itself.
+onLocationChange(handleHashChange);
 
 // Export for debugging
 export { init, renderView, getState };

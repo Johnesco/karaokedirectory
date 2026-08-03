@@ -108,6 +108,22 @@ export function getWeekStart(date) {
 }
 
 /**
+ * Whether a given week is the one containing today.
+ *
+ * Previously implemented twice with two different algorithms — Navigation
+ * compared `getWeekStart(...).toDateString()`, while app.js hand-rolled the
+ * week start with `setDate(getDate() - getDay())` and compared `getTime()`.
+ * They agreed, but only by coincidence of both being correct.
+ *
+ * @param {Date} weekStart - Any date within the week being examined
+ * @returns {boolean}
+ */
+export function isCurrentWeek(weekStart) {
+    if (!weekStart) return false;
+    return getWeekStart(new Date()).getTime() === getWeekStart(weekStart).getTime();
+}
+
+/**
  * Check if a schedule matches a specific date
  * Handles "every", "first", "second", etc. patterns
  * @param {Object} schedule - Schedule object with frequency and day
