@@ -337,9 +337,11 @@ Tags are rendered as color-coded badges in VenueCard, VenueModal, and VenueDetai
 
 ### State Management
 - `js/core/state.js`: `getState(key)`, `setState(obj)`, `subscribe(key, callback)` — simple observer pattern
+- **The single change channel.** Change something with `setState`, react with `subscribe(key, …)`. Never announce a state change on the event bus as well — subscribers have already run, and the second notification re-renders every listening view (#157)
 
 ### Event Bus
-- `js/core/events.js`: `emit(event, data)`, `on(event, callback)` — pub/sub with `Events` constants
+- `js/core/events.js`: `emit(event, data)`, `on(event, callback)`, `off(event, callback)`
+- Only for one-shots that are **not** state transitions. That is exactly two events: `VENUE_SELECTED` and `VENUE_CLOSED`. Nine others were deleted in #157 — eight had only one end (no emitter or no listener), and `FILTER_CHANGED` duplicated the state keys it accompanied
 
 ### Component Lifecycle
 `constructor` → `init()` → `template()` → `render()` → `afterRender()` → `destroy()`
@@ -350,7 +352,7 @@ Tags are rendered as color-coded badges in VenueCard, VenueModal, and VenueDetai
 - Escape key: closes card first, then exits to Calendar view
 
 ### Search Feature
-- Navigation updates `searchQuery` state; all views listen for `FILTER_CHANGED` events
+- Navigation updates `searchQuery` state; the views subscribe to that key. State is the only change channel — never `setState` and then `emit` the same change (#157)
 - `venues.js` → `venueMatchesSearch()` matches: venue name, city, neighborhood, venue-level host name/affiliation, per-show host name/affiliation, and tags (ID + label)
 - It does **not** match event names. This file claimed otherwise for months; `venueMatchesSearch` never reads `entry.eventName`. Adding it is a one-line change tracked on #37 — until that lands, the omission is the truth
 - Empty results collapse day cards to header-only (`.day-card--empty`)

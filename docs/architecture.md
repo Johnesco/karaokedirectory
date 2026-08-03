@@ -316,17 +316,20 @@ sequenceDiagram
 
 | Event Constant | String | Emitted By | Listened By | Payload |
 |---------------|--------|------------|-------------|---------|
-| `VENUE_SELECTED` | `venue:selected` | app.js, VenueCard, WeeklyView, AlphabeticalView | app.js, VenueModal, VenueDetailPane | venue object |
+| `VENUE_SELECTED` | `venue:selected` | app.js, VenueCard, MapView, venue-selection | app.js, VenueModal, VenueDetailPane | venue object |
 | `VENUE_CLOSED` | `venue:closed` | VenueModal | app.js, VenueDetailPane | — |
-| `VENUE_DETAIL_SHOWN` | `venue:detail-shown` | VenueDetailPane | — | venue object |
-| `VIEW_CHANGED` | `view:changed` | Navigation, MapView | — | view name string |
-| `WEEK_CHANGED` | `week:changed` | Navigation | — | — |
-| `FILTER_CHANGED` | `filter:changed` | Navigation, MapView | WeeklyView, AlphabeticalView, MapView | — |
-| `SEARCH_CHANGED` | `search:changed` | — | — | _(defined but unused)_ |
-| `MODAL_OPEN` | `modal:open` | VenueModal | — | — |
-| `MODAL_CLOSE` | `modal:close` | — | VenueModal | _(defined but unused as emitter)_ |
-| `DATA_LOADED` | `data:loaded` | app.js | — | karaokeData object |
-| `DATA_ERROR` | `data:error` | app.js | — | error object |
+
+Two events, both with a real emitter and a real listener. That is deliberate:
+**state changes belong in `state.js`, not on the bus.** A component that needs
+to react to `showDedicated`, `searchQuery`, `weekStart`, `view`, or `hostFilter`
+subscribes to that key — see the state-subscription table in
+[functional spec §21](functional-spec.md).
+
+Nine constants were removed in #157. Eight of them had only one end (emitted
+with nothing listening, or listened for with nothing emitting), and this table
+had been documenting them as `—` for months. The ninth, `FILTER_CHANGED`,
+duplicated the state keys it was emitted alongside, so every filter change
+rendered each listening view twice.
 
 ### Venue Selection Flow
 
@@ -348,13 +351,11 @@ sequenceDiagram
     alt Window width < 1400px AND view !== 'map'
         EventBus->>VenueModal: VENUE_SELECTED handler
         VenueModal->>VenueModal: Show modal with venue data
-        VenueModal->>EventBus: emit(MODAL_OPEN)
     end
 
     alt Window width >= 1400px
         EventBus->>VenueDetailPane: VENUE_SELECTED handler
         VenueDetailPane->>VenueDetailPane: Show venue in sidebar
-        VenueDetailPane->>EventBus: emit(VENUE_DETAIL_SHOWN, venue)
     end
 
     Note over User: User closes detail view
@@ -372,7 +373,6 @@ sequenceDiagram
 sequenceDiagram
     participant User
     participant Navigation
-    participant EventBus as Event Bus
     participant state.js
     participant WeeklyView
     participant AlphabeticalView
@@ -380,20 +380,20 @@ sequenceDiagram
 
     User->>Navigation: Type in search / toggle dedicated
     Navigation->>state.js: setState({ searchQuery }) or setState({ showDedicated })
-    Navigation->>EventBus: emit(FILTER_CHANGED)
 
-    par All views re-render
-        EventBus->>WeeklyView: FILTER_CHANGED handler
+    par state.js notifies subscribers of that key
+        state.js->>WeeklyView: searchQuery / showDedicated subscriber
         WeeklyView->>WeeklyView: render()
     and
-        EventBus->>AlphabeticalView: FILTER_CHANGED handler
+        state.js->>AlphabeticalView: searchQuery / showDedicated subscriber
         AlphabeticalView->>AlphabeticalView: render()
     and
-        EventBus->>MapView: FILTER_CHANGED handler
+        state.js->>MapView: searchQuery / showDedicated subscriber
         MapView->>MapView: updateMarkers()
     end
 
     Note over Navigation: Navigation does NOT re-render (preserves input focus)
+    Note over state.js: The event bus is not involved. Before #157 Navigation<br/>also emitted FILTER_CHANGED here, which the same three<br/>views listened to — so each rendered twice per change.
 ```
 
 ---
@@ -404,15 +404,21 @@ sequenceDiagram
 
 | Key | Type | Default | Writers | Readers | Subscribers |
 |-----|------|---------|---------|---------|-------------|
-| `venues` | array | `[]` | app.js (via initVenues) | venues.js | — |
-| `filteredVenues` | array | `[]` | — | — | — |
-| `filters` | object | `{...}` | — | — | — |
-| `view` | string | `'weekly'` | Navigation, MapView, app.js | Navigation, MapView | app.js → renderView() |
+| `view` | string | `'weekly'` | Navigation, MapView, app.js | Navigation, MapView, router.resolveView | app.js → renderView(), Navigation → render() |
 | `weekStart` | Date | today | Navigation | WeeklyView, Navigation | WeeklyView → render(), Navigation → render() |
 | `showDedicated` | boolean | `true` | Navigation, MapView | All views, Navigation | WeeklyView, AlphabeticalView, MapView, Navigation |
-| `searchQuery` | string | `''` | Navigation | All views (via getVenuesForDate/getVenuesSorted) | — _(uses FILTER_CHANGED event instead)_ |
+| `searchQuery` | string | `''` | Navigation | All views (via getVenuesForDate/getVenuesSorted) | WeeklyView, AlphabeticalView, MapView |
+| `hostFilter` | string | `''` | Navigation, app.js | Navigation, KJDossierView, router.resolveView | app.js → writeLocation() + renderView() |
 | `selectedVenue` | object/null | `null` | VenueModal, VenueDetailPane | — | — |
 | `isLoading` | boolean | `false` | — | — | — |
+
+`venues`, `filteredVenues`, and `filters` used to head this table with empty
+Writers/Readers columns. #157 deleted them — venue data lives in
+`js/services/venues.js`, which is the "Service-Level State" pattern below.
+
+Note that `searchQuery` now has real subscribers. It previously showed `—`
+here, annotated *"uses FILTER_CHANGED event instead"* — the views did react to
+it, just through a second channel that also fired for every other filter.
 
 ### Three Mutation Patterns
 
@@ -446,9 +452,9 @@ graph LR
 Components use `this.subscribe()` to register unsubscribe functions. On `destroy()`, all stored functions are called automatically:
 
 ```javascript
-// In a component's init() method:
+// In a component's init() method — one subscription per state key it reads:
 this.subscribe(subscribe('weekStart', () => this.render()));
-this.subscribe(on(Events.FILTER_CHANGED, () => this.render()));
+this.subscribe(subscribe('searchQuery', () => this.render()));
 
 // Component.subscribe() stores the unsubscribe function:
 subscribe(subscribeFn) {

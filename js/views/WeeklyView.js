@@ -10,18 +10,17 @@ import { renderDayCard } from '../components/DayCard.js';
 import { renderExtendedSection, attachExtendedSectionListeners } from '../components/ExtendedSection.js';
 import { attachVenueSelectionListener } from '../components/venue-selection.js';
 import { getState, subscribe } from '../core/state.js';
-import { on, Events } from '../core/events.js';
 import { getWeekDates, getWeekStart, getNextWeekRange, getThisMonthRange, getNextMonthRange, getMonthName } from '../utils/date.js';
 import { getVenuesForDate } from '../services/venues.js';
 
 export class WeeklyView extends Component {
     init() {
-        // Re-render when relevant state changes
+        // One subscription per state key this view reads. FILTER_CHANGED used
+        // to be a fourth subscription covering the same keys, so every filter
+        // change rendered twice (#157).
         this.subscribe(subscribe('weekStart', () => this.render()));
         this.subscribe(subscribe('showDedicated', () => this.render()));
-
-        // Listen for filter changes
-        this.subscribe(on(Events.FILTER_CHANGED, () => this.render()));
+        this.subscribe(subscribe('searchQuery', () => this.render()));
     }
 
     template() {

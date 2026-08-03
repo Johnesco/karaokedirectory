@@ -7,7 +7,7 @@
 
 import { Component } from '../components/Component.js';
 import { getState, setState, subscribe } from '../core/state.js';
-import { emit, on, Events } from '../core/events.js';
+import { emit, Events } from '../core/events.js';
 import { getVenuesWithCoordinates, getAllVenues } from '../services/venues.js';
 import { escapeHtml } from '../utils/string.js';
 import { buildDirectionsUrl, shareVenue } from '../utils/url.js';
@@ -25,8 +25,27 @@ export class MapView extends Component {
         this.selectedMarker = null;
         this._escHandler = null;
 
-        this.subscribe(subscribe('showDedicated', () => this.updateMarkers()));
-        this.subscribe(on(Events.FILTER_CHANGED, () => this.updateMarkers()));
+        // One subscription per key that affects which markers are shown.
+        // `showDedicated` was previously covered twice — once here and once via
+        // FILTER_CHANGED — so a single toggle ran updateMarkers three times.
+        this.subscribe(subscribe('showDedicated', () => {
+            this.syncDedicatedButton();
+            this.updateMarkers();
+        }));
+        this.subscribe(subscribe('searchQuery', () => this.updateMarkers()));
+    }
+
+    /**
+     * Update the floating "Hide/Show Dedicated" button to match state, without
+     * re-rendering the view. A full render rebuilds the Leaflet map from
+     * scratch, so the label is patched in place instead.
+     */
+    syncDedicatedButton() {
+        const btn = this.$('[data-action="toggle-dedicated"]');
+        if (!btn) return;
+        const showDedicated = getState('showDedicated');
+        btn.classList.toggle('map-controls__btn--active', showDedicated);
+        btn.textContent = showDedicated ? 'Hide Dedicated' : 'Show Dedicated';
     }
 
     /**
@@ -113,17 +132,22 @@ export class MapView extends Component {
 
         // View switcher buttons
         this.delegate('click', '[data-view]', (e, target) => {
-            const view = target.dataset.view;
-            setState({ view });
-            emit(Events.VIEW_CHANGED, view);
+            setState({ view: target.dataset.view });
         });
 
-        // Dedicated toggle
+        // Dedicated toggle. setState and stop — the `showDedicated` subscriber
+        // updates the markers and this button's own label.
+        //
+        // This used to call this.render() as well, just to refresh the label,
+        // which tears the whole Leaflet instance down and builds a new one
+        // (fresh tile requests, re-bound handlers, discarded cluster group).
+        // Patching the label in place avoids that.
+        //
+        // The viewport still shifts on a toggle, because updateMarkers() fits
+        // bounds to whatever markers remain — that is its own behaviour and is
+        // unchanged here.
         this.delegate('click', '[data-action="toggle-dedicated"]', () => {
-            const showDedicated = !getState('showDedicated');
-            setState({ showDedicated });
-            emit(Events.FILTER_CHANGED, { showDedicated });
-            this.render(); // Re-render to update button state
+            setState({ showDedicated: !getState('showDedicated') });
         });
 
         // Close venue card
@@ -153,7 +177,6 @@ export class MapView extends Component {
                 } else {
                     // Exit to weekly view
                     setState({ view: 'weekly' });
-                    emit(Events.VIEW_CHANGED, 'weekly');
                 }
             }
         };

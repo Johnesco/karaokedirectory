@@ -11,7 +11,6 @@
 
 import { Component } from '../components/Component.js';
 import { getState } from '../core/state.js';
-import { on, Events } from '../core/events.js';
 import { getAllVenues, venueMatchesHost } from '../services/venues.js';
 import { escapeHtml, containsIgnoreCase, getSortableName } from '../utils/string.js';
 import {
@@ -23,7 +22,15 @@ import { resolveHostFor, getVenueHosts } from '../utils/render.js';
 
 export class KJDossierView extends Component {
     init() {
-        this.subscribe(on(Events.FILTER_CHANGED, () => this.render()));
+        // No subscriptions, deliberately. This view's only input is
+        // `hostFilter`, and a hostFilter change replaces the view outright —
+        // app.js re-renders through the registry and builds a new instance,
+        // so there is nothing for a live instance to react to.
+        //
+        // It used to subscribe to FILTER_CHANGED, which also fired on every
+        // searchQuery keystroke. This view never reads searchQuery, so those
+        // were full re-renders producing byte-identical output (#157). KJ mode
+        // does not even show a search input.
     }
 
     template() {
