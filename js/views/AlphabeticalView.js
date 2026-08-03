@@ -9,15 +9,14 @@ import { Component } from '../components/Component.js';
 import { renderVenueCard } from '../components/VenueCard.js';
 import { attachVenueSelectionListener } from '../components/venue-selection.js';
 import { getState, subscribe } from '../core/state.js';
-import { on, Events } from '../core/events.js';
 import { getVenuesSorted } from '../services/venues.js';
 import { getSortableName } from '../utils/string.js';
 
 export class AlphabeticalView extends Component {
     init() {
-        // Re-render when relevant state changes
+        // One subscription per state key this view reads (#157).
         this.subscribe(subscribe('showDedicated', () => this.render()));
-        this.subscribe(on(Events.FILTER_CHANGED, () => this.render()));
+        this.subscribe(subscribe('searchQuery', () => this.render()));
     }
 
     template() {

@@ -129,12 +129,14 @@ Full venue with all optional fields:
 ```javascript
 import { Component } from '../components/Component.js';
 import { getState, subscribe } from '../core/state.js';
-import { on, Events } from '../core/events.js';
 
 export class NewView extends Component {
     init() {
-        // Subscribe to filter changes so the view re-renders
-        this.subscribe(on(Events.FILTER_CHANGED, () => this.render()));
+        // One subscription per state key this view reads in template().
+        // Do NOT also listen on the event bus — state.js already notified you,
+        // and a second channel means a second render (#157).
+        this.subscribe(subscribe('searchQuery', () => this.render()));
+        this.subscribe(subscribe('showDedicated', () => this.render()));
     }
 
     template() {
@@ -180,7 +182,9 @@ Find the view switcher buttons in `template()` and add a new button:
 </button>
 ```
 
-The existing click handler in Navigation uses `dataset.view` to emit `VIEW_CHANGED` — no additional JS needed.
+The existing click handler in Navigation reads `dataset.view` and calls
+`setState({ view, hostFilter: '' })` — no additional JS needed. `app.js`
+subscribes to the `view` key and re-renders through the view registry.
 
 **Step 4 — Add styles in `css/views.css`:**
 
@@ -193,8 +197,8 @@ The existing click handler in Navigation uses `dataset.view` to emit `VIEW_CHANG
 
 - Views are destroyed and recreated on every view switch. Don't store important state in `this.state` — use global state or localStorage.
 - The `init()` method is called in the constructor. Don't access `this.container` in `init()` — it exists but the DOM isn't rendered yet.
-- Always subscribe to `FILTER_CHANGED` so search and dedicated filter work.
-- If your view needs map-like immersive mode, toggle a body class in `app.js`'s `renderView()` function.
+- Subscribe to each state key your `template()` reads — typically `searchQuery` and `showDedicated` — so search and the dedicated filter work.
+- If your view needs map-like immersive mode, give it a `bodyClass` in the `VIEWS` registry in `app.js`. `renderView()` applies and clears them from the table; don't hand-toggle classes.
 
 ---
 
@@ -223,7 +227,7 @@ export class NewComponent extends Component {
         this.subscribe(subscribe('someKey', (value) => {
             this.render();
         }));
-        this.subscribe(on(Events.FILTER_CHANGED, () => {
+        this.subscribe(subscribe('anotherKey', () => {
             this.render();
         }));
     }
@@ -475,7 +479,8 @@ init() {
 
 - `setState()` uses reference equality (`!==`) to detect changes. Mutating an object in place and passing it back won't trigger subscribers — always create a new object.
 - Subscribers are notified after ALL updates in a single `setState()` call are applied. This means a subscriber for key A can safely read key B's new value if both were updated together.
-- Navigation intentionally does NOT subscribe to `searchQuery` — it emits `FILTER_CHANGED` instead so views re-render without the Navigation component itself re-rendering (which would steal keyboard focus from the search input).
+- Navigation intentionally does NOT subscribe to `searchQuery`. Re-rendering Navigation would destroy and recreate the input element, stealing keyboard focus mid-typing. The views subscribe to `searchQuery` themselves, so they update while Navigation stays put.
+- Never `setState(...)` and then `emit(...)` the same change. Subscribers have already run; the emit just renders everything again. The event bus is for one-shots that are not state transitions — currently only `VENUE_SELECTED` and `VENUE_CLOSED` (#157).
 
 ---
 

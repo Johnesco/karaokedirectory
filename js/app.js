@@ -134,11 +134,14 @@ async function init() {
     renderView();
 
     // Keep ?kj= in the URL in sync with hostFilter state and re-render the view
-    // (toggle between KJDossierView and the regular weekly/alphabetical/map views).
+    // (toggle between the KJ views and the regular weekly/alphabetical/map ones).
+    //
+    // renderView() builds a fresh view instance, so it has already rendered by
+    // the time this returns. The FILTER_CHANGED emit that used to follow landed
+    // on that brand-new instance and rendered it a second time.
     subscribe('hostFilter', (value) => {
         writeLocation({ hostFilter: value });
         renderView();
-        emit(Events.FILTER_CHANGED, { hostFilter: value });
     });
 
     // Expose helper for map popups
@@ -187,7 +190,6 @@ async function loadData() {
         initTagConfig(data.tagDefinitions);
 
         initVenues(data);
-        emit(Events.DATA_LOADED, data);
 
         // Update debug indicator with data source
         if (isDebugMode()) {
@@ -198,7 +200,6 @@ async function loadData() {
         }
     } catch (error) {
         console.error('Failed to load venue data:', error);
-        emit(Events.DATA_ERROR, error);
 
         // Show error to user
         const container = document.querySelector('#main-content');

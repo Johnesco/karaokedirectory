@@ -1,6 +1,19 @@
 /**
- * Simple event bus for component communication
- * Allows components to communicate without direct dependencies
+ * Event bus — for genuine one-shots only.
+ *
+ * This bus once carried eleven event names. Eight of them had only one end:
+ * emitted with nothing listening, or listened for with nothing emitting. The
+ * ninth, `filter:changed`, was emitted immediately after a `setState` that
+ * already notified the same subscribers, so every filter change rendered each
+ * view twice.
+ *
+ * The rule now (#157): **state changes go through `state.js`.** If a view needs
+ * to react to something, it subscribes to the state key. The bus is only for
+ * events that are not state transitions — right now that is exactly two, both
+ * about a venue being opened or dismissed.
+ *
+ * Before adding a name here, check that the thing being announced is not
+ * already a state key. If it is, subscribe to the key instead.
  */
 
 const listeners = new Map();
@@ -19,20 +32,6 @@ export function on(event, callback) {
 
     // Return unsubscribe function
     return () => off(event, callback);
-}
-
-/**
- * Subscribe to an event for one-time execution
- * @param {string} event - Event name
- * @param {Function} callback - Handler function
- * @returns {Function} Unsubscribe function
- */
-export function once(event, callback) {
-    const wrapper = (...args) => {
-        off(event, wrapper);
-        callback(...args);
-    };
-    return on(event, wrapper);
 }
 
 /**
@@ -64,37 +63,23 @@ export function emit(event, data) {
 }
 
 /**
- * Remove all listeners for an event (or all events)
- * @param {string} [event] - Event name (optional, clears all if not provided)
+ * The complete set of events.
+ *
+ * Both of these have a real emitter and a real listener, and neither duplicates
+ * a state key. A venue being selected is a one-shot announcement that several
+ * unrelated components (modal, detail pane, card highlighting) each act on
+ * differently — that is what a bus is for.
+ *
+ * Deleted in #157, with the reason each was dead:
+ *   VENUE_DETAIL_SHOWN, VIEW_CHANGED, WEEK_CHANGED,
+ *   MODAL_OPEN, DATA_LOADED, DATA_ERROR ... emitted, never listened for
+ *   MODAL_CLOSE ......................... listened for, never emitted
+ *   SEARCH_CHANGED ...................... neither
+ *   FILTER_CHANGED ...................... redundant with the state keys
+ *                                         (showDedicated, searchQuery,
+ *                                         hostFilter) it was emitted alongside
  */
-export function clear(event) {
-    if (event) {
-        listeners.delete(event);
-    } else {
-        listeners.clear();
-    }
-}
-
-// Common event names (for reference)
 export const Events = {
-    // Venue events
     VENUE_SELECTED: 'venue:selected',
     VENUE_CLOSED: 'venue:closed',
-    VENUE_DETAIL_SHOWN: 'venue:detail-shown',
-
-    // View events
-    VIEW_CHANGED: 'view:changed',
-    WEEK_CHANGED: 'week:changed',
-
-    // Filter events
-    FILTER_CHANGED: 'filter:changed',
-    SEARCH_CHANGED: 'search:changed',
-
-    // UI events
-    MODAL_OPEN: 'modal:open',
-    MODAL_CLOSE: 'modal:close',
-
-    // Data events
-    DATA_LOADED: 'data:loaded',
-    DATA_ERROR: 'data:error'
 };
