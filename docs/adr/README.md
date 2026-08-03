@@ -18,3 +18,5 @@ Format and threshold rule: see [sdlc-baseline `docs/adrs.md`](https://github.com
 | [008](008-fetch-data-json-directly.md) | Browser fetches `js/data.json` — remove the generated `js/data.js` wrapper | Accepted |
 | [009](009-park-supabase.md) | Park Supabase — remove the dormant runtime path, keep the design | Accepted |
 | [010](010-static-on-netlify-only-constraint.md) | Static output on Netlify is the only architectural constraint | Accepted |
+| [011](011-entity-link-contract.md) | Entity link contract — every linkable thing is `{type, id}` | Accepted |
+| [012](012-generated-entity-pages.md) | Adopt a build step to generate static entity pages | Accepted |

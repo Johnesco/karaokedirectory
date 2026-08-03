@@ -18,7 +18,7 @@
 - **HTML5 + CSS3** for structure and styling
 - **Leaflet.js** for the map view
 - **Font Awesome** for icons
-- No build step — files served as-is. **This is a choice, not a rule.** [ADR-010](docs/adr/010-static-on-netlify-only-constraint.md) makes static-output-on-Netlify the only architectural constraint, so a build step is permitted; the current setup is kept because it still suits the app's scale, not because anything forbids changing it.
+- **A build step exists** ([ADR-012](docs/adr/012-generated-entity-pages.md)): `npm run build` generates static entity pages under `/kj/`, `/company/`, `/venue/` plus `sitemap.xml`, from `js/data.json`. The SPA itself still needs no build — `index.html` runs as-is.
 
 **The one constraint:** whatever is deployed must be **static files served by Netlify** ([ADR-010](docs/adr/010-static-on-netlify-only-constraint.md)). Netlify Functions and edge handlers are out of scope — adding one needs a new ADR. Deploy config lives in `netlify.toml`.
 
@@ -573,6 +573,8 @@ Current ADRs:
 - [ADR-008](docs/adr/008-fetch-data-json-directly.md) — Browser fetches `js/data.json`, removing the generated `data.js` wrapper
 - [ADR-009](docs/adr/009-park-supabase.md) — Park Supabase: remove the dormant runtime path, keep the design
 - [ADR-010](docs/adr/010-static-on-netlify-only-constraint.md) — **Static output on Netlify is the only architectural constraint** (supersedes 002, 003)
+- [ADR-011](docs/adr/011-entity-link-contract.md) — Entity link contract: every linkable thing is `{type, id}` over a registry with stable ids
+- [ADR-012](docs/adr/012-generated-entity-pages.md) — Adopt a build step: static entity pages generated from `js/data.json`
 
 ## Security Considerations
 - Always use `escapeHtml()` when rendering user-provided content
