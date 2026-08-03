@@ -4,12 +4,12 @@
 # architectural constraint, so the deploy belongs in the repo rather than only
 # in the Netlify dashboard.
 #
-# This file pins the behaviour that was already in effect — it is deliberately
-# not a change. There is no build command: the repo root IS the published site
-# (ADR-002's no-build setup, retained by choice rather than by rule).
+# The build generates entity pages from js/data.json (ADR-012) and publishes the
+# repo root. Everything the site serves is either committed or generated here —
+# nothing is configured only in the Netlify dashboard.
 #
-# If a build step is ever adopted, `command` gains a value and `publish` moves
-# to the output directory. Nothing else here has to change.
+# The generator is plain Node (fs + path, no dependencies). Images are referenced
+# by URL, never processed at build time, so the build needs no image tooling.
 
 [build]
   publish = "."
