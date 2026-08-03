@@ -24,7 +24,8 @@ Karaoke enthusiasts looking for venues, schedules, and event details in the grea
 
 ### Architecture
 
-- **Vanilla JavaScript** (ES6 modules), HTML5, CSS3 — currently no build step
+- **Vanilla JavaScript** (ES6 modules), HTML5, CSS3 — no build step today, by choice rather than by rule ([ADR-010](adr/010-static-on-netlify-only-constraint.md))
+- **Hosting** — Netlify, serving static files from the repo root. That the output stays static on Netlify is the project's only architectural constraint
 - **Mobile-first responsive design** — base styles target mobile, enhanced for larger screens
 - **Data layer** — all venue data in a single JSON file (`js/data.json`); Supabase wiring exists but is dormant (see §11 *Storage and Data Flow*)
 - **Component-based** — `Component` base class with state management and event bus
@@ -696,30 +697,15 @@ The debug indicator (`?debug=1`) shows which source served the current page: `ca
 
 Because the data arrives by `fetch`, the site must be served over http(s) — opening `index.html` from the filesystem will not work, as `fetch` is blocked on `file://` origins. Use `python -m http.server` or `npx serve` (see README).
 
-#### Supabase Schema (issue #47 — JSONB redesign)
+#### Supabase — parked (ADR-009)
 
-Two tables only. The `venues.data` JSONB column holds the bulk of the venue object; `id`, `name`, and `active` are pulled out as columns for primary-key / sort / RLS-filter use.
+**There is no second data source.** `js/data.json` is the only one.
 
-| Table | Columns |
-|-------|---------|
-| `tags` | `id` (text PK), `label` (text), `color` (text), `text_color` (text) |
-| `venues` | `id` (text PK), `name` (text), `active` (bool), `data` (jsonb) |
+Supabase was wired but never switched on, and it decayed while dormant: the generated `seed.sql` fell three months and one ADR behind, holding 77 of 80 venues and predating the host registries entirely — so flipping the flag would have shipped a directory with no KJ attribution.
 
-The `data` JSONB matches the Venue Object Schema above minus the three top-level columns: `dedicated`, `tags[]`, `address{}`, `coordinates{}`, `host{}`, `socials{}`, `schedule[]`, `activePeriod{}`.
+[ADR-009](adr/009-park-supabase.md) parked it. Removed from the running app: `js/config.js` and its `useSupabase` flag, `js/services/supabase.js`, the fallback branch in `loadData()`, and the jsdelivr `<script>` tag every visitor was downloading. The schema, migrations `001`–`004`, and the seed generator are preserved in `_deprecated/supabase/`; the reasoning behind the JSONB design is in [ADR-001](adr/001-supabase-schema-jsonb.md).
 
-RLS: tags publicly readable; venues filtered to `active = true` for anonymous access.
-
-Migration history: `001_initial_schema.sql` (original 5-table normalized model), `002_rls_policies.sql`, `003_scale_indexes.sql`, `004_jsonb_redesign.sql` (current — collapses to 2 tables).
-
-#### Reseeding from data.json
-
-When `js/data.json` changes, regenerate Supabase from it:
-
-1. `node scripts/validate-data.js` — validates data.json against `schema/venue.schema.json` via Ajv, plus the cross-row checks a schema cannot express (unique ids, tag and host-ref cross-reference). Supersedes the former `audit-for-supabase.js`, which duplicated roughly 70% of these checks and was registry-blind (ADR-005)
-2. `node supabase/seed-from-data.js > supabase/seed.sql` — emits `INSERT INTO tags` + `INSERT INTO venues (id, name, active, data) VALUES (..., '{json}'::jsonb)` rows
-3. Run `004_jsonb_redesign.sql` followed by the regenerated `seed.sql` in the Supabase SQL editor (the migration drops + recreates tables, so the seed runs against an empty schema)
-
-There is no automatic sync. data.json → Supabase is a manual push by an authorized editor.
+**Re-entry trigger** — reopen the decision when the directory needs a *write* path: public submissions landing somewhere other than the curator's inbox, or a second curator. Validation of `js/data.json` itself is unaffected and still runs in CI (`node scripts/validate-data.js`).
 
 ---
 

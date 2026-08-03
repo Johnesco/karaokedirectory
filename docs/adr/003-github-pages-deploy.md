@@ -1,6 +1,6 @@
 # ADR-003: GitHub Pages as deploy target
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR-010](010-static-on-netlify-only-constraint.md) (2026-08)
 - **Date:** 2026-04-30 (backfilled — first deploy went live mid-April 2026)
 - **Issue:** [#56](https://github.com/Johnesco/karaokedirectory/issues/56) (backfill)
 - **Related:** [ADR-002](002-vanilla-js-no-build.md) — vanilla JS / no build step

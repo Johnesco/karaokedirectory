@@ -12,7 +12,7 @@
  *   node scripts/code-metrics.js --compare metrics/snapshots/<file>.json
  *
  * Buckets separate runtime app code (js/, css/, *.html) from tooling
- * (scripts/, supabase/) and docs (docs/, *.md). Refactor work should
+ * (scripts/) and docs (docs/, *.md). Refactor work should
  * shrink the app buckets without growing docs to mask the change.
  */
 
@@ -30,7 +30,8 @@ const BUCKETS = {
   // editor/ directory it matched never existed at this path.
   'tests':    (f) => /^(e2e|test)[\\/]/.test(f),
   'scripts':  (f) => /^scripts[\\/]/.test(f),
-  'supabase': (f) => /^supabase[\\/]/.test(f),
+  // 'supabase' bucket removed — supabase/ moved to _deprecated/ by ADR-009 (#159),
+  // and _deprecated is excluded from the walk entirely.
   'docs':     (f) => /^docs[\\/]/.test(f) || (/^[^\\/]+\.md$/.test(f) && f !== 'CLAUDE.md'),
   'claude':   (f) => f === 'CLAUDE.md',
   'config':   (f) => /^(\.github[\\/]|package\.json$|package-lock\.json$)/.test(f),

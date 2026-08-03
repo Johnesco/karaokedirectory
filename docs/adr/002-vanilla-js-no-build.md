@@ -1,6 +1,6 @@
 # ADR-002: Vanilla JS, no framework, no build step
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR-010](010-static-on-netlify-only-constraint.md) (2026-08)
 - **Date:** 2026-04-30 (backfilled — decision made at project inception, late 2025)
 - **Issue:** [#56](https://github.com/Johnesco/karaokedirectory/issues/56) (backfill)
 

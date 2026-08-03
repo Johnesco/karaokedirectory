@@ -1,0 +1,39 @@
+# Netlify deploy configuration.
+#
+# ADR-010 makes "static output served by Netlify" the project's only
+# architectural constraint, so the deploy belongs in the repo rather than only
+# in the Netlify dashboard.
+#
+# This file pins the behaviour that was already in effect — it is deliberately
+# not a change. There is no build command: the repo root IS the published site
+# (ADR-002's no-build setup, retained by choice rather than by rule).
+#
+# If a build step is ever adopted, `command` gains a value and `publish` moves
+# to the output directory. Nothing else here has to change.
+
+[build]
+  publish = "."
+
+# No `command` key on purpose. Netlify skips the build phase entirely and
+# publishes the checkout as-is.
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# js/data.json changes whenever the curator publishes. Keep it revalidating so
+# an edit is visible immediately rather than after a cache TTL.
+[[headers]]
+  for = "/js/data.json"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# The Supabase proof-of-concept page was deleted by ADR-009. It was publicly
+# reachable for months; this makes sure any cached link stops resolving.
+[[redirects]]
+  from = "/supabase/*"
+  to = "/"
+  status = 301
+  force = true

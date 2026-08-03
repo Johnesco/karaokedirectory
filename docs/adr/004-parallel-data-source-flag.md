@@ -1,6 +1,6 @@
 # ADR-004: Parallel data source via URL flag — production stays on JSON
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR-009](009-park-supabase.md) (2026-08)
 - **Date:** 2026-04-30
 - **Issue:** [#56](https://github.com/Johnesco/karaokedirectory/issues/56) (backfill of plan decisions)
 - **Related:** [ADR-001](001-supabase-schema-jsonb.md) — Supabase schema choice
