@@ -63,7 +63,9 @@ npm test               # Playwright end-to-end suite
 
 ### Deployment
 
-Deploy to any static hosting service (GitHub Pages, Netlify, Vercel, etc.) — just upload the files as-is.
+Deployed on **Netlify** from `main`, with no build step — the repo root is the published site. Config lives in `netlify.toml`; every PR gets a deploy preview.
+
+The project's one architectural constraint is that the deployed artifact stays **static files on Netlify** ([ADR-010](docs/adr/010-static-on-netlify-only-constraint.md)). A build step is allowed within that; there just isn't one today.
 
 ## Project Structure
 

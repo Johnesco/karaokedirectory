@@ -24,7 +24,8 @@ Karaoke enthusiasts looking for venues, schedules, and event details in the grea
 
 ### Architecture
 
-- **Vanilla JavaScript** (ES6 modules), HTML5, CSS3 — currently no build step
+- **Vanilla JavaScript** (ES6 modules), HTML5, CSS3 — no build step today, by choice rather than by rule ([ADR-010](adr/010-static-on-netlify-only-constraint.md))
+- **Hosting** — Netlify, serving static files from the repo root. That the output stays static on Netlify is the project's only architectural constraint
 - **Mobile-first responsive design** — base styles target mobile, enhanced for larger screens
 - **Data layer** — all venue data in a single JSON file (`js/data.json`); Supabase wiring exists but is dormant (see §11 *Storage and Data Flow*)
 - **Component-based** — `Component` base class with state management and event bus
