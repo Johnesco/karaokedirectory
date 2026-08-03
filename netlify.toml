@@ -13,9 +13,10 @@
 
 [build]
   publish = "."
-
-# No `command` key on purpose. Netlify skips the build phase entirely and
-# publishes the checkout as-is.
+  # Generates /kj/, /company/ and /venue/ entity pages plus sitemap.xml from
+  # js/data.json (ADR-012). Output is gitignored — the repo stays the source,
+  # and the generated pages exist only in the deploy.
+  command = "npm run build"
 
 [[headers]]
   for = "/*"

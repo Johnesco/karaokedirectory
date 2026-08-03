@@ -1222,9 +1222,26 @@ Each public page includes a `<link rel="canonical">` tag pointing to its canonic
 - Disallows `/docs/` (internal tools)
 - References `sitemap.xml`
 
-**`sitemap.xml`** (project root):
-- Lists all 5 public pages for search engine discovery
+**`sitemap.xml`** — **generated**, not authored:
+- Emitted by `scripts/build-pages.js` at deploy time and gitignored, so it cannot drift from the data (ADR-012)
+- Lists the four static pages plus every generated entity page — currently 120 URLs, against the 4 it held when hand-maintained
 - Does not include `docs/`
+
+### Entity pages (generated)
+
+`scripts/build-pages.js` reads `js/data.json` and emits a static page per entity at `/<type>/<id>/`, following the identity contract in [ADR-011](adr/011-entity-link-contract.md):
+
+| Type | Pages | Source of the id |
+|---|---|---|
+| `/venue/` | one per **active** venue | `listings[].id` |
+| `/kj/` | one per KJ with at least one show on an active venue | `kjs` registry key |
+| `/company/` | one per company with at least one show | `companies` registry key |
+
+Each page carries its own `<title>`, description, canonical, Open Graph and Twitter tags, and a JSON-LD node whose `@id` is the page's canonical URL — `BarOrPub` for venues, `Person` for KJs, `Organization` for companies.
+
+Pages cross-link: a venue lists the KJs and companies who host there, and each of those links back to the venues they play. This is the cross-linking ADR-011 exists to enable, and it is why the identity model had to be settled first.
+
+`/tag/` pages are **not** generated. Two tag ids (`21+`, `18+`) are not URL-safe, and 5 of 19 tags cover two or fewer venues — thin content. Blocked on the slug decision in #170.
 
 
 ### Pages Excluded from Indexing
