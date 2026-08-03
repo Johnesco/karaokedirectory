@@ -30,6 +30,18 @@ const DATA = path.join(ROOT, 'js', 'data.json');
 const ORIGIN = 'https://karaokedirectory.com';
 const SITE = 'Austin Karaoke Directory';
 
+/**
+ * Site-wide share card. One image for every page rather than per-entity
+ * artwork — social scrapers only need something recognisable, and generating
+ * 116 images would be a rendering pipeline for no gain.
+ *
+ * og.jpg is 1200x630 (Open Graph's canonical size), re-encoded from the 1.87 MB
+ * source og.png down to ~154 KB. Scrapers time out on large images, and a
+ * silently-failed card is exactly the failure this whole feature exists to fix.
+ */
+const OG_IMAGE = ORIGIN + '/og.jpg';
+const OG_ALT = 'Greater Austin Karaoke Directory - find karaoke nights by day, venue, and neighborhood';
+
 /** Entity types that get a generated page. Tags are absent on purpose — see ADR-012. */
 const TYPES = ['kj', 'company', 'venue'];
 
@@ -310,7 +322,12 @@ function renderPage(e, data) {
 <meta property="og:description" content="${esc(desc)}">
 <meta property="og:type" content="website">
 <meta property="og:url" content="${esc(url)}">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="${esc(OG_IMAGE)}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="${esc(OG_ALT)}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="${esc(OG_IMAGE)}">
 <meta name="twitter:title" content="${esc(title)}">
 <meta name="twitter:description" content="${esc(desc)}">
 <link rel="canonical" href="${esc(url)}">

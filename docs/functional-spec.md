@@ -1209,7 +1209,15 @@ Each public-facing page includes a `<meta name="description">` tag with a concis
 
 ### Open Graph and Twitter Card Tags
 
-Each public page includes Open Graph (`og:title`, `og:description`, `og:type`, `og:url`) and Twitter Card (`twitter:card`, `twitter:title`, `twitter:description`) meta tags. These control how links appear when shared on social media. No `og:image` or `twitter:image` is set — shares use text-only cards until a social preview image is added.
+Each public page — and every generated entity page — includes Open Graph (`og:title`, `og:description`, `og:type`, `og:url`, `og:image`) and Twitter Card (`twitter:card`, `twitter:title`, `twitter:description`, `twitter:image`) meta tags. These control how links appear when shared.
+
+**Share image:** `og.jpg` at the site root, 1200×630 (Open Graph's canonical size), ~154 KB. One image site-wide rather than per-entity artwork — scrapers only need something recognisable, and generating 116 images would be a rendering pipeline for no gain. Declared with explicit `og:image:width`/`height` so scrapers can lay out the card before downloading it, and `og:image:alt` for screen readers on platforms that surface it.
+
+`twitter:card` is **`summary_large_image`**, not `summary`. That is the correct pairing for a 1.91-aspect image; plain `summary` renders a small square thumbnail and crops the artwork to uselessness.
+
+`og.png` (1729×910, 1.87 MB) is the design source and is kept in the repo. Only `og.jpg` is referenced — scrapers time out on large images, and a silently-failed card is the failure this exists to prevent.
+
+This matters more than it looks: **Facebook, Slack, iMessage, LinkedIn and Bluesky do not execute JavaScript.** Everything above has to be present in the served HTML, which is why entity pages are generated rather than client-rendered (see [ADR-012](adr/012-generated-entity-pages.md)).
 
 ### Canonical URLs
 

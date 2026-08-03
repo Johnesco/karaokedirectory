@@ -205,6 +205,18 @@ describe('rendered pages', () => {
     }
   });
 
+  it('every page declares the share image with dimensions and alt text', () => {
+    for (const { e, html } of pages) {
+      assert.ok(html.includes('<meta property="og:image" content="https://karaokedirectory.com/og.jpg">'), `${e.id} og:image`);
+      assert.ok(html.includes('<meta property="og:image:width" content="1200">'), `${e.id} width`);
+      assert.ok(html.includes('<meta property="og:image:height" content="630">'), `${e.id} height`);
+      assert.ok(/og:image:alt" content="[^"]{20,}"/.test(html), `${e.id} alt text`);
+      // summary_large_image is the correct card type for a 1.91-aspect image;
+      // plain `summary` renders a small square thumbnail and wastes it.
+      assert.ok(html.includes('content="summary_large_image"'), `${e.id} twitter:card`);
+    }
+  });
+
   it('canonical, og:url and JSON-LD @id all agree', () => {
     for (const { e, html } of pages) {
       const url = urlFor(e);
