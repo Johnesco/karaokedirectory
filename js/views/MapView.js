@@ -23,7 +23,6 @@ export class MapView extends Component {
         this.clusterGroup = null;
         this.selectedVenue = null;
         this.selectedMarker = null;
-        this._escHandler = null;
 
         // One subscription per key that affects which markers are shown.
         // `showDedicated` was previously covered twice — once here and once via
@@ -33,6 +32,8 @@ export class MapView extends Component {
             this.updateMarkers();
         }));
         this.subscribe(subscribe('searchQuery', () => this.updateMarkers()));
+
+        this.bindEscape();
     }
 
     /**
@@ -169,18 +170,27 @@ export class MapView extends Component {
             }
         });
 
-        // Escape key to exit map view or close card
-        this._escHandler = (e) => {
-            if (e.key === 'Escape') {
-                if (this.selectedVenue) {
-                    this.hideVenueCard();
-                } else {
-                    // Exit to weekly view
-                    setState({ view: 'weekly' });
-                }
+    }
+
+    /**
+     * Escape closes the venue card first, then exits the map to the calendar.
+     *
+     * Registered in init(), not afterRender(): afterRender runs on every render,
+     * and each pass built a fresh closure and called raw
+     * `document.addEventListener` on it — orphaning the previous one, since only
+     * the newest was tracked for removal. init() runs exactly once per instance,
+     * and this.addEventListener records the listener so destroy() removes it.
+     */
+    bindEscape() {
+        this.addEventListener(document, 'keydown', (e) => {
+            if (e.key !== 'Escape') return;
+            if (this.selectedVenue) {
+                this.hideVenueCard();
+            } else {
+                // Exit to weekly view
+                setState({ view: 'weekly' });
             }
-        };
-        document.addEventListener('keydown', this._escHandler);
+        });
     }
 
     async loadLeaflet() {
@@ -233,6 +243,16 @@ export class MapView extends Component {
     initMap() {
         const container = this.$('#venue-map');
         if (!container || !window.L) return;
+
+        // Tear down any previous instance before building another. Nothing
+        // calls initMap twice per instance today — the dedicated toggle stopped
+        // re-rendering in #157 — but L.map() on a container that already hosts a
+        // map throws "Map container is already initialized", and the orphaned
+        // instance keeps its own document-level listeners alive.
+        if (this.map) {
+            this.map.remove();
+            this.map = null;
+        }
 
         // Default center on Austin, TX
         const austinCenter = [30.2672, -97.7431];
@@ -496,10 +516,8 @@ export class MapView extends Component {
     }
 
     onDestroy() {
-        // Remove escape key handler
-        if (this._escHandler) {
-            document.removeEventListener('keydown', this._escHandler);
-        }
+        // The keydown listener is not unbound here — it went through
+        // this.addEventListener, so Component.destroy() has already removed it.
 
         // Clean up cluster group
         if (this.clusterGroup) {

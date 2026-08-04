@@ -293,7 +293,8 @@ export function renderNewComponent(data) {
 - `init()` runs in the constructor before `render()`. Don't query the DOM in `init()`.
 - Always use `this.addEventListener()` or `this.delegate()` instead of raw `element.addEventListener()` — the component's auto-cleanup only tracks listeners registered through these methods.
 - Always wrap state/event subscriptions with `this.subscribe()` for auto-cleanup.
-- `afterRender()` is called every time `render()` runs, not just the first time. Previously attached listeners are NOT automatically cleaned up between renders — `this.addEventListener()` adds to the list each time. If this is a concern, use event delegation via `this.delegate()` instead.
+- `afterRender()` is called every time `render()` runs, not just the first time. Previously attached listeners are NOT automatically cleaned up between renders — `this.addEventListener()` adds to the list each time. If this is a concern, use event delegation via `this.delegate()` instead, which de-duplicates by `event::selector`.
+- **Document-level listeners (Escape keys, outside-clicks) belong in `init()`, not `afterRender()`.** `delegate()` can't help here — it binds to `this.container`, and these fire on `document`. Binding in `init()` runs exactly once per instance, and `this.addEventListener(document, 'keydown', …)` still gets auto-removed on `destroy()`. A handler bound this way outlives individual renders, so it must check whether it should act — see `VenueModal`, whose Escape handler guards on `this.state.isOpen` (#158).
 
 ---
 
