@@ -172,18 +172,40 @@ export function getSortableHostName(name) {
 }
 
 /**
- * Convert string to URL-safe slug
+ * Convert a name to a venue id.
+ *
+ * The output must satisfy the schema's id pattern, `^[a-z0-9][a-z0-9-]*$`
+ * (schema/venue.schema.json). Two things here exist for that reason and would
+ * otherwise look redundant:
+ *
+ *   - `[^a-z0-9\s-]` rather than `[^\w\s-]`. `\w` includes the underscore, so
+ *     the old version turned "Cafe_Blue" into "cafe_blue" — which the schema
+ *     rejects.
+ *   - the trailing trim of hyphens. Leading or trailing whitespace becomes a
+ *     hyphen at the edge, and the pattern requires the first character to be
+ *     alphanumeric.
+ *
+ * submit.html carried a second implementation (`generateVenueId`) that diverged
+ * from this one in both directions — it dropped underscores correctly but
+ * emitted "-leading-and-trailing-" for a padded name. Both could produce ids
+ * the schema rejects, which the curator then fixed by hand. Deleted in #168;
+ * this is the only one.
+ *
+ * Returns '' for input with no alphanumerics ("!!!"). Callers must handle that
+ * — the schema requires at least one character.
+ *
  * @param {string} str - String to slugify
- * @returns {string} Slugified string
+ * @returns {string} Slug matching ^[a-z0-9][a-z0-9-]*$, or ''
  */
 export function slugify(str) {
     if (!str) return '';
     return str
         .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')  // drop punctuation AND underscores
         .trim()
-        .replace(/[^\w\s-]/g, '')  // Remove non-word chars
-        .replace(/\s+/g, '-')       // Replace spaces with hyphens
-        .replace(/-+/g, '-');       // Remove duplicate hyphens
+        .replace(/\s+/g, '-')          // spaces become hyphens
+        .replace(/-+/g, '-')           // collapse runs
+        .replace(/^-+|-+$/g, '');      // schema: must start [a-z0-9]
 }
 
 /**

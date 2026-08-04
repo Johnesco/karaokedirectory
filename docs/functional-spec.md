@@ -959,11 +959,22 @@ Hidden honeypot field `website_url` (positioned offscreen via `.hp-field` CSS) w
 1. Inline-validate required fields; scroll to and highlight first offender if missing (form uses `novalidate` so the JS controls UX rather than the native browser bubble)
 2. KJ-specific validation: name + at least one contact method
 3. Check honeypot and rate limit
-4. POST to Google Apps Script backend (`mode: 'no-cors'` — opaque response is treated as success)
-5. **On success:** Shows success message, saves timestamp, updates rate limit counter
-6. **On failure:** Offers fallback options:
+4. Compose the submission email, save the timestamp, update the rate-limit counter
+5. Present two ways to send it:
    - Open in email app (pre-formatted `mailto:` link with venue JSON in body)
    - Copy to clipboard (formatted text in textarea)
+
+> **The form does not post anywhere.** There is no server. It authors an email
+> and the curator reconciles it by hand.
+>
+> It used to POST to a Google Apps Script endpoint first and only offer the
+> email when that threw — so the ordinary path announced "Couldn't reach the
+> server" in an error style over a submission that was perfectly fine. The email
+> *is* the submission (#168).
+>
+> The payload is still assembled and still shaped by the schema, and
+> `backend/Code.gs` still holds the Apps Script that would receive it, so
+> standing a server up later is a deploy rather than a rewrite.
 
 ### Email body format
 
@@ -1113,7 +1124,7 @@ Submission form limits to 3 submissions per hour per browser via `localStorage`.
 
 - No API keys or secrets in code
 - No server-side data storage — venue data is a static JSON file (`js/data.json`) fetched at runtime
-- Form submissions go to Google Apps Script (no-cors POST)
+- Form submissions are composed as an email in the visitor's own client — nothing is posted to a server, and there is no endpoint to secure (#168)
 
 ### Privacy
 

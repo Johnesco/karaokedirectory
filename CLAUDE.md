@@ -92,7 +92,6 @@ karaokedirectory/
 │       └── ci.yml         # CI: validators + unit tests, and the Playwright e2e job
 ├── CLAUDE.md              # THIS FILE - Claude project memory
 ├── README.md              # Public documentation
-├── Code.gs                # Google Apps Script backend for submit.html (deployed outside this repo)
 ├── index.html             # Main SPA (heavily commented)
 ├── about.html             # About page
 ├── bingo.html             # Karaoke bingo game
@@ -117,6 +116,8 @@ karaokedirectory/
 │   ├── app.js             # Application entry point
 │   ├── data.json          # Venue database — the single source (edit this)
 │   ├── bingo.js           # Bingo game logic
+│   ├── submit.js          # Venue submission form (was 803 inline lines, #168)
+│   ├── chrome.js          # Shared site header + footer for all five pages (#162)
 │   ├── analytics.js       # Consent-gated Microsoft Clarity loader (spec §23)
 │   │
 │   ├── core/
@@ -154,6 +155,12 @@ karaokedirectory/
 │       ├── tags.js        # Venue tag rendering and configuration
 │       ├── url.js         # URL building, sanitization
 │       └── validation.js  # Form validation
+│
+├── backend/
+│   └── Code.gs            # Google Apps Script behind submit.html. NOT deployed by
+│                          # this repo — the running copy lives in Google's editor
+│                          # and is updated by pasting this file in. Recipients come
+│                          # from a NOTIFICATION_EMAIL script property, not the source
 │
 ├── scripts/               # Developer tools
 │   ├── geocode-venues.js  # Add coordinates to venues (patches data.json)
