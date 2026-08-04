@@ -944,113 +944,24 @@ body.view--map .app-layout__detail {
     margin-top: var(--spacing-sm);
 }
 
-.map-venue-card__section {
-    border-top: 1px solid var(--border-color);
-    padding-top: var(--spacing-sm);
-}
 
-.map-venue-card__section h3 {
-    font-size: var(--font-size-sm);
-    font-weight: 600;
-    margin: 0 0 var(--spacing-xs);
-    color: var(--text-secondary);
-}
 
-.map-venue-card__section h3 i {
-    margin-right: var(--spacing-xs);
-    color: var(--color-primary);
-}
 
-.map-venue-card__address {
-    font-style: normal;
-    font-size: var(--font-size-sm);
-    color: var(--text-primary);
-    margin-bottom: var(--spacing-xs);
-}
 
-.map-venue-card__map-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-sm);
-    margin-top: var(--spacing-xs);
-}
 
-.map-venue-card__schedule-table {
-    font-size: var(--font-size-sm);
-}
 
-.map-venue-card__schedule-table th,
-.map-venue-card__schedule-table td {
-    padding: var(--spacing-xs) var(--spacing-sm);
-}
 
-.map-venue-card__schedule-table th {
-    font-weight: 600;
-    color: var(--text-secondary);
-    font-size: var(--font-size-xs);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
 
-.map-venue-card__schedule-table td {
-    color: var(--text-primary);
-}
 
-.map-venue-card__active-period {
-    font-size: var(--font-size-sm);
-    color: var(--text-secondary);
-    margin: var(--spacing-xs) 0 0;
-}
 
-.map-venue-card__active-period i {
-    margin-right: var(--spacing-xs);
-    color: var(--color-primary);
-}
 
-.map-venue-card__host {
-    font-size: var(--font-size-sm);
-}
 
-.map-venue-card__host-name {
-    font-weight: 600;
-    margin: 0 0 var(--spacing-2xs);
-}
 
-.map-venue-card__host-affiliation {
-    color: var(--text-secondary);
-    margin: 0 0 var(--spacing-xs);
-}
 
-.map-venue-card__host-website {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    color: var(--color-primary);
-    font-size: var(--font-size-sm);
-    margin-bottom: var(--spacing-xs);
-}
 
-.map-venue-card__socials-label {
-    font-size: var(--font-size-xs);
-    color: var(--text-muted);
-    margin: var(--spacing-xs) 0 2px;
-}
 
-.map-venue-card__host-socials {
-    display: flex;
-    gap: var(--spacing-sm);
-}
 
-.map-venue-card__socials {
-    display: flex;
-    gap: var(--spacing-sm);
-    flex-wrap: wrap;
-}
 
-.map-venue-card__phone {
-    color: var(--color-primary);
-    font-size: var(--font-size-sm);
-}
 
 /* Mobile adjustments */
 @media (max-width: 768px) {

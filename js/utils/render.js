@@ -54,10 +54,9 @@ function hasPerShowHosts(venue) {
  * a Host column is added. Otherwise the column is omitted and host info lives
  * in the venue-level "Presented By" section as before.
  * @param {Object} venue - Full venue object (needs .schedule and optionally .host)
- * @param {string} classPrefix - CSS class prefix (e.g., 'venue-modal', 'detail-pane')
  * @returns {string} HTML string for schedule table
  */
-export function renderScheduleTable(venue, classPrefix) {
+export function renderScheduleTable(venue) {
     const schedule = venue?.schedule;
     if (!schedule || schedule.length === 0) {
         return '<p>No schedule information available.</p>';
@@ -93,7 +92,7 @@ export function renderScheduleTable(venue, classPrefix) {
     }).join('');
 
     return `
-        <table class="${classPrefix}__schedule-table">
+        <table class="venue-detail__schedule-table">
             <thead>
                 <tr>
                     <th>Day</th>
@@ -128,14 +127,13 @@ export function renderScheduleCompact(schedule) {
 /**
  * Render an active period notice with icon
  * @param {Object} activePeriod - Object with start and/or end date strings
- * @param {string} classPrefix - CSS class prefix
  * @returns {string} HTML string or empty if no active period
  */
-export function renderActivePeriod(activePeriod, classPrefix) {
+export function renderActivePeriod(activePeriod) {
     const text = formatActivePeriodText(activePeriod);
     if (!text) return '';
 
-    return `<p class="${classPrefix}__active-period"><i class="fa-solid fa-calendar-check"></i> ${text}</p>`;
+    return `<p class="venue-detail__active-period"><i class="fa-solid fa-calendar-check"></i> ${text}</p>`;
 }
 
 /**
@@ -143,10 +141,9 @@ export function renderActivePeriod(activePeriod, classPrefix) {
  * the next 60 days (e.g. "Dec 25 (Christmas), Dec 26 (Repairs)"). Returns an
  * empty string when there are none.
  * @param {Object} venue - Venue object (needs .schedule)
- * @param {string} classPrefix - CSS class prefix
  * @returns {string} HTML string or empty
  */
-export function renderUpcomingClosures(venue, classPrefix) {
+export function renderUpcomingClosures(venue) {
     const upcoming = getUpcomingExclusions(venue, 60);
     if (!upcoming.length) return '';
 
@@ -155,17 +152,16 @@ export function renderUpcomingClosures(venue, classPrefix) {
         return ex.reason ? `${escapeHtml(label)} (${escapeHtml(ex.reason)})` : escapeHtml(label);
     }).join(', ');
 
-    return `<p class="${classPrefix}__upcoming-closures"><i class="fa-solid fa-ban"></i> Upcoming closures: ${list}</p>`;
+    return `<p class="venue-detail__upcoming-closures"><i class="fa-solid fa-ban"></i> Upcoming closures: ${list}</p>`;
 }
 
 /**
  * Render the host/KJ section for venue details
  * @param {Object} host - Host object with name, affiliation, website, socials
- * @param {string} classPrefix - CSS class prefix
  * @param {Object} options - Options for social links
  * @returns {string} HTML string or empty if no host
  */
-export function renderHostSection(host, classPrefix, options = {}) {
+export function renderHostSection(host, options = {}) {
     if (!host) return '';
 
     const { socialSize = 'fa-lg' } = options;
@@ -174,19 +170,19 @@ export function renderHostSection(host, classPrefix, options = {}) {
         : '';
 
     return `
-        <section class="${classPrefix}__section">
+        <section class="venue-detail__section">
             <h3>Presented By</h3>
-            <div class="${classPrefix}__host">
-                ${host.name ? `<p class="${classPrefix}__host-name">${escapeHtml(host.name)}</p>` : ''}
-                ${host.affiliation ? `<p class="${classPrefix}__host-affiliation">${escapeHtml(host.affiliation)}</p>` : ''}
+            <div class="venue-detail__host">
+                ${host.name ? `<p class="venue-detail__host-name">${escapeHtml(host.name)}</p>` : ''}
+                ${host.affiliation ? `<p class="venue-detail__host-affiliation">${escapeHtml(host.affiliation)}</p>` : ''}
                 ${host.website ? `
-                    <a href="${escapeHtml(sanitizeUrl(host.website) || '')}" target="_blank" rel="noopener noreferrer" class="${classPrefix}__host-website">
+                    <a href="${escapeHtml(sanitizeUrl(host.website) || '')}" target="_blank" rel="noopener noreferrer" class="venue-detail__host-website">
                         <i class="fa-solid fa-globe"></i> Website
                     </a>
                 ` : ''}
                 ${hostSocialsHtml ? `
-                    <p class="${classPrefix}__socials-label">KJ Social Media</p>
-                    <div class="${classPrefix}__host-socials">${hostSocialsHtml}</div>
+                    <p class="venue-detail__socials-label">KJ Social Media</p>
+                    <div class="venue-detail__host-socials">${hostSocialsHtml}</div>
                 ` : ''}
             </div>
         </section>
@@ -311,18 +307,33 @@ export function getScheduleContext(venue, schedule, currentDate = null) {
 
 /**
  * Render the full venue-detail sections (location, schedule, host, socials, contact)
- * shared by VenueModal, VenueDetailPane, and MapView's expanded detail card.
+ * shared by VenueModal, VenueDetailPane, MapView's expanded card, and the A–Z
+ * full card.
  *
- * Caller wraps these sections in their own outer container + header — the surfaces
- * differ in their wrappers (modal backdrop vs sticky pane vs floating map card).
+ * Emits ONE block: `.venue-detail__*`. It used to take a `classPrefix` and the
+ * four callers passed four different ones, so the same markup came out under
+ * four names and the stylesheet carried a hand-maintained 4x17 matrix to dress
+ * them identically. It had already drifted — `.venue-card__phone` was emitted
+ * and styled nowhere (#161).
+ *
+ * Callers put a surface modifier on their OWN wrapper and style the differences
+ * through it:
+ *
+ *   (none)                    modal and desktop pane — the reference treatment
+ *   .venue-detail--compact    MapView's floating card: tighter, smaller type
+ *   .venue-detail--inline     A–Z full card: sits inside a list item
+ *
+ * Their own wrappers, headers, titles and close buttons stay per-surface — those
+ * genuinely differ (modal backdrop vs sticky pane vs floating card) and are not
+ * this function's markup.
  *
  * @param {Object} venue - Venue data object
- * @param {Object} options
- * @param {string} options.classPrefix - BEM prefix (e.g. 'venue-modal', 'detail-pane', 'map-venue-card')
+ * @param {Object} [options]
  * @param {string} [options.hostSocialSize='fa-lg'] - Font Awesome size class for host socials ('' for compact)
+ * @param {boolean} [options.actions=true] - Render the View Map / Directions / Share row
  * @returns {string} HTML string of <section> elements
  */
-export function renderVenueDetailSections(venue, { classPrefix, hostSocialSize = 'fa-lg', actions = true }) {
+export function renderVenueDetailSections(venue, { hostSocialSize = 'fa-lg', actions = true } = {}) {
     const addressHtml = formatAddress(venue.address);
     const mapUrl = buildMapUrl(venue.address, venue.name);
     const directionsUrl = buildDirectionsUrl(venue.address, venue.name);
@@ -331,47 +342,47 @@ export function renderVenueDetailSections(venue, { classPrefix, hostSocialSize =
     // "Closed today" banner when a recurring show is excluded on the current date
     const todayExclusion = getVenueExclusionForDate(venue, new Date());
     const exclusionBanner = todayExclusion
-        ? `<div class="${classPrefix}__exclusion-banner"><i class="fa-solid fa-ban"></i> Closed Today${todayExclusion.reason ? `: ${escapeHtml(todayExclusion.reason)}` : ''}</div>`
+        ? `<div class="venue-detail__exclusion-banner"><i class="fa-solid fa-ban"></i> Closed Today${todayExclusion.reason ? `: ${escapeHtml(todayExclusion.reason)}` : ''}</div>`
         : '';
 
     return `
         ${exclusionBanner}
-        <section class="${classPrefix}__section">
+        <section class="venue-detail__section">
             <h3><i class="fa-solid fa-location-dot"></i> Location</h3>
-            <address class="${classPrefix}__address">${addressHtml}</address>
-            ${actions ? `<div class="${classPrefix}__map-links">
+            <address class="venue-detail__address">${addressHtml}</address>
+            ${actions ? `<div class="venue-detail__map-links">
                 <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" class="btn btn--secondary">
                     <i class="fa-solid fa-map"></i> View Map
                 </a>
                 <a href="${directionsUrl}" target="_blank" rel="noopener noreferrer" class="btn btn--secondary">
                     <i class="fa-solid fa-diamond-turn-right"></i> Directions
                 </a>
-                <button class="btn btn--secondary ${classPrefix}__share" type="button">
+                <button class="btn btn--secondary venue-detail__share" type="button">
                     <i class="fa-solid fa-share-from-square"></i> Share
                 </button>
             </div>` : ''}
         </section>
 
-        <section class="${classPrefix}__section">
+        <section class="venue-detail__section">
             <h3><i class="fa-regular fa-calendar"></i> Schedule</h3>
-            ${renderScheduleTable(venue, classPrefix)}
-            ${renderActivePeriod(venue.activePeriod, classPrefix)}
-            ${renderUpcomingClosures(venue, classPrefix)}
+            ${renderScheduleTable(venue)}
+            ${renderActivePeriod(venue.activePeriod)}
+            ${renderUpcomingClosures(venue)}
         </section>
 
-        ${renderHostSection(venue.host, classPrefix, { socialSize: hostSocialSize })}
+        ${renderHostSection(venue.host, { socialSize: hostSocialSize })}
 
         ${socialLinksHtml ? `
-            <section class="${classPrefix}__section">
+            <section class="venue-detail__section">
                 <h3><i class="fa-solid fa-share-nodes"></i> Venue Social Media</h3>
-                <div class="${classPrefix}__socials">${socialLinksHtml}</div>
+                <div class="venue-detail__socials">${socialLinksHtml}</div>
             </section>
         ` : ''}
 
         ${venue.phone ? `
-            <section class="${classPrefix}__section">
+            <section class="venue-detail__section">
                 <h3><i class="fa-solid fa-phone"></i> Contact</h3>
-                <a href="tel:${escapeHtml(venue.phone)}" class="${classPrefix}__phone">${escapeHtml(venue.phone)}</a>
+                <a href="tel:${escapeHtml(venue.phone)}" class="venue-detail__phone">${escapeHtml(venue.phone)}</a>
             </section>
         ` : ''}
     `;

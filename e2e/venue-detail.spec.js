@@ -50,9 +50,13 @@ test.describe('Venue detail — modal & detail pane', () => {
       await openFirstVenue(page);
       await expect(page.locator(modalContent)).toBeVisible({ timeout: 5000 });
 
-      await expect(page.locator('.venue-modal__address')).toBeVisible();
+      // Scope to the modal. Since #161 every detail surface emits the same
+      // .venue-detail__ block, so an unscoped locator also matches the
+      // (display:none at this width) desktop pane and trips strict mode.
+      const modal = page.locator(modalContent);
+      await expect(modal.locator('.venue-detail__address')).toBeVisible();
       // At least 2 sections: Location and Schedule
-      expect(await page.locator('.venue-modal__section').count()).toBeGreaterThanOrEqual(2);
+      expect(await modal.locator('.venue-detail__section').count()).toBeGreaterThanOrEqual(2);
     });
 
     test('close modal via close button', async ({ page }) => {
