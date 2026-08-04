@@ -180,7 +180,7 @@ export function renderHostSection(host, classPrefix, options = {}) {
                 ${host.name ? `<p class="${classPrefix}__host-name">${escapeHtml(host.name)}</p>` : ''}
                 ${host.affiliation ? `<p class="${classPrefix}__host-affiliation">${escapeHtml(host.affiliation)}</p>` : ''}
                 ${host.website ? `
-                    <a href="${escapeHtml(host.website)}" target="_blank" rel="noopener noreferrer" class="${classPrefix}__host-website">
+                    <a href="${escapeHtml(sanitizeUrl(host.website) || '')}" target="_blank" rel="noopener noreferrer" class="${classPrefix}__host-website">
                         <i class="fa-solid fa-globe"></i> Website
                     </a>
                 ` : ''}
@@ -371,7 +371,7 @@ export function renderVenueDetailSections(venue, { classPrefix, hostSocialSize =
         ${venue.phone ? `
             <section class="${classPrefix}__section">
                 <h3><i class="fa-solid fa-phone"></i> Contact</h3>
-                <a href="tel:${venue.phone}" class="${classPrefix}__phone">${escapeHtml(venue.phone)}</a>
+                <a href="tel:${escapeHtml(venue.phone)}" class="${classPrefix}__phone">${escapeHtml(venue.phone)}</a>
             </section>
         ` : ''}
     `;
