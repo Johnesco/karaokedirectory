@@ -110,10 +110,10 @@
     gap: var(--spacing-md);
     padding: var(--spacing-md) var(--spacing-lg);
     border-bottom: 1px solid var(--border-color);
-    border-radius: var(--border-radius) var(--border-radius) 50px 0;
+    border-radius: var(--border-radius) var(--border-radius) var(--border-radius-swoop) 0;
     position: -webkit-sticky;
     position: sticky;
-    z-index: 50;
+    z-index: var(--z-sticky-header);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
@@ -132,7 +132,12 @@
     margin: 0;
 }
 
-/* Rainbow colors for each day - ROYGBIV order starting Sunday */
+/* Rainbow colors for each day - ROYGBIV order starting Sunday.
+ *
+ * These stay at their true hues. Yellow is the lightest colour on the wheel and
+ * cannot hold white text on its own (1.45:1), but darkening it to compensate
+ * turns it brown and breaks the rainbow. The legibility fix lives on the text
+ * instead — see the outline below (#165). */
 .day-card--sunday .day-card__header { background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); }
 .day-card--monday .day-card__header { background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%); }
 .day-card--tuesday .day-card__header { background: linear-gradient(135deg, hwb(55 0% 7%) 0%, #c8c500 100%); }
@@ -141,12 +146,41 @@
 .day-card--friday .day-card__header { background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); }
 .day-card--saturday .day-card__header { background: linear-gradient(135deg, #9333ea 0%, #7e22ce 100%); }
 
-/* Ensure text is readable on colored backgrounds */
+/* Ensure text is readable on colored backgrounds.
+ *
+ * White fill with a drop shadow. The seven bands span the whole hue wheel and
+ * vary enormously in lightness — white sits at 6.3:1 on Friday's indigo but
+ * 1.45:1 on Tuesday's yellow. Darkening yellow to compensate turns the band
+ * brown and breaks the ROYGBIV run, so the legibility work lives on the glyph
+ * instead, leaving every band at its real hue (#165).
+ *
+ * The shadow colour is deliberately softer than black — --color-gray-800 at
+ * 90% rather than #000 — so it reads as depth rather than a hard sticker
+ * outline. Tune --day-header-shadow to taste; both layers follow it.
+ *
+ * The shadow carries the look. Under it sits a hairline stroke in the same
+ * gray, which carries the *measurement*: a blurred shadow has no hard edge, so
+ * WCAG's ratio has nothing to score, and Tuesday would formally read 1.45:1 on
+ * a treatment that is legible in practice. At 1px behind a 5px blur the stroke
+ * is barely perceptible, but it gives the glyph a real boundary against the
+ * band — which is what scripts/check-contrast.js measures.
+ *
+ * `paint-order: stroke fill` draws the stroke under the fill so it thickens
+ * outward rather than eating into the letterform.
+ */
+.day-card__header {
+    --day-header-shadow: rgba(31, 41, 55, 0.9);
+}
+
 .day-card__header .day-card__day,
 .day-card__header .day-card__date,
 .day-card__header .day-card__expand-indicator {
     color: var(--color-white);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    paint-order: stroke fill;
+    -webkit-text-stroke: 1px var(--color-gray-800);
+    text-shadow:
+        0 1px 2px var(--day-header-shadow),
+        0 2px 5px var(--day-header-shadow);
 }
 
 .day-card__date {
@@ -398,7 +432,7 @@
 }
 
 .letter-card__header {
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-pale) 100%);
     top: calc(var(--nav-height) + var(--az-index-height, 50px));
 }
 
@@ -473,23 +507,23 @@
 
     /* Edge-to-edge cards only on index page */
     .page--edge-to-edge .day-card {
-        border-radius: 0 0 50px 0;
+        border-radius: 0 0 var(--border-radius-swoop) 0;
     }
 
     .page--edge-to-edge .day-card__header {
-        border-radius: 0 0 50px 0;
+        border-radius: 0 0 var(--border-radius-swoop) 0;
     }
 
     .page--edge-to-edge .day-card--past .day-card__header {
-        border-radius: 0 0 50px 0;
+        border-radius: 0 0 var(--border-radius-swoop) 0;
     }
 
     .page--edge-to-edge .day-card--past.day-card--expanded .day-card__header {
-        border-radius: 0 0 50px 0;
+        border-radius: 0 0 var(--border-radius-swoop) 0;
     }
 
     .page--edge-to-edge .day-card--empty .day-card__header {
-        border-radius: 0 0 50px 0;
+        border-radius: 0 0 var(--border-radius-swoop) 0;
     }
 
     .page--edge-to-edge .letter-card {
@@ -497,7 +531,7 @@
     }
 
     .page--edge-to-edge .letter-card__header {
-        border-radius: 0 0 50px 0;
+        border-radius: 0 0 var(--border-radius-swoop) 0;
     }
 
     .page--edge-to-edge .alphabetical-view__index {
@@ -764,7 +798,7 @@ body.view--map .app-layout__detail {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-sm);
-    z-index: 1000; /* Above Leaflet controls (typically 800-999) */
+    z-index: var(--z-map-ui);
 }
 
 .map-controls__btn {
@@ -810,7 +844,7 @@ body.view--map .app-layout__detail {
     right: var(--spacing-md);
     display: flex;
     gap: var(--spacing-xs);
-    z-index: 1000; /* Above Leaflet controls (typically 800-999) */
+    z-index: var(--z-map-ui);
     background: var(--bg-card);
     padding: var(--spacing-xs);
     border-radius: var(--border-radius-lg);
@@ -846,7 +880,7 @@ body.view--map .app-layout__detail {
     background: var(--bg-card);
     border-radius: var(--border-radius-lg);
     box-shadow: var(--shadow-lg);
-    z-index: 1000; /* Above Leaflet controls (typically 800-999) */
+    z-index: var(--z-map-ui);
     padding: var(--spacing-md);
     border: 1px solid var(--border-color);
     transform: translateY(calc(100% + var(--spacing-lg)));

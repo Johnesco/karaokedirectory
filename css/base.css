@@ -4,10 +4,24 @@
 
 /* CSS Custom Properties */
 :root {
-    /* Colors */
+    /* The app is dark-only. Declaring it lets the browser theme what CSS
+       cannot reach: the calendar and clock popups behind submit.html's six
+       date/time inputs, select dropdowns, scrollbars, and form control
+       defaults — all of which rendered light-on-dark before (#165). */
+    color-scheme: dark;
+
+    /* Colors
+     *
+     * The ramp runs dark -> base -> light -> pale. `--color-primary-dark` used
+     * to hold #d8c4ff, which is *lighter* than the base — so every
+     * `:hover { background: var(--color-primary-dark) }` under white text
+     * dropped to 1.59:1, including the consent banner's Accept button. The pale
+     * value is still wanted (body text, the A-Z header gradient), so it kept its
+     * value under an honest name and `-dark` became genuinely dark (#165). */
+    --color-primary-dark: #4f46e5;
     --color-primary: #6366f1;
-    --color-primary-dark: #d8c4ff;
     --color-primary-light: #818cf8;
+    --color-primary-pale: #d8c4ff;
 
     --color-secondary: #ec4899;
     --color-secondary-dark: #db2777;
@@ -57,7 +71,7 @@
     --bg-overlay: rgba(0, 0, 0, 0.7);
 
     /* Text */
-    --text-primary: var(--color-primary-dark);
+    --text-primary: var(--color-primary-pale);
     --text-secondary: var(--color-gray-400);
     --text-muted: var(--color-gray-500);
 
@@ -66,14 +80,20 @@
     --border-radius: 8px;
     --border-radius-lg: 12px;
     --border-radius-sm: 4px;
+    /* Fully-rounded ends (chips, pill buttons). */
+    --border-radius-pill: 999px;
+    /* The one oversized corner on sticky section headers — the "swoop".
+       Eight literal 50px values used to carry this shape. */
+    --border-radius-swoop: 50px;
 
     /* Shadows */
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
     --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.4);
 
-    /* Spacing */
-    --spacing-2xs: 2px;
+    /* Spacing — rem throughout, so the scale tracks the user's text size.
+       --spacing-2xs was the lone px value on the scale. */
+    --spacing-2xs: 0.125rem;
     --spacing-xs: 0.25rem;
     --spacing-sm: 0.5rem;
     --spacing-md: 1rem;
@@ -90,19 +110,36 @@
     --font-size-xl: 1.25rem;
     --font-size-2xl: 1.5rem;
     --font-size-3xl: 2rem;
+    --font-size-4xl: 3rem;
 
     /* Transitions */
     --transition-fast: 150ms ease;
     --transition: 200ms ease;
     --transition-slow: 300ms ease;
 
-    /* Z-index layers */
+    /* Z-index layers
+     *
+     * Leaflet occupies 400-999 internally and paints its own controls around
+     * 800-999, so anything that must sit over the map has to clear 999. The
+     * scale used to stop at 500, which is *below* that floor — so every real
+     * stacking case ignored it and hardcoded 997-1002 or 9999 instead.
+     * Rebased above the Leaflet floor so the tokens are usable (#165).
+     *
+     * In-page layers (below the map): the map is a view, not an overlay. */
+    --z-base: 1;
+    --z-raised: 2;
+    --z-sticky-header: 50;
     --z-dropdown: 100;
     --z-sticky: 200;
-    --z-modal-backdrop: 300;
-    --z-modal: 400;
-    --z-tooltip: 450;
-    --z-toast: 500;
+
+    /* ---- Leaflet floor: 800-999. Nothing below this paints over the map. ---- */
+
+    --z-map-ui: 1000;        /* floating map controls, view switcher, venue card */
+    --z-modal-backdrop: 1100;
+    --z-modal: 1200;
+    --z-tooltip: 1250;
+    --z-toast: 1300;
+    --z-consent: 1400;       /* consent banner outranks everything it may cover */
 
     /* Icon / touch-target sizes */
     --size-icon-sm: 32px;
