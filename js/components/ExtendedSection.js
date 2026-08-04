@@ -11,6 +11,7 @@
  */
 
 import { renderDayCard } from './DayCard.js';
+import { renderDisclosureButton } from '../utils/disclosure.js';
 import { getDateRange } from '../utils/date.js';
 import { getVenuesForDate } from '../services/venues.js';
 import { getState } from '../core/state.js';
@@ -148,6 +149,8 @@ export function renderExtendedSection({ title, startDate, endDate, seenVenues, d
     const collapsed = isCollapsed(title);
     const collapsedClass = collapsed ? 'extended-section--collapsed' : '';
     const chevronClass = collapsed ? '' : 'extended-section__toggle--expanded';
+    // Stable per-section id so aria-controls points somewhere real.
+    const contentId = `extended-section-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 
     // Add venues to seenVenues set
     venuesByDate.forEach(({ venues }) => {
@@ -176,11 +179,15 @@ export function renderExtendedSection({ title, startDate, endDate, seenVenues, d
             <header class="extended-section__header">
                 <h3 class="extended-section__title">${title}</h3>
                 <span class="extended-section__count">${count} venue${count !== 1 ? 's' : ''}</span>
-                <button class="extended-section__toggle ${chevronClass}" aria-label="Toggle section">
-                    <i class="fa-solid fa-chevron-down"></i>
-                </button>
+                ${renderDisclosureButton({
+                    controls: contentId,
+                    expanded: !collapsed,
+                    label: `${collapsed ? 'Show' : 'Hide'} ${title}`,
+                    className: `extended-section__toggle ${chevronClass}`.trim(),
+                    icon: 'fa-solid fa-chevron-down',
+                })}
             </header>
-            <div class="extended-section__content">
+            <div class="extended-section__content" id="${contentId}">
                 ${dayCardsHtml ? `<div class="weekly-view__grid">${dayCardsHtml}</div>` : ''}
                 ${dedupNotice}
             </div>
@@ -196,13 +203,22 @@ export function attachExtendedSectionListeners(container) {
     container.querySelectorAll('.extended-section__toggle').forEach(button => {
         button.addEventListener('click', (e) => {
             const section = e.target.closest('.extended-section');
-            if (section) {
-                const title = section.dataset.sectionTitle;
-                // Toggle the DOM first; its result is the authoritative new state
-                const nowCollapsed = section.classList.toggle('extended-section--collapsed');
-                button.classList.toggle('extended-section__toggle--expanded', !nowCollapsed);
-                setCollapsed(title, nowCollapsed);
-            }
+            if (!section) return;
+
+            const title = section.dataset.sectionTitle;
+            // Toggle the DOM first; its result is the authoritative new state
+            const nowCollapsed = section.classList.toggle('extended-section--collapsed');
+            button.classList.toggle('extended-section__toggle--expanded', !nowCollapsed);
+
+            // The button announces its own state, and says what it will do next
+            // rather than what it just did (#167). It used to carry a static
+            // aria-label="Toggle section" and no aria-expanded at all, so a
+            // screen reader could not tell open from closed.
+            button.setAttribute('aria-expanded', String(!nowCollapsed));
+            const label = button.querySelector('.sr-only');
+            if (label) label.textContent = `${nowCollapsed ? 'Show' : 'Hide'} ${title}`;
+
+            setCollapsed(title, nowCollapsed);
         });
     });
 }

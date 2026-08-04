@@ -64,6 +64,30 @@
     border-radius: var(--border-radius);
 }
 
+/* The past-day expand control. A transparent overlay across the whole sticky
+   header, so the entire header stays clickable while the interaction is a real
+   <button> with aria-expanded — keyboard and screen readers included (#167).
+   It cannot wrap the header's content: a <button> may only contain phrasing
+   content, and the header holds an <h2>.
+
+   No `position: relative` on the header — it is already `position: sticky` from
+   .panel__header--sticky, which is a positioned element and so already the
+   containing block. Adding relative here would override the sticky and drop
+   every calendar header out of its stuck position. */
+.day-card__toggle {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.day-card__toggle:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: -4px;
+}
+
 /* Chevron indicator for collapsed past days */
 .day-card__expand-indicator {
     display: none;

@@ -16,6 +16,7 @@ import { Component } from './Component.js';
 import { renderVenueCard } from './VenueCard.js';
 import { formatDateShort, isToday, getDayDisplayName, getDayName, getScheduleExclusion } from '../utils/date.js';
 import { getVenueEventsForDate } from '../services/venues.js';
+import { renderDisclosureButton } from '../utils/disclosure.js';
 import { getState } from '../core/state.js';
 
 /**
@@ -59,18 +60,42 @@ export class DayCard extends Component {
         const pastClass = isPast(date) ? 'day-card--past' : '';
         const emptyClass = events.length === 0 ? 'day-card--empty' : '';
 
+        // Past days collapse and expand on click. That interaction is spec'd
+        // (§2) but was mouse-only: the header carried a delegated click and no
+        // button, tabindex, role or aria-expanded (#167).
+        //
+        // The button does NOT wrap the header's content, though the ticket words
+        // it that way — a <button> may only contain phrasing content, and this
+        // header holds an <h2>. Instead it is a transparent overlay stretched
+        // across the header (see .day-card__toggle in views.css): the whole
+        // header stays clickable, the heading stays a heading, and keyboard and
+        // screen-reader users get a real control with a real state.
+        const isPastDay = isPast(date);
+        const contentId = `day-content-${date.toISOString().slice(0, 10)}`;
+        const toggle = isPastDay
+            ? renderDisclosureButton({
+                controls: contentId,
+                expanded: false,
+                // dateStr already leads with the weekday abbreviation, so
+                // pairing it with dayName read "Sunday, Sun 8/2".
+                label: `Show venues for ${dayName} ${dateStr.replace(/^\S+\s/, '')}`,
+                className: 'day-card__toggle',
+            })
+            : '';
+
         return `
             <article class="panel day-card day-card--${dayOfWeek} ${todayClass} ${pastClass} ${emptyClass}">
                 <header class="panel__header panel__header--sticky day-card__header">
                     <h2 class="panel__title panel__title--display day-card__day">${dayName}</h2>
                     <span class="day-card__date">${dateStr}</span>
                     ${isToday(date) ? '<span class="day-card__today-badge">Today</span>' : ''}
-                    <span class="day-card__expand-indicator">
+                    <span class="day-card__expand-indicator" aria-hidden="true">
                         <i class="fa-solid fa-chevron-down"></i>
                     </span>
+                    ${toggle}
                 </header>
 
-                <div class="panel__body day-card__content">
+                <div class="panel__body day-card__content" id="${contentId}">
                     ${events.length > 0
                         ? this.renderEvents(events, date)
                         : '<p class="day-card__empty">No karaoke scheduled</p>'

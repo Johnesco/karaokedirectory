@@ -18,7 +18,7 @@ import { Component } from './Component.js';
 import { getState, setState, subscribe, navigateWeek, goToCurrentWeek } from '../core/state.js';
 import { formatWeekRange, getWeekStart, isCurrentWeek } from '../utils/date.js';
 import { resolveView, isKJView } from '../core/router.js';
-import { html } from '../utils/string.js';
+import { html, raw } from '../utils/string.js';
 
 export class Navigation extends Component {
     init() {
@@ -170,21 +170,28 @@ export class Navigation extends Component {
             hostFilter: getState('hostFilter'),
         }));
         const cls = (active) => `nav-btn nav-btn--labeled${active ? ' nav-btn--active' : ''}`;
+        // The active view was signalled by class alone, which is invisible to a
+        // screen reader. aria-current="page" says it out loud (#167).
+        //
+        // raw() because the `html` tag escapes every interpolation by design —
+        // without it the attribute renders as visible text instead of an
+        // attribute, which is exactly what happened on the first attempt.
+        const cur = (active) => raw(active ? ' aria-current="page"' : '');
         return html`
             <div class="navigation__views">
-                <button class="${cls(!inKJMode && view === 'weekly')}" data-view="weekly" type="button">
+                <button class="${cls(!inKJMode && view === 'weekly')}"${cur(!inKJMode && view === 'weekly')} data-view="weekly" type="button">
                     <i class="fa-regular fa-calendar"></i>
                     <span class="nav-btn__label">CAL</span>
                 </button>
-                <button class="${cls(!inKJMode && view === 'alphabetical')}" data-view="alphabetical" type="button">
+                <button class="${cls(!inKJMode && view === 'alphabetical')}"${cur(!inKJMode && view === 'alphabetical')} data-view="alphabetical" type="button">
                     <i class="fa-solid fa-list"></i>
                     <span class="nav-btn__label">A-Z</span>
                 </button>
-                <button class="${cls(!inKJMode && view === 'map')}" data-view="map" type="button">
+                <button class="${cls(!inKJMode && view === 'map')}"${cur(!inKJMode && view === 'map')} data-view="map" type="button">
                     <i class="fa-solid fa-map-location-dot"></i>
                     <span class="nav-btn__label">MAP</span>
                 </button>
-                <a class="${cls(kjIndexActive)}" href="?kj=all">
+                <a class="${cls(kjIndexActive)}"${cur(kjIndexActive)} href="?kj=all">
                     <i class="fa-solid fa-microphone-lines"></i>
                     <span class="nav-btn__label">KJs</span>
                 </a>

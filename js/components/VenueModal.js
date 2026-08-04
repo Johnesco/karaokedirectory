@@ -32,6 +32,29 @@ export class VenueModal extends Component {
         this.addEventListener(document, 'keydown', (e) => {
             if (e.key === 'Escape' && this.state.isOpen) this.close();
         });
+
+        // Tab cycle. Bound here, not in trapFocus(), because trapFocus runs from
+        // afterRender on every render and this.addEventListener does not
+        // de-duplicate — binding it there would stack one handler per render
+        // (#158). init() runs once per instance.
+        this.addEventListener(document, 'keydown', (e) => {
+            if (e.key !== 'Tab' || !this.state.isOpen) return;
+
+            const items = this.focusableElements();
+            if (!items.length) return;
+
+            const first = items[0];
+            const last = items[items.length - 1];
+            const active = document.activeElement;
+
+            if (e.shiftKey && (active === first || !items.includes(active))) {
+                e.preventDefault();
+                last.focus();
+            } else if (!e.shiftKey && active === last) {
+                e.preventDefault();
+                first.focus();
+            }
+        });
     }
 
     template() {
@@ -92,6 +115,12 @@ export class VenueModal extends Component {
             return;
         }
 
+        // Remember what had focus so close() can hand it back. Without this the
+        // modal dropped focus to the top of the document on close, so a keyboard
+        // user tabbing through the calendar landed back at the page start every
+        // time they looked at a venue (#167).
+        this._returnFocusTo = document.activeElement;
+
         this.setState({ venue, isOpen: true });
         document.body.style.overflow = 'hidden';
     }
@@ -100,19 +129,34 @@ export class VenueModal extends Component {
         document.body.style.overflow = '';
         this.setState({ isOpen: false });
         emit(Events.VENUE_CLOSED, this.state.venue);
+
+        // Back to the card that opened it, if it is still in the document.
+        const target = this._returnFocusTo;
+        this._returnFocusTo = null;
+        if (target && document.contains(target) && typeof target.focus === 'function') {
+            target.focus();
+        }
     }
 
-    trapFocus() {
+    /** Everything inside the modal a user can tab to, in DOM order. */
+    focusableElements() {
         const modal = this.$('.venue-modal__content');
-        if (!modal) return;
-
-        const focusable = modal.querySelectorAll(
+        if (!modal) return [];
+        return [...modal.querySelectorAll(
             'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
+        )].filter(el => !el.hasAttribute('disabled') && el.offsetParent !== null);
+    }
 
-        if (focusable.length) {
-            focusable[0].focus();
-        }
+    /**
+     * Move focus into the modal and keep it there.
+     *
+     * The old version only focused the first element and called that a trap —
+     * Tab walked straight out into the page behind, which is still scrolled
+     * and inert. This wraps at both ends (#167).
+     */
+    trapFocus() {
+        const focusable = this.focusableElements();
+        if (focusable.length) focusable[0].focus();
     }
 
     onDestroy() {
