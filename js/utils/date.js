@@ -133,7 +133,14 @@ export function isCurrentWeek(weekStart) {
 export function scheduleMatchesDate(schedule, date) {
     const { frequency, day } = schedule;
 
-    // One-time special event: compare exact date string
+    // One-time special event: compare exact date string.
+    //
+    // "One-time" means the date is not on a predictable cadence, not that it
+    // happens only once. A venue or KJ may hold many of these — The Highball's
+    // Xpider nights are the standing example — and each is listed explicitly
+    // because nothing can generate them. They keep the star for the same
+    // reason: an irregular date is genuinely a departure from the recurring
+    // baseline, which is what Display Philosophy §4 marks.
     if (frequency === 'once') {
         const y = date.getFullYear();
         const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -180,8 +187,8 @@ export function scheduleMatchesDate(schedule, date) {
  * indicator); call this alongside `scheduleMatchesDate()` to know whether to
  * dim/banner the card.
  *
- * Accepts both shorthand (`"2026-06-12"`) and object (`{date, reason}`) forms
- * inside `schedule.exclusions`.
+ * `schedule.exclusions` holds objects: `{date, reason?}`. A bare date string is
+ * NOT accepted — the schema forbids it (#169).
  *
  * @param {Object} schedule - Schedule entry, possibly with `exclusions`
  * @param {Date} date - Date to check
@@ -195,10 +202,13 @@ export function getScheduleExclusion(schedule, date) {
     const d = String(date.getDate()).padStart(2, '0');
     const dateStr = `${y}-${m}-${d}`;
 
+    // Objects only. A bare `"2026-12-25"` string used to be accepted here and
+    // was documented in CLAUDE.md as valid — but the schema requires an object
+    // with additionalProperties:false, so following the documentation failed
+    // CI. Reading the shorthand made the code agree with the docs and disagree
+    // with the gate; it is gone from both (#169).
     for (const ex of schedule.exclusions) {
-        if (typeof ex === 'string') {
-            if (ex === dateStr) return { date: ex, reason: null };
-        } else if (ex?.date === dateStr) {
+        if (ex?.date === dateStr) {
             return { date: ex.date, reason: ex.reason || null };
         }
     }
@@ -242,12 +252,12 @@ export function getUpcomingExclusions(venue, days = 60) {
     const upcoming = [];
     for (const entry of venue?.schedule || []) {
         for (const ex of entry.exclusions || []) {
-            const dateStr = typeof ex === 'string' ? ex : ex?.date;
+            const dateStr = ex?.date;
             if (!dateStr || seen.has(dateStr)) continue;
             const d = parseLocalDate(dateStr);
             if (d > today && d <= horizon) {
                 seen.add(dateStr);
-                upcoming.push({ date: dateStr, reason: typeof ex === 'string' ? null : (ex.reason || null) });
+                upcoming.push({ date: dateStr, reason: ex.reason || null });
             }
         }
     }

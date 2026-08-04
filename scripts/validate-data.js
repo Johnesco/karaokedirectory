@@ -268,6 +268,34 @@ for (const venue of data.listings) {
     );
 }
 
+// ---- Spent one-time events (#169) ----
+// `once` does not mean "happens only once" — it means the date is not on a
+// predictable cadence, so it has to be listed explicitly. A venue or KJ may
+// legitimately carry many, and this check says nothing about how many there are.
+//
+// It reports individual rows whose date has passed: those can never match again
+// and only pad the schedule table with history. Thirty days is the grace period
+// — long enough not to nag about last weekend, short enough that a year-old row
+// gets noticed.
+//
+// Warned, not failed: deleting rows is curation, and only the curator knows
+// whether a past date is finished or about to be rescheduled (#135).
+const STALE_ONCE_DAYS = 30;
+const staleCutoff = new Date(TODAY);
+staleCutoff.setDate(staleCutoff.getDate() - STALE_ONCE_DAYS);
+
+for (const venue of data.listings) {
+    for (const entry of venue.schedule || []) {
+        if (entry.frequency !== 'once' || !entry.date) continue;
+        if (new Date(entry.date + 'T00:00:00') >= staleCutoff) continue;
+        warnings.push(
+            `${venue.name} (${venue.id}) has a spent one-time event on ${entry.date}` +
+            (entry.eventName ? ` ("${entry.eventName}")` : '') +
+            ` — more than ${STALE_ONCE_DAYS} days past and can never match again`
+        );
+    }
+}
+
 // ---- Output ----
 console.log('=== Summary ===');
 console.log('Total venues:', data.listings.length);

@@ -229,7 +229,7 @@ When adding or modifying venues in `js/data.json`, follow this structure:
       endTime: "01:00",       // Can cross midnight
       eventUrl: "https://...", // Optional: link to event page
       exclusions: [           // Optional: dates this recurring show is skipped (holiday/closure)
-        { date: "2026-12-25", reason: "Holiday" }  // reason optional; "2026-12-25" shorthand also accepted
+        { date: "2026-12-25", reason: "Holiday" }  // objects only — reason optional. A bare date string is NOT accepted (#169)
       ],
       host: {                 // Optional: overrides venue-level host for this show only
         name: "Guest KJ",     // See "Per-show host override" below

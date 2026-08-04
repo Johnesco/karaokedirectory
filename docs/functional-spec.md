@@ -667,14 +667,21 @@ A **host ref** is the pair `{ kjId?, companyId? }`, with at least one id present
 
 ### Schedule Exclusions
 
-A recurring schedule entry may carry an `exclusions` array listing dates on which that show does **not** happen (holiday closures, private events, one-off cancellations). Each item is either a shorthand date string or an object with an optional reason:
+A recurring schedule entry may carry an `exclusions` array listing dates on which that show does **not** happen (holiday closures, private events, one-off cancellations). **Each item is an object**; `reason` is optional:
 
 ```
 exclusions: [
-  "2026-12-25",                              // shorthand — no reason
-  { date: "2026-12-26", reason: "Repairs" }  // object form with a reason
+  { date: "2026-12-25" },                    // no reason given
+  { date: "2026-12-26", reason: "Repairs" }
 ]
 ```
+
+> A bare `"2026-12-25"` string used to be documented here and in CLAUDE.md as an
+> accepted shorthand, and `getScheduleExclusion` read it — but the schema
+> requires an object with `additionalProperties: false`, so **following the
+> documentation failed CI**. Confirmed live: the validator reports
+> `exclusions/0 — must be object` and exits 1. The shorthand is gone from the
+> code and both documents (#169).
 
 - An exclusion **suppresses** the recurring occurrence on that date, but the schedule still "matches" the date — so the venue renders with a **closure indicator** rather than disappearing (users hunting for it still find it in place).
 - Helpers in `js/utils/date.js`: `getScheduleExclusion(entry, date)` (per-entry), `getVenueExclusionForDate(venue, date)` (venue-level — is it closed on a given date?), and `getUpcomingExclusions(venue, days)` (future closures within a window, today excluded).
