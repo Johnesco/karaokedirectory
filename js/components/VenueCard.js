@@ -5,7 +5,7 @@
 
 import { Component } from './Component.js';
 import { escapeHtml } from '../utils/string.js';
-import { formatTimeRange, scheduleMatchesDate, getScheduleExclusion, getDayName } from '../utils/date.js';
+import { formatTimeRange, getScheduleExclusion } from '../utils/date.js';
 import { buildMapUrl, formatAddress, sanitizeUrl } from '../utils/url.js';
 import { emit, Events } from '../core/events.js';
 import { isDebugMode, getDebugHtml } from '../utils/debug.js';
@@ -37,11 +37,21 @@ export class VenueCard extends Component {
         return this.fullTemplate(venue);
     }
 
-    compactTemplate(venue, date, showSchedule, scheduleProp) {
-        // Prefer explicit schedule prop (so callers can pick the specific event
-        // when a venue has multiple matches on the same date). Fall back to
-        // auto-detection when no prop is passed.
-        const schedule = scheduleProp || this.getScheduleForDate(venue, date);
+    compactTemplate(venue, date, showSchedule, schedule) {
+        // `schedule` is required in compact mode: the caller already knows which
+        // entry matched the date it is rendering, so it passes that entry.
+        //
+        // A getScheduleForDate() fallback used to sit here for callers that
+        // omitted it. It matched on weekday alone with no frequency check — so
+        // a "first Monday" show would have been picked for any Monday — and
+        // then fell back to schedule[0], an unrelated entry with the wrong
+        // time. Nothing ever reached it (getVenueEventsForDate always supplies
+        // the matched entry), so it was a wrong-time bug one call site away
+        // from activating rather than a live one. Deleted in #160.
+        if (!schedule) {
+            console.warn(`VenueCard: compact mode needs a schedule entry (venue: ${venue?.id})`);
+        }
+
         const timeDisplay = schedule
             ? formatTimeRange(schedule.startTime, schedule.endTime)
             : '';
@@ -69,7 +79,8 @@ export class VenueCard extends Component {
         // (avoids "Also May 30" appearing on a card already rendered for May 30).
         const { frequencyHtml, moreNightsHtml } = renderScheduleContext(venue, schedule, date);
 
-        // Build full address string and map URL
+        // formatAddress escapes its own fields (#160) — do not wrap this in
+        // escapeHtml, or the separators it emits get escaped too.
         const fullAddress = formatAddress(venue.address);
         const mapsUrl = buildMapUrl(venue.address, venue.name);
 
@@ -101,7 +112,7 @@ export class VenueCard extends Component {
                 <div class="venue-card__location">
                     <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" class="venue-card__map-link">
                         <i class="fa-solid fa-location-dot"></i>
-                        ${escapeHtml(fullAddress)}
+                        ${fullAddress}
                     </a>
                 </div>
                 ${hostDisplay ? `
@@ -134,20 +145,6 @@ export class VenueCard extends Component {
                 ${renderVenueDetailSections(venue, { classPrefix: 'venue-card', actions: false })}
             </div>
         `;
-    }
-
-    getScheduleForDate(venue, date) {
-        if (!date || !venue.schedule) return venue.schedule?.[0] || null;
-
-        // Check for one-time event on this exact date first
-        const onceEntry = venue.schedule.find(s =>
-            s.frequency === 'once' && scheduleMatchesDate(s, date)
-        );
-        if (onceEntry) return onceEntry;
-
-        // Fall back to the recurring entry for this weekday
-        const dayName = getDayName(date);
-        return venue.schedule.find(s => s.day?.toLowerCase() === dayName) || venue.schedule[0];
     }
 
     afterRender() {

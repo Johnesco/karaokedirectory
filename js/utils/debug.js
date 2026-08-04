@@ -3,7 +3,7 @@
  * Enable with ?debug=1 in URL or localStorage.setItem('debug', '1')
  */
 
-import { scheduleMatchesDate, getDayName } from './date.js';
+import { scheduleMatchesDate } from './date.js';
 
 let debugMode = false;
 
@@ -61,7 +61,6 @@ export function getVenueDebugInfo(venue, date) {
         };
     }
 
-    const dayName = getDayName(date);
     const matchingSchedules = [];
 
     for (const sched of venue.schedule) {
@@ -79,9 +78,10 @@ export function getVenueDebugInfo(venue, date) {
             continue;
         }
 
-        const schedDay = sched.day.toLowerCase();
-        if (schedDay !== dayName) continue;
-
+        // No day-name pre-filter here: scheduleMatchesDate() already checks the
+        // weekday, and doing it again first meant this loop disagreed with the
+        // real matcher about what counts as a match. It also read `sched.day`
+        // unguarded, which throws on a recurring entry missing a day (#160).
         const matches = scheduleMatchesDate(sched, date);
         if (matches) {
             matchingSchedules.push({

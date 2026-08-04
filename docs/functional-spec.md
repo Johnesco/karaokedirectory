@@ -381,7 +381,9 @@ When debug mode is enabled (`?debug=1`), compact cards show the schedule match r
 - Clicking links (address, social, event URL) opens the link directly without triggering venue detail
 - In Weekly and Alphabetical views, clicking anywhere on the card (except links) also triggers `VENUE_SELECTED`
 
-> **Implementation note:** Compact cards are rendered via `renderVenueCard()`, which creates a temporary VenueCard instance, calls `template()`, and returns the HTML string — no persistent component instance is kept. Schedule display uses `getScheduleForDate()` which prioritizes `once` entries (special events) over recurring entries for the matching date. Full-mode cards (Alphabetical view) render all schedule entries. The `formatHostDisplay()` function from `js/utils/render.js` generates the compact "Presented by" line.
+> **Implementation note:** Compact cards are rendered via `renderVenueCard()`, which creates a temporary VenueCard instance, calls `template()`, and returns the HTML string — no persistent component instance is kept. The **caller supplies the schedule entry**: `getVenueEventsForDate()` emits one `{venue, schedule}` pair per matching entry, and `DayCard` passes that entry straight through, which is why a venue with two shows on one date renders two cards with the right time on each. Full-mode cards (Alphabetical view) render all schedule entries. The `formatHostDisplay()` function from `js/utils/render.js` generates the compact "Presented by" line.
+>
+> This note previously described a `getScheduleForDate()` selector inside the card, "which prioritizes `once` entries over recurring entries for the matching date." That function existed but was unreachable, and it did not do what the sentence claimed — it matched on weekday alone with no frequency check, then fell back to `schedule[0]`. It was deleted in #160 rather than fixed, because the real selection had already moved to the service layer.
 
 ---
 

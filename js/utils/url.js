@@ -3,6 +3,7 @@
  */
 
 import { venueShareUrl } from '../core/router.js';
+import { escapeHtml } from './string.js';
 
 // Social media platform configurations
 // Note: 'icon' should be full class including prefix (fa-brands or fa-solid)
@@ -138,21 +139,28 @@ export function createSocialLinks(socials, options = {}) {
 }
 
 /**
- * Format full address as string
+ * Format a full address as an HTML fragment.
+ *
+ * Returns **markup, not text** — with `multiline` the separator is a literal
+ * `<br>` — so it escapes each field itself. A caller cannot escape the result
+ * without destroying that `<br>`, which is why the escaping has to live here.
+ * `renderVenueDetailSections` interpolated the result raw (#160).
+ *
  * @param {Object} address - Address object
  * @param {boolean} [multiline=false] - Use line breaks
- * @returns {string} Formatted address
+ * @returns {string} Formatted address, HTML-escaped field by field
  */
 export function formatAddress(address, multiline = false) {
     if (!address) return '';
 
     const { street, city, state, zip } = address;
     const separator = multiline ? '<br>' : ', ';
+    const esc = (v) => escapeHtml(v || '');
 
-    const cityStateZip = [city, state].filter(Boolean).join(', ') +
-        (zip ? ` ${zip}` : '');
+    const cityStateZip = [city, state].filter(Boolean).map(esc).join(', ') +
+        (zip ? ` ${esc(zip)}` : '');
 
-    return [street, cityStateZip].filter(Boolean).join(separator);
+    return [street ? esc(street) : '', cityStateZip].filter(Boolean).join(separator);
 }
 
 /*

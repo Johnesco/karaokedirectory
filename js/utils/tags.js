@@ -4,6 +4,8 @@
  * Configuration is loaded from js/data.json at runtime
  */
 
+import { html } from './string.js';
+
 // Tag configuration - initialized from js/data.json
 let tagConfig = {};
 
@@ -30,11 +32,14 @@ export function renderTags(tags, options = {}) {
 
     if (allTags.length === 0) return '';
 
+    // The `html` tag escapes every interpolation, including the colours and the
+    // label — all three come from data.json's tagDefinitions, which the curator
+    // writes, and the colours land inside a style attribute (#160).
     const badges = allTags.map(tag => {
         const config = tagConfig[tag];
         if (!config) return '';
 
-        return `<span class="venue-tag" style="background-color: ${config.color}; color: ${config.textColor};">${config.label}</span>`;
+        return String(html`<span class="venue-tag" style="background-color: ${config.color}; color: ${config.textColor};">${config.label}</span>`);
     }).filter(Boolean).join('');
 
     return badges ? `<div class="venue-tags">${badges}</div>` : '';
