@@ -393,14 +393,14 @@ Tags are rendered as color-coded badges in VenueCard, VenueModal, and VenueDetai
 - `?view=<weekly|alphabetical|map>` — initial view. `VALID_VIEWS` is declared once, in the router
 - `?kj=all` — KJ index (`KJIndexView`)
 - `?kj=none` — venues with no listed host
-- `?kj=<name>` — KJ dossier (`KJDossierView`; `venueMatchesHost()` filters by **substring**, which is why `?kj=Armando` also matches "KJ Armando and Paola" — see #124 Phase 5 and ADR-011)
+- `?kj=<id>` — KJ dossier (`KJDossierView`). Carries a **registry id**, matched exactly, so `?kj=armando` no longer also matches "KJ Armando and Paola". A non-id value still substring-matches names, so links shared before #124 Phase 5 keep working
 - `?debug=1` — debug mode (also `localStorage.debug=1`)
 - `#view=<v>&venue=<id>` — deep link to a selected venue. The hash records the **actual** view; a venue-less hash is cleared rather than left as `#view=weekly`
 - Legacy bare hashes (`#weekly`) are still honoured
 
 `venueShareUrl()` pins `view=weekly` deliberately — a shared venue link should land on the calendar regardless of which view the sharer was in. That is a different question from what the address bar shows while browsing.
 
-`?kj=` and the generated `/kj/<id>/` pages (ADR-012) are still two systems for one concept: the SPA matches on substring, the static pages on registry id. Reconciling them is #124 Phase 5.
+`?kj=` and the generated `/kj/<id>/` pages (ADR-012) now speak the same language: both address a host by registry id (#124 Phase 5). The SPA additionally accepts a name substring, for links that predate the change.
 
 ### Extended Sections
 - `ExtendedSection` component renders collapsible sections: "Next Week", "Later in [Month]", "[Next Month]"

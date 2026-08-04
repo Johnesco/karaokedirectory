@@ -11,8 +11,8 @@
 
 import { Component } from '../components/Component.js';
 import { getState } from '../core/state.js';
-import { getAllVenues, venueMatchesHost } from '../services/venues.js';
-import { escapeHtml, containsIgnoreCase, getSortableName } from '../utils/string.js';
+import { getAllVenues, venueMatchesHost, hostMatches, resolveHostLabel } from '../services/venues.js';
+import { escapeHtml, getSortableName } from '../utils/string.js';
 import {
     formatScheduleEntry,
     parseLocalDate,
@@ -41,12 +41,15 @@ export class KJDossierView extends Component {
 
         const isNone = kjName.toLowerCase() === 'none';
         const matches = isNone ? this.getNoHostMatches() : this.getMatches(kjName);
+        // `?kj=` now carries a registry id, which is a slug, not a name. Resolve
+        // it back for display; legacy name links resolve to themselves (#124 P5).
+        const label = isNone ? '' : resolveHostLabel(kjName);
 
         if (matches.length === 0) {
             return `
                 <div class="kj-dossier">
                     <header class="kj-dossier__header">
-                        <h2 class="kj-dossier__title">${isNone ? 'Venues with no listed host' : `KJ: ${escapeHtml(kjName)}`}</h2>
+                        <h2 class="kj-dossier__title">${isNone ? 'Venues with no listed host' : `KJ: ${escapeHtml(label)}`}</h2>
                         <p class="kj-dossier__stats">No venues currently listed.</p>
                     </header>
                     ${!isNone ? `
@@ -68,7 +71,7 @@ export class KJDossierView extends Component {
 
         const title = isNone
             ? `<i class="fa-solid fa-circle-question"></i> Venues with no listed host`
-            : `<i class="fa-solid fa-microphone-lines"></i> KJ: ${escapeHtml(kjName)}`;
+            : `<i class="fa-solid fa-microphone-lines"></i> KJ: ${escapeHtml(label)}`;
 
         const hint = isNone
             ? 'These venues have no <code>host</code> field on the venue or on any schedule entry. If you host at one of these, contact the directory to get your attribution added.'
@@ -148,14 +151,12 @@ export class KJDossierView extends Component {
         const matches = getAllVenues()
             .filter(v => venueMatchesHost(v, kjName))
             .map(v => {
-                const kjEntries = (v.schedule || []).filter(e => {
-                    const eff = resolveHostFor(v, e);
-                    if (!eff) return false;
-                    return (
-                        containsIgnoreCase(eff.name, kjName) ||
-                        containsIgnoreCase(eff.affiliation, kjName)
-                    );
-                });
+                // Same predicate the venue filter uses. Substring-matching here
+                // separately meant a dossier reached by registry id matched the
+                // venue but none of its shows (#124 Phase 5).
+                const kjEntries = (v.schedule || []).filter(e =>
+                    hostMatches(resolveHostFor(v, e), kjName)
+                );
 
                 const recurring = kjEntries
                     .filter(e => e.frequency !== 'once')

@@ -542,12 +542,25 @@ Venues with an `activePeriod` field only appear when the current date falls with
 - **Chip:** Reads "All KJs" (special-cased) instead of the literal "all". × exits to weekly view.
 - **Empty state:** "No KJs found in the directory." (renders when data has zero host fields populated).
 
-### KJ Dossier (`?kj=<name>`)
+### KJ Dossier (`?kj=<id>`)
 
 - **Audience:** KJs auditing their own listings ("what do I have up on karaokedirectory?"). Not a customer-facing filter.
-- **URL-driven:** Append `?kj=<name>` to `index.html` (e.g. `index.html?kj=xpider`). Discoverable via `?kj=all`.
-- **Match scope:** Case-insensitive substring against `venue.host.{name,company}` and per-show `schedule[N].host.{name,company}` only. Does NOT match venue name, city, tags, or event names.
-- **Replaces the normal views:** `KJDossierView` renders in place of weekly/alphabetical/map. Navigation collapses to a minimal bar showing just the `KJ: <name>` chip with a × close button (clearing the chip exits dossier mode and strips `?kj=` from the URL).
+- **URL-driven:** Append `?kj=<id>` to `index.html` (e.g. `index.html?kj=xpider-cantu`). Discoverable via `?kj=all`, whose every link carries an id.
+- **Match scope — id first, exactly.** The value is a `kjs`/`companies` registry id, matched against `host.kjId`/`host.companyId` on the venue and on each schedule entry. A value that is *not* a known id falls back to case-insensitive substring matching on host names, so links shared before #124 Phase 5 keep working. Does NOT match venue name, city, tags, or event names.
+
+> **Why ids.** A substring cannot identify an entity. `?kj=armando` matched both
+> "Armando" and "KJ Armando and Paola" — two different KJs on one dossier — and
+> `?kj=karaoke` matched 23 venues across 13 distinct hosts, because most company
+> names contain the word.
+>
+> An id query is answered **by id alone**, never falling through to the substring
+> pass. That matters more than it looks: `armando` is a valid id *and* a substring
+> of the duo's name, so a fallback would have kept matching a venue hosted only by
+> the duo. See the ADR-007 amendment.
+>
+> The dossier title and the nav chip resolve the id back to a display name, so a
+> visitor sees "KJ: Xpider Cantu", not the slug.
+- **Replaces the normal views:** `KJDossierView` renders in place of weekly/alphabetical/map. Navigation collapses to a minimal bar showing just the `KJ: <name>` chip (the resolved name, not the id) with a × close button (clearing the chip exits dossier mode and strips `?kj=` from the URL).
 - **Layout per venue:**
   - Venue name + address
   - All recurring slots that belong to this KJ (one entry per slot, sorted Sunday → Saturday)
