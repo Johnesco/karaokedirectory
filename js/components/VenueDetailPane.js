@@ -30,7 +30,7 @@ export class VenueDetailPane extends Component {
         }
 
         return `
-            <div class="detail-pane">
+            <div class="detail-pane venue-detail venue-detail--pane">
                 <header class="detail-pane__header">
                     <h2 class="detail-pane__title">
                         ${escapeHtml(venue.name)}
@@ -39,7 +39,7 @@ export class VenueDetailPane extends Component {
                     ${renderTags(venue.tags, { dedicated: venue.dedicated })}
                 </header>
 
-                ${renderVenueDetailSections(venue, { classPrefix: 'detail-pane' })}
+                ${renderVenueDetailSections(venue)}
             </div>
         `;
     }
@@ -48,7 +48,7 @@ export class VenueDetailPane extends Component {
         if (!this.state.venue) return;
 
         // Share button
-        this.addEventListener('.detail-pane__share', 'click', (e) => {
+        this.addEventListener('.venue-detail__share', 'click', (e) => {
             shareVenue(this.state.venue, e.currentTarget);
         });
     }

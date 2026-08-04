@@ -466,15 +466,15 @@ export class MapView extends Component {
                 <h3 class="map-venue-card__title">${escapeHtml(venue.name)}</h3>
             </div>
             ${tagsHtml}
-            <div class="map-venue-card__detail-content">
-                ${renderVenueDetailSections(venueForDisplay, { classPrefix: 'map-venue-card', hostSocialSize: '' })}
+            <div class="map-venue-card__detail-content venue-detail venue-detail--compact">
+                ${renderVenueDetailSections(venueForDisplay, { hostSocialSize: '' })}
             </div>
         `;
 
         cardEl.classList.add('map-venue-card--expanded');
 
         // Bind share button
-        const shareBtn = cardEl.querySelector('.map-venue-card__share');
+        const shareBtn = cardEl.querySelector('.venue-detail__share');
         if (shareBtn) {
             shareBtn.addEventListener('click', () => shareVenue(venue, shareBtn));
         }

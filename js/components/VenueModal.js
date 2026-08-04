@@ -34,7 +34,7 @@ export class VenueModal extends Component {
         return `
             <div class="venue-modal venue-modal--open" role="dialog" aria-modal="true" aria-labelledby="venue-modal-title">
                 <div class="venue-modal__backdrop"></div>
-                <div class="venue-modal__content">
+                <div class="venue-modal__content venue-detail">
                     <button class="venue-modal__close" type="button" aria-label="Close">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
@@ -47,7 +47,7 @@ export class VenueModal extends Component {
                         ${renderTags(venue.tags, { dedicated: venue.dedicated })}
                     </header>
 
-                    ${renderVenueDetailSections(venue, { classPrefix: 'venue-modal' })}
+                    ${renderVenueDetailSections(venue)}
                 </div>
             </div>
         `;
@@ -63,7 +63,7 @@ export class VenueModal extends Component {
         this.addEventListener('.venue-modal__backdrop', 'click', () => this.close());
 
         // Share button
-        this.addEventListener('.venue-modal__share', 'click', (e) => {
+        this.addEventListener('.venue-detail__share', 'click', (e) => {
             shareVenue(this.state.venue, e.currentTarget);
         });
 

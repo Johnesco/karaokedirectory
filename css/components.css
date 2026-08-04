@@ -391,9 +391,6 @@
     font-size: var(--font-size-lg);
 }
 
-.venue-card__address {
-    margin-bottom: var(--spacing-md);
-}
 
 .venue-card__map-link {
     display: inline-flex;
@@ -411,26 +408,9 @@
     color: var(--color-primary-light);
 }
 
-.venue-card__host {
-    margin-top: var(--spacing-md);
-}
 
-.venue-card__host-name {
-    font-weight: 500;
-}
 
-.venue-card__host-affiliation {
-    color: var(--text-secondary);
-    font-size: var(--font-size-sm);
-}
 
-.venue-card__socials {
-    display: flex;
-    gap: var(--spacing-sm);
-    margin-top: var(--spacing-md);
-    padding-top: var(--spacing-md);
-    border-top: 1px solid var(--border-color);
-}
 
 /* Social links */
 .social-link {
@@ -528,13 +508,33 @@
     margin: 0;
 }
 
-.venue-modal__section,
-.detail-pane__section {
+/* ===================================================================
+   Venue detail block — .venue-detail
+   ===================================================================
+   ONE block for the sections renderVenueDetailSections() emits. Four
+   surfaces show it, and each puts .venue-detail (plus an optional
+   modifier) on its own wrapper:
+
+     VenueModal        .venue-modal__content venue-detail
+     VenueDetailPane   .detail-pane venue-detail
+     MapView card      .map-venue-card__detail-content venue-detail venue-detail--compact
+     A-Z full card     .venue-card--full venue-detail venue-detail--inline
+
+   Before #161 the renderer took a classPrefix and emitted the same
+   markup under four different names, so these rules existed four times
+   over — a hand-maintained matrix that had already drifted
+   (.venue-card__phone was emitted and styled nowhere).
+
+   The base below IS the modal/pane treatment. Their wrappers, headers,
+   titles and close buttons stay per-surface: those genuinely differ and
+   are not this renderer's markup.
+   =================================================================== */
+
+.venue-detail__section {
     margin-bottom: var(--spacing-lg);
 }
 
-.venue-modal__section h3,
-.detail-pane__section h3 {
+.venue-detail__section h3 {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
@@ -543,114 +543,88 @@
     margin-bottom: var(--spacing-sm);
 }
 
-.venue-modal__section h3 i,
-.detail-pane__section h3 i {
+.venue-detail__section h3 i {
     color: var(--color-primary-light);
 }
 
-.venue-modal__address,
-.detail-pane__address {
+.venue-detail__address {
     font-style: normal;
     color: var(--text-primary);
 }
 
-.venue-modal__map-links {
+.venue-detail__map-links {
     display: flex;
     flex-wrap: wrap;
     gap: var(--spacing-sm);
     margin-top: var(--spacing-md);
 }
 
-.venue-modal__schedule-table,
-.detail-pane__schedule-table,
-.map-venue-card__schedule-table {
+.venue-detail__schedule-table {
     width: 100%;
     border-collapse: collapse;
 }
 
-.venue-modal__schedule-table th,
-.venue-modal__schedule-table td,
-.detail-pane__schedule-table th,
-.detail-pane__schedule-table td,
-.map-venue-card__schedule-table th,
-.map-venue-card__schedule-table td {
+.venue-detail__schedule-table th,
+.venue-detail__schedule-table td {
     text-align: left;
     border-bottom: 1px solid var(--border-color);
-}
-
-.venue-modal__schedule-table th,
-.venue-modal__schedule-table td,
-.detail-pane__schedule-table th,
-.detail-pane__schedule-table td {
     padding: var(--spacing-sm);
 }
 
-.venue-modal__schedule-table th,
-.detail-pane__schedule-table th {
+.venue-detail__schedule-table th {
     color: var(--text-muted);
     font-weight: 500;
     font-size: var(--font-size-sm);
 }
 
-.venue-modal__active-period,
-.detail-pane__active-period {
+.venue-detail__active-period {
     color: var(--color-warning);
     font-size: var(--font-size-sm);
     margin-top: var(--spacing-sm);
 }
 
-.venue-modal__host-name,
-.detail-pane__host-name {
+.venue-detail__host-name {
     font-weight: 500;
     margin-bottom: var(--spacing-xs);
 }
 
-.venue-modal__host-affiliation,
-.detail-pane__host-affiliation {
+.venue-detail__host-affiliation {
     color: var(--text-secondary);
     margin-bottom: var(--spacing-xs);
 }
 
-.venue-modal__host-website,
-.detail-pane__host-website {
+.venue-detail__host-website {
     display: inline-flex;
     align-items: center;
     gap: var(--spacing-xs);
 }
 
-.venue-modal__socials-label,
-.detail-pane__socials-label {
+.venue-detail__socials-label {
     font-size: var(--font-size-sm);
     color: var(--text-muted);
     margin-top: var(--spacing-md);
     margin-bottom: var(--spacing-xs);
 }
 
-.venue-modal__host-socials,
-.detail-pane__host-socials {
+.venue-detail__host-socials {
     display: flex;
     gap: var(--spacing-sm);
 }
 
-.venue-modal__socials,
-.detail-pane__socials {
+.venue-detail__socials {
     display: flex;
     flex-wrap: wrap;
     gap: var(--spacing-sm);
 }
 
-.venue-modal__phone,
-.detail-pane__phone {
+.venue-detail__phone {
     font-size: var(--font-size-lg);
 }
 
-/* Exclusion (closure) notices — shared across the three detail surfaces
-   (modal, desktop pane, map expanded card). The "Closed today" banner mirrors
-   the weekly-view .venue-card__exclusion-banner; the upcoming-closures line
+/* Exclusion (closure) notices. The "Closed today" banner mirrors the
+   weekly-view .venue-card__exclusion-banner; the upcoming-closures line
    lists exclusion dates within the next 60 days. */
-.venue-modal__exclusion-banner,
-.detail-pane__exclusion-banner,
-.map-venue-card__exclusion-banner {
+.venue-detail__exclusion-banner {
     display: flex;
     align-items: center;
     gap: var(--spacing-xs);
@@ -663,15 +637,11 @@
     border-radius: var(--border-radius-sm);
 }
 
-.venue-modal__exclusion-banner i,
-.detail-pane__exclusion-banner i,
-.map-venue-card__exclusion-banner i {
+.venue-detail__exclusion-banner i {
     font-size: var(--font-size-xs);
 }
 
-.venue-modal__upcoming-closures,
-.detail-pane__upcoming-closures,
-.map-venue-card__upcoming-closures {
+.venue-detail__upcoming-closures {
     display: flex;
     align-items: baseline;
     gap: var(--spacing-xs);
@@ -680,11 +650,143 @@
     font-size: var(--font-size-sm);
 }
 
-.venue-modal__upcoming-closures i,
-.detail-pane__upcoming-closures i,
-.map-venue-card__upcoming-closures i {
+.venue-detail__upcoming-closures i {
     color: var(--color-warning);
 }
+
+/* --- .venue-detail--compact : MapView's floating card ---------------
+   A card that floats over the map has far less room than a modal or a
+   sidebar, so it runs a tighter, smaller treatment throughout. This is
+   the one surface that genuinely differs on most properties rather than
+   a handful. */
+
+.venue-detail--compact .venue-detail__section {
+    margin-bottom: 0;
+    border-top: 1px solid var(--border-color);
+    padding-top: var(--spacing-sm);
+}
+
+.venue-detail--compact .venue-detail__section h3 {
+    display: block;
+    /* gap/align-items do nothing on a block box, but resetting them keeps a
+       computed-style parity diff against this surface clean. */
+    gap: normal;
+    align-items: normal;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    margin: 0 0 var(--spacing-xs);
+}
+
+.venue-detail--compact .venue-detail__section h3 i {
+    color: var(--color-primary);
+    margin-right: var(--spacing-xs);
+}
+
+.venue-detail--compact .venue-detail__address {
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-xs);
+}
+
+.venue-detail--compact .venue-detail__map-links {
+    margin-top: var(--spacing-xs);
+}
+
+.venue-detail--compact .venue-detail__schedule-table {
+    font-size: var(--font-size-sm);
+}
+
+/* Tighter rows than the base — the card floats over the map and every
+   pixel of height pushes it further over the pins. */
+.venue-detail--compact .venue-detail__schedule-table th,
+.venue-detail--compact .venue-detail__schedule-table td {
+    padding: var(--spacing-xs) var(--spacing-sm);
+}
+
+.venue-detail--compact .venue-detail__schedule-table th {
+    color: var(--text-secondary);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.venue-detail--compact .venue-detail__schedule-table td {
+    color: var(--text-primary);
+}
+
+.venue-detail--compact .venue-detail__active-period {
+    color: var(--text-secondary);
+    margin: var(--spacing-xs) 0 0;
+}
+
+.venue-detail--compact .venue-detail__host {
+    font-size: var(--font-size-sm);
+}
+
+.venue-detail--compact .venue-detail__host-name {
+    font-weight: 600;
+    margin: 0 0 var(--spacing-2xs);
+}
+
+.venue-detail--compact .venue-detail__host-affiliation {
+    margin: 0 0 var(--spacing-xs);
+}
+
+.venue-detail--compact .venue-detail__host-website {
+    color: var(--color-primary);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-xs);
+}
+
+.venue-detail--compact .venue-detail__socials-label {
+    font-size: var(--font-size-xs);
+    margin: var(--spacing-xs) 0 2px;
+}
+
+.venue-detail--compact .venue-detail__phone {
+    color: var(--color-primary);
+    font-size: var(--font-size-sm);
+}
+
+/* --- .venue-detail--pane : the desktop sidebar ----------------------
+   One difference only: the sidebar is narrow, so the action buttons
+   stack instead of sitting in a row. */
+
+.venue-detail--pane .venue-detail__map-links {
+    flex-direction: column;
+    flex-wrap: nowrap;
+}
+
+/* --- .venue-detail--inline : the A-Z full card ----------------------
+   Sits inside a list item rather than its own panel, so the exclusion
+   banner bleeds to the card edge and the socials row gets a rule above
+   it to separate it from the card body. */
+
+.venue-detail--inline .venue-detail__address {
+    margin-bottom: var(--spacing-md);
+}
+
+.venue-detail--inline .venue-detail__host {
+    margin-top: var(--spacing-md);
+}
+
+.venue-detail--inline .venue-detail__host-affiliation {
+    font-size: var(--font-size-sm);
+}
+
+.venue-detail--inline .venue-detail__socials {
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--border-color);
+}
+
+.venue-detail--inline .venue-detail__exclusion-banner {
+    margin: calc(var(--spacing-md) * -1) calc(var(--spacing-md) * -1) var(--spacing-sm);
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
 
 /* Responsive modal */
 @media (max-width: 480px) {
@@ -696,29 +798,30 @@
         padding: var(--spacing-md);
     }
 
-    .venue-modal__map-links {
+    /* The floating map card keeps its row layout — it is already compact. */
+    .venue-detail:not(.venue-detail--compact) .venue-detail__map-links {
         flex-direction: column;
     }
 
     /* Stack the schedule table into label/value cards on small phones — a
        3-column table (Day/Time/Host) is too cramped here. data-label
        attributes come from renderScheduleTable() in js/utils/render.js. */
-    .venue-modal__schedule-table,
-    .venue-modal__schedule-table tbody {
+    .venue-detail__schedule-table,
+    .venue-detail__schedule-table tbody {
         display: block;
     }
 
-    .venue-modal__schedule-table thead {
+    .venue-detail__schedule-table thead {
         display: none;
     }
 
-    .venue-modal__schedule-table tr {
+    .venue-detail__schedule-table tr {
         display: block;
         padding: var(--spacing-sm) 0;
         border-bottom: 1px solid var(--border-color);
     }
 
-    .venue-modal__schedule-table td {
+    .venue-detail__schedule-table td {
         display: flex;
         gap: var(--spacing-sm);
         padding: var(--spacing-2xs) 0;
@@ -726,12 +829,12 @@
     }
 
     /* Empty cells (e.g. a show with no host) collapse instead of showing a bare label */
-    .venue-modal__schedule-table td:empty {
+    .venue-detail__schedule-table td:empty {
         display: none;
     }
 
     /* Label column from data-label */
-    .venue-modal__schedule-table td::before {
+    .venue-detail__schedule-table td::before {
         content: attr(data-label);
         flex: 0 0 4.5em;
         color: var(--text-muted);
@@ -740,145 +843,28 @@
     }
 
     /* The day cell is the card's title — bold, no label */
-    .venue-modal__schedule-table td:first-child {
+    .venue-detail__schedule-table td:first-child {
         font-weight: 600;
         font-size: var(--font-size-base);
     }
 
-    .venue-modal__schedule-table td:first-child::before {
+    .venue-detail__schedule-table td:first-child::before {
         content: none;
     }
 }
 
-/* Alphabetical full card reuses the shared detail-section renderer
-   (renderVenueDetailSections, classPrefix 'venue-card', actions omitted).
-   These mirror the .venue-modal__/.detail-pane__ section styles for the classes
-   not already defined above (__address, __host, __host-name, __host-affiliation,
-   __socials, __exclusion-banner are shared with the compact/weekly card). */
-.venue-card__section {
-    margin-bottom: var(--spacing-lg);
-}
 
-.venue-card__section h3 {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    font-size: var(--font-size-base);
-    color: var(--text-muted);
-    margin-bottom: var(--spacing-sm);
-}
 
-.venue-card__section h3 i {
-    color: var(--color-primary-light);
-}
 
-.venue-card__schedule-table {
-    width: 100%;
-    border-collapse: collapse;
-}
 
-.venue-card__schedule-table th,
-.venue-card__schedule-table td {
-    text-align: left;
-    border-bottom: 1px solid var(--border-color);
-    padding: var(--spacing-sm);
-}
 
-.venue-card__schedule-table th {
-    color: var(--text-muted);
-    font-weight: 500;
-    font-size: var(--font-size-sm);
-}
 
-.venue-card__active-period {
-    color: var(--color-warning);
-    font-size: var(--font-size-sm);
-    margin-top: var(--spacing-sm);
-}
 
-.venue-card__host-website {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-}
 
-.venue-card__socials-label {
-    font-size: var(--font-size-sm);
-    color: var(--text-muted);
-    margin-top: var(--spacing-md);
-    margin-bottom: var(--spacing-xs);
-}
 
-.venue-card__host-socials {
-    display: flex;
-    gap: var(--spacing-sm);
-}
 
-.venue-card__upcoming-closures {
-    display: flex;
-    align-items: baseline;
-    gap: var(--spacing-xs);
-    margin: var(--spacing-sm) 0 0;
-    color: var(--text-secondary);
-    font-size: var(--font-size-sm);
-}
 
-.venue-card__upcoming-closures i {
-    color: var(--color-warning);
-}
 
-/* Stack the inline schedule table into label/value rows on small phones,
-   mirroring the modal (data-label comes from renderScheduleTable). */
-@media (max-width: 480px) {
-    .venue-card__schedule-table,
-    .venue-card__schedule-table tbody {
-        display: block;
-    }
-
-    .venue-card__schedule-table thead {
-        display: none;
-    }
-
-    .venue-card__schedule-table tr {
-        display: block;
-        padding: var(--spacing-sm) 0;
-        border-bottom: 1px solid var(--border-color);
-    }
-
-    .venue-card__schedule-table td {
-        display: flex;
-        gap: var(--spacing-sm);
-        padding: var(--spacing-2xs) 0;
-        border: none;
-    }
-
-    .venue-card__schedule-table td:empty {
-        display: none;
-    }
-
-    .venue-card__schedule-table td::before {
-        content: attr(data-label);
-        flex: 0 0 4.5em;
-        color: var(--text-muted);
-        font-size: var(--font-size-sm);
-        font-weight: 500;
-    }
-
-    .venue-card__schedule-table td:first-child {
-        font-weight: 600;
-        font-size: var(--font-size-base);
-    }
-
-    .venue-card__schedule-table td:first-child::before {
-        content: none;
-    }
-}
-
-/* Special Event card accent */
-.venue-card--special-event {
-    border-left: 4px solid var(--color-accent-special-event);
-    background: linear-gradient(135deg, rgba(233, 30, 99, 0.05), transparent);
-}
 
 /* Excluded card — recurring entry suppressed on this specific date
    (holiday, private event, etc.). Body content is dimmed; the banner stays
@@ -1012,13 +998,6 @@
     color: var(--text-primary);
 }
 
-/* Detail pane specific styles (map links layout differs from modal) */
-.detail-pane__map-links {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-sm);
-    margin-top: var(--spacing-md);
-}
 
 /* Mobile overflow prevention */
 @media (max-width: 768px) {

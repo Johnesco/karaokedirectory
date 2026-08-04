@@ -133,7 +133,7 @@ export class VenueCard extends Component {
         // button row to keep the long A–Z list light — full actions live in the
         // detail pane/modal opened on click.
         return `
-            <div class="venue-card venue-card--full" data-venue-id="${escapeHtml(venue.id)}">
+            <div class="venue-card venue-card--full venue-detail venue-detail--inline" data-venue-id="${escapeHtml(venue.id)}">
                 <div class="venue-card__header">
                     <h3 class="venue-card__name">
                         <button class="venue-card__link" type="button">
@@ -142,7 +142,7 @@ export class VenueCard extends Component {
                     </h3>
                     ${renderTags(venue.tags, { dedicated: venue.dedicated })}
                 </div>
-                ${renderVenueDetailSections(venue, { classPrefix: 'venue-card', actions: false })}
+                ${renderVenueDetailSections(venue, { actions: false })}
             </div>
         `;
     }

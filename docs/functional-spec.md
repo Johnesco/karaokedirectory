@@ -450,6 +450,17 @@ Visible when window width is **1400px or wider**. Hidden on smaller screens via 
 
 Same sections as the mobile modal (closure banner, Location, Schedule, Host, Social Media, Contact) — both are built by the shared `renderVenueDetailSections()`, so the "Closed Today" banner and "Upcoming closures" list (§7, §11) appear identically here.
 
+> **Implementation note (#161):** `renderVenueDetailSections()` emits one block, `.venue-detail__*`, on all four surfaces that use it — the mobile modal, this pane, the map's expanded card, and the A–Z full card. Each caller adds `.venue-detail` plus an optional surface modifier to its own wrapper:
+>
+> | Surface | Wrapper classes |
+> |---|---|
+> | Mobile modal | `.venue-modal__content venue-detail` |
+> | Desktop pane | `.detail-pane venue-detail venue-detail--pane` |
+> | Map expanded card | `.map-venue-card__detail-content venue-detail venue-detail--compact` |
+> | A–Z full card | `.venue-card--full venue-detail venue-detail--inline` |
+>
+> The renderer previously took a `classPrefix` and the four callers passed four different ones, so the same markup came out under four names and the stylesheet carried a 4×17 matrix to dress them alike. Wrappers, headers, titles and close buttons stay per-surface — those genuinely differ and are not the renderer's markup.
+
 ### Empty State
 
 When no venue is selected, shows a microphone icon and the text: "Select a venue to see details, schedule, and host information."
