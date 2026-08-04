@@ -1,18 +1,49 @@
 /**
  * Google Apps Script — Austin Karaoke Directory Submissions
  *
- * Setup:
+ * NOT DEPLOYED, AND NOTHING CALLS IT.
+ *
+ * submit.html does not post anywhere — it composes an email for the visitor to
+ * send, and the curator reconciles it by hand. This file is the Apps Script
+ * that would receive a POST if a server were stood up, kept as the source of
+ * record so that day is a deploy rather than a rewrite. The payload
+ * js/submit.js builds is already the shape doPost expects.
+ *
+ * It sits under backend/ so its status is obvious from the tree (#168). At the
+ * repo root it read as part of the static site Netlify publishes, which it has
+ * never been.
+ *
+ * Setup, when that day comes:
  * 1. Create a Google Sheet named "Karaoke Directory Submissions"
  * 2. Open Extensions > Apps Script
  * 3. Paste this entire file into the Code.gs editor
- * 4. Save, then Deploy > New deployment > Web app
+ * 4. Project Settings > Script Properties: add NOTIFICATION_EMAIL, a
+ *    comma-separated list of recipients (see below)
+ * 5. Save, then Deploy > New deployment > Web app
  *    - Execute as: "Me"
  *    - Who has access: "Anyone"
- * 5. Authorize when prompted
- * 6. Copy the deployed URL into APPS_SCRIPT_URL in submit.html
+ * 6. Authorize when prompted
+ * 7. Point js/submit.js at the deployed URL — presentSubmission() is where
+ *    the email-composing path lives and would gain a POST attempt
  */
 
-const NOTIFICATION_EMAIL = 'karaokedirectoryatx@gmail.com,letmeshowyou@gmail.com';
+/**
+ * Recipients, from a Script Property rather than a literal.
+ *
+ * Two personal addresses used to be hardcoded here, which meant they were
+ * published in a public repository and that changing them was a code edit.
+ * Set NOTIFICATION_EMAIL under Project Settings > Script Properties.
+ */
+function getNotificationEmail() {
+  var value = PropertiesService.getScriptProperties().getProperty('NOTIFICATION_EMAIL');
+  if (!value) {
+    throw new Error(
+      'NOTIFICATION_EMAIL script property is not set. ' +
+      'Add it under Project Settings > Script Properties.'
+    );
+  }
+  return value;
+}
 
 // ---- HTTP Handlers ----
 
@@ -31,11 +62,12 @@ function doPost(e) {
 
     if (data.type === 'venue') {
       return handleVenueSubmission(data);
-    } else if (data.type === 'report') {
-      return handleReportSubmission(data);
-    } else {
-      return buildResponse(400, { status: 'error', message: 'Unknown submission type.' });
     }
+
+    // 'report' was handled here too, writing to an "Issue Reports" sheet.
+    // Nothing ever sent it — the submit form posts only type: 'venue' — so the
+    // handler and its branch went in #168.
+    return buildResponse(400, { status: 'error', message: 'Unknown submission type.' });
   } catch (err) {
     return buildResponse(500, { status: 'error', message: err.toString() });
   }
@@ -88,40 +120,13 @@ function handleVenueSubmission(data) {
   // Send email notification
   if (data.emailBody) {
     GmailApp.sendEmail(
-      NOTIFICATION_EMAIL,
+      getNotificationEmail(),
       'New Venue Submission: ' + (venue.name || 'Unknown'),
       data.emailBody
     );
   }
 
   return buildResponse(200, { status: 'ok', message: 'Venue submission recorded.' });
-}
-
-function handleReportSubmission(data) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = getOrCreateSheet(ss, 'Issue Reports', [
-    'Timestamp', 'Venue Name', 'Issues', 'Details', 'Reporter Email', 'Status'
-  ]);
-
-  sheet.appendRow([
-    new Date(),
-    data.venueName || '',
-    (data.issues || []).join(', '),
-    data.details || '',
-    data.contact || '',
-    'New'
-  ]);
-
-  // Send email notification
-  if (data.emailBody) {
-    GmailApp.sendEmail(
-      NOTIFICATION_EMAIL,
-      'Issue Report: ' + (data.venueName || 'Unknown'),
-      data.emailBody
-    );
-  }
-
-  return buildResponse(200, { status: 'ok', message: 'Issue report recorded.' });
 }
 
 // ---- Helpers ----
