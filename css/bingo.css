@@ -335,18 +335,13 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    animation: fireworkExplode 1s ease-out forwards;
 }
 
-@keyframes fireworkExplode {
-    0% {
-        transform: translate(0, 0) scale(1);
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-    }
-}
+/* @keyframes fireworkExplode lived here. js/bingo.js assigned it and then
+   immediately replaced it with a Web Animations API call on the same element —
+   its own comment said "Override the animation with inline keyframes" — so the
+   keyframe never rendered a frame. Removed in #166 along with the assignment
+   and the --end-x/--end-y properties nothing read. */
 
 /* Star burst */
 .star {

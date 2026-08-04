@@ -48,12 +48,12 @@ export class AlphabeticalView extends Component {
 
                 <div class="alphabetical-view__list">
                     ${Object.entries(groups).map(([letter, letterVenues]) => `
-                        <article class="letter-card" id="venues-${letter}">
-                            <header class="letter-card__header">
-                                <h2 class="letter-card__letter">${letter}</h2>
+                        <article class="panel letter-card" id="venues-${letter}">
+                            <header class="panel__header panel__header--sticky letter-card__header">
+                                <h2 class="panel__title panel__title--display letter-card__letter">${letter}</h2>
                                 <span class="letter-card__count">${letterVenues.length} venue${letterVenues.length !== 1 ? 's' : ''}</span>
                             </header>
-                            <div class="letter-card__content">
+                            <div class="panel__body letter-card__content">
                                 <ul class="letter-card__venues">
                                     ${letterVenues.map(venue => `
                                         <li class="letter-card__venue-item">

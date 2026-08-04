@@ -224,28 +224,58 @@
     pointer-events: none;
 }
 
-.search-input__field {
+/* .input — the one text-field surface.
+ *
+ * There were four text fields with four focus treatments, one of them keyed to
+ * a violet (rgba(139,92,246,.2)) that exists in no token. They all compose this
+ * now and share the global :focus-visible ring from base.css (#166).
+ *
+ * 16px is deliberate, not arbitrary: iOS auto-zooms the page when a focused
+ * input is smaller. The submit form already used it for that reason; the search
+ * field did not, and now does.
+ *
+ * The consumers are named in the selector list rather than each carrying a
+ * `class="input"`, because submit.html's schedule rows are generated in JS and
+ * would need the class threaded through there too. The point of the AC — one
+ * definition of the field surface — holds either way. #168 converts that file
+ * to a module and can add the class then.
+ */
+.input,
+.search-input__field,
+.form-group input,
+.form-group select,
+.form-group textarea {
     width: 100%;
     padding: var(--spacing-sm) var(--spacing-md);
-    padding-left: calc(var(--spacing-sm) + 1.25em + var(--spacing-xs));
-    padding-right: calc(var(--spacing-sm) + 1.25em + var(--spacing-xs));
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
     background: var(--bg-card);
     color: var(--text-primary);
-    font-size: var(--font-size-sm);
-    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    font-size: 16px;
+    min-height: var(--size-icon-lg);
+    box-sizing: border-box;
+    transition: border-color var(--transition-fast);
+}
+
+.input:focus,
+.search-input__field:focus,
+.form-group :is(input, select, textarea):focus {
+    border-color: var(--color-primary);
+}
+
+/* Composes .input; adds room for the magnifier and clear button. */
+.search-input__field {
+    padding-left: calc(var(--spacing-sm) + 1.25em + var(--spacing-xs));
+    padding-right: calc(var(--spacing-sm) + 1.25em + var(--spacing-xs));
 }
 
 .search-input__field::placeholder {
     color: var(--text-muted);
 }
 
-.search-input__field:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
-}
+/* The `outline: none` + violet box-shadow that lived here is gone — it removed
+   the focus ring and replaced it with a colour from no token (#166). The
+   global :focus-visible ring in base.css applies instead. */
 
 .search-input__clear {
     position: absolute;
@@ -373,13 +403,37 @@
     margin-bottom: var(--spacing-sm);
 }
 
-.venue-tag {
+/* .tag — the one chip for tag data.
+ *
+ * The same tags used to render as two components with two radii and two
+ * inline-style call sites: `.venue-tag` in the directory and `.tag-badge` on
+ * the submit form. Both are this now (#166).
+ *
+ * Colours come from data.json's tagDefinitions, so they cannot be written here.
+ * initTagConfig() in js/utils/tags.js injects one stylesheet keyed on
+ * `[data-tag]` at load, which is what replaced the inline `style=` on both
+ * sites. A tag with no definition simply falls back to the neutral surface
+ * below rather than rendering unstyled.
+ */
+.tag {
     display: inline-block;
     padding: var(--spacing-2xs) var(--spacing-sm);
     border-radius: var(--border-radius-sm);
     font-size: var(--font-size-xs);
     font-weight: 500;
     white-space: nowrap;
+    background: var(--color-gray-700);
+    color: var(--text-primary);
+    text-decoration: none;
+}
+
+/* Hover/focus land on every tag, anchor or not, so wiring a destination later
+   (a future `?tag=` link — ADR-011) needs no new component. Nothing is linked
+   today; renderTagBadge() only emits an <a> when given an href. */
+a.tag:hover,
+a.tag:focus-visible {
+    filter: brightness(1.15);
+    text-decoration: none;
 }
 
 /* Full venue card */
@@ -506,6 +560,67 @@
     color: var(--color-primary-light);
     font-style: italic;
     margin: 0;
+}
+
+/* ===================================================================
+   .panel — a titled content surface
+   ===================================================================
+   A card with a header, a title and a body. The weekly view's day cards
+   and the A-Z view's letter cards are consumers; so is the About page.
+
+   Before #166 there was no such thing, so about.html built seven of its
+   prose sections out of `.day-card` — inheriting sticky positioning, the
+   uppercase calendar display face, and a z-index, none of which a prose
+   page wants. Seven sticky headers stacked up while scrolling it, and
+   restyling the calendar silently restyled About.
+
+   The base is deliberately quiet: a surface, a header, a plain title.
+   Stickiness and the display face belong to the calendar consumers,
+   which add them below.
+   =================================================================== */
+
+.panel {
+    background: var(--bg-card);
+    border-radius: var(--border-radius);
+    display: flex;
+    flex-direction: column;
+}
+
+.panel__header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: var(--color-gray-800);
+    border-bottom: 1px solid var(--border-color);
+    border-radius: var(--border-radius) var(--border-radius) var(--border-radius-swoop) 0;
+}
+
+.panel__title {
+    margin: 0;
+}
+
+.panel__body {
+    flex: 1;
+    padding: var(--spacing-md);
+}
+
+/* --- Sticky variant: the calendar and A-Z section headers ----------- */
+
+.panel__header--sticky {
+    position: -webkit-sticky;
+    position: sticky;
+    z-index: var(--z-sticky-header);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* --- Display face: the oversized uppercase calendar title ----------- */
+
+.panel__title--display {
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
 }
 
 /* ===================================================================

@@ -400,19 +400,12 @@ body.view--map .fab-group {
     display: none;
 }
 
-/* Responsive grid utilities */
-.grid {
-    display: grid;
-    gap: var(--spacing-md);
-}
 
-.grid-cols-1 { grid-template-columns: 1fr; }
-.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
-.grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
-.grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
 
-/* Responsive breakpoints */
-@media (max-width: 1200px) {
+/* Responsive breakpoints.
+   768px, not the 1200px this used to say: it tightens the main-content gutter,
+   which is a tablet-and-below concern, and 1200 is not on the scale (#166). */
+@media (max-width: 768px) {
     .main-content {
         padding: var(--spacing-md);
     }

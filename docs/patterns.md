@@ -693,7 +693,7 @@ socials.threads = document.getElementById('social-threads').value.trim() || unde
 |------|-----------|---------|
 | **Block** | Lowercase, hyphen-separated noun | `.venue-card`, `.day-card` |
 | **Element** | Block + `__` + element name | `.venue-card__header` |
-| **Modifier** | Block + `--` + modifier name | `.venue-card--compact` |
+| **Modifier** | Block + `--` + modifier name | `.venue-card--full` |
 
 ### Gotchas
 

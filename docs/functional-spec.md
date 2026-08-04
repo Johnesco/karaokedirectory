@@ -1050,14 +1050,25 @@ The `<body>` carries the `page--readable` class, which constrains `.main-content
 
 ### Breakpoints
 
+The scale is **480 / 560 / 768 / 1400**, plus one `min-width: 1024px` rule for
+the map's docked venue card.
+
 | Width | Behavior |
 |-------|----------|
+| ≤480px | Schedule tables stack into label/value rows; the section header's swoop corner squares off |
 | Phone (≤560px) | Single column, modal for venue details; compact two-row navigation (~102px sticky) with collapsible search; single-row scrollable A–Z index |
-| Phablet (561–768px) | Desktop-style labeled navigation with inline search (~115–130px); single column content |
+| Phablet (561–768px) | Desktop-style labeled navigation with inline search (~115–130px); single column content; tighter main-content gutter below 768px |
 | 769px+ | Venue cards flow into a multi-column grid (`auto-fill, minmax(320px, 1fr)`) inside day/letter cards; labeled nav buttons |
-| 1024px+ | More grid columns as space allows |
-| 1200px+ | Side-by-side layouts where applicable |
+| 1024px+ | The map's expanded venue card docks right at a fixed 350px instead of a bottom sheet |
 | 1400px+ | Desktop venue detail pane visible alongside main content; mobile modal suppressed |
+
+> **Corrected in #166.** This table used to list a `1200px+` row ("side-by-side
+> layouts where applicable") and describe `1024px+` as "more grid columns as
+> space allows" — neither matched the stylesheets. There was one 1200px query,
+> tightening the main-content gutter, which is a tablet concern and now sits at
+> 768px; and one stray 600px query, now 560px. `bingo.html` keeps its own
+> game-specific scale (400/599/600 and a landscape max-height rule), which is
+> deliberate and out of this table.
 
 ### Mobile-Specific Behaviors
 
