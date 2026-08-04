@@ -26,6 +26,12 @@ jobs:
       - name: Check CSS load order across HTML pages
         run: node scripts/check-css-load-order.js
 
+      # Contrast for the seven day-header gradients. They are literal
+      # colours rather than tokens, and Tuesday sat at 1.45:1 under white
+      # text until #165 — nothing in the repo could have caught it.
+      - name: Check colour contrast
+        run: node scripts/check-contrast.js
+
       # Pure-module unit tests via the built-in Node runner. Sub-second, no
       # browser, so they live in the fast job rather than alongside Playwright.
       #

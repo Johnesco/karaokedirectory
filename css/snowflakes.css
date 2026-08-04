@@ -17,7 +17,9 @@
     height: 100%;
     pointer-events: none;
     overflow: hidden;
-    z-index: 9999;
+    /* Decorative overlay: above page chrome, below the consent banner so it
+       never covers a control the visitor has to click (#165). */
+    z-index: var(--z-toast);
 }
 
 .snowflake {

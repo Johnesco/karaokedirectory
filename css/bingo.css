@@ -3,6 +3,19 @@
  * Extends base.css for game-specific functionality
  */
 
+/* Win-celebration stack — page-local layers, ordered bottom to top.
+ * These were the hardcoded 997-1002 range. They sit above the app's modal
+ * band so a win covers the board chrome, and below --z-consent (1400) so the
+ * cookie banner stays reachable during the animation (#165). */
+:root {
+    --z-bingo-star: 1300;
+    --z-bingo-burst: 1310;
+    --z-bingo-confetti: 1320;
+    --z-bingo-overlay: 1330;
+    --z-bingo-message: 1340;
+    --z-bingo-flash: 1350;
+}
+
 * {
     -webkit-tap-highlight-color: transparent;
 }
@@ -136,7 +149,7 @@
     width: 100%;
     height: 100%;
     pointer-events: none;
-    z-index: 1000;
+    z-index: var(--z-bingo-overlay);
     overflow: hidden;
 }
 
@@ -156,7 +169,7 @@
         0 0 20px rgba(255, 255, 255, 0.5),
         0 0 40px rgba(255, 255, 255, 0.3),
         0 0 60px rgba(255, 255, 255, 0.2);
-    z-index: 1001;
+    z-index: var(--z-bingo-message);
     pointer-events: none;
     opacity: 0;
     letter-spacing: 0.1em;
@@ -213,7 +226,7 @@
 #reset-button, #undo-button {
     padding: clamp(12px, 3vw, 16px) clamp(24px, 6vw, 40px);
     font-size: clamp(14px, 4vw, 18px);
-    border-radius: 50px;
+    border-radius: var(--border-radius-pill);
     touch-action: manipulation;
 }
 
@@ -281,7 +294,7 @@
     width: 10px;
     height: 10px;
     pointer-events: none;
-    z-index: 999;
+    z-index: var(--z-bingo-confetti);
     animation: confettiFall linear forwards;
 }
 
@@ -314,7 +327,7 @@
 .firework-burst {
     position: fixed;
     pointer-events: none;
-    z-index: 998;
+    z-index: var(--z-bingo-burst);
 }
 
 .firework-particle {
@@ -339,7 +352,7 @@
 .star {
     position: fixed;
     pointer-events: none;
-    z-index: 997;
+    z-index: var(--z-bingo-star);
     font-size: 30px;
     animation: starBurst 1.5s ease-out forwards;
 }
@@ -368,7 +381,7 @@
     height: 100%;
     background: white;
     pointer-events: none;
-    z-index: 1002;
+    z-index: var(--z-bingo-flash);
     animation: flash 0.3s ease-out forwards;
 }
 

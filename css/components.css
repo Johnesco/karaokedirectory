@@ -173,7 +173,7 @@
     padding: var(--spacing-2xs) var(--spacing-sm);
     background: var(--color-primary);
     color: var(--color-white);
-    border-radius: 999px;
+    border-radius: var(--border-radius-pill);
     font-size: var(--font-size-sm);
     font-weight: 500;
 }
@@ -974,7 +974,7 @@
 }
 
 .detail-pane__empty-icon {
-    font-size: 3rem;
+    font-size: var(--font-size-4xl);
     color: var(--color-gray-500);
     margin-bottom: var(--spacing-lg);
 }
@@ -1156,7 +1156,7 @@
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 9999;
+    z-index: var(--z-consent);
     background: var(--bg-card);
     border-top: 1px solid var(--border-color);
     padding: var(--spacing-md);
