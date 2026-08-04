@@ -452,17 +452,19 @@
                 return;
             }
 
-            grid.innerHTML = getUserSelectableTagIds().map(id => {
-                const def = tagDefinitions[id];
-                const safeLabel = def.label
-                    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                return `
+            // Chips come from the directory's own renderer, so this form and the
+            // venue cards cannot drift apart again (#166). A dynamic import works
+            // from this classic script; #168 converts the whole file to a module.
+            // initTagConfig also injects the [data-tag] colour stylesheet, which
+            // is what replaced the inline style= that used to be on each badge.
+            const { initTagConfig, renderTagBadge } = await import('./js/utils/tags.js');
+            initTagConfig(tagDefinitions);
+
+            grid.innerHTML = getUserSelectableTagIds().map(id => `
                     <label class="tag-checkbox-option">
                         <input type="checkbox" name="tag-${id}" value="${id}">
-                        <span class="tag-badge" data-tag="${id}"
-                              style="background:${def.color};color:${def.textColor}">${safeLabel}</span>
-                    </label>`;
-            }).join('');
+                        ${renderTagBadge(id)}
+                    </label>`).join('');
         })();
 
         // Rate limiting configuration

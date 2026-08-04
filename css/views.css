@@ -18,11 +18,9 @@
    - .day-card--empty: Collapsed, no venues match filters
    - .day-card--expanded: Past day that's been expanded
    ============================================ */
+/* Composes .panel — see components.css. Only what is specific to a calendar
+   day lives here. */
 .day-card {
-    background: var(--bg-card);
-    border-radius: var(--border-radius);
-    display: flex;
-    flex-direction: column;
     scroll-margin-top: var(--nav-height);
 }
 
@@ -102,34 +100,10 @@
     transform: rotate(180deg);
 }
 
-/* Sticky section header shared by day cards (weekly view) and letter cards (alphabetical view) */
-.day-card__header,
-.letter-card__header {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-md);
-    padding: var(--spacing-md) var(--spacing-lg);
-    border-bottom: 1px solid var(--border-color);
-    border-radius: var(--border-radius) var(--border-radius) var(--border-radius-swoop) 0;
-    position: -webkit-sticky;
-    position: sticky;
-    z-index: var(--z-sticky-header);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
+/* Both section headers compose .panel__header .panel__header--sticky; each only
+   needs the offset it sticks at, plus its own background. */
 .day-card__header {
-    background: var(--color-gray-800);
     top: var(--nav-height);
-}
-
-/* Shared title typography */
-.day-card__day,
-.letter-card__letter {
-    font-size: 1.8rem;
-    font-weight: 800;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    margin: 0;
 }
 
 /* Rainbow colors for each day - ROYGBIV order starting Sunday.
@@ -195,11 +169,6 @@
     padding: var(--spacing-2xs) var(--spacing-sm);
     border-radius: var(--border-radius-sm);
     margin-left: auto;
-}
-
-.day-card__content {
-    flex: 1;
-    padding: var(--spacing-md);
 }
 
 .day-card__empty {
@@ -423,11 +392,8 @@
 }
 
 /* Letter Card - similar structure to Day Card */
+/* Composes .panel — see components.css. */
 .letter-card {
-    background: var(--bg-card);
-    border-radius: var(--border-radius);
-    display: flex;
-    flex-direction: column;
     scroll-margin-top: calc(var(--nav-height) + var(--az-index-height, 50px));
 }
 
@@ -445,11 +411,6 @@
     margin-left: auto;
     color: rgba(255, 255, 255, 0.8);
     font-size: var(--font-size-sm);
-}
-
-.letter-card__content {
-    flex: 1;
-    padding: var(--spacing-md);
 }
 
 .letter-card__venues {
@@ -584,27 +545,9 @@
     margin-top: var(--spacing-xs);
 }
 
-/* Map popup */
-.map-popup {
-    min-width: 200px;
-}
 
-.map-popup__name {
-    font-size: var(--font-size-base);
-    font-weight: 600;
-    margin-bottom: var(--spacing-sm);
-    color: var(--color-gray-900);
-}
 
-.map-popup__schedule {
-    font-size: var(--font-size-sm);
-    color: var(--color-gray-600);
-    margin-bottom: var(--spacing-sm);
-}
 
-.map-popup__details {
-    margin-top: var(--spacing-sm);
-}
 
 /* Custom Map Markers */
 .map-marker {
@@ -1192,7 +1135,9 @@ body.view--map .app-layout__detail {
     padding-left: calc(14ch + var(--spacing-sm));
 }
 
-@media (max-width: 600px) {
+/* 560px, not the 600px this used to say — the scale is 480/560/768/1400 and a
+   lone 600 put a phone/phablet boundary 40px away from the real one (#166). */
+@media (max-width: 560px) {
     .kj-dossier__show-event {
         padding-left: 0;
     }

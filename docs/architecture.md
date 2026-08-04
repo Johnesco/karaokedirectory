@@ -546,7 +546,7 @@ Components use Block-Element-Modifier naming:
 .venue-card__header            /* Element */
 .venue-card__name              /* Element */
 .venue-card__more-nights       /* Element */
-.venue-card--compact           /* Modifier */
+.venue-card--full              /* Modifier */
 .venue-card--special-event     /* Modifier */
 .venue-card--selected          /* Modifier */
 

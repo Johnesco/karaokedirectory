@@ -24,7 +24,7 @@
 
 ### 2. Mobile-First Responsive Design
 - Base styles target mobile devices
-- Media queries enhance for larger screens (560px, 768px, 1024px, 1400px breakpoints); 560px splits phone vs phablet nav, 769px+ enables multi-column venue grids (see spec §19)
+- Media queries enhance for larger screens. The scale is **480 / 560 / 768 / 1400**, plus one `min-width: 1024px` rule for the map's docked venue card: 480px stacks schedule tables, 560px splits phone vs phablet nav, 769px+ enables multi-column venue grids, 1400px+ shows the desktop detail pane (see spec §19). `bingo.html` keeps its own game-specific scale.
 - Modal for venue details on mobile, side pane on desktop (1400px+)
 
 ### 3. Separation of Concerns

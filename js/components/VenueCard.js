@@ -60,7 +60,11 @@ export class VenueCard extends Component {
         const isSpecialEvent = schedule?.frequency === 'once';
         // Excluded: a recurring entry suppressed on this specific date (e.g. holiday, private event)
         const exclusion = (schedule && date) ? getScheduleExclusion(schedule, date) : null;
-        const classes = ['venue-card', 'venue-card--compact'];
+        // No `venue-card--compact` modifier: the compact card IS the base
+        // `.venue-card`, and the modifier carried no rules — it was emitted on
+        // every card in the calendar and styled nothing (#166). `--full` is the
+        // variant that genuinely differs.
+        const classes = ['venue-card'];
         if (isSpecialEvent) classes.push('venue-card--special-event');
         if (exclusion) classes.push('venue-card--excluded');
         const cardClass = classes.join(' ');

@@ -393,13 +393,10 @@ function createSingleFirework(x, y) {
         const endX = Math.cos(angle) * velocity;
         const endY = Math.sin(angle) * velocity;
 
-        // Set custom end position via CSS variable
-        particle.style.setProperty('--end-x', `${endX}px`);
-        particle.style.setProperty('--end-y', `${endY}px`);
-        particle.style.animation = `fireworkExplode 1s ease-out forwards`;
-        particle.style.setProperty('transform', `translate(0, 0)`);
-
-        // Override the animation with inline keyframes
+        // The motion is a Web Animations API call, not CSS. A
+        // `fireworkExplode` CSS animation used to be assigned here first, along
+        // with --end-x/--end-y custom properties, and then overridden on the
+        // very next line — the keyframe never rendered (#166).
         particle.animate([
             { transform: 'translate(0, 0) scale(1)', opacity: 1 },
             { transform: `translate(${endX}px, ${endY}px) scale(0.3)`, opacity: 0 }

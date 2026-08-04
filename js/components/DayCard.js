@@ -60,9 +60,9 @@ export class DayCard extends Component {
         const emptyClass = events.length === 0 ? 'day-card--empty' : '';
 
         return `
-            <article class="day-card day-card--${dayOfWeek} ${todayClass} ${pastClass} ${emptyClass}">
-                <header class="day-card__header">
-                    <h2 class="day-card__day">${dayName}</h2>
+            <article class="panel day-card day-card--${dayOfWeek} ${todayClass} ${pastClass} ${emptyClass}">
+                <header class="panel__header panel__header--sticky day-card__header">
+                    <h2 class="panel__title panel__title--display day-card__day">${dayName}</h2>
                     <span class="day-card__date">${dateStr}</span>
                     ${isToday(date) ? '<span class="day-card__today-badge">Today</span>' : ''}
                     <span class="day-card__expand-indicator">
@@ -70,7 +70,7 @@ export class DayCard extends Component {
                     </span>
                 </header>
 
-                <div class="day-card__content">
+                <div class="panel__body day-card__content">
                     ${events.length > 0
                         ? this.renderEvents(events, date)
                         : '<p class="day-card__empty">No karaoke scheduled</p>'
