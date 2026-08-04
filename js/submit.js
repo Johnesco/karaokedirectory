@@ -441,9 +441,6 @@ function collectFormData() {
 
     // Optional fields — only set when there's something to set so the
     // emitted shape contains no empty strings or empty arrays.
-    const neighborhood = formData.get('neighborhood')?.trim();
-    if (neighborhood) venue.address.neighborhood = neighborhood;
-
     if (tags.length > 0) venue.tags = tags;
 
     // activePeriod inputs aren't in the slim submit form (curator handles

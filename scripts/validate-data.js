@@ -78,9 +78,17 @@ if (!schemaOk) {
 const VALID_TAGS = Object.keys(data.tagDefinitions || {});
 const KJS = data.kjs || {};
 const COMPANIES = data.companies || {};
+const CITIES = data.cities || {};
+
+// City names, indexed for lookup. `address.city` stores the display name rather
+// than the id, so the check is name-based; the id exists so a city can become a
+// link target later (ADR-011) without another migration (#170).
+const CITY_NAMES = new Map(
+    Object.entries(CITIES).map(([id, c]) => [c.name, id])
+);
 
 // Registry ids actually pointed at by a host, so unused entries can be reported.
-const referenced = { kjs: new Set(), companies: new Set() };
+const referenced = { kjs: new Set(), companies: new Set(), cities: new Set() };
 
 function fail(venue, msg) {
     issues.push(`${venue.name || 'index ?'} (${venue.id || '?'}): ${msg}`);
@@ -111,23 +119,27 @@ function checkHostRef(venue, host, where) {
 const AUSTIN_BOX = { minLat: 29.0, maxLat: 31.5, minLng: -99.0, maxLng: -96.5 };
 
 /**
- * Nearest tag id by edit distance, for the "did you mean" hint. Returns null
+ * Nearest candidate by edit distance, for the "did you mean" hint. Returns null
  * when nothing is close enough to be a plausible typo — suggesting a wildly
- * different tag is worse than suggesting nothing.
+ * different value is worse than suggesting nothing.
+ *
+ * Shared by the tag and city checks (#170): both are closed vocabularies where a
+ * wrong value is almost always one edit from a right one.
  */
-function findClosestTag(input) {
+function findClosest(input, candidates) {
     const lower = String(input).toLowerCase();
     let best = null;
     let bestDist = Infinity;
-    for (const tag of VALID_TAGS) {
-        const dist = levenshtein(lower, tag.toLowerCase());
+    for (const c of candidates) {
+        const dist = levenshtein(lower, String(c).toLowerCase());
         if (dist < bestDist) {
             bestDist = dist;
-            best = tag;
+            best = c;
         }
     }
     return bestDist <= Math.max(2, Math.ceil(lower.length / 3)) ? best : null;
 }
+
 
 function levenshtein(a, b) {
     const m = a.length;
@@ -157,10 +169,25 @@ for (const venue of data.listings) {
     if (Array.isArray(venue.tags)) {
         for (const tag of venue.tags) {
             if (!VALID_TAGS.includes(tag)) {
-                const suggestion = findClosestTag(tag);
+                const suggestion = findClosest(tag, VALID_TAGS);
                 fail(venue, `tag "${tag}" is not defined in tagDefinitions` +
                     (suggestion ? ` — did you mean "${suggestion}"?` : ''));
             }
+        }
+    }
+
+    // City cross-reference: the third closed vocabulary, after tags and hosts.
+    // Free text let "Hutto/Round Rock" and "Lake Travis" live alongside the real
+    // city names for as long as the field existed (#170). Nearest-match hint for
+    // the same reason as tags — a wrong city is usually one edit from a right one.
+    const city = venue.address?.city;
+    if (city) {
+        if (CITY_NAMES.has(city)) {
+            referenced.cities.add(CITY_NAMES.get(city));
+        } else {
+            const suggestion = findClosest(city, [...CITY_NAMES.keys()]);
+            fail(venue, `city "${city}" is not in the cities registry` +
+                (suggestion ? ` — did you mean "${suggestion}"?` : ''));
         }
     }
 
@@ -221,12 +248,13 @@ for (const [id, count] of Object.entries(idCounts)) {
 // ---- Registry hygiene (warnings — bad smells, not broken data) ----
 // An unreferenced entry is dead weight; two entries with the same name are the
 // duplication ADR-007 exists to remove, creeping back in.
-for (const [label, registry] of [['kjs', KJS], ['companies', COMPANIES]]) {
+for (const [label, registry] of [['kjs', KJS], ['companies', COMPANIES], ['cities', CITIES]]) {
     const namesSeen = new Map();
 
     for (const [id, entry] of Object.entries(registry)) {
         if (!referenced[label].has(id)) {
-            warnings.push(`${label}["${id}"] (${entry.name}) is never referenced by a host`);
+            const by = label === 'cities' ? 'a venue' : 'a host';
+            warnings.push(`${label}["${id}"] (${entry.name}) is never referenced by ${by}`);
         }
 
         const key = (entry.name || '').trim().toLowerCase();

@@ -232,6 +232,59 @@
       "website": "https://www.facebook.com/texaslbk"
     }
   },
+  "cities": {
+    "austin": {
+      "name": "Austin"
+    },
+    "buda": {
+      "name": "Buda"
+    },
+    "cedar-park": {
+      "name": "Cedar Park"
+    },
+    "del-valle": {
+      "name": "Del Valle"
+    },
+    "dripping-springs": {
+      "name": "Dripping Springs"
+    },
+    "elgin": {
+      "name": "Elgin"
+    },
+    "georgetown": {
+      "name": "Georgetown"
+    },
+    "hutto": {
+      "name": "Hutto"
+    },
+    "jonestown": {
+      "name": "Jonestown"
+    },
+    "kyle": {
+      "name": "Kyle"
+    },
+    "lakeway": {
+      "name": "Lakeway"
+    },
+    "leander": {
+      "name": "Leander"
+    },
+    "manchaca": {
+      "name": "Manchaca"
+    },
+    "manor": {
+      "name": "Manor"
+    },
+    "pflugerville": {
+      "name": "Pflugerville"
+    },
+    "round-rock": {
+      "name": "Round Rock"
+    },
+    "taylor": {
+      "name": "Taylor"
+    }
+  },
   "listings": [
     {
       "id": "sociedad",
@@ -783,8 +836,7 @@
         "street": "900 Red River St.",
         "city": "Austin",
         "state": "TX",
-        "zip": "78701",
-        "neighborhood": "Downtown"
+        "zip": "78701"
       },
       "schedule": [
         {
@@ -1282,8 +1334,7 @@
         "street": "2700 S Lamar Blvd",
         "city": "Austin",
         "state": "TX",
-        "zip": "78745",
-        "neighborhood": "South Austin"
+        "zip": "78745"
       },
       "schedule": [
         {
@@ -1543,7 +1594,7 @@
       "dedicated": false,
       "address": {
         "street": "5000 Hudson Bend Rd Suite D",
-        "city": "Lake Travis",
+        "city": "Lakeway",
         "state": "TX",
         "zip": "78734"
       },
@@ -1898,8 +1949,7 @@
         "street": "323 E 6th St",
         "city": "Austin",
         "state": "TX",
-        "zip": "78701",
-        "neighborhood": "Downtown"
+        "zip": "78701"
       },
       "schedule": [
         {
@@ -2155,8 +2205,7 @@
         "street": "309 E 6th St",
         "city": "Austin",
         "state": "TX",
-        "zip": "78701",
-        "neighborhood": "Downtown"
+        "zip": "78701"
       },
       "schedule": [
         {
@@ -2255,7 +2304,7 @@
       "dedicated": false,
       "address": {
         "street": "101 Limmer Loop",
-        "city": "Hutto/Round Rock",
+        "city": "Round Rock",
         "state": "TX",
         "zip": "78665"
       },
@@ -2506,7 +2555,7 @@
         "street": "109 E Pecan St",
         "city": "Pflugerville",
         "state": "TX",
-        "zip": "78729"
+        "zip": "78660"
       },
       "schedule": [
         {
@@ -2635,7 +2684,9 @@
           "startTime": "21:00",
           "endTime": "00:00",
           "exclusions": [
-            { "date": "2026-08-08" }
+            {
+              "date": "2026-08-08"
+            }
           ]
         }
       ],
@@ -2699,8 +2750,7 @@
         "street": "204 US-79",
         "city": "Hutto",
         "state": "TX",
-        "zip": "78634",
-        "neighborhood": "Hutto"
+        "zip": "78634"
       },
       "schedule": [
         {

@@ -494,7 +494,6 @@ Search is case-insensitive substring matching. A venue matches if the query appe
 |-------|--------------|---------|
 | Venue name | "highball" | "The Highball" |
 | City | "round rock" | Venues in Round Rock |
-| Neighborhood | "downtown" | Venues with neighborhood "Downtown" |
 | Host name | "johnny" | Venues hosted by someone named Johnny |
 | Host company | "sing" | Venues with company containing "sing" |
 | Tag ID | "lgbtq" | Venues tagged `lgbtq` |
@@ -515,7 +514,7 @@ The Weekly view's extended sections (Next Week, Later in Month, Next Month) are 
 
 The Navigation component does **not** re-render when search changes, to preserve keyboard focus in the input field. Only the views re-render.
 
-> **Implementation note:** Navigation updates `searchQuery` state but does NOT subscribe to it — that would re-render Navigation, destroying and recreating the input element and losing keyboard focus mid-typing. The views subscribe to `searchQuery` directly and call `this.render()` themselves. (Before #157 they reached it via a `FILTER_CHANGED` event instead, which also fired for every other filter change.) The search matching logic lives in `venueMatchesSearch()` in `js/services/venues.js`, which handles all field matching (name, city, neighborhood, host, company, tags by ID and label, dedicated keyword).
+> **Implementation note:** Navigation updates `searchQuery` state but does NOT subscribe to it — that would re-render Navigation, destroying and recreating the input element and losing keyboard focus mid-typing. The views subscribe to `searchQuery` directly and call `this.render()` themselves. (Before #157 they reached it via a `FILTER_CHANGED` event instead, which also fired for every other filter change.) The search matching logic lives in `venueMatchesSearch()` in `js/services/venues.js`, which handles all field matching (name, city, host, company, tags by ID and label, dedicated keyword).
 
 ---
 
@@ -587,7 +586,6 @@ The shape `{ tagDefinitions, listings }` is the contract — both the local file
     address.city        string        REQUIRED
     address.state       string        REQUIRED
     address.zip         string        OPTIONAL
-    address.neighborhood string       OPTIONAL  Helps with search filtering
 
   coordinates           object        OPTIONAL  Required for map view
     coordinates.lat     number        Latitude (-90 to 90)
@@ -639,6 +637,32 @@ The shape `{ tagDefinitions, listings }` is the contract — both the local file
   phone                 string        OPTIONAL  Venue's public phone — tel: link in detail views (venue line only, not KJ/host or curator-internal)
 }
 ```
+
+### City Registry
+
+`address.city` is a closed vocabulary, checked the same way tags and host refs are. `js/data.json` carries a top-level `cities` map alongside `tagDefinitions`, `kjs` and `companies`:
+
+```javascript
+cities: {
+  "austin":      { name: "Austin" },
+  "round-rock":  { name: "Round Rock" }
+}
+```
+
+- `validate-data.js` **fails** on any `address.city` not in the map, with a nearest-match hint (the same affordance the tag check has — a wrong city is usually one edit from a right one).
+- Ids are stable so a city can become a link target rather than a string ([ADR-011](adr/011-entity-link-contract.md)). **Nothing links to one today**; the id exists so adding that later is not another migration.
+- The registry is closed because the frame is fixed at Austin-metro, which makes the legal set finite and knowable.
+
+> **What free text cost.** 19 distinct strings covered 17 actual cities.
+> `"Hutto/Round Rock"` (zip 78665 — Round Rock's) and `"Lake Travis"` (a lake;
+> zip 78734 is Lakeway) had lived there for as long as the field existed, and
+> nothing could see them. Both folded in when the registry was built (#170).
+
+> **`address.neighborhood` was removed in #170.** It was populated on 5 of 80
+> venues, one of its three values ("Hutto") was a city, and every page's meta
+> description advertised "search by name or neighborhood" — a promise that
+> worked for 6% of the directory. Gone from the schema, `venueMatchesSearch`,
+> `filterVenues`, `getNeighborhoods()`, the submit payload, and the meta text.
 
 ### Host Registries
 
@@ -1002,7 +1026,7 @@ The email body gains a **HOST** section stating which path was taken — either 
 
 ### Payload shape contract (#101)
 
-The `venue` object inside the Apps Script payload validates against [`schema/venue.schema.json`](../schema/venue.schema.json) as a **partial venue** — the same schema the curator targets and CI enforces (ADR-005). Fields submit does not collect (coordinates, neighborhood, activePeriod, per-show host override, the four less-common social platforms, `dedicated`) are simply absent; the schema marks them optional. Empty-string defaults and `null` placeholders are suppressed at assembly time so the curator never has to translate "blank" into "absent". A future ticket may add an Ajv-based pre-send check in the browser; today the shape is verified end-to-end by piping the captured payload through the schema in a Node script (see issue #101).
+The `venue` object inside the Apps Script payload validates against [`schema/venue.schema.json`](../schema/venue.schema.json) as a **partial venue** — the same schema the curator targets and CI enforces (ADR-005). Fields submit does not collect (coordinates, activePeriod, per-show host override, the four less-common social platforms, `dedicated`) are simply absent; the schema marks them optional. Empty-string defaults and `null` placeholders are suppressed at assembly time so the curator never has to translate "blank" into "absent". A future ticket may add an Ajv-based pre-send check in the browser; today the shape is verified end-to-end by piping the captured payload through the schema in a Node script (see issue #101).
 
 ---
 
@@ -1268,7 +1292,7 @@ Each public-facing page includes a `<meta name="description">` tag with a concis
 
 | Page | Description |
 |------|-------------|
-| `index.html` | "Find karaoke in Austin, TX. Browse 70+ venues by day, search by name or neighborhood, and explore the interactive map." |
+| `index.html` | "Find karaoke in Austin, TX. Browse 70+ venues by day, search by name or city, and explore the interactive map." |
 | `about.html` | "Learn about the Greater Austin Karaoke Directory — a community-sourced guide to karaoke nights across Austin, Texas." |
 | `submit.html` | "Submit a karaoke venue to the Greater Austin Karaoke Directory. Help us keep Austin's karaoke scene up to date." |
 | `bingo.html` | "Play Karaoke Bingo at your next karaoke night! A fun interactive game from the Austin Karaoke Directory." |
