@@ -130,6 +130,30 @@ describe('scheduleMatchesDate — one-time events', () => {
   });
 });
 
+describe('isPastOnceEvent', () => {
+  // "One-time" means the date is not on a predictable cadence, not that it
+  // happens only once — a venue may hold many. Each is still spent the day
+  // after it happens, which is what this reports (#169).
+  it('retires an entry the day after it happens', () => {
+    const e = { frequency: 'once', date: '2026-01-09' };
+    assert.equal(isPastOnceEvent(e, JAN(10)), true);
+    assert.equal(isPastOnceEvent(e, JAN(9)), false, 'the day itself is not past');
+  });
+
+  it("says nothing about a venue's other one-time entries", () => {
+    // Several `once` rows on one venue is the normal shape for an irregular
+    // night, not a data smell. Each is judged on its own date.
+    const past = { frequency: 'once', date: '2026-01-09' };
+    const future = { frequency: 'once', date: '2026-02-06' };
+    assert.equal(isPastOnceEvent(past, JAN(10)), true);
+    assert.equal(isPastOnceEvent(future, JAN(10)), false);
+  });
+
+  it('never retires a weekday-recurring entry', () => {
+    assert.equal(isPastOnceEvent({ frequency: 'every', day: 'friday' }, JAN(30)), false);
+  });
+});
+
 describe('getScheduleExclusion', () => {
   const base = { frequency: 'every', day: 'Friday' };
 
@@ -148,12 +172,14 @@ describe('getScheduleExclusion', () => {
     assert.deepEqual(getScheduleExclusion(s, JAN(2)), { date: '2026-01-02', reason: null });
   });
 
-  it('accepts the bare-string shorthand', () => {
-    // CLAUDE.md documents this form; the JSON Schema does not accept it.
-    // See #169 — the shorthand is slated for removal. Until then the runtime
-    // takes it, and this test records that.
+  it('ignores the bare-string shorthand — the schema rejects it', () => {
+    // This test used to assert the opposite, recording that the runtime took a
+    // form CLAUDE.md documented and the schema refused. That combination meant
+    // following the documentation failed CI (`exclusions/0 — must be object`).
+    // The shorthand is gone from the code and both documents (#169), so a bare
+    // string now matches nothing rather than quietly working in one layer.
     const s = { ...base, exclusions: ['2026-01-02'] };
-    assert.deepEqual(getScheduleExclusion(s, JAN(2)), { date: '2026-01-02', reason: null });
+    assert.equal(getScheduleExclusion(s, JAN(2)), null);
   });
 
   it('returns null on a non-excluded date', () => {
