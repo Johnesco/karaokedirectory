@@ -37,12 +37,7 @@
     <link rel="stylesheet" href="css/submit.css">
 </head>
 <body>
-    <header class="site-header">
-        <div class="site-header__content">
-            <h1 class="site-header__title">Greater Austin Karaoke Directory</h1>
-            <p class="site-header__tagline">Submit a New Venue</p>
-        </div>
-    </header>
+    <div data-site-header></div>
 
     <nav class="navigation-container">
         <div class="navigation">
@@ -358,28 +353,7 @@
         </div>
     </main>
 
-    <footer class="site-footer">
-        <div class="site-footer__social">
-            <h2>Follow Us</h2>
-            <div class="social-links">
-                <a href="https://www.facebook.com/groups/2494105004273043"
-                   target="_blank" rel="noopener noreferrer" title="Facebook">
-                    <i class="fa-brands fa-facebook fa-lg"></i>
-                </a>
-                <a href="https://www.instagram.com/karaokedirectory/"
-                   target="_blank" rel="noopener noreferrer" title="Instagram">
-                    <i class="fa-brands fa-instagram fa-lg"></i>
-                </a>
-            </div>
-        </div>
-        <div class="site-footer__links">
-            <a href="about.html">About Us</a>
-            <a href="submit.html">Submit Venue</a>
-        </div>
-        <p class="site-footer__copyright">
-            &copy; 2025 Austin Karaoke Directory
-        </p>
-    </footer>
+    <div data-site-footer></div>
 
     <script>
         // Tag ids that are *not* user-selectable as checkboxes:
@@ -1188,5 +1162,9 @@
         });
     </script>
     <script src="js/analytics.js" defer></script>
+    <script type="module">
+        import { renderSiteChrome } from './js/chrome.js';
+        renderSiteChrome({ tagline: 'Submit a New Venue' });
+    </script>
 </body>
 </html>

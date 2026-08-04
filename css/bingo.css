@@ -20,10 +20,8 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-/* Compact header for bingo page */
-.site-header--compact {
-    padding: var(--spacing-md);
-}
+/* .site-header--compact moved to layout.css in #162 — bday.html uses it too
+   and never loads this file, so it was styled on one of its two consumers. */
 
 /* Main bingo area */
 .bingo-main {

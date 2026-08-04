@@ -38,12 +38,7 @@
 <body class="page--readable">
     <!-- Note: Not using page--edge-to-edge as this is a content page, not the main app -->
     <!-- page--readable constrains the content column to a comfortable reading measure (see layout.css) -->
-    <header class="site-header">
-        <div class="site-header__content">
-            <h1 class="site-header__title">Greater Austin Karaoke Directory</h1>
-            <p class="site-header__tagline">NOTE HOLIDAY MAY CHANGE AVAILABILITY, CALL VENUE FIRST</p>
-        </div>
-    </header>
+    <div data-site-header></div>
 
     <nav class="navigation-container">
         <div class="navigation">
@@ -55,6 +50,13 @@
     </nav>
 
     <main class="main-content">
+        <!-- A time-sensitive page notice. This text used to sit in the header's
+             brand-tagline slot, where the tagline belongs (#162). -->
+        <p class="notice">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            Holidays may change availability — call the venue first.
+        </p>
+
         <article class="panel">
             <header class="panel__header">
                 <h2 class="panel__title">About Us</h2>
@@ -153,29 +155,11 @@
         </article>
     </main>
 
-    <footer class="site-footer">
-        <div class="site-footer__social">
-            <h2>Follow Us</h2>
-            <div class="social-links">
-                <a href="https://www.facebook.com/groups/2494105004273043"
-                   target="_blank" rel="noopener noreferrer" title="Facebook">
-                    <i class="fa-brands fa-facebook fa-lg"></i>
-                </a>
-                <a href="https://www.instagram.com/karaokedirectory/"
-                   target="_blank" rel="noopener noreferrer" title="Instagram">
-                    <i class="fa-brands fa-instagram fa-lg"></i>
-                </a>
-            </div>
-        </div>
-        <div class="site-footer__links">
-            <a href="about.html">About Us</a>
-            <a href="submit.html">Submit Venue</a>
-            <a href="docs/index.html">Documentation</a>
-        </div>
-        <p class="site-footer__copyright">
-            &copy; 2025 Austin Karaoke Directory
-        </p>
-    </footer>
+    <div data-site-footer></div>
     <script src="js/analytics.js" defer></script>
+    <script type="module">
+        import { renderSiteChrome } from './js/chrome.js';
+        renderSiteChrome();
+    </script>
 </body>
 </html>
