@@ -34,10 +34,17 @@ Counts from `js/data.json`; shape from [`schema/venue.schema.json`](../../schema
 | `host` (venue and/or per-show) | ~all | `affiliation` on ~31 |
 | `socials` | 75 | venue-level |
 | `tags` | 68 | |
-| `address.neighborhood` | 26 | optional |
+| `address.neighborhood` | 26 | optional — **see note** |
 | `activePeriod` | 3 | seasonal |
 | `frequency:"once"` | 6 | specials genuinely rare |
 | `exclusions` | 1 | closure dates |
+
+> **Correction (#170).** The `address.neighborhood` count of 26 did not hold up.
+> Measured against `js/data.json` on 2026-08-04 it was populated on **5 of 80**
+> venues, with three distinct values — one of which ("Hutto") was a city, not a
+> neighborhood. That 26 was carried into #170's acceptance criteria and framed
+> the "fill in or drop" decision as a much closer call than it was. The field is
+> dropped; the rest of this table is left as written.
 | **`phone`** | **0** | rendered in detail view but **not in schema** |
 | **`schedule.note`** | **0** | rendered in 3 places but **not in schema** |
 | **`host.socials`** | **0** | rendered in 2 places but **schema-forbidden** |

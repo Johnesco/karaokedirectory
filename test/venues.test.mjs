@@ -60,11 +60,18 @@ describe('venuePasses', () => {
 });
 
 describe('venueMatchesSearch', () => {
-  it('matches on name, city, and neighborhood, case-insensitively', () => {
-    const v = venue({ name: 'Ego\'s', address: { city: 'Austin', neighborhood: 'Downtown' } });
+  it('matches on name and city, case-insensitively', () => {
+    const v = venue({ name: 'Ego\'s', address: { city: 'Austin' } });
     assert.equal(venueMatchesSearch(v, 'ego'), true);
     assert.equal(venueMatchesSearch(v, 'AUSTIN'), true);
-    assert.equal(venueMatchesSearch(v, 'downtown'), true);
+  });
+
+  it('no longer matches neighborhood — the field is gone (#170)', () => {
+    // It was populated on 5 of 80 venues, and one of its three values was a
+    // city rather than a neighborhood. Search now covers name, city, host
+    // and tags.
+    const v = venue({ name: 'Ego\'s', address: { city: 'Austin', neighborhood: 'Downtown' } });
+    assert.equal(venueMatchesSearch(v, 'downtown'), false);
   });
 
   it('matches on host name and affiliation', () => {

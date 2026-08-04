@@ -32,6 +32,21 @@
       },
       "additionalProperties": false
     },
+    "cities": {
+      "description": "Map of city id → { name }. The legal set of address.city values, closed because the frame is fixed at Austin-metro (#170). Ids are stable so a city can become a link target rather than a string (ADR-011). validate-data.js cross-checks every listing against this map.",
+      "type": "object",
+      "patternProperties": {
+        "^[a-z0-9][a-z0-9-]*$": {
+          "type": "object",
+          "required": ["name"],
+          "additionalProperties": false,
+          "properties": {
+            "name": { "type": "string", "minLength": 1 }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
     "listings": {
       "type": "array",
       "items": { "$ref": "#/$defs/venue" }
@@ -104,10 +119,13 @@
       "additionalProperties": false,
       "properties": {
         "street": { "type": "string", "minLength": 1 },
-        "city": { "type": "string", "minLength": 1 },
+        "city": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Must match a name in the top-level `cities` registry; validate-data.js cross-checks it."
+        },
         "state": { "type": "string", "minLength": 2, "maxLength": 2 },
-        "zip": { "type": "string", "pattern": "^\\d{5}(-\\d{4})?$" },
-        "neighborhood": { "type": "string", "minLength": 1 }
+        "zip": { "type": "string", "pattern": "^\\d{5}(-\\d{4})?$" }
       }
     },
     "coordinates": {

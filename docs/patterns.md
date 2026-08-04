@@ -57,8 +57,7 @@ Full venue with all optional fields:
     street: "1120 S Lamar Blvd",
     city: "Austin",
     state: "TX",
-    zip: "78704",
-    neighborhood: "South Lamar"
+    zip: "78704"
   },
   coordinates: { lat: 30.2531, lng: -97.7654 },
   schedule: [

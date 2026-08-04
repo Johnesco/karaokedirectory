@@ -215,7 +215,6 @@ When adding or modifying venues in `js/data.json`, follow this structure:
     city: "Austin",
     state: "TX",
     zip: "78701",
-    neighborhood: "Downtown"  // Optional: helps with search filtering
   },
   coordinates: {              // Optional, for map view
     lat: 30.2672,
@@ -305,6 +304,29 @@ listings: [
 
 Full detail: [functional spec §11 "Host Registries"](docs/functional-spec.md).
 
+### City registry (#170)
+
+`address.city` is a closed vocabulary, checked the same way tags and host refs
+are. `js/data.json` carries a top-level `cities` map:
+
+```javascript
+cities: { "round-rock": { name: "Round Rock" } }
+```
+
+`validate-data.js` **fails** on any `address.city` not in the map, with a
+nearest-match hint. That is what free text cost: `"Hutto/Round Rock"` and
+`"Lake Travis"` lived alongside the real names for as long as the field existed
+— 19 distinct strings for 17 actual cities. Both are folded in.
+
+The id is stable so a city can become a link target rather than a string
+(ADR-011). Nothing links to one today.
+
+**`address.neighborhood` is gone.** It was populated on 5 of 80 venues, one of
+its three values was a city, and every page's meta description advertised
+"search by name or neighborhood" — a promise that worked for 6% of the
+directory. Removed from the schema, `venueMatchesSearch`, `filterVenues`,
+`getNeighborhoods()`, the submit payload, and the meta text.
+
 ### Venue Tags
 
 Tags are defined in `tagDefinitions` at the top of `js/data.json`. Each tag has:
@@ -360,7 +382,7 @@ Tags are rendered as color-coded badges in VenueCard, VenueModal, and VenueDetai
 
 ### Search Feature
 - Navigation updates `searchQuery` state; the views subscribe to that key. State is the only change channel — never `setState` and then `emit` the same change (#157)
-- `venues.js` → `venueMatchesSearch()` matches: venue name, city, neighborhood, venue-level host name/affiliation, per-show host name/affiliation, and tags (ID + label)
+- `venues.js` → `venueMatchesSearch()` matches: venue name, city, venue-level host name/affiliation, per-show host name/affiliation, and tags (ID + label)
 - It does **not** match event names. This file claimed otherwise for months; `venueMatchesSearch` never reads `entry.eventName`. Adding it is a one-line change tracked on #37 — until that lands, the omission is the truth
 - Empty results collapse day cards to header-only (`.day-card--empty`)
 

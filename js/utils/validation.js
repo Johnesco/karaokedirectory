@@ -204,8 +204,7 @@ export function sanitizeVenue(venue) {
             street: sanitized.address.street?.trim() || '',
             city: sanitized.address.city?.trim() || '',
             state: sanitized.address.state?.trim().toUpperCase() || '',
-            zip: sanitized.address.zip?.trim() || '',
-            neighborhood: sanitized.address.neighborhood?.trim() || ''
+            zip: sanitized.address.zip?.trim() || ''
         };
     }
 

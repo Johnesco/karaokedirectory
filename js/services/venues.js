@@ -11,7 +11,7 @@
  * - getVenuesWithCoordinates(options): Get venues with map coordinates
  * - venueMatchesSearch(venue, query): Check if venue matches search query
  *
- * Search matches against: name, city, neighborhood, host, affiliation, tags (ID and label)
+ * Search matches against: name, city, host, affiliation, tags (ID and label)
  */
 
 import { scheduleMatchesDate, isDateInRange } from '../utils/date.js';
@@ -156,9 +156,6 @@ export function venueMatchesSearch(venue, query) {
 
     // Search in city
     if (containsIgnoreCase(venue.address.city, q)) return true;
-
-    // Search in neighborhood
-    if (containsIgnoreCase(venue.address.neighborhood, q)) return true;
 
     // Search in host name
     if (containsIgnoreCase(venue.host?.name, q)) return true;
@@ -334,7 +331,6 @@ export function filterVenues(filters = {}) {
     const {
         day = null,           // Day of week (lowercase)
         city = null,          // City name
-        neighborhood = null,  // Neighborhood
         dedicated = null,     // true/false/null (null = include all)
         search = '',          // Search query
         date = null           // Specific date
@@ -351,13 +347,6 @@ export function filterVenues(filters = {}) {
     if (city) {
         result = result.filter(v =>
             v.address.city.toLowerCase() === city.toLowerCase()
-        );
-    }
-
-    // Filter by neighborhood
-    if (neighborhood) {
-        result = result.filter(v =>
-            v.address.neighborhood?.toLowerCase() === neighborhood.toLowerCase()
         );
     }
 
@@ -383,7 +372,6 @@ export function filterVenues(filters = {}) {
         result = result.filter(venue =>
             containsIgnoreCase(venue.name, q) ||
             containsIgnoreCase(venue.address.city, q) ||
-            containsIgnoreCase(venue.address.neighborhood, q) ||
             containsIgnoreCase(venue.host?.name, q) ||
             containsIgnoreCase(venue.host?.affiliation, q)
         );
@@ -404,17 +392,6 @@ export function filterVenues(filters = {}) {
 export function getCities() {
     const cities = new Set(getActiveVenues().map(v => v.address.city).filter(Boolean));
     return [...cities].sort();
-}
-
-/**
- * Get unique neighborhoods from active venues
- * @returns {string[]} Sorted list of neighborhoods
- */
-export function getNeighborhoods() {
-    const neighborhoods = new Set(
-        getActiveVenues().map(v => v.address.neighborhood).filter(Boolean)
-    );
-    return [...neighborhoods].sort();
 }
 
 /**
