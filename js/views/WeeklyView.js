@@ -12,6 +12,7 @@ import { attachVenueSelectionListener } from '../components/venue-selection.js';
 import { getState, subscribe } from '../core/state.js';
 import { getWeekDates, getWeekStart, getNextWeekRange, getThisMonthRange, getNextMonthRange, getMonthName } from '../utils/date.js';
 import { getVenuesForDate } from '../services/venues.js';
+import { bindDisclosure } from '../utils/disclosure.js';
 
 export class WeeklyView extends Component {
     init() {
@@ -109,13 +110,20 @@ export class WeeklyView extends Component {
     }
 
     afterRender() {
-        // Event delegation for past day card header clicks to toggle expansion
-        this.delegate('click', '.day-card--past .day-card__header', (_e, target) => {
-            const dayCard = target.closest('.day-card--past');
-            if (dayCard) {
-                dayCard.classList.toggle('day-card--expanded');
-            }
+        // Past-day expand. The button owns aria-expanded; this only mirrors it
+        // onto the card so CSS can react (#167).
+        //
+        // afterRender runs on every render, so the previous binding is released
+        // first — stacking them would fire the toggle N times per click and
+        // leave the state flipping back to where it started (#158's lesson).
+        if (this._unbindDisclosure) this._unbindDisclosure();
+        this._unbindDisclosure = bindDisclosure(this.container, {
+            onToggle: (button, expanded) => {
+                button.closest('.day-card--past')
+                    ?.classList.toggle('day-card--expanded', expanded);
+            },
         });
+        this.subscribe(() => this._unbindDisclosure?.());
 
         attachVenueSelectionListener(this);
 

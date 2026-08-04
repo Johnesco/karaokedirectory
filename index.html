@@ -117,7 +117,11 @@
 
     <div class="app-layout">
         <div class="app-layout__list">
-            <nav id="navigation" class="navigation-container"></nav>
+            <!-- A div, not a nav: the Navigation component renders its own <nav>
+                 inside this mount, and two nested nav landmarks are one too
+                 many (#167). The other four pages hand-write their nav and
+                 keep the element. -->
+            <div id="navigation" class="navigation-container"></div>
 
             <main id="main-content" class="main-content">
                 <div class="loading">
