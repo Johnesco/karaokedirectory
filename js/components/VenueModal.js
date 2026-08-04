@@ -20,8 +20,18 @@ export class VenueModal extends Component {
 
         // Listen for venue selection events. MODAL_CLOSE was subscribed here
         // too, but nothing ever emitted it — the modal closes through its own
-        // close button, backdrop, and Escape handlers (see afterRender).
+        // close button, backdrop, and Escape handlers.
         this.subscribe(on(Events.VENUE_SELECTED, (venue) => this.open(venue)));
+
+        // Escape closes the modal. Bound once, here, rather than per-render:
+        // afterRender() built a fresh closure and registered it with raw
+        // document.addEventListener every time it ran, tracking only the newest
+        // for removal. Selecting a venue while the modal was already open
+        // therefore orphaned one listener per selection. It guards on isOpen
+        // instead of relying on being unbound while closed.
+        this.addEventListener(document, 'keydown', (e) => {
+            if (e.key === 'Escape' && this.state.isOpen) this.close();
+        });
     }
 
     template() {
@@ -67,12 +77,6 @@ export class VenueModal extends Component {
             shareVenue(this.state.venue, e.currentTarget);
         });
 
-        // Escape key
-        this._escHandler = (e) => {
-            if (e.key === 'Escape') this.close();
-        };
-        document.addEventListener('keydown', this._escHandler);
-
         // Trap focus in modal
         this.trapFocus();
     }
@@ -93,9 +97,6 @@ export class VenueModal extends Component {
     }
 
     close() {
-        if (this._escHandler) {
-            document.removeEventListener('keydown', this._escHandler);
-        }
         document.body.style.overflow = '';
         this.setState({ isOpen: false });
         emit(Events.VENUE_CLOSED, this.state.venue);
@@ -115,9 +116,10 @@ export class VenueModal extends Component {
     }
 
     onDestroy() {
-        if (this._escHandler) {
-            document.removeEventListener('keydown', this._escHandler);
-        }
+        // The keydown listener is not unbound here — it went through
+        // this.addEventListener, so Component.destroy() has already removed it.
+        // Body scroll must still be restored: destroying a component while its
+        // modal is open would otherwise leave the page permanently unscrollable.
         document.body.style.overflow = '';
     }
 }
