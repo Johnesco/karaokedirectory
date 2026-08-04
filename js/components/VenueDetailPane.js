@@ -6,7 +6,7 @@
 import { Component } from './Component.js';
 import { escapeHtml } from '../utils/string.js';
 import { shareVenue } from '../utils/url.js';
-import { on, emit, Events } from '../core/events.js';
+import { on, Events } from '../core/events.js';
 import { getState } from '../core/state.js';
 import { renderTags } from '../utils/tags.js';
 import { renderVenueDetailSections } from '../utils/render.js';
@@ -71,8 +71,10 @@ export class VenueDetailPane extends Component {
             return;
         }
         this.setState({ venue });
-        // Emit event so VenueCard can show selected state
-        emit(Events.VENUE_DETAIL_SHOWN, venue);
+        // A VENUE_DETAIL_SHOWN emit used to follow, commented "so VenueCard can
+        // show selected state". VenueCard never listened for it; the selected
+        // class is applied by app.js's VENUE_SELECTED handler, which has
+        // already run by this point.
     }
 
     clearVenue() {

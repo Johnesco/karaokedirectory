@@ -37,6 +37,41 @@ export const SENTINELS = {
     NO_HOST: 'none',
 };
 
+/**
+ * Which view should be on screen, given the current state.
+ *
+ * This is the ONLY place `hostFilter` is turned into a view. It used to be
+ * re-derived in four independent expressions across app.js and Navigation.js,
+ * each with its own spelling of "am I in KJ mode?".
+ *
+ * Pure on purpose — it takes state rather than reading it, so it is testable
+ * without a DOM and cannot drift from what the caller actually has.
+ *
+ * The two sentinels get their own view keys rather than being folded into the
+ * dossier, so the routing table shows all three `?kj=` destinations explicitly.
+ * That is ADR-011's point: `all` and `none` are routes, not host identifiers.
+ *
+ * @param {{view?: string, hostFilter?: string}} state
+ * @returns {string} a key into the view registry
+ */
+export function resolveView({ view, hostFilter } = {}) {
+    const kj = (hostFilter || '').trim();
+
+    if (kj) {
+        const lower = kj.toLowerCase();
+        if (lower === SENTINELS.INDEX) return 'kj-index';
+        if (lower === SENTINELS.NO_HOST) return 'kj-none';
+        return 'kj-dossier';
+    }
+
+    return VALID_VIEWS.includes(view) ? view : DEFAULT_VIEW;
+}
+
+/** True when the resolved view is one of the `?kj=` destinations. */
+export function isKJView(viewKey) {
+    return viewKey === 'kj-index' || viewKey === 'kj-dossier' || viewKey === 'kj-none';
+}
+
 /** Parse a `key=value&key2=value2` hash body. Bare keys become `true`. */
 function parseHash(rawHash) {
     const hash = (rawHash || '').replace(/^#/, '');

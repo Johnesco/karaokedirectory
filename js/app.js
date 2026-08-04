@@ -16,7 +16,7 @@ import { KJDossierView } from './views/KJDossierView.js';
 import { KJIndexView } from './views/KJIndexView.js';
 import { initDebugMode, isDebugMode } from './utils/debug.js';
 import { initTagConfig } from './utils/tags.js';
-import { readLocation, writeLocation, onLocationChange, VALID_VIEWS, DEFAULT_VIEW } from './core/router.js';
+import { readLocation, writeLocation, onLocationChange, resolveView, DEFAULT_VIEW } from './core/router.js';
 import { initFabs } from './components/fabs.js';
 
 // View instances
@@ -25,11 +25,34 @@ let venueModal = null;
 let venueDetailPane = null;
 let currentView = null;
 
-const views = {
-    weekly: WeeklyView,
-    alphabetical: AlphabeticalView,
-    map: MapView
+/**
+ * The view registry.
+ *
+ * Every renderable view is a row here: which class draws it, and which body
+ * class the page wears while it is up. Previously only three views were
+ * registered while five existed — the two KJ views were reached through a
+ * `hostFilter` ternary and three hand-toggled body classes, so adding a
+ * destination meant editing branching logic in two places.
+ *
+ * ADR-011 shapes this: a future `?tag=` or `?city=` destination should be a new
+ * row, not a new `if`. `kj-index` and `kj-none` are the sentinel routes; only
+ * `kj-dossier` addresses an actual entity.
+ */
+const VIEWS = {
+    weekly: { Class: WeeklyView, bodyClass: null },
+    alphabetical: { Class: AlphabeticalView, bodyClass: null },
+    map: { Class: MapView, bodyClass: 'view--map' },
+    'kj-index': { Class: KJIndexView, bodyClass: 'view--kj-index' },
+    'kj-dossier': { Class: KJDossierView, bodyClass: 'view--kj-dossier' },
+    // `?kj=none` is its own route but the dossier view renders it — it reads
+    // hostFilter itself and switches to its no-host listing.
+    'kj-none': { Class: KJDossierView, bodyClass: 'view--kj-dossier' },
 };
+
+/** Every body class the registry can apply, so swapping is data-driven. */
+const ALL_BODY_CLASSES = [...new Set(
+    Object.values(VIEWS).map((v) => v.bodyClass).filter(Boolean)
+)];
 
 /**
  * Initialize the application
@@ -93,10 +116,9 @@ async function init() {
         writeLocation({ venueId: null });
     });
 
-    // Subscribe to view changes
-    subscribe('view', (view) => {
-        renderView(view);
-    });
+    // Subscribe to view changes. renderView() reads state itself, so it cannot
+    // be handed a stale view name.
+    subscribe('view', () => renderView());
 
     const location = readLocation();
     const initialView = location.view || DEFAULT_VIEW;
@@ -109,14 +131,17 @@ async function init() {
     // setState alone won't trigger the subscriber if the value matches the
     // default ('weekly'), so we always call renderView explicitly as well.
     setState({ view: initialView });
-    renderView(initialView);
+    renderView();
 
     // Keep ?kj= in the URL in sync with hostFilter state and re-render the view
-    // (toggle between KJDossierView and the regular weekly/alphabetical/map views).
+    // (toggle between the KJ views and the regular weekly/alphabetical/map ones).
+    //
+    // renderView() builds a fresh view instance, so it has already rendered by
+    // the time this returns. The FILTER_CHANGED emit that used to follow landed
+    // on that brand-new instance and rendered it a second time.
     subscribe('hostFilter', (value) => {
         writeLocation({ hostFilter: value });
-        renderView(getState('view'));
-        emit(Events.FILTER_CHANGED, { hostFilter: value });
+        renderView();
     });
 
     // Expose helper for map popups
@@ -165,7 +190,6 @@ async function loadData() {
         initTagConfig(data.tagDefinitions);
 
         initVenues(data);
-        emit(Events.DATA_LOADED, data);
 
         // Update debug indicator with data source
         if (isDebugMode()) {
@@ -176,7 +200,6 @@ async function loadData() {
         }
     } catch (error) {
         console.error('Failed to load venue data:', error);
-        emit(Events.DATA_ERROR, error);
 
         // Show error to user
         const container = document.querySelector('#main-content');
@@ -195,43 +218,34 @@ async function loadData() {
 /**
  * Render the specified view
  */
-function renderView(viewName) {
+function renderView() {
     const container = document.querySelector('#main-content');
     if (!container) {
         console.error('Main content container not found');
         return;
     }
 
-    // KJ-mode overrides the normal weekly/alphabetical/map views.
-    // ?kj=all   → KJIndexView (alphabetical directory of every KJ name)
-    // ?kj=<n>   → KJDossierView (one KJ's full schedule across venues)
-    const hostFilter = getState('hostFilter');
-    const inKJIndexMode = hostFilter && hostFilter.toLowerCase() === 'all';
-    const inDossierMode = !!hostFilter && !inKJIndexMode;
-    const inKJMode = inKJIndexMode || inDossierMode;
+    // One resolution, from the router. Nothing here re-derives "KJ mode".
+    const key = resolveView({ view: getState('view'), hostFilter: getState('hostFilter') });
+    const descriptor = VIEWS[key];
+    if (!descriptor) {
+        console.error(`Unknown view: ${key}`);
+        return;
+    }
 
-    // Toggle body class for immersive map mode (only when NOT in KJ mode)
-    document.body.classList.toggle('view--map', viewName === 'map' && !inKJMode);
-    document.body.classList.toggle('view--kj-dossier', inDossierMode);
-    document.body.classList.toggle('view--kj-index', inKJIndexMode);
+    // Body classes come from the descriptor: clear every one the registry
+    // knows about, then apply this view's. Adding a view with its own body
+    // class needs no change here.
+    for (const cls of ALL_BODY_CLASSES) {
+        document.body.classList.toggle(cls, cls === descriptor.bodyClass);
+    }
 
-    // Destroy current view
     if (currentView) {
         currentView.destroy();
         currentView = null;
     }
 
-    const ViewClass = inKJIndexMode
-        ? KJIndexView
-        : inDossierMode
-            ? KJDossierView
-            : views[viewName];
-    if (!ViewClass) {
-        console.error(`Unknown view: ${viewName}`);
-        return;
-    }
-
-    currentView = new ViewClass(container);
+    currentView = new descriptor.Class(container);
     currentView.render();
 }
 

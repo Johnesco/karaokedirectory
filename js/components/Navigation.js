@@ -16,8 +16,8 @@
 
 import { Component } from './Component.js';
 import { getState, setState, subscribe, navigateWeek, goToCurrentWeek } from '../core/state.js';
-import { emit, Events } from '../core/events.js';
 import { formatWeekRange, getWeekStart, isCurrentWeek } from '../utils/date.js';
+import { resolveView, isKJView } from '../core/router.js';
 import { html } from '../utils/string.js';
 
 export class Navigation extends Component {
@@ -36,20 +36,23 @@ export class Navigation extends Component {
         const showDedicated = getState('showDedicated');
         const hostFilter = getState('hostFilter');
 
-        // KJ mode (dossier or index): show the full view switcher + a filter chip.
-        // CAL/A-Z/MAP click handlers clear hostFilter (see afterRender), so clicking
-        // any of them leaves KJ mode cleanly. The KJs link is active on the index.
-        if (hostFilter) {
-            const lc = hostFilter.toLowerCase();
-            const isIndex = lc === 'all';
-            const isNone = lc === 'none';
+        // KJ mode (dossier, index, or no-host): full view switcher + a filter
+        // chip. CAL/A-Z/MAP click handlers clear hostFilter (see afterRender),
+        // so clicking any of them leaves KJ mode cleanly.
+        //
+        // The router decides which of the three it is — this component no
+        // longer re-derives it from the raw hostFilter string.
+        const resolved = resolveView({ view, hostFilter });
+
+        if (isKJView(resolved)) {
+            const isIndex = resolved === 'kj-index';
             let chipLabel = 'KJ:';
             let chipValue = hostFilter;
             let chipIcon = 'fa-microphone-lines';
             if (isIndex) {
                 chipLabel = '';
                 chipValue = 'All KJs';
-            } else if (isNone) {
+            } else if (resolved === 'kj-none') {
                 chipLabel = '';
                 chipValue = 'No host listed';
                 chipIcon = 'fa-circle-question';
@@ -162,7 +165,10 @@ export class Navigation extends Component {
     renderViewSwitcher({ view, kjIndexActive }) {
         // In KJ mode, CAL/A-Z/MAP shouldn't appear active even though `view`
         // still holds the prior selection — the user isn't in those views.
-        const inKJMode = !!getState('hostFilter');
+        const inKJMode = isKJView(resolveView({
+            view: getState('view'),
+            hostFilter: getState('hostFilter'),
+        }));
         const cls = (active) => `nav-btn nav-btn--labeled${active ? ' nav-btn--active' : ''}`;
         return html`
             <div class="navigation__views">
@@ -191,12 +197,14 @@ export class Navigation extends Component {
     }
 
     afterRender() {
+        // Every handler below changes state and stops. Subscribers to the key
+        // do the rendering. These used to setState AND emit an event that the
+        // same components also listened to, so one click rendered twice (#157).
+
         // View toggle buttons. Always clear hostFilter so clicking from a KJ
         // page exits KJ mode cleanly. No-op when hostFilter is already empty.
         this.delegate('click', '[data-view]', (e, target) => {
-            const view = target.dataset.view;
-            setState({ view, hostFilter: '' });
-            emit(Events.VIEW_CHANGED, view);
+            setState({ view: target.dataset.view, hostFilter: '' });
         });
 
         // Week navigation
@@ -207,20 +215,17 @@ export class Navigation extends Component {
             } else {
                 navigateWeek(parseInt(action, 10));
             }
-            emit(Events.WEEK_CHANGED, getState('weekStart'));
         });
 
         // Dedicated toggle
         this.delegate('change', '[data-filter="dedicated"]', (e, target) => {
             setState({ showDedicated: target.checked });
-            emit(Events.FILTER_CHANGED, { showDedicated: target.checked });
         });
 
         // Search input
         this.delegate('input', '[data-search="query"]', (e, target) => {
             const query = target.value;
             setState({ searchQuery: query });
-            emit(Events.FILTER_CHANGED, { searchQuery: query });
 
             // Update clear button visibility without full re-render
             const clearBtn = this.container.querySelector('[data-search="clear"]');
@@ -257,7 +262,6 @@ export class Navigation extends Component {
                 const clearBtn = this.container.querySelector('[data-search="clear"]');
                 if (clearBtn) clearBtn.remove();
                 setState({ searchQuery: '' });
-                emit(Events.FILTER_CHANGED, { searchQuery: '' });
             }
         });
 
@@ -274,7 +278,6 @@ export class Navigation extends Component {
                 input.focus();
             }
             setState({ searchQuery: '' });
-            emit(Events.FILTER_CHANGED, { searchQuery: '' });
 
             // Remove clear button
             const clearBtn = this.container.querySelector('[data-search="clear"]');

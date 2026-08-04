@@ -1,27 +1,30 @@
 /**
- * Reactive state store with subscribe/get/set + key-scoped subscribers.
+ * Reactive state store — the single channel for anything that changes.
  *
- * State keys:
- * - view: Current view ('weekly', 'alphabetical', 'map')
+ * Change something with `setState`, react to it with `subscribe(key, fn)`. That
+ * is the whole protocol. Do not announce a state change on the event bus as
+ * well: subscribers already ran, and the second notification renders everything
+ * a second time (#157).
+ *
+ * State keys — every one is read and written by real code:
+ * - view: Current base view ('weekly', 'alphabetical', 'map'). What is actually
+ *   on screen also depends on hostFilter; router.resolveView() combines them.
  * - weekStart: Date for current week in weekly view
  * - showDedicated: Whether to show dedicated karaoke venues
  * - searchQuery: Global search filter text
  * - hostFilter: KJ/host name filter, URL-driven via ?kj= (substring match against host name/company only)
  * - selectedVenue: Currently selected venue object (for modal/detail pane)
  * - isLoading: Loading indicator state
+ *
+ * `venues`, `filteredVenues`, and `filters` used to sit here too. Nothing ever
+ * read or wrote them — venue data lives in services/venues.js — but the spec
+ * documented them as live, so they read as the app's data model to anyone
+ * arriving cold. Removed in #157.
  */
 
 const subscribers = new Map();
 
 const state = {
-    venues: [],
-    filteredVenues: [],
-    filters: {
-        day: null,
-        city: null,
-        search: '',
-        dedicatedOnly: false
-    },
     view: 'weekly',
     weekStart: new Date(),
     showDedicated: true,
@@ -50,27 +53,13 @@ export function subscribe(key, callback) {
 }
 
 /**
- * Subscribe to any state change
- * @param {Function} callback - Called with full state when any value changes
- * @returns {Function} Unsubscribe function
- */
-export function subscribeAll(callback) {
-    return subscribe('*', callback);
-}
-
-/**
  * Notify subscribers of a state change
  * @param {string} key - State key that changed
  * @param {*} value - New value
  */
 function notify(key, value) {
-    // Notify specific key subscribers
     if (subscribers.has(key)) {
         subscribers.get(key).forEach(callback => callback(value, key));
-    }
-    // Notify wildcard subscribers
-    if (subscribers.has('*')) {
-        subscribers.get('*').forEach(callback => callback(state, key));
     }
 }
 
@@ -99,36 +88,6 @@ export function setState(updates) {
  */
 export function getState(key) {
     return key ? state[key] : { ...state };
-}
-
-/**
- * Reset state to initial values
- */
-export function resetState() {
-    setState({
-        venues: [],
-        filteredVenues: [],
-        filters: {
-            day: null,
-            city: null,
-            search: '',
-            dedicatedOnly: false
-        },
-        view: 'weekly',
-        weekStart: new Date(),
-        showDedicated: true,
-        selectedVenue: null,
-        isLoading: false
-    });
-}
-
-/**
- * Update filters and trigger filtering
- * @param {Object} filterUpdates - Filter updates
- */
-export function setFilters(filterUpdates) {
-    const newFilters = { ...state.filters, ...filterUpdates };
-    setState({ filters: newFilters });
 }
 
 /**

@@ -109,8 +109,8 @@ When viewing the current week, the page scrolls to today's day card after render
 ### Filtering
 
 - Respects the "Show dedicated" toggle
-- Respects the search query — day cards with no matching venues collapse to `.day-card--empty`
-- Re-renders on `FILTER_CHANGED` event
+- Respects the search query - day cards with no matching venues collapse to `.day-card--empty`
+- Re-renders on the `weekStart`, `showDedicated`, and `searchQuery` state keys
 
 ### Extended Sections
 
@@ -189,7 +189,7 @@ If no venues match the current search/filter, displays "No venues match your sea
 
 - Respects the "Show dedicated" toggle
 - Respects the search query
-- Re-renders on `FILTER_CHANGED` event
+- Re-renders on the `showDedicated` and `searchQuery` state keys
 
 ---
 
@@ -428,8 +428,9 @@ When the modal is open, `document.body.style.overflow = 'hidden'` prevents backg
 
 ### Events Emitted
 
-- `MODAL_OPEN` when opening
 - `VENUE_CLOSED` when closing
+
+A `MODAL_OPEN` emit on open was removed in #157 - nothing listened for it.
 
 ---
 
@@ -453,9 +454,10 @@ When no venue is selected, shows a microphone icon and the text: "Select a venue
 
 ### State
 
-- Listens to `VENUE_SELECTED` — updates with venue data
-- Listens to `VENUE_CLOSED` — clears to empty state
-- Emits `VENUE_DETAIL_SHOWN` when displaying a venue
+- Listens to `VENUE_SELECTED` - updates with venue data
+- Listens to `VENUE_CLOSED` - clears to empty state
+
+A `VENUE_DETAIL_SHOWN` emit was removed in #157 - nothing listened for it. Card highlighting is applied by the `VENUE_SELECTED` handler in `app.js`.
 
 ---
 
@@ -468,7 +470,7 @@ The app includes a global search bar that filters venues across all views.
 Located in the Navigation component. Visible inline on desktop and phablets (561px+); on phones (≤560px) hidden behind a magnifying-glass toggle button in the navigation bar.
 - **Placeholder:** "Search venues, tags, hosts..."
 - **Clear button** (X icon) appears when search has text; clicking clears input and refocuses it
-- Typing updates the `searchQuery` state and emits `FILTER_CHANGED`
+- Typing updates the `searchQuery` state; the views subscribe to that key
 - **Phone toggle (≤560px):** opening expands the input as a full-width row and focuses it; closing the toggle while a query is active clears the query (prevents invisible active filters). The row stays expanded while a query is active.
 
 ### What Search Matches Against
@@ -500,7 +502,7 @@ The Weekly view's extended sections (Next Week, Later in Month, Next Month) are 
 
 The Navigation component does **not** re-render when search changes, to preserve keyboard focus in the input field. Only the views re-render.
 
-> **Implementation note:** Navigation updates `searchQuery` state and emits `FILTER_CHANGED` but does NOT subscribe to `searchQuery` — this prevents Navigation from re-rendering (which would destroy and recreate the input element, losing keyboard focus). Views subscribe to `FILTER_CHANGED` via the event bus and independently call `this.render()`. The search matching logic lives in `venueMatchesSearch()` in `js/services/venues.js`, which handles all field matching (name, city, neighborhood, host, company, tags by ID and label, dedicated keyword).
+> **Implementation note:** Navigation updates `searchQuery` state but does NOT subscribe to it — that would re-render Navigation, destroying and recreating the input element and losing keyboard focus mid-typing. The views subscribe to `searchQuery` directly and call `this.render()` themselves. (Before #157 they reached it via a `FILTER_CHANGED` event instead, which also fired for every other filter change.) The search matching logic lives in `venueMatchesSearch()` in `js/services/venues.js`, which handles all field matching (name, city, neighborhood, host, company, tags by ID and label, dedicated keyword).
 
 ---
 
@@ -546,8 +548,8 @@ Venues with an `activePeriod` field only appear when the current date falls with
 
 1. User changes filter (dedicated toggle, search input) or loads a URL with `?kj=`
 2. State updated (`showDedicated`, `searchQuery`, or `hostFilter`)
-3. `FILTER_CHANGED` event emitted
-4. All views re-render with filtered results
+3. `state.js` notifies that key's subscribers
+4. Each subscribing view re-renders once with filtered results
 
 ---
 
@@ -1101,52 +1103,74 @@ No analytics tag loads until the visitor consents. See **§23 Analytics and Cons
 
 Centralized state with observer pattern.
 
+**State is the single change channel.** Anything that changes goes through
+`setState`; anything that needs to react subscribes to the key. A state change
+is never *also* announced on the event bus — subscribers have already run, and a
+second notification renders every listening view a second time.
+
 | Key | Type | Default | Purpose |
 |-----|------|---------|---------|
-| `venues` | array | `[]` | All active venues |
-| `filteredVenues` | array | `[]` | Filtered venue results |
-| `filters` | object | `{ day: null, city: null, search: '', dedicatedOnly: false }` | Filter settings |
-| `view` | string | `'weekly'` | Current view: `weekly`, `alphabetical`, or `map` |
+| `view` | string | `'weekly'` | Base view: `weekly`, `alphabetical`, or `map`. What is actually on screen also depends on `hostFilter` — `router.resolveView()` combines the two |
 | `weekStart` | Date | Today | Start date for weekly view |
 | `showDedicated` | boolean | `true` | Whether dedicated venues are shown |
 | `searchQuery` | string | `''` | Current search text |
+| `hostFilter` | string | `''` | KJ/host filter, URL-driven via `?kj=`. `all` and `none` are route sentinels, not host names (ADR-011) |
 | `selectedVenue` | object/null | `null` | Currently selected venue |
 | `isLoading` | boolean | `false` | Loading indicator |
+
+Which view subscribes to which key:
+
+| View | Subscribes to |
+|---|---|
+| `WeeklyView` | `weekStart`, `showDedicated`, `searchQuery` |
+| `AlphabeticalView` | `showDedicated`, `searchQuery` |
+| `MapView` | `showDedicated`, `searchQuery` |
+| `KJDossierView` | *(nothing)* — its only input is `hostFilter`, and a `hostFilter` change replaces the view instance outright |
+| `KJIndexView` | *(nothing)* — static listing |
+| `Navigation` | `view`, `weekStart`, `showDedicated`, `hostFilter`. Deliberately **not** `searchQuery`, which would re-render the input and lose focus mid-typing |
 
 ### API
 
 - `getState(key)` — read a state value (or entire state without key)
 - `setState(updates)` — update state and notify subscribers
 - `subscribe(key, callback)` — subscribe to changes for a specific key; returns unsubscribe function
-- `subscribeAll(callback)` — subscribe to all state changes
 - `navigateWeek(weeks)` — move weekStart by N weeks
 - `goToCurrentWeek()` — reset weekStart to today
 
+> **Removed in #157.** The keys `venues`, `filteredVenues`, and `filters` were
+> documented here as the app's data model, but no code ever read or wrote them —
+> venue data lives in `js/services/venues.js`. `subscribeAll()`, `setFilters()`,
+> and `resetState()` were likewise unused and are gone.
+
 ### Events (`js/core/events.js`)
 
-Pub/sub event bus for component communication.
+Pub/sub bus for genuine one-shots — things that are **not** state transitions.
+If what you want to announce is already a state key, subscribe to the key
+instead (see State above).
 
-| Event | Constant | Trigger |
-|-------|----------|---------|
-| `venue:selected` | `VENUE_SELECTED` | User clicks/selects a venue |
-| `venue:closed` | `VENUE_CLOSED` | Venue detail dismissed |
-| `venue:detail-shown` | `VENUE_DETAIL_SHOWN` | Venue detail displayed |
-| `view:changed` | `VIEW_CHANGED` | User switches views |
-| `week:changed` | `WEEK_CHANGED` | Week navigation occurs |
-| `filter:changed` | `FILTER_CHANGED` | Any filter state changes |
-| `search:changed` | `SEARCH_CHANGED` | Search query changes |
-| `modal:open` | `MODAL_OPEN` | Modal opens |
-| `modal:close` | `MODAL_CLOSE` | Modal closes |
-| `data:loaded` | `DATA_LOADED` | Venue data loaded successfully |
-| `data:error` | `DATA_ERROR` | Data loading failed |
+| Event | Constant | Trigger | Emitters | Listeners |
+|-------|----------|---------|----------|-----------|
+| `venue:selected` | `VENUE_SELECTED` | User clicks/selects a venue | `app.js`, `VenueCard`, `MapView`, `venue-selection` | `app.js`, `VenueModal`, `VenueDetailPane` |
+| `venue:closed` | `VENUE_CLOSED` | Venue detail dismissed | `VenueModal` | `app.js`, `VenueDetailPane` |
+
+That is the whole bus. Both events have a real emitter *and* a real listener,
+and neither duplicates a state key.
 
 ### API
 
 - `on(event, callback)` — subscribe; returns unsubscribe function
-- `once(event, callback)` — subscribe for one execution
 - `off(event, callback)` — unsubscribe specific callback
 - `emit(event, data)` — fire event to all subscribers (errors caught per-handler)
-- `clear(event?)` — remove listeners for one or all events
+
+> **Removed in #157.** The bus carried eleven event names. Eight had only one
+> end: `VENUE_DETAIL_SHOWN`, `VIEW_CHANGED`, `WEEK_CHANGED`, `MODAL_OPEN`,
+> `DATA_LOADED`, and `DATA_ERROR` were emitted with nothing listening;
+> `MODAL_CLOSE` was listened for with nothing emitting; `SEARCH_CHANGED` had
+> neither. The ninth, `FILTER_CHANGED`, was emitted immediately after a
+> `setState` that had already notified the same components — so a single
+> dedicated-toggle click rendered each view twice, and on the map ran
+> `updateMarkers` three times and rebuilt the Leaflet instance. The unused
+> `once()` and `clear()` helpers went with them.
 
 ### URL Hash Sync and Shareable Links
 

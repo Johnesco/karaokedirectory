@@ -39,7 +39,7 @@ function at(href) {
     return calls;
 }
 
-const { readLocation, writeLocation, venueShareUrl, VALID_VIEWS, DEFAULT_VIEW, SENTINELS } =
+const { readLocation, writeLocation, venueShareUrl, resolveView, isKJView, VALID_VIEWS, DEFAULT_VIEW, SENTINELS } =
     await import('../js/core/router.js');
 
 describe('readLocation — query', () => {
@@ -177,6 +177,58 @@ describe('venueShareUrl', () => {
     it('encodes the id', () => {
         at(ORIGIN + '/');
         assert.ok(venueShareUrl('a b').endsWith('venue=a%20b'));
+    });
+});
+
+describe('resolveView', () => {
+    it('returns the base view when there is no host filter', () => {
+        assert.equal(resolveView({ view: 'map' }), 'map');
+        assert.equal(resolveView({ view: 'alphabetical', hostFilter: '' }), 'alphabetical');
+    });
+
+    it('falls back to the default for an unknown or missing view', () => {
+        assert.equal(resolveView({ view: 'nonsense' }), DEFAULT_VIEW);
+        assert.equal(resolveView({}), DEFAULT_VIEW);
+        assert.equal(resolveView(), DEFAULT_VIEW);
+    });
+
+    it('routes the two sentinels to their own views, case-insensitively', () => {
+        assert.equal(resolveView({ hostFilter: 'all' }), 'kj-index');
+        assert.equal(resolveView({ hostFilter: 'ALL' }), 'kj-index');
+        assert.equal(resolveView({ hostFilter: 'none' }), 'kj-none');
+        assert.equal(resolveView({ hostFilter: 'None' }), 'kj-none');
+    });
+
+    it('routes any other host filter to the dossier', () => {
+        assert.equal(resolveView({ hostFilter: 'armando' }), 'kj-dossier');
+        assert.equal(resolveView({ hostFilter: 'KJ Armando and Paola' }), 'kj-dossier');
+    });
+
+    it('a host filter overrides the base view', () => {
+        assert.equal(resolveView({ view: 'map', hostFilter: 'armando' }), 'kj-dossier');
+        assert.equal(resolveView({ view: 'map', hostFilter: 'all' }), 'kj-index');
+    });
+
+    it('treats a whitespace-only filter as absent', () => {
+        assert.equal(resolveView({ view: 'map', hostFilter: '   ' }), 'map');
+    });
+
+    it('a KJ literally named "all" would still hit the index — the collision ADR-011 names', () => {
+        // Documented, not endorsed. It is why the sentinels are slated to leave
+        // the id namespace entirely.
+        assert.equal(resolveView({ hostFilter: 'all' }), 'kj-index');
+    });
+});
+
+describe('isKJView', () => {
+    it('is true for exactly the three ?kj= destinations', () => {
+        for (const k of ['kj-index', 'kj-dossier', 'kj-none']) {
+            assert.equal(isKJView(k), true, k);
+        }
+    });
+
+    it('is false for every base view', () => {
+        for (const v of VALID_VIEWS) assert.equal(isKJView(v), false, v);
     });
 });
 

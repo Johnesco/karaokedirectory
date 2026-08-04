@@ -18,9 +18,10 @@ export class VenueModal extends Component {
             isOpen: false
         };
 
-        // Listen for venue selection events
+        // Listen for venue selection events. MODAL_CLOSE was subscribed here
+        // too, but nothing ever emitted it — the modal closes through its own
+        // close button, backdrop, and Escape handlers (see afterRender).
         this.subscribe(on(Events.VENUE_SELECTED, (venue) => this.open(venue)));
-        this.subscribe(on(Events.MODAL_CLOSE, () => this.close()));
     }
 
     template() {
@@ -89,7 +90,6 @@ export class VenueModal extends Component {
 
         this.setState({ venue, isOpen: true });
         document.body.style.overflow = 'hidden';
-        emit(Events.MODAL_OPEN, venue);
     }
 
     close() {
