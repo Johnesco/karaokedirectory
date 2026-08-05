@@ -156,8 +156,7 @@ karaokedirectory/
 │       ├── render.js      # Shared rendering (schedule table, host section, active period)
 │       ├── string.js      # Text manipulation, escaping
 │       ├── tags.js        # Venue tag rendering and configuration
-│       ├── url.js         # URL building, sanitization
-│       └── validation.js  # Form validation
+│       └── url.js         # URL building, sanitization
 │
 ├── backend/
 │   └── Code.gs            # Google Apps Script behind submit.html. NOT deployed by

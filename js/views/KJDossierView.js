@@ -7,11 +7,21 @@
  *
  * Audience: the KJ themselves, not customers browsing. Replaces the normal
  * weekly/alphabetical/map views while active.
+ *
+ * Both match paths run venues through `venuePasses` so an out-of-activePeriod
+ * venue is absent here exactly as it is from the calendar, A–Z and map (#117).
+ *
+ * The **dedicated toggle is deliberately not applied.** #117's acceptance
+ * criteria asked for it; this view is where that would do harm. Its stated job
+ * is "verify your listings" — silently omitting a KJ's shows because of a
+ * checkbox that KJ mode does not even render would defeat the page's purpose,
+ * and there would be no visible control to explain the gap. The activePeriod
+ * gate has no such problem: an out-of-season venue is genuinely not running.
  */
 
 import { Component } from '../components/Component.js';
 import { getState } from '../core/state.js';
-import { getAllVenues, venueMatchesHost, hostMatches, resolveHostLabel } from '../services/venues.js';
+import { getAllVenues, venuePasses, venueMatchesHost, hostMatches, resolveHostLabel } from '../services/venues.js';
 import { escapeHtml, getSortableName } from '../utils/string.js';
 import {
     formatScheduleEntry,
@@ -110,6 +120,7 @@ export class KJDossierView extends Component {
         );
 
         return getAllVenues()
+            .filter(v => venuePasses(v))
             .filter(v => !hasNamedHost(v))
             .map(v => {
                 const recurring = (v.schedule || [])
@@ -149,6 +160,7 @@ export class KJDossierView extends Component {
         today.setHours(0, 0, 0, 0);
 
         const matches = getAllVenues()
+            .filter(v => venuePasses(v))
             .filter(v => venueMatchesHost(v, kjName))
             .map(v => {
                 // Same predicate the venue filter uses. Substring-matching here

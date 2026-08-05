@@ -89,7 +89,7 @@ The project's one architectural constraint is that the deployed artifact stays *
 │   ├── components/     # UI components (Navigation, DayCard, VenueCard, etc.)
 │   ├── views/          # View controllers (Weekly, Alphabetical, Map)
 │   ├── services/       # Data services (venue search, filtering)
-│   └── utils/          # Utilities (date, string, tags, url, render, debug, validation)
+│   └── utils/          # Utilities (date, string, tags, url, render, debug, hosts)
 ├── scripts/            # Developer tools
 │   ├── geocode-venues.js   # Batch geocode venues (Node.js)
 │   └── validate-data.js    # Validate venue data integrity

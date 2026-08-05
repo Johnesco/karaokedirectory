@@ -18,7 +18,7 @@
  */
 
 import { Component } from '../components/Component.js';
-import { getAllVenues } from '../services/venues.js';
+import { getAllVenues, venuePasses } from '../services/venues.js';
 import { getVenueHosts } from '../utils/render.js';
 import { escapeHtml, getSortableHostName } from '../utils/string.js';
 
@@ -214,7 +214,16 @@ export class KJIndexView extends Component {
         };
 
         let noHostCount = 0;
-        getAllVenues().forEach(v => {
+        // Same activePeriod gate every other surface uses (#117). A venue outside
+        // its season is not operating, so it should not contribute a KJ here
+        // while being absent from the calendar, A–Z and map.
+        //
+        // `includeDedicated` is deliberately left at its default. The dedicated
+        // toggle has no control in KJ mode — Navigation renders only the view
+        // switcher and the filter chip — so honouring it would silently drop
+        // venues from a page with no visible way to bring them back. See the
+        // note in KJDossierView for why that matters more there than here.
+        getAllVenues().filter(v => venuePasses(v)).forEach(v => {
             let attributed = false;
             for (const { host } of getVenueHosts(v)) {
                 if (processHost(host, v.id)) attributed = true;

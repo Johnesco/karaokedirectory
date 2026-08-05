@@ -144,14 +144,6 @@ async function init() {
         renderView();
     });
 
-    // Expose helper for map popups
-    window.showVenueDetails = (venueId) => {
-        const venue = getVenueById(venueId);
-        if (venue) {
-            emit(Events.VENUE_SELECTED, venue);
-        }
-    };
-
     // Floating action buttons. Previously an inline <script> in index.html that
     // polled window.isCurrentWeek() every 500ms, because an inline script has no
     // way to subscribe to state.

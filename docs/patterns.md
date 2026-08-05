@@ -752,7 +752,7 @@ const text = pluralize(5, 'venue');  // "5 venues"
 | `tags.js` | Tag configuration storage and badge rendering | Yes |
 | `debug.js` | Debug mode detection and debug HTML | No (imports date.js) |
 | `render.js` | Shared HTML rendering for detail views | No (imports string.js, date.js, url.js) |
-| `validation.js` | Form and data validation | Yes |
+| `hosts.js` | Host ref hydration against the kjs/companies registries | Yes |
 
 ### Gotchas
 

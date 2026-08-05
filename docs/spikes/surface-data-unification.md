@@ -116,7 +116,7 @@ derive the unique list from the events list. Supersedes **#72** (which is now la
 ### S5 — The render layer believes in a shape the schema forbids
 Three fields are rendered but are **schema-illegal** (`additionalProperties:false`) and absent from data:
 
-- `venue.phone` → Contact section `js/utils/render.js:345`. *(And `js/utils/validation.js:198` sanitizes a `phone` from the submit form — a field the schema drops and the renderer can never show: an end-to-end orphan.)*
+- `venue.phone` → Contact section `js/utils/render.js:345`. *(A `js/utils/validation.js` also sanitized a `phone` from the submit form — a field the schema dropped and the renderer could never show. `phone` was promoted to the schema by S5; the whole 228-line module, which nothing ever imported, was deleted by #117.)*
 - `schedule.note` → `js/utils/render.js:69`, `js/components/VenueCard.js:98`, `:184`
 - `host.socials` → `js/utils/render.js:152`, `js/components/VenueCard.js:122`
 
@@ -149,11 +149,11 @@ estimate to be replaced with "Actual" as each issue lands. S2 and S3 overlap on
 
 | Seam | Issue | Implementations today | Baseline dup LOC | Projected net LOC | Actual | Status |
 |---|---|---|---|---|---|---|
-| S1 host walk | #114 | 4 walks | ~100 | −40 … −60 | net **+10** (+40/−30); `getVenueHosts` ~24 LOC offsets per-consumer savings; **4 walks → 1** | ✅ `114-get-venue-hosts`, pending Verify |
-| S2 schedule render | #115 | 6 formatters | ~93 | −15 … −30 (converge) | net **−1**; most skins already used `formatScheduleEntry` — converged the last holdout (`renderOneTime` via a `weekday` opt) + `getScheduleForDate`; **1 core, all skins** | ✅ `unify-surfaces`, pending Verify |
-| S3 alpha detail parity | #116 | 2 detail renderers | 72 (`fullTemplate` 46 + `renderScheduleList` 26) | −55 … −60 | JS net **−57**; CSS **+95** (venue-card section styles) → net **+43**; **facts parity achieved** | ✅ `116-alphabetical-detail-parity`, pending Verify |
-| S4 service predicate/sort | #117 | 6 copies | ~50 | −30 … −50 | net **−7**; predicate **6→1** (`venuePasses`) + `byName`; `getVenuesForDate` derived from events; supersedes #72 | ✅ `unify-surfaces`, pending Verify |
-| S5 schema↔render | #118 | 3 phantom fields | ~18 | −18 (delete) / +schema (promote) | note −26 (render+CSS+debug); schema +18 (phone, host+event socials); **phantom 3→0** | ✅ Implemented on `118-schema-rendered-fields`, pending human Verify |
+| S1 host walk | #114 | 4 walks | ~100 | −40 … −60 | net **+10** (+40/−30); `getVenueHosts` ~24 LOC offsets per-consumer savings; **4 walks → 1** | ✅ merged |
+| S2 schedule render | #115 | 6 formatters | ~93 | −15 … −30 (converge) | net **−1**; most skins already used `formatScheduleEntry` — converged the last holdout (`renderOneTime` via a `weekday` opt) + `getScheduleForDate`; **1 core, all skins** | ✅ merged |
+| S3 alpha detail parity | #116 | 2 detail renderers | 72 (`fullTemplate` 46 + `renderScheduleList` 26) | −55 … −60 | JS net **−57**; CSS **+95** (venue-card section styles) → net **+43**; **facts parity achieved** | ✅ merged |
+| S4 service predicate/sort | #117 | 5 live + 1 dead | ~50 | −30 … −50 | net **−7** then **−341** on completion; predicate **5→1** (`venuePasses`) + `byName`; `getVenuesForDate` derived from events; supersedes #72 | ✅ merged |
+| S5 schema↔render | #118 | 3 phantom fields | ~18 | −18 (delete) / +schema (promote) | note −26 (render+CSS+debug); schema +18 (phone, host+event socials); **phantom 3→0** | ✅ merged |
 | **Total** | (parent #113) | | **~330** | **−160 … −220** | **≈ +37 net** (JS/logic ≈ −61, CSS +80, schema +18) | 5/5 implemented |
 
 **Final actuals — all five implemented, integrated on `unify-surfaces`.** Per-seam net: S5 −8, S1 +10, S3 +43, S4 −7, S2 −1 = **≈ +37 LOC overall**, *not* the projected −160…−220. Split by layer: **JS/application logic ≈ −61** (the real dedup), **CSS +80** (S3's `venue-card` detail-section styling for A–Z parity), **schema +18** (S5 phone + multi-scope socials). The projections badly over-counted raw deletion — every seam added shared code (`getVenueHosts`, `venuePasses`/`byName`, the `weekday` option, the section CSS), and the codebase had *already* converged on `formatScheduleEntry`, so S2/S4 had little raw fat to cut. **The realized value is structural dedup + cross-surface consistency + correctness**, not line count (see below) — plus A–Z now shows per-show hosts / closures / active period it previously omitted, and the KJ surfaces now sort article-insensitively.
@@ -162,7 +162,20 @@ Structural wins (independent of LOC):
 - host-walk implementations **4 → 1**
 - schedule formatters **6 → 1 core + 3 skins**
 - full-detail renderers **2 → 1**
-- service filter predicate **6 → 1**
+- service filter predicate **5 → 1** (see the correction below)
+
+> **Corrected on #117's completion.** This table said "6 copies → 1" for S4 in
+> both the ledger and the list above. It was **five** live copies plus a sixth
+> inside `filterVenues`, which nothing called — and whose day filter compared
+> the stored `"Friday"` against `day.toLowerCase()`, so it could never have
+> matched had anything called it. Counting a dead implementation as deduplicated
+> work overstated the seam and, worse, let the dead code survive the very issue
+> that was meant to retire it. `filterVenues`, `searchVenues`, `getCities`,
+> `getNeighborhoods` and `js/utils/validation.js` were all deleted when #117
+> closed: 341 lines that no import reached.
+>
+> Every row's status read "pending Verify" long after all five merged. They are
+> merged; verification is tracked on the issues, not here.
 - phantom rendered fields **3 → 0** (or promoted to schema)
 
 ## Decisions (resolved 2026-06-14)

@@ -2,16 +2,29 @@
  * Venue data service
  * Handles loading, filtering, sorting, and querying venue data.
  *
- * Key exports:
- * - initVenues(data): Initialize venue data from js/data.json (resolves host refs)
- * - getAllVenues(): Get all active venues
- * - getVenueById(id): Get single venue by ID
- * - getVenuesForDate(date, options): Get venues with karaoke on a specific date
- * - getVenuesSorted(options): Get all venues sorted alphabetically
- * - getVenuesWithCoordinates(options): Get venues with map coordinates
- * - venueMatchesSearch(venue, query): Check if venue matches search query
+ * Every surface reads through one predicate and one comparator:
+ * - venuePasses(venue, ctx): the dedicated + search + activePeriod gate
+ * - byName(a, b): alphabetical, leading articles ignored
  *
- * Search matches against: name, city, host, affiliation, tags (ID and label)
+ * Entry points:
+ * - initVenues(data): Initialize from js/data.json (resolves host refs)
+ * - getAllVenues() / getVenueById(id)
+ * - getVenuesForDate(date, options): venues with karaoke on a date
+ * - getVenueEventsForDate(date, options): the same, one row per show
+ * - getVenuesSorted(options): all venues, alphabetical
+ * - getVenuesWithCoordinates(options): map view
+ * - venueMatchesSearch(venue, query) / venueMatchesHost(venue, query)
+ *
+ * Search matches against: name, city, host, affiliation, tags (ID and label).
+ * It does NOT match event names — see #37.
+ *
+ * A second, unused query API lived here for months: searchVenues, filterVenues,
+ * getCities and getNeighborhoods. All four were reachable from nothing, and
+ * filterVenues carried its own copy of the predicate this file exists to
+ * centralise — plus a day filter comparing the stored "Friday" against
+ * `day.toLowerCase()`, which could never match. Deleted in #117; the
+ * lesson is that an exported function with no caller is not an API, it is a
+ * second implementation waiting to disagree with the first.
  */
 
 import { scheduleMatchesDate, isDateInRange } from '../utils/date.js';
@@ -358,106 +371,6 @@ function venueMatchesTag(venue, query) {
 function venueMatchesDedicated(venue, query) {
     if (!venue.dedicated) return false;
     return 'dedicated'.includes(query) || 'karaoke'.includes(query);
-}
-
-/**
- * Search venues by query.
- * Uses venueMatchesSearch for matching (single source of truth) and filters
- * out venues outside their activePeriod for today — a seasonally-bounded
- * venue should not appear in search results outside its window.
- * @param {string} query - Search query
- * @param {Object} options - Search options
- * @returns {Object[]} Matching venues sorted with name-matches first
- */
-export function searchVenues(query, options = {}) {
-    if (!query?.trim()) {
-        return options.returnAll ? getVenuesSorted(options) : [];
-    }
-
-    const q = query.toLowerCase().trim();
-    const { includeDedicated = true } = options;
-
-    return getActiveVenues()
-        .filter(venue => venuePasses(venue, { includeDedicated, searchQuery: q }))
-        .sort((a, b) => {
-            // Prioritize name matches, then alphabetical
-            const aNameMatch = containsIgnoreCase(a.name, q);
-            const bNameMatch = containsIgnoreCase(b.name, q);
-            if (aNameMatch !== bNameMatch) return aNameMatch ? -1 : 1;
-            return byName(a, b);
-        });
-}
-
-/**
- * Filter venues by multiple criteria
- * @param {Object} filters - Filter criteria
- * @returns {Object[]} Filtered venues
- */
-export function filterVenues(filters = {}) {
-    const {
-        day = null,           // Day of week (lowercase)
-        city = null,          // City name
-        dedicated = null,     // true/false/null (null = include all)
-        search = '',          // Search query
-        date = null           // Specific date
-    } = filters;
-
-    let result = getActiveVenues();
-
-    // Filter by dedicated
-    if (dedicated !== null) {
-        result = result.filter(v => v.dedicated === dedicated);
-    }
-
-    // Filter by city
-    if (city) {
-        result = result.filter(v =>
-            v.address.city.toLowerCase() === city.toLowerCase()
-        );
-    }
-
-    // Filter by specific date
-    if (date) {
-        result = result.filter(venue => {
-            if (venue.activePeriod && !isDateInRange(date, venue.activePeriod.start, venue.activePeriod.end)) {
-                return false;
-            }
-            return venue.schedule.some(sched => scheduleMatchesDate(sched, date));
-        });
-    }
-    // Or filter by day of week
-    else if (day) {
-        result = result.filter(venue =>
-            venue.schedule.some(sched => sched.day === day.toLowerCase())
-        );
-    }
-
-    // Filter by search query
-    if (search?.trim()) {
-        const q = search.toLowerCase().trim();
-        result = result.filter(venue =>
-            containsIgnoreCase(venue.name, q) ||
-            containsIgnoreCase(venue.address.city, q) ||
-            containsIgnoreCase(venue.host?.name, q) ||
-            containsIgnoreCase(venue.host?.affiliation, q)
-        );
-    }
-
-    // Sort alphabetically, ignoring articles
-    return result.sort((a, b) => {
-        const nameA = getSortableName(a.name).toLowerCase();
-        const nameB = getSortableName(b.name).toLowerCase();
-        return nameA.localeCompare(nameB);
-    });
-}
-
-/**
- * Get unique cities from active venues
- * @returns {string[]} Sorted list of cities
- */
-export function getCities() {
-    const cities = new Set(getActiveVenues().map(v => v.address.city).filter(Boolean));
-    return [...cities].sort();
 }
 
 /**
