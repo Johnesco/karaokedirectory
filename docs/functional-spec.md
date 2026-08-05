@@ -1103,6 +1103,24 @@ The `<body>` carries the `page--readable` class, which constrains `.main-content
 
 ## 19 Responsive Design
 
+### Page background
+
+`body` carries a sheet-music photograph (`assets/images/notes3.webp`) at
+`background-size: cover` with `background-attachment: fixed`. It is a design
+element rather than decoration — `.main-content` and the view containers are
+transparent, so it shows through the gutters and behind the 95%-alpha cards.
+
+`background-attachment: fixed` sizes the background to the **viewport**, not
+the document, which is what bounds the asset: nothing wider than the viewport
+is ever sampled. It shipped as a 3000×4000 phone photo at **810 KB**,
+downloaded on every page of the site; #163 re-encoded it to WebP at 1600px —
+**105 KB, an 87% cut**, at SSIM 0.988 / PSNR 46 dB against the original, which
+is past the conventional visually-lossless threshold.
+
+No JPEG fallback is served. WebP has been universal since Safari 14 (2020),
+which is older than the `hwb()` and `paint-order` features `base.css` and
+`views.css` already require.
+
 ### Breakpoints
 
 The scale is **480 / 560 / 768 / 1400**, plus one `min-width: 1024px` rule for
@@ -1348,7 +1366,33 @@ Each public page includes a `<link rel="canonical">` tag pointing to its canonic
 | `/kj/` | one per KJ with at least one show on an active venue | `kjs` registry key |
 | `/company/` | one per company with at least one show | `companies` registry key |
 
-Each page carries its own `<title>`, description, canonical, Open Graph and Twitter tags, and a JSON-LD node whose `@id` is the page's canonical URL — `BarOrPub` for venues, `Person` for KJs, `Organization` for companies.
+Each page carries its own `<title>`, description, canonical, Open Graph and Twitter tags, and a JSON-LD `@graph` whose first node is the page's own entity, `@id`'d to the canonical URL — `BarOrPub` for venues, `Person` for KJs, `Organization` for companies.
+
+### Event markup (JSON-LD)
+
+Every show on a page follows its entity node in the same `@graph` as a **`MusicEvent`** (#164). 132 events across the 116 pages; a show that appears on a venue page, its KJ's page and its company's page carries **the same `@id` on all three**, so a consumer merges them into one event rather than three.
+
+| Field | Source |
+|---|---|
+| `name` | `eventName`, or "Karaoke at {venue}" |
+| `location` | the venue's own `BarOrPub` node, `@id`'d to `/venue/<id>/` |
+| `performer` | `Person` for the KJ and `Organization` for the company, `@id`'d to their pages |
+| `organizer` | the company, when the show has one |
+| `startDate` / `endDate` | `frequency: "once"` only |
+| `eventSchedule` | everything else |
+
+**Recurring shows are described by a rule, not by a list of dates.** A `Schedule` node carries `byDay`, `repeatFrequency` (`P1W` for `every`, `P1M` for the ordinals), `byMonthWeek` (1–4, and **-1** for `last`), `exceptDate` from `exclusions`, and `startDate`/`endDate` from `activePeriod`.
+
+This is the decision worth remembering: Netlify builds **on push, not on a timer**. Concrete dates baked at build time would silently rot between deploys, and an expired event costs a page its eligibility rather than merely wasting a field. A rule stays true however long the gap.
+
+Two consequences of the data model surface here:
+
+- **Duration, never `endTime`.** 94 shows run past midnight, so `endTime` is routinely *smaller* than `startTime` — a contradiction to any consumer that does not know the house convention. `Schedule.duration` (`PT4H`) says the same thing unambiguously. One-time events get a real `endDate` on the following day instead.
+- **Real UTC offsets.** Austin is `-05:00` half the year and `-06:00` the other half, so the offset is probed per date rather than fixed. Relatedly, "today" is computed in `America/Chicago`, not UTC: the UTC date rolls over at 6–7 PM local, and karaoke happens at night, so a UTC comparison would drop an event on the very evening it runs.
+
+**Past one-time events are not published.** They are stale by definition, and `validate-data.js` already warns about them (#169), so the dataset and the markup disagree for at most one curator cycle.
+
+Not emitted: `offers`. The directory does not hold cover-charge data, and asserting "free" would be inventing a fact.
 
 Pages cross-link: a venue lists the KJs and companies who host there, and each of those links back to the venues they play. This is the cross-linking ADR-011 exists to enable, and it is why the identity model had to be settled first.
 
@@ -1367,7 +1411,7 @@ Pages cross-link: a venue lists the KJs and companies who host there, and each o
 
 The site loads **Microsoft Clarity** (project `x1sfnv6zu4`) for anonymous traffic analytics — pageviews, clicks, scroll depth. Clarity sets non-essential cookies, so it is gated behind explicit consent.
 
-Implemented in `js/analytics.js`, loaded with `defer` on all five public pages (`index`, `about`, `submit`, `bingo`, `bday`). It is a standalone IIFE, not an ES module, so it runs independently of `app.js`.
+Implemented in `js/analytics.js`, loaded with `defer` on all four public pages (`index`, `about`, `submit`, `bingo`). It is a standalone IIFE, not an ES module, so it runs independently of `app.js`.
 
 ### The guarantee
 
@@ -1439,12 +1483,14 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-02 | 1.0.20 | #32: Replaced "+N more" with smart "Also [days]" / "Everyday" schedule indicator on compact venue cards. Added `buildAlsoText()` and `abbreviateDay()` helpers in `render.js`. Updated Section 6. | Claude Code |
 | 2026-02 | 1.0.21 | Shareable venue links: URL hash syncs with venue selection (`#venue={id}`), share button on all detail surfaces (modal, pane, map card) with Web Share API / clipboard fallback. Added `shareVenue()` to `url.js`. Updated Sections 4, 7, 21. | Claude Code |
 | 2026-02 | 1.0.22 | SEO quick wins: Added meta descriptions, Open Graph tags, Twitter Card tags, and canonical URLs to all 5 public pages. Created `robots.txt` and `sitemap.xml`. Added `noindex` to `editor.html`. New Section 22. Renumbered Sections 22–23 → 23–24. | Claude Code |
+| | | *Two rows of this entry are now historical only (corrected #163): `editor.html` was removed in #95, so its `noindex` no longer exists to be listed; and `sitemap.xml` is generated by `scripts/build-pages.js` rather than authored (ADR-012). The page count was 5 until `bday.html` was deleted; it is 4.* | |
 | 2026-06 | 1.0.23 | Exclusion Dates feature (#3–#8): recurring shows can be marked closed on specific dates via `schedule[].exclusions` (`"YYYY-MM-DD"` shorthand or `{date, reason}`). Weekly cards dim with a "Closed" banner; Map dims the marker and shows a "Closed Today" card banner; detail modal/pane/map-expanded show a "Closed Today" banner plus an "Upcoming closures" list (next 60 days). Added `getVenueExclusionForDate()` and `getUpcomingExclusions()` to `date.js`. New §11 "Schedule Exclusions"; updated §2, §4, §7, §8. | Claude Code |
 | 2026-07 | 1.0.24 | #88: Map venue card now hides `frequency: "once"` entries dated before today (both summary and detail schedule). Added `isPastOnceEvent()` helper to `js/utils/date.js`. VenueModal and VenueDetailPane unchanged. Updated Section 4. | Claude Code |
 | 2026-07 | 1.0.25 | #137: Compact card "Also …" indicator now omits past one-time events, reusing `isPastOnceEvent()`. Recurring entries unaffected; a venue whose only other entries are past shows no "Also" line. Updated Sections 2 and 6. | Claude Code |
 | 2026-07 | 1.0.26 | #131: KJ index gains a filter box matching KJ *and* company names, and sorts on `getSortableHostName()` so stage titles (KJ/DJ/MC) no longer scatter names alphabetically. "Affiliations" section renamed "Companies". Updated Section 10. | Claude Code |
 | 2026-07 | 1.0.27 | #124 Phase 3: submit form's host fields suggest known KJs/companies from the registries and emit a `{kjId, companyId}` ref when both sides match, falling back to the inline shape otherwise. Email body gains a HOST section saying which it was. Updated Section 15. | Claude Code |
 | 2026-08 | 1.0.28 | #154: Documented the analytics consent banner as new **Section 23**; Known Discrepancies and Change Log renumbered 23→24 and 24→25. Header version/date corrected — it had read "1.0 / February 2026" since creation while this log ran to 1.0.27. Section 20 corrected: `escapeHtml()` no longer uses the DOM `textContent` technique (#147 — it did not escape quotes) and venue data is a JSON file, not a JS file. Drift-prone prose venue counts removed from Sections 1 and 11. | Claude Code |
+| 2026-08 | 1.0.29 | #164: Every show on a generated entity page is now a `MusicEvent` in the page's JSON-LD `@graph` — 132 events, shared by `@id` across venue/KJ/company pages. Recurring shows use `eventSchedule` rather than materialised dates so they cannot rot between deploys; times carry real DST-aware offsets. New "Event markup" subsection in Section 22. #163: page background re-encoded to WebP at viewport width (810 KB → 105 KB) and moved to `assets/images/`; `bday.html` deleted with a 301, taking the public page count from 5 to 4; `og:image:alt` on generated pages stopped advertising the neighborhood field #170 removed. | Claude Code |
 
 ---
 

@@ -40,7 +40,16 @@ const SITE = 'Austin Karaoke Directory';
  * silently-failed card is exactly the failure this whole feature exists to fix.
  */
 const OG_IMAGE = ORIGIN + '/og.jpg';
-const OG_ALT = 'Greater Austin Karaoke Directory - find karaoke nights by day, venue, and neighborhood';
+// "neighborhood" outlived the field: #170 deleted address.neighborhood and fixed
+// the five hand-authored pages, but missed this constant, which stamps all 121
+// generated ones.
+const OG_ALT = 'Greater Austin Karaoke Directory - find karaoke nights by day, venue, and city';
+
+/**
+ * Every venue in the directory is in the Austin metro (#170's city registry is
+ * the closed vocabulary), so one timezone covers the dataset.
+ */
+const TZ = 'America/Chicago';
 
 /** Entity types that get a generated page. Tags are absent on purpose — see ADR-012. */
 const TYPES = ['kj', 'company', 'venue'];
@@ -102,6 +111,73 @@ function sortEntries(entries) {
         const bi = WEEKDAY_ORDER.indexOf((b.day || '').toLowerCase());
         return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi);
     });
+}
+
+// ------------------------------------------------------------ time helpers
+
+/**
+ * Today's date in Austin, not in UTC.
+ *
+ * This distinction is not pedantic here: `new Date().toISOString()` rolls over
+ * at 6 or 7 PM local, and karaoke happens at night. Using the UTC date would
+ * drop a one-time event from the markup on the very evening it runs.
+ */
+function todayInTz() {
+    const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit',
+    }).formatToParts(new Date());
+    const get = (t) => parts.find((p) => p.type === t).value;
+    return `${get('year')}-${get('month')}-${get('day')}`;
+}
+
+/**
+ * UTC offset in effect in Austin on a given date, as "-05:00" / "-06:00".
+ *
+ * A hardcoded offset is wrong for half the year, and an event written in
+ * November using June's offset lands an hour off in every calendar that
+ * ingests it. Probing the actual instant is a few lines and is simply correct.
+ */
+function tzOffset(date, hhmm) {
+    const probe = new Date(`${date}T${hhmm || '12:00'}:00Z`);
+    const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: TZ, timeZoneName: 'longOffset',
+    }).formatToParts(probe);
+    const name = parts.find((p) => p.type === 'timeZoneName');
+    const m = name && /GMT([+-]\d{2}:\d{2})/.exec(name.value);
+    return m ? m[1] : '-06:00';
+}
+
+/** ISO 8601 with a real offset: 2026-03-15T20:00:00-05:00 */
+function isoDateTime(date, hhmm) {
+    if (!date) return undefined;
+    const t = hhmm || '00:00';
+    return `${date}T${t}:00${tzOffset(date, t)}`;
+}
+
+function addDay(date) {
+    const d = new Date(`${date}T00:00:00Z`);
+    d.setUTCDate(d.getUTCDate() + 1);
+    return d.toISOString().slice(0, 10);
+}
+
+/**
+ * ISO 8601 duration between two "HH:MM" times, e.g. "PT4H".
+ *
+ * Shows routinely run past midnight — 21:00–01:00 is the house pattern — so a
+ * non-positive difference means the next day, not a data error. Emitting
+ * `duration` rather than an `endTime` of "01:00" is what keeps that
+ * unambiguous: an endTime earlier than its startTime reads as a contradiction.
+ */
+function durationOf(startTime, endTime) {
+    if (!startTime || !endTime) return undefined;
+    const [sh, sm] = startTime.split(':').map(Number);
+    const [eh, em] = endTime.split(':').map(Number);
+    let mins = (eh * 60 + em) - (sh * 60 + sm);
+    if (mins <= 0) mins += 24 * 60;
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    const iso = `PT${h ? `${h}H` : ''}${m ? `${m}M` : ''}`;
+    return iso === 'PT' ? undefined : iso;
 }
 
 // ---------------------------------------------------------------- model
@@ -187,42 +263,47 @@ function titleFor(e) {
     return `${e.name} — Karaoke Company in Austin — ${SITE}`;
 }
 
-/** JSON-LD. @id is the entity URL, which is exactly what ADR-011's ids buy. */
+/**
+ * The venue as a schema.org place. One definition, used both as the venue
+ * page's own node and as every event's `location` — including on KJ and
+ * company pages, where the venue has no node of its own.
+ *
+ * Because the `@id` is the venue's canonical URL either way, a consumer that
+ * crawls a KJ page and a venue page merges the two into one place rather than
+ * inventing two. That is the whole point of ADR-011's stable ids.
+ */
+function venueNode(venue) {
+    const a = venue.address || {};
+    const url = `${ORIGIN}/venue/${venue.id}/`;
+    const node = { '@type': 'BarOrPub', '@id': url, name: venue.name, url };
+    if (a.street || a.city) {
+        node.address = {
+            '@type': 'PostalAddress',
+            streetAddress: a.street || undefined,
+            addressLocality: a.city || undefined,
+            addressRegion: a.state || undefined,
+            postalCode: a.zip || undefined,
+            addressCountry: 'US',
+        };
+    }
+    if (venue.coordinates) {
+        node.geo = {
+            '@type': 'GeoCoordinates',
+            latitude: venue.coordinates.lat,
+            longitude: venue.coordinates.lng,
+        };
+    }
+    if (venue.phone) node.telephone = venue.phone;
+    if (venue.socials && venue.socials.website) node.sameAs = [venue.socials.website];
+    return node;
+}
+
+/** JSON-LD for the page's own entity. @id is the entity URL (ADR-011). */
 function jsonLd(e) {
     const url = urlFor(e);
-    if (e.type === 'venue') {
-        const a = e.venue.address || {};
-        const node = {
-            '@context': 'https://schema.org',
-            '@type': 'BarOrPub',
-            '@id': url,
-            name: e.name,
-            url,
-        };
-        if (a.street || a.city) {
-            node.address = {
-                '@type': 'PostalAddress',
-                streetAddress: a.street || undefined,
-                addressLocality: a.city || undefined,
-                addressRegion: a.state || undefined,
-                postalCode: a.zip || undefined,
-                addressCountry: 'US',
-            };
-        }
-        if (e.venue.coordinates) {
-            node.geo = {
-                '@type': 'GeoCoordinates',
-                latitude: e.venue.coordinates.lat,
-                longitude: e.venue.coordinates.lng,
-            };
-        }
-        if (e.venue.phone) node.telephone = e.venue.phone;
-        if (e.venue.socials && e.venue.socials.website) node.sameAs = [e.venue.socials.website];
-        return node;
-    }
+    if (e.type === 'venue') return venueNode(e.venue);
 
     const node = {
-        '@context': 'https://schema.org',
         '@type': e.type === 'kj' ? 'Person' : 'Organization',
         '@id': url,
         name: e.name,
@@ -231,7 +312,131 @@ function jsonLd(e) {
         areaServed: 'Austin, TX',
     };
     if (e.website) node.sameAs = [e.website];
-    return JSON.parse(JSON.stringify(node)); // drop undefined
+    return node;
+}
+
+/** schema.org day URIs, keyed by the lowercase day names data.json stores. */
+const DAY_URI = Object.fromEntries(
+    WEEKDAY_ORDER.map((d) => [d, `https://schema.org/${d[0].toUpperCase()}${d.slice(1)}`])
+);
+
+/** `frequency` -> Schedule.byMonthWeek. "last" is -1, which is why it is a map. */
+const MONTH_WEEK = { first: 1, second: 2, third: 3, fourth: 4, last: -1 };
+
+/**
+ * A recurring show as a schema.org Schedule.
+ *
+ * Deliberately NOT materialised into concrete dates. Netlify builds on push,
+ * not on a timer, so a list of dates baked at build time silently rots between
+ * deploys — and an expired event is worse than no markup, because search
+ * engines drop the page rather than ignore the field. A Schedule states the
+ * rule instead of its consequences, so it stays true however long the gap.
+ *
+ * The mapping falls out of the data model almost exactly: `every` is a weekly
+ * repeat, the ordinals are monthly repeats with `byMonthWeek`, `exclusions`
+ * are `exceptDate`, and `activePeriod` bounds the whole thing.
+ */
+function scheduleNode(entry, venue) {
+    const node = { '@type': 'Schedule', scheduleTimezone: TZ };
+    const day = (entry.day || '').toLowerCase();
+    if (DAY_URI[day]) node.byDay = DAY_URI[day];
+
+    if (entry.frequency === 'every') {
+        node.repeatFrequency = 'P1W';
+    } else if (MONTH_WEEK[entry.frequency]) {
+        node.repeatFrequency = 'P1M';
+        node.byMonthWeek = MONTH_WEEK[entry.frequency];
+    }
+
+    if (entry.startTime) node.startTime = `${entry.startTime}:00`;
+    const dur = durationOf(entry.startTime, entry.endTime);
+    if (dur) node.duration = dur;
+
+    const skipped = (entry.exclusions || []).map((x) => x && x.date).filter(Boolean);
+    if (skipped.length) node.exceptDate = skipped.length === 1 ? skipped[0] : skipped;
+
+    const period = venue.activePeriod || {};
+    if (period.start) node.startDate = period.start;
+    if (period.end) node.endDate = period.end;
+
+    return node;
+}
+
+/** Stable, unique anchor for an event. Two shows can share a venue and a day. */
+function eventId(venue, entry) {
+    const when = entry.frequency === 'once'
+        ? `once-${entry.date}`
+        : `${entry.frequency}-${(entry.day || 'day').toLowerCase()}`;
+    const at = (entry.startTime || '').replace(':', '');
+    return `${ORIGIN}/venue/${venue.id}/#${when}${at ? `-${at}` : ''}`;
+}
+
+/**
+ * The shows on this page as schema.org MusicEvent nodes.
+ *
+ * Past one-time events are dropped: they are stale data by definition, and
+ * publishing an expired event costs the page its eligibility rather than
+ * merely wasting a field. `validate-data.js` already warns about them (#169),
+ * so the dataset and the markup disagree for at most one curator cycle.
+ */
+function eventNodes(shows, data) {
+    const today = todayInTz();
+    const out = [];
+
+    for (const show of shows) {
+        const { venue, entry } = show;
+        if (entry.frequency === 'once' && (!entry.date || entry.date < today)) continue;
+
+        const node = {
+            '@type': 'MusicEvent',
+            '@id': eventId(venue, entry),
+            name: entry.eventName || `Karaoke at ${venue.name}`,
+            eventStatus: 'https://schema.org/EventScheduled',
+            eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+            location: venueNode(venue),
+            image: OG_IMAGE,
+            url: entry.eventUrl || `${ORIGIN}/venue/${venue.id}/`,
+        };
+
+        if (entry.frequency === 'once') {
+            node.startDate = isoDateTime(entry.date, entry.startTime);
+            if (entry.endTime) {
+                const crosses = entry.startTime && entry.endTime < entry.startTime;
+                node.endDate = isoDateTime(crosses ? addDay(entry.date) : entry.date, entry.endTime);
+            }
+            node.description = `One-time karaoke event at ${venue.name}.`;
+        } else {
+            node.eventSchedule = scheduleNode(entry, venue);
+            node.description = `${entryLabel(entry)} karaoke at ${venue.name}.`;
+        }
+
+        const performers = [];
+        const kj = show.kjId && (data.kjs || {})[show.kjId];
+        const co = show.companyId && (data.companies || {})[show.companyId];
+        if (kj) performers.push({ '@type': 'Person', '@id': `${ORIGIN}/kj/${show.kjId}/`, name: kj.name });
+        if (co) performers.push({ '@type': 'Organization', '@id': `${ORIGIN}/company/${show.companyId}/`, name: co.name });
+        if (performers.length) node.performer = performers.length === 1 ? performers[0] : performers;
+        if (co) node.organizer = { '@type': 'Organization', '@id': `${ORIGIN}/company/${show.companyId}/`, name: co.name };
+
+        out.push(node);
+    }
+
+    return out;
+}
+
+/**
+ * The page's full graph: the entity, then its shows.
+ *
+ * `@graph` rather than one node because a page now describes several linked
+ * things. Nodes reference each other by `@id`, so a venue named as an event's
+ * location is the same node as the venue page itself.
+ */
+function graphFor(e, data) {
+    const nodes = [jsonLd(e), ...eventNodes(e.shows || [], data)];
+    return JSON.parse(JSON.stringify({   // drop undefined
+        '@context': 'https://schema.org',
+        '@graph': nodes,
+    }));
 }
 
 /**
@@ -341,7 +546,7 @@ function renderPage(e, data) {
 <link rel="stylesheet" href="/css/layout.css">
 <link rel="stylesheet" href="/css/components.css">
 <link rel="stylesheet" href="/css/views.css">
-<script type="application/ld+json">${jsonLdScript(jsonLd(e))}</script>
+<script type="application/ld+json">${jsonLdScript(graphFor(e, data))}</script>
 </head>
 <body class="page--readable">
 <header class="site-header">
@@ -436,4 +641,10 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { entitiesOf, showsOf, renderPage, renderSitemap, describe, titleFor, jsonLd, jsonLdScript, urlFor, esc, clip, sentence };
+module.exports = {
+    entitiesOf, showsOf, renderPage, renderSitemap, describe, titleFor,
+    jsonLd, jsonLdScript, urlFor, esc, clip, sentence,
+    // event markup (#164)
+    graphFor, eventNodes, scheduleNode, venueNode, eventId,
+    durationOf, isoDateTime, tzOffset, todayInTz, addDay,
+};
