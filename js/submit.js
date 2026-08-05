@@ -37,6 +37,7 @@ const TAG_GRID_EXCLUDE = new Set([
 let tagDefinitions = {};
 let knownKjs = {};        // id → { name, ... }  (ADR-007 registries)
 let knownCompanies = {};
+let knownCities = {};     // id → { name }       (#170 city vocabulary)
 
 function getUserSelectableTagIds() {
     return Object.keys(tagDefinitions).filter(id => !TAG_GRID_EXCLUDE.has(id));
@@ -55,9 +56,18 @@ function matchRegistryId(registry, typed) {
     return hit ? hit[0] : null;
 }
 
-/** Fill a <datalist> with the registry's names, so typing suggests known hosts. */
-function populateHostSuggestions() {
-    for (const [listId, registry] of [['known-kjs', knownKjs], ['known-companies', knownCompanies]]) {
+/** Fill a <datalist> with a registry's names, so typing suggests known values. */
+function populateSuggestions() {
+    const lists = [
+        ['known-kjs', knownKjs],
+        ['known-companies', knownCompanies],
+        // #170 made address.city a closed vocabulary that validate-data.js
+        // hard-fails on. Free text is what produced 19 distinct strings for 17
+        // real cities, and this form could still emit "Hutto/Round Rock"
+        // verbatim (#212).
+        ['known-cities', knownCities],
+    ];
+    for (const [listId, registry] of lists) {
         const list = document.getElementById(listId);
         if (!list) continue;
         list.innerHTML = Object.values(registry)
@@ -83,7 +93,8 @@ function populateHostSuggestions() {
         tagDefinitions = data.tagDefinitions || {};
         knownKjs = data.kjs || {};
         knownCompanies = data.companies || {};
-        populateHostSuggestions();
+        knownCities = data.cities || {};
+        populateSuggestions();
     } catch (error) {
         console.error('Could not load tag definitions from js/data.json:', error);
         grid.innerHTML = '<p class="validation-error">Could not load the tag list. Everything else on this form still works.</p>';
@@ -292,6 +303,7 @@ function addScheduleEntry() {
                 <option value="second">Second</option>
                 <option value="third">Third</option>
                 <option value="fourth">Fourth</option>
+                <option value="fifth">Fifth</option>
                 <option value="last">Last</option>
                 <option value="once">One-Time Event</option>
             </select>
@@ -549,13 +561,25 @@ function collectFormData() {
         if (other) contactMethods.push({ type: 'other', value: other });
     }
 
+    // `address.city` is a closed vocabulary (#170) that validate-data.js hard-
+    // fails on, but a venue in a suburb the registry doesn't list yet is still
+    // a real submission. So the value passes through and the email flags it,
+    // the same reconciliation route an unrecognised host takes — rejecting the
+    // report would lose the venue to save the curator one lookup.
+    const cityNote = matchRegistryId(knownCities, venue.address.city)
+        ? ''
+        : `"${venue.address.city}" is not in the cities registry. Add it to `
+          + `data.json's "cities" map, or correct the spelling — validate-data.js `
+          + `fails the venue otherwise.`;
+
     return {
         venue,
         notes,
         submitterName,
         submitterType,
         contactMethods,
-        hostNote
+        hostNote,
+        cityNote
     };
 }
 
@@ -594,6 +618,10 @@ function formatEmailBody(data) {
     // the ref shape can't hold.
     if (data.hostNote) {
         body += 'HOST:\n' + data.hostNote + '\n\n';
+    }
+
+    if (data.cityNote) {
+        body += 'CITY:\n' + data.cityNote + '\n\n';
     }
 
     body += 'VENUE JSON (copy/paste ready):\n';
