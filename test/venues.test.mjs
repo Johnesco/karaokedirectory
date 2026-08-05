@@ -11,7 +11,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { venuePasses, venueMatchesSearch, venueMatchesHost, byName } from '../js/services/venues.js';
+import { venuePasses, venueMatchesSearch, venueMatchesHost, byName, initVenues, hostMatches, resolveHostLabel } from '../js/services/venues.js';
 import { hydrateVenues, isHostRef, resolveHostRef } from '../js/utils/hosts.js';
 
 const JAN = (d) => new Date(2026, 0, d);
@@ -118,14 +118,75 @@ describe('venueMatchesHost', () => {
     assert.equal(venueMatchesHost(venue(), ''), true);
   });
 
-  it('matches on SUBSTRING, so distinct KJs collide', () => {
-    // Not an endorsement — this is the live defect behind the ?kj= identity
-    // work (#124 Phase 5, #171). A query of "Joe" matches "Average Joe" and
-    // would equally match any other Joe. When ?kj= moves to registry ids this
-    // test should be replaced by an exact-id assertion.
+  it('still substring-matches a NAME, for links that predate ids', () => {
+    // Legacy behaviour, kept deliberately so shared and indexed ?kj=<name>
+    // links keep working. No link the app renders produces one any more.
     const v = venue({ host: { name: 'Average Joe' } });
     assert.equal(venueMatchesHost(v, 'Joe'), true);
     assert.equal(venueMatchesHost(v, 'ave'), true);
+  });
+});
+
+describe('venueMatchesHost — registry ids (#124 Phase 5)', () => {
+  // The collision this closes: "Armando" is a substring of "KJ Armando and
+  // Paola", so a dossier for one showed venues belonging to the other. Ids are
+  // matched exactly; names are not.
+  const DATA = {
+    kjs: {
+      'armando': { name: 'Armando' },
+      'kj-armando-and-paola': { name: 'KJ Armando and Paola' },
+    },
+    companies: {
+      'starling-karaoke': { name: 'Starling Karaoke' },
+    },
+    listings: [
+      { id: 'solo-bar', name: 'Solo Bar', address: {}, schedule: [],
+        host: { kjId: 'armando' } },
+      { id: 'duo-bar', name: 'Duo Bar', address: {}, schedule: [],
+        host: { kjId: 'kj-armando-and-paola' } },
+      { id: 'company-bar', name: 'Company Bar', address: {}, schedule: [],
+        host: { companyId: 'starling-karaoke' } },
+    ],
+  };
+
+  it('an id matches only its own entity', () => {
+    initVenues(structuredClone(DATA));
+    const solo = { ...DATA.listings[0] };
+    const duo = { ...DATA.listings[1] };
+    assert.equal(venueMatchesHost(solo, 'armando'), true);
+    assert.equal(venueMatchesHost(duo, 'armando'), false,
+      'the duo must NOT appear under the solo KJ');
+    assert.equal(venueMatchesHost(duo, 'kj-armando-and-paola'), true);
+    assert.equal(venueMatchesHost(solo, 'kj-armando-and-paola'), false);
+  });
+
+  it('an id query never falls back to substring matching', () => {
+    // This is the subtle half. "armando" IS a valid id, and it is also a
+    // substring of the duo's name — so a fallback pass would re-open the
+    // collision the id was meant to close.
+    initVenues(structuredClone(DATA));
+    assert.equal(hostMatches({ kjId: 'kj-armando-and-paola', name: 'KJ Armando and Paola' }, 'armando'),
+      false);
+  });
+
+  it('company ids work the same way', () => {
+    initVenues(structuredClone(DATA));
+    assert.equal(hostMatches({ companyId: 'starling-karaoke', affiliation: 'Starling Karaoke' }, 'starling-karaoke'), true);
+    assert.equal(hostMatches({ kjId: 'armando', name: 'Armando' }, 'starling-karaoke'), false);
+  });
+
+  it('a non-id query still substring-matches, so old links survive', () => {
+    initVenues(structuredClone(DATA));
+    // "Paola" is nobody's id, so it behaves as a name query.
+    assert.equal(hostMatches({ kjId: 'kj-armando-and-paola', name: 'KJ Armando and Paola' }, 'Paola'), true);
+  });
+
+  it('resolveHostLabel turns an id back into a display name', () => {
+    initVenues(structuredClone(DATA));
+    assert.equal(resolveHostLabel('kj-armando-and-paola'), 'KJ Armando and Paola');
+    assert.equal(resolveHostLabel('starling-karaoke'), 'Starling Karaoke');
+    // A legacy name link resolves to itself rather than an empty title.
+    assert.equal(resolveHostLabel('Some Old Name'), 'Some Old Name');
   });
 });
 

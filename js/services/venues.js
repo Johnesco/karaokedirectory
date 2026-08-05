@@ -22,6 +22,9 @@ import { hydrateVenues } from '../utils/hosts.js';
 
 let venues = [];
 
+// Registry ids (kjs + companies), lowercased. Populated by initVenues.
+let registryIds = new Set();
+
 /**
  * Check if a venue is active
  * Venues without an 'active' property are considered active (default true)
@@ -96,6 +99,13 @@ export function initVenues(data) {
     // Resolve any { kjId, companyId } host refs against the kjs/companies
     // registries so everything downstream sees one host shape (ADR-007).
     venues = hydrateVenues(data);
+
+    // The set of ids `?kj=` can name. Kept so venueMatchesHost can tell an id
+    // query from a name query — see hostMatches (#124 Phase 5).
+    registryIds = new Set([
+        ...Object.keys(data.kjs || {}),
+        ...Object.keys(data.companies || {}),
+    ].map(id => id.toLowerCase()));
     const activeCount = getActiveVenues().length;
     const inactiveCount = venues.length - activeCount;
     console.log(`Loaded ${venues.length} venues (${activeCount} active, ${inactiveCount} inactive)`);
@@ -121,23 +131,79 @@ export function getVenueById(id) {
 }
 
 /**
- * Check if a venue is hosted by a KJ matching the given query.
- * Substring + case-insensitive. Matches on venue.host.name, venue.host.affiliation,
- * and per-show schedule[N].host.{name,affiliation} (for multi-host venues like
- * The Highball). Does NOT match venue name, city, tags, or event names — use
+ * Check if a venue is hosted by the KJ or company the query identifies.
+ *
+ * Two modes, in order:
+ *
+ *   1. **Registry id** — an exact match against `host.kjId` or `host.companyId`.
+ *      This is what `?kj=` carries now, and it identifies exactly one entity.
+ *   2. **Name substring** — the old behaviour, kept so links already shared or
+ *      indexed keep working.
+ *
+ * Mode 2 is why this needed fixing (#124 Phase 5). A substring cannot identify
+ * an entity: `?kj=armando` matched both "Armando" and "KJ Armando and Paola" —
+ * two different KJs on one dossier — and `?kj=karaoke` matched 23 venues across
+ * 13 distinct hosts, because most company names contain the word. A dossier is
+ * supposed to be one host's shows.
+ *
+ * Ids are checked first and exactly, so a registry id can never widen into a
+ * substring sweep.
+ *
+ * Does NOT match venue name, city, tags, or event names — use
  * venueMatchesSearch() for that.
  *
+ * `hostMatches` is exported so the dossier can filter individual schedule
+ * entries by the same rule. It used to substring-match them separately, which
+ * would show zero shows for a dossier reached by id.
+ *
  * @param {Object} venue - Venue object
- * @param {string} query - Host name or affiliation substring
- * @returns {boolean} True if any host field substring-matches
+ * @param {string} query - Registry id (preferred) or host-name substring
+ * @returns {boolean} True if the venue is hosted by that entity
  */
+export function hostMatches(host, query) {
+    if (!host) return false;
+    const q = (query || '').toLowerCase().trim();
+    if (!q) return true;
+
+    // An id query is answered by id alone. Falling through to the substring
+    // pass would undo the whole fix: `?kj=armando` is a valid KJ id, but the
+    // string "armando" is also inside "KJ Armando and Paola", so a venue hosted
+    // ONLY by the duo still matched. Verified against Feral Housewife Wine,
+    // whose single host is the duo (#124 Phase 5).
+    if (registryIds.has(q)) {
+        return host.kjId === q || host.companyId === q;
+    }
+
+    // Not an id — a legacy name link. Substring, as before.
+    return containsIgnoreCase(host.name, q) || containsIgnoreCase(host.affiliation, q);
+}
+
 export function venueMatchesHost(venue, query) {
     if (!query?.trim()) return true;
-    const q = query.toLowerCase().trim();
+    return getVenueHosts(venue).some(({ host }) => hostMatches(host, query));
+}
 
-    return getVenueHosts(venue).some(({ host }) =>
-        containsIgnoreCase(host.name, q) || containsIgnoreCase(host.affiliation, q)
-    );
+/**
+ * Resolve a `?kj=` value to a display label.
+ *
+ * A registry id is not a name — `?kj=kj-armando-and-paola` should title the page
+ * "KJ Armando and Paola", not echo the slug. Falls back to the query itself for
+ * legacy name links (#124 Phase 5).
+ *
+ * @param {string} query - Registry id or legacy name
+ * @returns {string} Display label
+ */
+export function resolveHostLabel(query) {
+    const q = (query || '').trim();
+    if (!q) return '';
+
+    for (const venue of getAllVenues()) {
+        for (const { host } of getVenueHosts(venue)) {
+            if (host.kjId === q && host.name) return host.name;
+            if (host.companyId === q && host.affiliation) return host.affiliation;
+        }
+    }
+    return q;
 }
 
 /**

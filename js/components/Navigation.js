@@ -18,6 +18,7 @@ import { Component } from './Component.js';
 import { getState, setState, subscribe, navigateWeek, goToCurrentWeek } from '../core/state.js';
 import { formatWeekRange, getWeekStart, isCurrentWeek } from '../utils/date.js';
 import { resolveView, isKJView } from '../core/router.js';
+import { resolveHostLabel } from '../services/venues.js';
 import { html, raw } from '../utils/string.js';
 
 export class Navigation extends Component {
@@ -47,7 +48,8 @@ export class Navigation extends Component {
         if (isKJView(resolved)) {
             const isIndex = resolved === 'kj-index';
             let chipLabel = 'KJ:';
-            let chipValue = hostFilter;
+            // hostFilter carries a registry id now; show the name (#124 Phase 5).
+            let chipValue = resolveHostLabel(hostFilter);
             let chipIcon = 'fa-microphone-lines';
             if (isIndex) {
                 chipLabel = '';

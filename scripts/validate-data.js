@@ -245,6 +245,28 @@ for (const [id, count] of Object.entries(idCounts)) {
     if (count > 1) issues.push(`Duplicate ID: ${id} (${count} times)`);
 }
 
+// ---- Committed data is refs-only (#124 Phase 5) ----
+// The schema accepts BOTH host shapes on purpose: the inline form is the submit
+// form's intake contract, carrying a KJ or company we don't have a registry
+// entry for yet (ADR-007 amendment). That tolerance is for submissions, not for
+// this file — js/data.json should be all refs, or identity goes back to being a
+// string and `?kj=` goes back to substring matching.
+//
+// A hard failure, because there is no case where a committed inline host is
+// right: the curator creates the registry entry as part of accepting the
+// submission.
+for (const venue of data.listings) {
+    const check = (host, where) => {
+        if (!host) return;
+        if (host.kjId || host.companyId) return;
+        const named = host.name || host.affiliation || '(unnamed)';
+        fail(venue, `${where} is an inline host ("${named}") — js/data.json is ` +
+            'refs-only. Add the KJ/company to the registry and reference it by id.');
+    };
+    check(venue.host, 'host');
+    (venue.schedule || []).forEach((entry, i) => check(entry.host, `schedule[${i}].host`));
+}
+
 // ---- Registry hygiene (warnings — bad smells, not broken data) ----
 // An unreferenced entry is dead weight; two entries with the same name are the
 // duplication ADR-007 exists to remove, creeping back in.

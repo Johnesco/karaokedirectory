@@ -68,3 +68,58 @@ Two top-level registries in `data.json`, with shows referencing them by id:
 - **#124** — implementation ticket (phased: contract/runtime → migration → submit form → curator → cleanup)
 - **ADR-005** — the schema this extends; **ADR-006** — migration edits `data.json`, `data.js` regenerated
 - Tag system (`tagDefinitions` + `validate-data.js` cross-reference) — the in-repo precedent this generalizes
+
+---
+
+## Amendment (2026-08-04, #124 Phase 5)
+
+### The dual-shape `oneOf` is permanent — it is the intake contract, not a transition artifact
+
+The Negative section above calls the inline-host shape a cost of "the transition
+window", and Phase 5 was originally scoped to delete it once the curator and the
+submit form were migrated. Both are migrated. It is staying anyway.
+
+Phase 3 built the submit form to emit a **ref** when a typed KJ or company name
+matches a registry entry, and the **inline** shape when it does not. That
+fallback is not a leftover — it is what carries the most valuable submissions we
+receive, the ones telling us about a host we do not have yet. Removing inline
+support would mean the form has to reject an unknown name, or silently drop the
+attribution.
+
+So the two shapes have different jobs:
+
+| Shape | Where it is legal | Why |
+|---|---|---|
+| `{ kjId?, companyId? }` | `js/data.json` | The committed data is all refs. Identity is exact, and the registries are the single source of truth. |
+| `{ name?, affiliation?, website?, socials? }` | submission intake | A submitter cannot know registry ids. An unrecognised name still has to arrive intact for the curator to reconcile. |
+
+The schema keeps accepting both. `js/data.json` staying all-refs is a separate,
+narrower rule — enforceable by a check on the committed file rather than by
+tightening the shared contract.
+
+### `?kj=` now carries a registry id
+
+The Positive section anticipated this ("the index and dossiers group by id,
+ending substring conflation and enabling stable `?kj=<slug>` URLs later"). Later
+is now.
+
+`KJIndexView` groups by `kjId`/`companyId`, falling back to the lowercased name
+only for inline hosts, and every link it renders carries an id. `venueMatchesHost`
+resolves an id **exactly**; name substring matching is retained solely so links
+shared or indexed before this change keep working.
+
+One subtlety worth recording, because getting it wrong silently re-opens the bug:
+**an id query must not fall through to the substring pass.** `armando` is a valid
+KJ id *and* a substring of "KJ Armando and Paola", so a fallback would still have
+matched a venue hosted only by the duo. The service keeps the set of known
+registry ids and answers an id query by id alone.
+
+### Supabase seed pipeline — deferred, deliberately
+
+Phase 5 also listed updating `supabase/seed-from-data.js` for the registries.
+Supabase was parked by **ADR-009** and its scaffolding moved to
+`_deprecated/supabase/`. Updating a seed script for a runtime that no longer
+exists would be maintaining two data models to no benefit. It stays deferred;
+ADR-009's re-entry trigger (the directory needing a *write* path) is when it gets
+revisited, and at that point the registries are the shape it should target
+anyway.

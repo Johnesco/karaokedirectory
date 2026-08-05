@@ -161,48 +161,55 @@ export class KJIndexView extends Component {
         const affiliations = new Map();
         const independents = new Map();
 
-        const addAffiliation = (rawAff, venueId) => {
+        // Group by registry id, falling back to the lowercased name for the
+        // legacy inline hosts the schema still accepts from submissions.
+        //
+        // The name was the key for both before #124 Phase 5, which is how
+        // "Armando" and "KJ Armando and Paola" ended up sharing a dossier: the
+        // link carried a name, and a name is matched by substring. An id is
+        // matched exactly, so the link means one entity.
+        const addAffiliation = (rawAff, companyId, venueId) => {
             const aff = (rawAff || '').trim();
             if (!aff) return null;
-            const key = aff.toLowerCase();
+            const key = companyId || aff.toLowerCase();
             if (!affiliations.has(key)) {
-                affiliations.set(key, { name: aff, venueIds: new Set(), kjs: new Map() });
+                affiliations.set(key, { id: companyId || null, name: aff, venueIds: new Set(), kjs: new Map() });
             }
             const entry = affiliations.get(key);
             entry.venueIds.add(venueId);
             return entry;
         };
 
-        const addKJUnder = (affEntry, rawName, venueId) => {
+        const addKJUnder = (affEntry, rawName, kjId, venueId) => {
             const name = (rawName || '').trim();
             if (!name) return;
-            const key = name.toLowerCase();
+            const key = kjId || name.toLowerCase();
             if (!affEntry.kjs.has(key)) {
-                affEntry.kjs.set(key, { name, venueIds: new Set() });
+                affEntry.kjs.set(key, { id: kjId || null, name, venueIds: new Set() });
             }
             affEntry.kjs.get(key).venueIds.add(venueId);
         };
 
-        const addIndependent = (rawName, venueId) => {
+        const addIndependent = (rawName, kjId, venueId) => {
             const name = (rawName || '').trim();
             if (!name) return;
-            const key = name.toLowerCase();
+            const key = kjId || name.toLowerCase();
             if (!independents.has(key)) {
-                independents.set(key, { name, venueIds: new Set() });
+                independents.set(key, { id: kjId || null, name, venueIds: new Set() });
             }
             independents.get(key).venueIds.add(venueId);
         };
 
         const processHost = (host, venueId) => {
             if (!host) return false;
-            const affEntry = addAffiliation(host.affiliation, venueId);
+            const affEntry = addAffiliation(host.affiliation, host.companyId, venueId);
             if (affEntry) {
-                addKJUnder(affEntry, host.name, venueId);
+                addKJUnder(affEntry, host.name, host.kjId, venueId);
                 return true;
             }
             const nm = (host.name || '').trim();
             if (!nm) return false;
-            addIndependent(host.name, venueId);
+            addIndependent(host.name, host.kjId, venueId);
             return true;
         };
 
@@ -223,23 +230,26 @@ export class KJIndexView extends Component {
 
         const affiliationList = [...affiliations.values()]
             .map(a => ({
+                id: a.id,
                 name: a.name,
                 venueCount: a.venueIds.size,
                 kjs: [...a.kjs.values()]
-                    .map(k => ({ name: k.name, venueCount: k.venueIds.size }))
+                    .map(k => ({ id: k.id, name: k.name, venueCount: k.venueIds.size }))
                     .sort(sortByName),
             }))
             .sort(sortByName);
 
         const independentList = [...independents.values()]
-            .map(k => ({ name: k.name, venueCount: k.venueIds.size }))
+            .map(k => ({ id: k.id, name: k.name, venueCount: k.venueIds.size }))
             .sort(sortByName);
 
         return { affiliations: affiliationList, independents: independentList, noHostCount };
     }
 
-    renderAffiliation({ name, venueCount, kjs }) {
-        const href = `?kj=${encodeURIComponent(name)}`;
+    renderAffiliation({ id, name, venueCount, kjs }) {
+        // Prefer the registry id: it identifies one entity exactly. Falls back
+        // to the name for legacy inline hosts, which have no id (#124 Phase 5).
+        const href = `?kj=${encodeURIComponent(id || name)}`;
         const subList = kjs.length > 0
             ? `
                 <ul class="kj-index__sublist">
@@ -258,8 +268,10 @@ export class KJIndexView extends Component {
         `;
     }
 
-    renderKjUnderAffiliation({ name, venueCount }) {
-        const href = `?kj=${encodeURIComponent(name)}`;
+    renderKjUnderAffiliation({ id, name, venueCount }) {
+        // Prefer the registry id: it identifies one entity exactly. Falls back
+        // to the name for legacy inline hosts, which have no id (#124 Phase 5).
+        const href = `?kj=${encodeURIComponent(id || name)}`;
         return `
             <li class="kj-index__subitem" data-search="${escapeHtml(name.toLowerCase())}">
                 <a class="kj-index__link kj-index__link--kj" href="${href}">
@@ -270,8 +282,10 @@ export class KJIndexView extends Component {
         `;
     }
 
-    renderIndependent({ name, venueCount }) {
-        const href = `?kj=${encodeURIComponent(name)}`;
+    renderIndependent({ id, name, venueCount }) {
+        // Prefer the registry id: it identifies one entity exactly. Falls back
+        // to the name for legacy inline hosts, which have no id (#124 Phase 5).
+        const href = `?kj=${encodeURIComponent(id || name)}`;
         return `
             <li class="kj-index__item" data-search="${escapeHtml(name.toLowerCase())}">
                 <a class="kj-index__link" href="${href}">
