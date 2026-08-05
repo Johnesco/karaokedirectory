@@ -168,7 +168,21 @@ body {
     line-height: 1.6;
     color: var(--text-primary);
     background-color: var(--bg-primary);
-    background-image: url('../notes3.jpg');
+    /*
+     * Sheet-music texture, visible through the transparent .main-content
+     * gutters and behind the 95%-alpha cards — a design element, not decoration
+     * that could simply be dropped.
+     *
+     * It shipped as a 3000x4000 phone photo at 810 KB, downloaded on every page
+     * of the site. `background-attachment: fixed` sizes the background to the
+     * VIEWPORT, not the document, so nothing above ~1600px wide was ever
+     * sampled. Re-encoded to WebP at that width: 810 KB -> 105 KB, no visible
+     * change (#163).
+     *
+     * No JPEG fallback. WebP has been universal since Safari 14 (2020) — older
+     * than `hwb()` and `paint-order`, which this stylesheet already requires.
+     */
+    background-image: url('../assets/images/notes3.webp');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;

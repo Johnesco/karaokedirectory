@@ -20,8 +20,9 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-/* .site-header--compact moved to layout.css in #162 — bday.html uses it too
-   and never loads this file, so it was styled on one of its two consumers. */
+/* .site-header--compact moved to layout.css in #162 — the since-deleted
+   bday.html used it too and never loaded this file, so it was styled on only
+   one of its two consumers. */
 
 /* Main bingo area */
 .bingo-main {

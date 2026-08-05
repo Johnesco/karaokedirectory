@@ -23,8 +23,9 @@
     margin: 0;
 }
 
-/* Compact header — bingo and bday. Lived in bingo.css, which bday.html does
-   not load, so one of its two consumers went unstyled (#162). */
+/* Compact header. Lived in bingo.css, which the since-deleted bday.html did
+   not load, so one of its two consumers went unstyled (#162). Only bingo.html
+   uses it now, but it stays here: a header modifier belongs with the header. */
 .site-header--compact {
     padding: var(--spacing-md);
 }

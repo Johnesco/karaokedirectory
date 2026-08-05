@@ -72,8 +72,8 @@ function checkPage(file) {
  * Loading the right files in the right order is not enough: a page can use a
  * class that is only defined in a stylesheet it never loads, and nothing goes
  * red. `.site-header--compact` did exactly that — it lived in bingo.css, and
- * bday.html used it without loading that file, so one of its two consumers
- * was unstyled (#162).
+ * the since-deleted bday.html used it without loading that file, so one of its
+ * two consumers was unstyled (#162).
  */
 
 /** Every class selector a stylesheet defines. */
