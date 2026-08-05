@@ -87,7 +87,22 @@ export function renderTagBadge(tagId, { href } = {}) {
 }
 
 /**
- * Render tags as HTML badges
+ * Render tags as HTML badges.
+ *
+ * Two tags are **derived** rather than stored, and are prepended by whoever
+ * knows the condition: `dedicated` here, and `special-event` by VenueCard when
+ * the entry it is rendering is a one-time show. Neither prepend can know
+ * whether the venue also lists that tag in its own `tags`, so the list is
+ * deduplicated here — the one funnel every surface renders through.
+ *
+ * Without it, `austin-deaf-club` — which stores `special-event` and whose only
+ * show is a `once` entry — rendered `Special Event · LGBTQ+ · Special Event`
+ * (#208). The equivalent `dedicated` collision was latent: no venue sets
+ * `dedicated: true` *and* lists `dedicated`, but nothing prevented it.
+ *
+ * Order is preserved, first occurrence wins, so a derived tag keeps the
+ * leading position it already rendered in.
+ *
  * @param {string[]} tags - Array of tag IDs
  * @param {Object} options - Render options
  * @param {boolean} options.dedicated - Whether to include the dedicated tag
@@ -97,7 +112,7 @@ export function renderTags(tags, options = {}) {
     const { dedicated = false } = options;
 
     // Build the full tag list, prepending 'dedicated' if applicable
-    const allTags = dedicated ? ['dedicated', ...(tags || [])] : (tags || []);
+    const allTags = [...new Set(dedicated ? ['dedicated', ...(tags || [])] : (tags || []))];
 
     if (allTags.length === 0) return '';
 

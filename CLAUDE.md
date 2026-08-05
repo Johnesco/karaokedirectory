@@ -358,9 +358,11 @@ Available tags:
 | `games` | Games | Arcade, bowling, entertainment center |
 | `craft-cocktails` | Craft Cocktails | Upscale craft cocktail bar |
 | `neighborhood` | Neighborhood Bar | Casual neighborhood bar |
-| `special-event` | Special Event | One-time special karaoke events |
+| `special-event` | Special Event | One-time special karaoke events (auto-added on cards for `frequency: "once"` entries) |
 
-Tags are rendered as color-coded badges in VenueCard, VenueModal, and VenueDetailPane components using the `renderTags()` function from `js/utils/tags.js`.
+Tags are rendered as color-coded badges in VenueCard, VenueModal, VenueDetailPane and MapView using the `renderTags()` function from `js/utils/tags.js`.
+
+**`dedicated` and `special-event` are derived, not stored.** `renderTags()` prepends the first when `venue.dedicated` is true; `VenueCard` prepends the second when the entry it is rendering is `frequency: "once"`. `renderTags()` deduplicates the result, so listing either in a venue's `tags` no longer renders the badge twice (#208) — but it is still redundant, and `validate-data.js` warns about it.
 
 ## Key Technical Patterns
 
