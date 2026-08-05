@@ -104,7 +104,7 @@ It also **excludes one-time events whose date has passed**, for the same reason 
 
 When viewing the current week, the page scrolls to today's day card after render using `scrollIntoView({ behavior: 'instant', block: 'start' })`.
 
-> **Implementation note:** WeeklyView creates day cards via `renderDayCard()` — a template helper that instantiates a temporary DayCard, calls `template()`, and returns an HTML string (no persistent component instance). Extended sections use `renderExtendedSection()` with a shared `seenVenues` Set passed across all three sections for deduplication. Auto-scroll to today runs in `afterRender()`. See [Architecture: Component Hierarchy](architecture.md#2-component-hierarchy) for the template helper pattern.
+> **Implementation note:** WeeklyView creates day cards via `renderDayCard(date, venueIds?)` — a template helper that instantiates a temporary DayCard, calls `template()`, and returns an HTML string (no persistent component instance). The optional second argument narrows the card to a given set of venue ids; the primary week omits it. Extended sections use `renderExtendedSection()` with a shared `seenVenues` Set passed across all three sections for deduplication, and hand the resulting ids to each card so the rendered venues match the section's own count (#206). Auto-scroll to today runs in `afterRender()`. See [Architecture: Component Hierarchy](architecture.md#2-component-hierarchy) for the template helper pattern.
 
 ### Filtering
 
@@ -144,11 +144,34 @@ Below the current 7-day week, three additional collapsible sections display venu
 
 This prevents the same weekly-recurring venue from appearing multiple times across sections.
 
+> **A section renders exactly the venues it counts.** The header badge, the
+> dedup notice and the cards are three statements about one set, and they must
+> agree. `ExtendedSection` passes the deduplicated venue ids into
+> `renderDayCard(date, venueIds)`; `DayCard` narrows its events to that set.
+>
+> This is stated because it did not hold (#206). The dedup was computed, used
+> to write the badge and the notice, and then discarded — `renderDayCard(date)`
+> took only the date and re-derived the full day. On 2026-08-05 the "Later in
+> August" section read **"1 venue"** above a notice reading **"Plus 67
+> recurring venues already shown above"** above a card listing **17 venues**,
+> 16 of them from the 67 it had just placed elsewhere. Display Principle #5
+> ("Balance Visibility, Don't Overwhelm") had no effect at all: the
+> less-frequent shows the section exists to surface stayed buried under the
+> nightly regulars.
+>
+> Passing the id set is unconditional, including for "Next Week" where
+> `deduplicate: false` makes it every venue that day. A no-op filter is
+> cheaper than a branch, and the invariant then holds without exception.
+
 #### Implementation
 
 - Component: `ExtendedSection` (`js/components/ExtendedSection.js`)
 - CSS classes: `.extended-section`, `.extended-section__header`, `.extended-section__content`, `.extended-section--collapsed`, `.extended-section__dedup-notice`
 - WeeklyView method: `renderExtendedSections()`
+- `DayCard` accepts an optional `props.venueIds` (`Set<string>`); when absent it
+  renders every venue scheduled that day, which is what the primary week wants
+- Pinned by e2e: a section's badge equals its unique rendered venues, and a
+  deduplicating section repeats nothing shown above it
 
 ---
 
@@ -1491,6 +1514,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-07 | 1.0.27 | #124 Phase 3: submit form's host fields suggest known KJs/companies from the registries and emit a `{kjId, companyId}` ref when both sides match, falling back to the inline shape otherwise. Email body gains a HOST section saying which it was. Updated Section 15. | Claude Code |
 | 2026-08 | 1.0.28 | #154: Documented the analytics consent banner as new **Section 23**; Known Discrepancies and Change Log renumbered 23→24 and 24→25. Header version/date corrected — it had read "1.0 / February 2026" since creation while this log ran to 1.0.27. Section 20 corrected: `escapeHtml()` no longer uses the DOM `textContent` technique (#147 — it did not escape quotes) and venue data is a JSON file, not a JS file. Drift-prone prose venue counts removed from Sections 1 and 11. | Claude Code |
 | 2026-08 | 1.0.29 | #164: Every show on a generated entity page is now a `MusicEvent` in the page's JSON-LD `@graph` — 132 events, shared by `@id` across venue/KJ/company pages. Recurring shows use `eventSchedule` rather than materialised dates so they cannot rot between deploys; times carry real DST-aware offsets. New "Event markup" subsection in Section 22. #163: page background re-encoded to WebP at viewport width (810 KB → 105 KB) and moved to `assets/images/`; `bday.html` deleted with a 301, taking the public page count from 5 to 4; `og:image:alt` on generated pages stopped advertising the neighborhood field #170 removed. | Claude Code |
+| 2026-08 | 1.0.30 | #206: An extended section now renders exactly the venues its header counts. The deduplicated list was computed, used to write the badge and the "plus N already shown above" notice, then discarded — `renderDayCard(date)` re-derived the full day — so "Later in August: 1 venue / plus 67 above" rendered 17 venues, 16 of them from that 67. `DayCard` gains an optional `venueIds` prop. Display Principle #5 now takes effect. Updated Section 2. #23 closed as wontfix in the same pass. | Claude Code |
 
 ---
 

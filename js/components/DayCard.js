@@ -35,15 +35,26 @@ export class DayCard extends Component {
      * @param {HTMLElement|string} container
      * @param {Object} props
      * @param {Date} props.date - Date for this day
+     * @param {Set<string>} [props.venueIds] - Render only these venue ids.
+     *   Extended sections pass the deduplicated set they counted, so the card
+     *   shows exactly what its header claims. Omit for the primary week, which
+     *   shows everything (#206).
      */
 
     template() {
-        const { date } = this.props;
+        const { date, venueIds = null } = this.props;
         const showDedicated = getState('showDedicated');
         const searchQuery = getState('searchQuery');
         // One entry per matching schedule entry, so a venue with two events
         // on the same day renders two cards (each with its own event title/time).
-        const events = getVenueEventsForDate(date, { includeDedicated: showDedicated, searchQuery });
+        //
+        // The venueIds narrowing exists because this component used to be the
+        // only thing deciding what a day contains. ExtendedSection computed a
+        // deduplicated list, wrote its header and notice from it, then called
+        // renderDayCard(date) — which re-derived the full list here and rendered
+        // that instead, so header, notice and body all disagreed (#206).
+        const allEvents = getVenueEventsForDate(date, { includeDedicated: showDedicated, searchQuery });
+        const events = venueIds ? allEvents.filter(e => venueIds.has(e.venue.id)) : allEvents;
         // Footer count is unique venues that are actually open — exclude
         // venues whose only event today is suppressed by an exclusion.
         const openVenueIds = new Set(
@@ -127,10 +138,12 @@ export class DayCard extends Component {
 /**
  * Render a day card without component instance
  * @param {Date} date - Date to render
+ * @param {Set<string>} [venueIds] - Restrict to these venue ids (see the class
+ *   doc). Omit to render every venue scheduled that day.
  * @returns {string} HTML string
  */
-export function renderDayCard(date) {
+export function renderDayCard(date, venueIds = null) {
     const container = document.createElement('div');
-    const card = new DayCard(container, { date });
+    const card = new DayCard(container, { date, venueIds });
     return card.template();
 }

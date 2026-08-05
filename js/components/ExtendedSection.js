@@ -157,11 +157,20 @@ export function renderExtendedSection({ title, startDate, endDate, seenVenues, d
         venues.forEach(v => seenVenues.add(v.id));
     });
 
-    // Render day cards for dates with venues
+    // Render day cards for exactly the venues this section counted.
+    //
+    // The venue list is handed to the card rather than dropped. Passing only
+    // the date let DayCard re-derive the full, undeduplicated day, so a section
+    // headed "1 venue" with a "plus 67 already shown above" notice rendered 17
+    // venues — 16 of them from the 67 it had just said were elsewhere (#206).
+    //
+    // Passed unconditionally, including when deduplicate is false: there the
+    // set is every venue that day, so the filter is a no-op and the invariant
+    // "a section renders what it counted" holds without a branch.
     const dayCardsHtml = Array.from(venuesByDate.values())
-        .map(({ date }) => `
+        .map(({ date, venues }) => `
             <div class="weekly-view__day">
-                ${renderDayCard(date)}
+                ${renderDayCard(date, new Set(venues.map(v => v.id)))}
             </div>
         `)
         .join('');
