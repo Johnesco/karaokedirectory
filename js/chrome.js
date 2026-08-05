@@ -54,7 +54,7 @@ const SITE_NAME = 'Austin Karaoke Directory';
  * @param {string} [options.title] - Brand line
  * @param {string} [options.tagline] - The line under it. A page-level notice is
  *   NOT a tagline; put that in a `.notice` in <main> (see about.html).
- * @param {boolean} [options.compact=false] - Tighter padding (bingo, bday)
+ * @param {boolean} [options.compact=false] - Tighter padding (bingo)
  * @param {string} [options.icon] - Font Awesome classes for a leading icon
  * @returns {HTMLElement|null} the mount, or null when the page has none
  */

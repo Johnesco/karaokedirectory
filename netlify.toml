@@ -38,3 +38,18 @@
   to = "/"
   status = 301
   force = true
+
+# bday.html was a one-off invite for an April 25 event, deleted once it passed.
+# The link went out to real people, so send it to the directory rather than a
+# 404 — same treatment, and same reasoning, as /supabase/ above.
+[[redirects]]
+  from = "/bday"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/bday.html"
+  to = "/"
+  status = 301
+  force = true
