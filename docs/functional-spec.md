@@ -991,9 +991,9 @@ The form is structured as a short required-fields zone, then a single `<details>
 |-------|-------|
 | Venue Name | |
 | Street | `autocomplete="street-address"` |
-| City | Default "Austin", `autocomplete="address-level2"` |
+| City | Default "Austin", `autocomplete="address-level2"`, backed by a `<datalist>` of the `cities` registry (#212). Not a `<select>` — see "City is a closed vocabulary" below |
 | ZIP | `pattern="\d{5}(-\d{4})?"`, `inputmode="numeric"` |
-| Schedule (≥ 1 entry) | First entry needs a day (recurring) or date (one-time); start/end times default to 21:00 / 01:00 |
+| Schedule (≥ 1 entry) | First entry needs a day (recurring) or date (one-time); start/end times default to 21:00 / 01:00. The frequency dropdown carries the schema's full `frequency` enum — `fifth` was missing until #212, so a fifth-of-the-month show could not be submitted at all |
 
 **Optional, always visible:**
 
@@ -1077,6 +1077,16 @@ The email body gains a **HOST** section stating which path was taken — either 
 ### Payload shape contract (#101)
 
 The `venue` object inside the Apps Script payload validates against [`schema/venue.schema.json`](../schema/venue.schema.json) as a **partial venue** — the same schema the curator targets and CI enforces (ADR-005). Fields submit does not collect (coordinates, activePeriod, per-show host override, the four less-common social platforms, `dedicated`) are simply absent; the schema marks them optional. Empty-string defaults and `null` placeholders are suppressed at assembly time so the curator never has to translate "blank" into "absent". A future ticket may add an Ajv-based pre-send check in the browser; today the shape is verified end-to-end by piping the captured payload through the schema in a Node script (see issue #101).
+
+### City is a closed vocabulary (#212)
+
+`address.city` is the one field the schema alone cannot police: it types as a plain string, and the real constraint lives in `validate-data.js`, which **hard-fails** any city absent from `js/data.json`'s `cities` registry (#170).
+
+The form therefore backs the City input with a `<datalist>` of the registry's names, loaded from `data.json` beside `tagDefinitions` / `kjs` / `companies`. There is no parallel hardcoded list — adding a city to the registry surfaces it here, exactly as adding a tag surfaces a checkbox.
+
+**An unknown city is not blocked.** A venue in a suburb the registry does not list yet is a real submission, and rejecting it loses the venue to save the curator one lookup. The value passes through and the email gains a `CITY:` section naming the problem — the same reconciliation route an unrecognised host takes (see "Host matching on submit"). A city already in the registry produces no note.
+
+This mattered concretely: before #212 the form could emit `"city": "Hutto/Round Rock"` — one of the exact strings #170 had to fold in, and precisely what free text produces (19 distinct strings for 17 real cities).
 
 ---
 
@@ -1531,6 +1541,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-08 | 1.0.30 | #206: An extended section now renders exactly the venues its header counts. The deduplicated list was computed, used to write the badge and the "plus N already shown above" notice, then discarded — `renderDayCard(date)` re-derived the full day — so "Later in August: 1 venue / plus 67 above" rendered 17 venues, 16 of them from that 67. `DayCard` gains an optional `venueIds` prop. Display Principle #5 now takes effect. Updated Section 2. #23 closed as wontfix in the same pass. | Claude Code |
 | 2026-08 | 1.0.31 | #208: `renderTags()` deduplicates, so a tag renders at most once per card. `dedicated` and `special-event` are derived at render time and prepended by different modules; neither could see a stored copy, and `austin-deaf-club` had one — its card read "Special Event · LGBTQ+ · Special Event". The `dedicated` equivalent was latent. `validate-data.js` now warns when a venue stores a derived tag. Section 12 gains a "Derived tags" subsection; its badge class corrected from `.venue-tag` to `.tag`. | Claude Code |
 | 2026-08 | 1.0.32 | #210: Removed the stored `special-event` tag from `austin-deaf-club`, the only venue that carried a derived tag. The stored and derived forms assert different things — *this venue is tagged Special Event* vs *this show is a one-off* — and agreed only because that venue had a single one-time show. The compact calendar card is unchanged (it injects the tag); the modal, detail pane, A–Z card and map card no longer show it. Star icon and `.venue-card--special-event` are unaffected, both deriving from `frequency: "once"`. | Claude Code |
+| 2026-08 | 1.0.33 | #212: The submit form learned the `cities` registry — the City input is backed by a `<datalist>` from `js/data.json`, since #170 made `address.city` a closed vocabulary that `validate-data.js` hard-fails on while the form still emitted free text (it could produce `"Hutto/Round Rock"` verbatim). An unknown city still submits and the email flags it, mirroring the host fallback. Added the schema's `fifth` frequency, which the dropdown had never offered. Section 15 gains "City is a closed vocabulary". | Claude Code |
 
 ---
 
