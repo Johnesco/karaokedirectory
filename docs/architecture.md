@@ -46,7 +46,7 @@ graph TD
         TAGS[tags.js]
         DEBUG[debug.js]
         RENDER[render.js]
-        VALID[validation.js]
+        HOSTS[hosts.js]
     end
 
     APP --> WV
@@ -154,7 +154,7 @@ These utility modules have zero imports from the project — they depend only on
 | `js/utils/string.js` | Text manipulation, escaping |
 | `js/utils/url.js` | URL building, sanitization |
 | `js/utils/tags.js` | Tag config and rendering |
-| `js/utils/validation.js` | Form validation |
+| `js/utils/hosts.js` | Host ref hydration (ADR-007) |
 
 ### Modules With Local Imports
 

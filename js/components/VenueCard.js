@@ -1,13 +1,19 @@
 /**
  * VenueCard Component
  * Displays venue information in compact or full mode
+ *
+ * This class is never mounted. `renderVenueCard()` below constructs one purely
+ * to call `template()` for its string, so `render()` and `afterRender()` never
+ * run. It carried an `afterRender` binding clicks on `.venue-card__link` until
+ * #117 — dead twice over, since the container it bound to was a detached div
+ * and `attachVenueSelectionListener` already catches the same click bubbling
+ * up to `.venue-card` (the link is a <button>, so nothing skips it).
  */
 
 import { Component } from './Component.js';
 import { escapeHtml } from '../utils/string.js';
 import { formatTimeRange, getScheduleExclusion } from '../utils/date.js';
 import { buildMapUrl, formatAddress, sanitizeUrl } from '../utils/url.js';
-import { emit, Events } from '../core/events.js';
 import { isDebugMode, getDebugHtml } from '../utils/debug.js';
 import { renderTags } from '../utils/tags.js';
 import { formatHostDisplay, renderScheduleContext, renderVenueDetailSections } from '../utils/render.js';
@@ -151,13 +157,6 @@ export class VenueCard extends Component {
         `;
     }
 
-    afterRender() {
-        // Handle venue name click to show details
-        this.delegate('click', '.venue-card__link', (e, target) => {
-            e.preventDefault();
-            emit(Events.VENUE_SELECTED, this.props.venue);
-        });
-    }
 }
 
 /**

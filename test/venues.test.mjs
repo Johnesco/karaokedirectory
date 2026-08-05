@@ -51,6 +51,17 @@ describe('venuePasses', () => {
     assert.equal(venuePasses(v, { date: new Date(2026, 6, 15) }), true);
   });
 
+  it('called with no context at all, gates on activePeriod against today', () => {
+    // This is the shape the KJ index and dossier use (#117): they want the
+    // activePeriod gate and nothing else, so they pass no ctx. Worth pinning —
+    // if the defaults ever changed, those two views would silently start
+    // hiding venues with no visible control to explain it.
+    assert.equal(venuePasses(venue()), true);
+    assert.equal(venuePasses(venue({ dedicated: true })), true, 'dedicated is included by default');
+    assert.equal(venuePasses(venue({ activePeriod: { start: '2099-01-01' } })), false);
+    assert.equal(venuePasses(venue({ activePeriod: { end: '2000-01-01' } })), false);
+  });
+
   it('an activePeriod of a single day includes that day', () => {
     // Same #60 shape as the date.js suite, one layer up
     const v = venue({ activePeriod: { start: '2026-01-02', end: '2026-01-02' } });
