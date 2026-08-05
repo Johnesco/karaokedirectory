@@ -346,6 +346,32 @@ for (const venue of data.listings) {
     }
 }
 
+// ---- Derived tags stored on the venue ----
+//
+// `dedicated` and `special-event` are DERIVED at render time — the first from
+// the `dedicated` flag, the second from a schedule entry being `frequency:
+// "once"`. Storing either in `tags` is redundant, and it used to render the
+// badge twice (#208). renderTags now deduplicates, so this is a tidiness
+// warning rather than a correctness one.
+//
+// Warned, not failed: whether "hosts one-time events" belongs on the venue as
+// well as the event is an editorial call, and js/data.json is curator-owned.
+const DERIVED_TAGS = {
+    'special-event': 'derived from a schedule entry with frequency "once"',
+    dedicated: 'derived from the venue\'s `dedicated` flag',
+};
+
+for (const venue of data.listings) {
+    for (const tag of venue.tags || []) {
+        if (!DERIVED_TAGS[tag]) continue;
+        if (tag === 'dedicated' && !venue.dedicated) continue;   // stored but not derived: not a duplicate
+        warnings.push(
+            `${venue.name} (${venue.id}) stores the derived tag "${tag}" — ${DERIVED_TAGS[tag]}, ` +
+            `so the venue does not need to list it`
+        );
+    }
+}
+
 // ---- Output ----
 console.log('=== Summary ===');
 console.log('Total venues:', data.listings.length);

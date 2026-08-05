@@ -830,9 +830,21 @@ Tags are defined in the `tagDefinitions` object in `js/data.json`. Each tag has:
 ### Rendering
 
 Tags render as color-coded inline badges using `renderTags(tags, options)` from `js/utils/tags.js`.
-- CSS classes: `.venue-tags` (container), `.venue-tag` (individual badge)
-- The `dedicated` tag is auto-prepended when `venue.dedicated === true`, even if not in the `tags` array
-- The `special-event` tag is injected in compact venue cards for `frequency: "once"` events
+- CSS classes: `.venue-tags` (container), `.tag` (individual badge, carrying `data-tag="<id>"`). *(This line read `.venue-tag` until #208; that class was replaced during #166 and exists only in a comment.)*
+- Colours come from `tagDefinitions` in `js/data.json` and are painted into one generated stylesheet keyed on `[data-tag]`, not inline styles
+
+#### Derived tags
+
+Two tags are **derived at render time** rather than stored, each prepended by whichever module knows the condition:
+
+| Tag | Prepended by | When |
+|---|---|---|
+| `dedicated` | `renderTags()` | `venue.dedicated === true` |
+| `special-event` | `VenueCard` (compact card) | the entry being rendered is `frequency: "once"` |
+
+**`renderTags()` deduplicates the final list**, first occurrence winning, so a derived tag keeps its leading position. Neither prepend can see whether the venue *also* lists that id in its own `tags`, and one did: `austin-deaf-club` stored `special-event` while its only show is a `once` entry, so its card rendered `Special Event · LGBTQ+ · Special Event` (#208). The equivalent `dedicated` collision was latent — no venue sets the flag and lists the tag, but nothing prevented it.
+
+Storing a derived tag is redundant rather than harmful now. `validate-data.js` **warns** (does not fail) when a venue does, since whether "hosts one-time events" also belongs on the venue is an editorial call and `js/data.json` is curator-owned.
 
 ### Searchability
 
@@ -1515,6 +1527,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-08 | 1.0.28 | #154: Documented the analytics consent banner as new **Section 23**; Known Discrepancies and Change Log renumbered 23→24 and 24→25. Header version/date corrected — it had read "1.0 / February 2026" since creation while this log ran to 1.0.27. Section 20 corrected: `escapeHtml()` no longer uses the DOM `textContent` technique (#147 — it did not escape quotes) and venue data is a JSON file, not a JS file. Drift-prone prose venue counts removed from Sections 1 and 11. | Claude Code |
 | 2026-08 | 1.0.29 | #164: Every show on a generated entity page is now a `MusicEvent` in the page's JSON-LD `@graph` — 132 events, shared by `@id` across venue/KJ/company pages. Recurring shows use `eventSchedule` rather than materialised dates so they cannot rot between deploys; times carry real DST-aware offsets. New "Event markup" subsection in Section 22. #163: page background re-encoded to WebP at viewport width (810 KB → 105 KB) and moved to `assets/images/`; `bday.html` deleted with a 301, taking the public page count from 5 to 4; `og:image:alt` on generated pages stopped advertising the neighborhood field #170 removed. | Claude Code |
 | 2026-08 | 1.0.30 | #206: An extended section now renders exactly the venues its header counts. The deduplicated list was computed, used to write the badge and the "plus N already shown above" notice, then discarded — `renderDayCard(date)` re-derived the full day — so "Later in August: 1 venue / plus 67 above" rendered 17 venues, 16 of them from that 67. `DayCard` gains an optional `venueIds` prop. Display Principle #5 now takes effect. Updated Section 2. #23 closed as wontfix in the same pass. | Claude Code |
+| 2026-08 | 1.0.31 | #208: `renderTags()` deduplicates, so a tag renders at most once per card. `dedicated` and `special-event` are derived at render time and prepended by different modules; neither could see a stored copy, and `austin-deaf-club` had one — its card read "Special Event · LGBTQ+ · Special Event". The `dedicated` equivalent was latent. `validate-data.js` now warns when a venue stores a derived tag. Section 12 gains a "Derived tags" subsection; its badge class corrected from `.venue-tag` to `.tag`. | Claude Code |
 
 ---
 
