@@ -108,6 +108,36 @@ export function getWeekStart(date) {
 }
 
 /**
+ * Today at local midnight — the reference point for anything that asks
+ * "from now on". Written out rather than inlined because `new Date()` carries a
+ * time of day, and comparing that against a date-only schedule value silently
+ * drops today's own shows.
+ * @returns {Date} Today, 00:00:00.000 local
+ */
+export function startOfToday() {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+}
+
+/**
+ * The Sunday–Saturday span containing a date.
+ *
+ * The whole calendar week, not the rest of it: a week that started on Sunday is
+ * still "this week" on Thursday, and the map's This Week filter says so.
+ *
+ * @param {Date} [date] - Any date within the week (defaults to today)
+ * @returns {{ start: Date, end: Date }} Sunday 00:00 through Saturday 23:59:59.999
+ */
+export function getWeekRange(date = new Date()) {
+    const start = getWeekStart(date);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 6);
+    end.setHours(23, 59, 59, 999);
+    return { start, end };
+}
+
+/**
  * Whether a given week is the one containing today.
  *
  * Previously implemented twice with two different algorithms — Navigation

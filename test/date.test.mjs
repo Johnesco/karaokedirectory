@@ -28,6 +28,8 @@ import {
   formatTime12,
   formatTime24,
   formatTimeRange,
+  getWeekRange,
+  startOfToday,
 } from '../js/utils/date.js';
 
 // January 2026 has five Fridays: 2, 9, 16, 23, 30.
@@ -51,6 +53,41 @@ describe('date fixtures are what the tests assume', () => {
     }
     assert.equal(FEB(28).getDate(), 28);
     assert.notEqual(getDayName(FEB(28)), 'friday');
+  });
+});
+
+describe('getWeekRange / startOfToday — the map date filter spans (#215)', () => {
+  // Jan 2026: the 4th is a Sunday, the 10th the Saturday that closes that week.
+  it('spans Sunday 00:00 to Saturday 23:59 around a midweek date', () => {
+    const { start, end } = getWeekRange(new Date(2026, 0, 7, 15, 30));
+    assert.equal(getDayName(start), 'sunday');
+    assert.equal(start.getDate(), 4);
+    assert.equal(getDayName(end), 'saturday');
+    assert.equal(end.getDate(), 10);
+    assert.equal(start.getHours(), 0);
+    assert.equal(end.getHours(), 23);
+  });
+
+  it('includes days already past — a week is the whole week', () => {
+    // Asked on Thursday, Sunday is still in range. This is the behaviour the
+    // "This Week" button promises, as opposed to "the next seven days".
+    const { start } = getWeekRange(JAN(8));
+    assert.equal(start.getDate(), 4);
+  });
+
+  it('a Sunday is its own week start; a Saturday closes its own week', () => {
+    assert.equal(getWeekRange(JAN(4)).start.getDate(), 4);
+    assert.equal(getWeekRange(JAN(10)).end.getDate(), 10);
+    assert.equal(getWeekRange(JAN(11)).start.getDate(), 11);
+  });
+
+  it('startOfToday strips the time of day', () => {
+    const d = startOfToday();
+    assert.equal(d.getHours(), 0);
+    assert.equal(d.getMinutes(), 0);
+    assert.equal(d.getSeconds(), 0);
+    assert.equal(d.getMilliseconds(), 0);
+    assert.equal(d.toDateString(), new Date().toDateString());
   });
 });
 

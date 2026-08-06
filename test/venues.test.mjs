@@ -11,7 +11,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { venuePasses, venueMatchesSearch, venueMatchesHost, byName, initVenues, hostMatches, resolveHostLabel } from '../js/services/venues.js';
+import { venuePasses, venueHasShowInRange, venueMatchesSearch, venueMatchesHost, byName, initVenues, hostMatches, resolveHostLabel } from '../js/services/venues.js';
 import { hydrateVenues, isHostRef, resolveHostRef } from '../js/utils/hosts.js';
 
 const JAN = (d) => new Date(2026, 0, d);
@@ -67,6 +67,89 @@ describe('venuePasses', () => {
     const v = venue({ activePeriod: { start: '2026-01-02', end: '2026-01-02' } });
     assert.equal(venuePasses(v, { date: JAN(2) }), true);
     assert.equal(venuePasses(v, { date: JAN(3) }), false);
+  });
+});
+
+describe('venueHasShowInRange — the map date filter (#215)', () => {
+  // Jan 2026: Sun 4 through Sat 10 is a whole week; the 9th is its Friday.
+  const WEEK = { start: JAN(4), end: JAN(10) };
+
+  it('bounded: matches a recurring show whose day falls in the span', () => {
+    assert.equal(venueHasShowInRange(venue(), WEEK.start, WEEK.end), true);
+  });
+
+  it('bounded: rejects a recurring show whose day does not fall in the span', () => {
+    // Friday the 9th is in the week, but a single Saturday (the 10th) is not.
+    const v = venue();
+    assert.equal(venueHasShowInRange(v, JAN(10), JAN(10)), false);
+    assert.equal(venueHasShowInRange(v, JAN(9), JAN(9)), true);
+  });
+
+  it('bounded: honours ordinal frequencies via scheduleMatchesDate', () => {
+    // First Friday of Jan 2026 is the 2nd, so it misses the Jan 4-10 week.
+    const v = venue({ schedule: [{ frequency: 'first', day: 'Friday' }] });
+    assert.equal(venueHasShowInRange(v, WEEK.start, WEEK.end), false);
+    assert.equal(venueHasShowInRange(v, JAN(2), JAN(2)), true);
+  });
+
+  it('bounded: matches a one-time event dated inside the span', () => {
+    const v = venue({ schedule: [{ frequency: 'once', date: '2026-01-07' }] });
+    assert.equal(venueHasShowInRange(v, WEEK.start, WEEK.end), true);
+    assert.equal(venueHasShowInRange(v, JAN(11), JAN(17)), false);
+  });
+
+  it('open-ended: a recurring show always qualifies', () => {
+    // No end date means "from here on", and a recurring entry keeps recurring —
+    // there is nothing to walk.
+    assert.equal(venueHasShowInRange(venue(), JAN(4), null), true);
+  });
+
+  it('open-ended: a past one-time event does not, a future one does', () => {
+    // This is the whole difference between the map's "All" and the unfiltered
+    // map it replaced: a venue whose sole listing already happened drops off.
+    const past = venue({ schedule: [{ frequency: 'once', date: '2026-01-01' }] });
+    const future = venue({ schedule: [{ frequency: 'once', date: '2026-02-14' }] });
+    assert.equal(venueHasShowInRange(past, JAN(4), null), false);
+    assert.equal(venueHasShowInRange(future, JAN(4), null), true);
+  });
+
+  it('open-ended: today counts as future', () => {
+    const v = venue({ schedule: [{ frequency: 'once', date: '2026-01-04' }] });
+    assert.equal(venueHasShowInRange(v, JAN(4), null), true);
+  });
+
+  it('open-ended: a mixed schedule qualifies on its recurring entry alone', () => {
+    const v = venue({
+      schedule: [
+        { frequency: 'once', date: '2026-01-01' },
+        { frequency: 'every', day: 'Friday' },
+      ],
+    });
+    assert.equal(venueHasShowInRange(v, JAN(4), null), true);
+  });
+
+  it('an excluded occurrence still counts — closures are shown, not hidden', () => {
+    // The weekly view lists a closed night with a banner and the map dims its
+    // marker. Filtering it out would suppress the cue.
+    const v = venue({
+      schedule: [{
+        frequency: 'every',
+        day: 'Friday',
+        exclusions: [{ date: '2026-01-09', reason: 'Holiday' }],
+      }],
+    });
+    assert.equal(venueHasShowInRange(v, JAN(9), JAN(9)), true);
+  });
+
+  it('an empty or missing schedule never matches', () => {
+    assert.equal(venueHasShowInRange(venue({ schedule: [] }), JAN(4), JAN(10)), false);
+    assert.equal(venueHasShowInRange(venue({ schedule: [] }), JAN(4), null), false);
+    assert.equal(venueHasShowInRange({}, JAN(4), null), false);
+    assert.equal(venueHasShowInRange(null, JAN(4), null), false);
+  });
+
+  it('no span at all is no constraint', () => {
+    assert.equal(venueHasShowInRange(venue(), null, null), true);
   });
 });
 

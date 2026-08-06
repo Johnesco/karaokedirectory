@@ -64,4 +64,88 @@ test.describe('Map view — immersive mode & controls', () => {
     await expect(dedicatedBtn).toBeVisible();
   });
 
+  // Date filter (#215). These assert the control, not the marker set: which
+  // venues get plotted is decided by venueHasShowInRange, which the unit suite
+  // covers date by date without waiting on the Leaflet CDN.
+  test('date filter offers All, This Week and Today', async ({ page }) => {
+    const filter = page.locator('.map-date-filter');
+    await expect(filter).toBeVisible();
+
+    await expect(filter.locator('[data-date-filter]')).toHaveCount(3);
+    await expect(filter.locator('[data-date-filter="all"]')).toHaveText('All');
+    await expect(filter.locator('[data-date-filter="week"]')).toHaveText('This Week');
+    await expect(filter.locator('[data-date-filter="today"]')).toHaveText('Today');
+  });
+
+  test('date filter starts on All', async ({ page }) => {
+    const all = page.locator('[data-date-filter="all"]');
+    await expect(all).toHaveClass(/map-date-filter__btn--active/);
+    await expect(all).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('[data-date-filter="today"]')).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  test('clicking a date filter moves the active state', async ({ page }) => {
+    await page.locator('[data-date-filter="today"]').click();
+
+    await expect(page.locator('[data-date-filter="today"]')).toHaveClass(/map-date-filter__btn--active/);
+    await expect(page.locator('[data-date-filter="all"]')).not.toHaveClass(/map-date-filter__btn--active/);
+    await expect(page.locator('[data-date-filter="all"]')).toHaveAttribute('aria-pressed', 'false');
+
+    await page.locator('[data-date-filter="week"]').click();
+
+    await expect(page.locator('[data-date-filter="week"]')).toHaveClass(/map-date-filter__btn--active/);
+    await expect(page.locator('[data-date-filter="today"]')).not.toHaveClass(/map-date-filter__btn--active/);
+  });
+
+  test('date filter does not tear the map down', async ({ page }) => {
+    // The dedicated toggle stopped re-rendering in #157 because a re-render
+    // rebuilds the Leaflet instance from scratch. The date filter follows the
+    // same contract: patch the buttons, repaint the markers, keep the map.
+    const mapContainer = page.locator('.map-view__container');
+    await expect(mapContainer).toBeVisible();
+
+    await page.locator('[data-date-filter="today"]').click();
+    await page.locator('[data-date-filter="all"]').click();
+
+    await expect(mapContainer).toBeVisible();
+    await expect(page.locator('.map-view')).toHaveCount(1);
+  });
+
+  // #217: the map filters by time, not text. A query typed on the calendar must
+  // not follow the user onto the map, where the input that set it is hidden.
+  test('a search carried over from the calendar does not filter the map', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('[data-search="query"]').fill('ego');
+    await page.locator('.nav-btn[data-view="map"]').click();
+    await expect(page.locator('.map-view')).toBeVisible({ timeout: 15000 });
+
+    // The service is what MapView plots through; ask it the same question the
+    // view does. Counting markers would put the Leaflet CDN on the gate's
+    // critical path for an assertion that is really about the filter set.
+    const counts = await page.evaluate(async () => {
+      const { getVenuesWithCoordinates } = await import('/js/services/venues.js');
+      return {
+        plotted: getVenuesWithCoordinates().length,
+        matchingTheQuery: getVenuesWithCoordinates().filter(v => /ego/i.test(v.name)).length,
+      };
+    });
+
+    expect(counts.matchingTheQuery).toBeGreaterThan(0);
+    expect(counts.plotted).toBeGreaterThan(counts.matchingTheQuery);
+  });
+
+  test('the search input is not reachable on the map', async ({ page }) => {
+    await expect(page.locator('.navigation-container')).not.toBeVisible();
+    await expect(page.locator('[data-search="query"]')).not.toBeVisible();
+  });
+
+  test('date filter and dedicated toggle are independent', async ({ page }) => {
+    await page.locator('[data-date-filter="today"]').click();
+    await page.locator('[data-action="toggle-dedicated"]').click();
+
+    // Toggling one must not reset the other — they compose in updateMarkers().
+    await expect(page.locator('[data-date-filter="today"]')).toHaveClass(/map-date-filter__btn--active/);
+    await expect(page.locator('[data-action="toggle-dedicated"]')).toHaveText('Show Dedicated');
+  });
+
 });

@@ -13,7 +13,30 @@ import { escapeHtml } from '../utils/string.js';
 import { buildDirectionsUrl, shareVenue } from '../utils/url.js';
 import { renderTags } from '../utils/tags.js';
 import { renderScheduleCompact, renderVenueDetailSections } from '../utils/render.js';
-import { getVenueExclusionForDate, isPastOnceEvent } from '../utils/date.js';
+import { getVenueExclusionForDate, isPastOnceEvent, getWeekRange, startOfToday } from '../utils/date.js';
+
+/**
+ * The map's date filter (#215). One row per button: the id state carries, the
+ * label, and the span it plots.
+ *
+ * `range` is a function, not a value, so it is computed per click — a tab left
+ * open past midnight answers with the new day rather than the day it was opened.
+ * An open-ended `end: null` means "everything from here on"; see
+ * venueHasShowInRange for what that does to recurring vs one-time entries.
+ *
+ * Adding a span (This Month, say) is a new row here plus nothing else.
+ */
+const DATE_FILTERS = [
+    { id: 'all', label: 'All', range: () => ({ start: startOfToday(), end: null }) },
+    { id: 'week', label: 'This Week', range: () => getWeekRange() },
+    { id: 'today', label: 'Today', range: () => ({ start: startOfToday(), end: startOfToday() }) },
+];
+
+/** Resolve a filter id to its span, falling back to the first row. */
+function dateFilterRange(id) {
+    const filter = DATE_FILTERS.find(f => f.id === id) || DATE_FILTERS[0];
+    return filter.range();
+}
 
 export class MapView extends Component {
     init() {
@@ -23,15 +46,29 @@ export class MapView extends Component {
         this.clusterGroup = null;
         this.selectedVenue = null;
         this.selectedMarker = null;
+        // Set by onDestroy so the in-flight loadLeaflet() promise knows not to
+        // build a map for an instance nobody is listening to any more. See
+        // afterRender.
+        this.destroyed = false;
 
         // One subscription per key that affects which markers are shown.
         // `showDedicated` was previously covered twice — once here and once via
         // FILTER_CHANGED — so a single toggle ran updateMarkers three times.
+        //
+        // `searchQuery` is deliberately absent (#217). The map filters by time,
+        // not text: the date buttons are its search, and the text box belongs to
+        // the two list views. It also could not have worked honestly here — the
+        // navigation bar that holds the input is display:none in immersive map
+        // mode, so a query carried over from the calendar narrowed the map with
+        // nothing on screen to explain it or clear it.
         this.subscribe(subscribe('showDedicated', () => {
             this.syncDedicatedButton();
             this.updateMarkers();
         }));
-        this.subscribe(subscribe('searchQuery', () => this.updateMarkers()));
+        this.subscribe(subscribe('mapDateFilter', () => {
+            this.syncDateFilterButtons();
+            this.updateMarkers();
+        }));
 
         this.bindEscape();
     }
@@ -47,6 +84,19 @@ export class MapView extends Component {
         const showDedicated = getState('showDedicated');
         btn.classList.toggle('map-controls__btn--active', showDedicated);
         btn.textContent = showDedicated ? 'Hide Dedicated' : 'Show Dedicated';
+    }
+
+    /**
+     * Mark the active date-filter button. Patched in place for the same reason
+     * the dedicated label is: a re-render would rebuild the Leaflet map.
+     */
+    syncDateFilterButtons() {
+        const active = getState('mapDateFilter');
+        this.$$('[data-date-filter]').forEach(btn => {
+            const isActive = btn.dataset.dateFilter === active;
+            btn.classList.toggle('map-date-filter__btn--active', isActive);
+            btn.setAttribute('aria-pressed', String(isActive));
+        });
     }
 
     /**
@@ -78,6 +128,7 @@ export class MapView extends Component {
         const venuesWithCoords = getVenuesWithCoordinates();
         const totalVenues = getAllVenues().length;
         const showDedicated = getState('showDedicated');
+        const activeDateFilter = getState('mapDateFilter');
 
         return `
             <div class="map-view">
@@ -96,6 +147,16 @@ export class MapView extends Component {
 
                 <!-- Floating Controls (left side) -->
                 <div class="map-controls">
+                    <div class="map-date-filter" role="group" aria-label="Filter venues by date">
+                        ${DATE_FILTERS.map(f => `
+                            <button
+                                class="map-date-filter__btn ${f.id === activeDateFilter ? 'map-date-filter__btn--active' : ''}"
+                                data-date-filter="${f.id}"
+                                aria-pressed="${f.id === activeDateFilter}"
+                                type="button"
+                            >${f.label}</button>
+                        `).join('')}
+                    </div>
                     <button
                         class="map-controls__btn map-controls__btn--text ${showDedicated ? 'map-controls__btn--active' : ''}"
                         data-action="toggle-dedicated"
@@ -126,8 +187,21 @@ export class MapView extends Component {
     }
 
     afterRender() {
-        // Load Leaflet if not already loaded
+        // Load Leaflet if not already loaded.
+        //
+        // The destroyed check is what keeps the map alive on a `?view=map` deep
+        // link. app.js boots that path with two renderView() calls — setState
+        // notifies the `view` subscriber AND the explicit call runs — so a first
+        // MapView is built and destroyed before its CDN load resolves. Without
+        // this guard that dead instance still ran initMap(), claiming the live
+        // instance's container: the survivor then threw "Map container is
+        // already initialized", left this.map null, and every updateMarkers()
+        // returned early. The map on screen belonged to a destroyed component
+        // with no subscriptions, so the date filter, the dedicated toggle and
+        // search all silently did nothing — only on that entry path, which is
+        // the one shared links use.
         this.loadLeaflet().then(() => {
+            if (this.destroyed) return;
             this.initMap();
         });
 
@@ -149,6 +223,13 @@ export class MapView extends Component {
         // unchanged here.
         this.delegate('click', '[data-action="toggle-dedicated"]', () => {
             setState({ showDedicated: !getState('showDedicated') });
+        });
+
+        // Date filter. Same contract as the dedicated toggle — setState and
+        // stop; the `mapDateFilter` subscriber repaints the markers and the
+        // button states.
+        this.delegate('click', '[data-date-filter]', (e, target) => {
+            setState({ mapDateFilter: target.dataset.dateFilter });
         });
 
         // Close venue card
@@ -307,10 +388,19 @@ export class MapView extends Component {
         this.markerMap.clear();
         this.selectedMarker = null;
 
-        // Get venues with coordinates, respecting filters
+        // Get venues with coordinates, respecting the map's own two filters —
+        // the date span and the dedicated toggle. Text search is not one of
+        // them (#217).
         const showDedicated = getState('showDedicated');
-        const searchQuery = getState('searchQuery');
-        const venues = getVenuesWithCoordinates({ includeDedicated: showDedicated, searchQuery });
+        const dateRange = dateFilterRange(getState('mapDateFilter'));
+        const venues = getVenuesWithCoordinates({ includeDedicated: showDedicated, dateRange });
+
+        // A selected venue can drop out of the plotted set — switch to "Today"
+        // while a Friday-only venue's card is open and the card is left
+        // describing a pin that is no longer on the map. Close it.
+        if (this.selectedVenue && !venues.some(v => v.id === this.selectedVenue.id)) {
+            this.hideVenueCard();
+        }
 
         // Create cluster group
         this.clusterGroup = L.markerClusterGroup({
@@ -518,6 +608,9 @@ export class MapView extends Component {
     onDestroy() {
         // The keydown listener is not unbound here — it went through
         // this.addEventListener, so Component.destroy() has already removed it.
+
+        // Anything still in flight (the Leaflet CDN load) must not act.
+        this.destroyed = true;
 
         // Clean up cluster group
         if (this.clusterGroup) {

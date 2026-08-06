@@ -381,11 +381,14 @@ Tags are rendered as color-coded badges in VenueCard, VenueModal, VenueDetailPan
 
 ### Immersive Map Mode
 - `app.js` adds `body.view--map` class; CSS hides header/footer/nav, map fills viewport
-- Floating elements: `.map-controls` (left), `.map-view-switcher` (right), `.map-venue-card` (details)
+- Floating elements: `.map-date-filter` + `.map-controls` (left), `.map-view-switcher` (right), `.map-venue-card` (details)
 - Escape key: closes card first, then exits to Calendar view
+- **Date filter** (#215): All / This Week / Today, held in `mapDateFilter` state. "This week" is Sunday–Saturday of the current week, not the next seven days. The predicate is `venueHasShowInRange()` in `js/services/venues.js`. Deliberately not in the URL — the spans are relative to "now"
+- **The map filters by time, not text** (#217). Its two filters are the date buttons and the dedicated toggle; `MapView` does not subscribe to `searchQuery` and `getVenuesWithCoordinates()` takes no such option. The nav bar holding the search input is hidden in immersive mode, so a carried-over query used to narrow the map invisibly
+- Leaflet loads from a CDN *after* render, so `MapView.destroyed` gates the async `initMap()`. Skip that guard and a destroyed instance claims the live one's container, which leaves a map nothing is subscribed to — see functional spec §4
 
 ### Search Feature
-- Navigation updates `searchQuery` state; the views subscribe to that key. State is the only change channel — never `setState` and then `emit` the same change (#157)
+- Navigation updates `searchQuery` state; **WeeklyView and AlphabeticalView** subscribe to that key. MapView does not — the map filters by time (#217). State is the only change channel — never `setState` and then `emit` the same change (#157)
 - `venues.js` → `venueMatchesSearch()` matches: venue name, city, venue-level host name/affiliation, per-show host name/affiliation, and tags (ID + label)
 - It does **not** match event names. This file claimed otherwise for months; `venueMatchesSearch` never reads `entry.eventName`. Adding it is a one-line change tracked on #37 — until that lands, the omission is the truth
 - Empty results collapse day cards to header-only (`.day-card--empty`)
