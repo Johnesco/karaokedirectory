@@ -111,6 +111,34 @@ test.describe('Map view — immersive mode & controls', () => {
     await expect(page.locator('.map-view')).toHaveCount(1);
   });
 
+  // #217: the map filters by time, not text. A query typed on the calendar must
+  // not follow the user onto the map, where the input that set it is hidden.
+  test('a search carried over from the calendar does not filter the map', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('[data-search="query"]').fill('ego');
+    await page.locator('.nav-btn[data-view="map"]').click();
+    await expect(page.locator('.map-view')).toBeVisible({ timeout: 15000 });
+
+    // The service is what MapView plots through; ask it the same question the
+    // view does. Counting markers would put the Leaflet CDN on the gate's
+    // critical path for an assertion that is really about the filter set.
+    const counts = await page.evaluate(async () => {
+      const { getVenuesWithCoordinates } = await import('/js/services/venues.js');
+      return {
+        plotted: getVenuesWithCoordinates().length,
+        matchingTheQuery: getVenuesWithCoordinates().filter(v => /ego/i.test(v.name)).length,
+      };
+    });
+
+    expect(counts.matchingTheQuery).toBeGreaterThan(0);
+    expect(counts.plotted).toBeGreaterThan(counts.matchingTheQuery);
+  });
+
+  test('the search input is not reachable on the map', async ({ page }) => {
+    await expect(page.locator('.navigation-container')).not.toBeVisible();
+    await expect(page.locator('[data-search="query"]')).not.toBeVisible();
+  });
+
   test('date filter and dedicated toggle are independent', async ({ page }) => {
     await page.locator('[data-date-filter="today"]').click();
     await page.locator('[data-action="toggle-dedicated"]').click();

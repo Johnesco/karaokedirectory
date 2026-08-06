@@ -313,8 +313,9 @@ tonight?" a question only the calendar could answer.
   the Map](#exclusion-dates-on-the-map)) keeps its venue in the result — the
   dimmed marker and "Closed Today" banner exist to announce that, and filtering
   the venue out would suppress the announcement.
-- **The three filters compose.** Date filter, search, and the dedicated toggle
-  are separate gates in `updateMarkers()`; narrowing one leaves the others alone.
+- **The map has exactly two filters** — this one and the dedicated toggle. They
+  are separate gates in `updateMarkers()`, so narrowing one leaves the other
+  alone. Text search is not among them ([Section 9](#9-search)).
 - Selecting a filter repaints markers **in place** — the Leaflet instance is not
   rebuilt, matching the dedicated toggle's contract (see §21, #157).
 - If the selected venue falls out of the plotted set, its floating card closes
@@ -341,7 +342,11 @@ Displays "X of Y venues have map coordinates" at the bottom. If some venues lack
 
 - Respects the date filter — All / This Week / Today, see above
 - Respects the "Show dedicated" toggle — re-renders markers when changed
-- Respects the search query — only matching venues with coordinates shown
+- **Ignores the search query.** The map filters by time, not text (#217). Its
+  date buttons are its search; the text box belongs to the Calendar and A-Z
+  views, and the navigation bar holding it is hidden in immersive map mode
+  anyway — a query carried over from the calendar used to narrow the map with
+  nothing on screen to explain it or clear it
 - Only venues with valid `coordinates.lat` and `coordinates.lng` appear on the map
 
 > **Implementation note — the deep-link guard.** Leaflet is loaded from a CDN
@@ -550,7 +555,10 @@ A `VENUE_DETAIL_SHOWN` emit was removed in #157 - nothing listened for it. Card 
 
 ## 9 Search
 
-The app includes a global search bar that filters venues across all views.
+A search bar in the navigation filters venues in the two list views — Weekly and
+Alphabetical. The Map is not one of them: it filters by time instead ([Section
+4](#date-filter)), and its immersive mode hides the navigation bar the input
+lives in.
 
 ### Search Input
 
@@ -578,7 +586,7 @@ Search is case-insensitive substring matching. A venue matches if the query appe
 
 - **Weekly:** Day cards with no matching venues collapse to `.day-card--empty`. Days with matches show only matching venues. Extended sections also filter to show only matching venues (see [Section 2: Extended Sections](#extended-sections)).
 - **Alphabetical:** Letter groups only show matching venues. Letters with no matches disappear. Empty results show "No venues match your search."
-- **Map:** Only matching venues with coordinates appear as markers.
+- **Map:** Not filtered by search at all (#217). `MapView` does not subscribe to `searchQuery`, and `getVenuesWithCoordinates()` takes no such option — the option was removed rather than left accepted-and-ignored, so wiring search back in has to be a deliberate change in the service, not a silent one at a call site. The map's filters are the date buttons and the dedicated toggle.
 
 ### Extended Sections and Search
 
@@ -1320,7 +1328,7 @@ Which view subscribes to which key:
 |---|---|
 | `WeeklyView` | `weekStart`, `showDedicated`, `searchQuery` |
 | `AlphabeticalView` | `showDedicated`, `searchQuery` |
-| `MapView` | `showDedicated`, `searchQuery`, `mapDateFilter` |
+| `MapView` | `showDedicated`, `mapDateFilter`. Deliberately **not** `searchQuery` — the map filters by time (#217) |
 | `KJDossierView` | *(nothing)* — its only input is `hostFilter`, and a `hostFilter` change replaces the view instance outright |
 | `KJIndexView` | *(nothing)* — static listing |
 | `Navigation` | `view`, `weekStart`, `showDedicated`, `hostFilter`. Deliberately **not** `searchQuery`, which would re-render the input and lose focus mid-typing |

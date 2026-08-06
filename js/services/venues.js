@@ -426,19 +426,25 @@ function venueMatchesDedicated(venue, query) {
 /**
  * Get active venues with coordinates (for map view).
  * Also filters out venues outside their activePeriod for today.
+ *
+ * Takes no `searchQuery` (#217). The map filters by time, not text — its date
+ * buttons are its search, and the text box belongs to the calendar and A-Z
+ * views. The option is removed rather than accepted-and-ignored so that wiring
+ * search back in has to be a deliberate change here, not a silent one at a call
+ * site.
+ *
  * @param {Object} options - Filter options
  * @param {boolean} [options.includeDedicated=true]
- * @param {string} [options.searchQuery='']
  * @param {{start: Date, end: Date|null}|null} [options.dateRange=null] - Only
  *   venues with a show in this span (see venueHasShowInRange). Null = no date
  *   constraint, which is the whole directory rather than the map's "All".
  * @returns {Object[]} Active venues with valid coordinates
  */
 export function getVenuesWithCoordinates(options = {}) {
-    const { includeDedicated = true, searchQuery = '', dateRange = null } = options;
+    const { includeDedicated = true, dateRange = null } = options;
     return getActiveVenues().filter(v =>
         v.coordinates?.lat && v.coordinates?.lng &&
-        venuePasses(v, { includeDedicated, searchQuery }) &&
+        venuePasses(v, { includeDedicated }) &&
         (!dateRange || venueHasShowInRange(v, dateRange.start, dateRange.end))
     );
 }

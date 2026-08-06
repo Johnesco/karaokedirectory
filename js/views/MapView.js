@@ -54,11 +54,17 @@ export class MapView extends Component {
         // One subscription per key that affects which markers are shown.
         // `showDedicated` was previously covered twice — once here and once via
         // FILTER_CHANGED — so a single toggle ran updateMarkers three times.
+        //
+        // `searchQuery` is deliberately absent (#217). The map filters by time,
+        // not text: the date buttons are its search, and the text box belongs to
+        // the two list views. It also could not have worked honestly here — the
+        // navigation bar that holds the input is display:none in immersive map
+        // mode, so a query carried over from the calendar narrowed the map with
+        // nothing on screen to explain it or clear it.
         this.subscribe(subscribe('showDedicated', () => {
             this.syncDedicatedButton();
             this.updateMarkers();
         }));
-        this.subscribe(subscribe('searchQuery', () => this.updateMarkers()));
         this.subscribe(subscribe('mapDateFilter', () => {
             this.syncDateFilterButtons();
             this.updateMarkers();
@@ -382,12 +388,12 @@ export class MapView extends Component {
         this.markerMap.clear();
         this.selectedMarker = null;
 
-        // Get venues with coordinates, respecting filters. The three gates
-        // compose: a search under "Today" narrows to venues matching both.
+        // Get venues with coordinates, respecting the map's own two filters —
+        // the date span and the dedicated toggle. Text search is not one of
+        // them (#217).
         const showDedicated = getState('showDedicated');
-        const searchQuery = getState('searchQuery');
         const dateRange = dateFilterRange(getState('mapDateFilter'));
-        const venues = getVenuesWithCoordinates({ includeDedicated: showDedicated, searchQuery, dateRange });
+        const venues = getVenuesWithCoordinates({ includeDedicated: showDedicated, dateRange });
 
         // A selected venue can drop out of the plotted set — switch to "Today"
         // while a Friday-only venue's card is open and the card is left
