@@ -6,6 +6,10 @@
  * - venuePasses(venue, ctx): the dedicated + search + activePeriod gate
  * - byName(a, b): alphabetical, leading articles ignored
  *
+ * One more predicate sits alongside rather than inside those, because only the
+ * map asks it:
+ * - venueHasShowInRange(venue, start, end): does the schedule reach this span
+ *
  * Entry points:
  * - initVenues(data): Initialize from js/data.json (resolves host refs)
  * - getAllVenues() / getVenueById(id)
@@ -27,7 +31,7 @@
  * second implementation waiting to disagree with the first.
  */
 
-import { scheduleMatchesDate, isDateInRange } from '../utils/date.js';
+import { scheduleMatchesDate, isDateInRange, getDateRange, parseLocalDate } from '../utils/date.js';
 import { getSortableName, containsIgnoreCase } from '../utils/string.js';
 import { getTagConfig } from '../utils/tags.js';
 import { getVenueHosts } from '../utils/render.js';
@@ -86,6 +90,52 @@ export function venuePasses(venue, { date = null, includeDedicated = true, searc
     if (searchQuery && !venueMatchesSearch(venue, searchQuery)) return false;
     if (!isVenueActiveOn(venue, date || new Date())) return false;
     return true;
+}
+
+/**
+ * Does this venue have at least one show inside a date range?
+ *
+ * A schedule-only question. It does not consider `active`, `activePeriod`,
+ * search, or the dedicated toggle — callers compose it with `venuePasses`, which
+ * owns those. Used by the map's date filter (#215).
+ *
+ * Two modes, because "all future shows" is not a finite span:
+ *
+ *   - **Open-ended** (`end` is null) — a recurring entry qualifies on sight,
+ *     since it keeps recurring; only `once` entries have a date to fall behind.
+ *     This is what separates "All" from today's unfiltered map: a venue whose
+ *     sole listing is last month's special event drops off.
+ *   - **Bounded** — walks each date in the span and asks `scheduleMatchesDate`,
+ *     the same matcher the weekly calendar uses, so the two views agree about
+ *     what happens on a given day.
+ *
+ * Exclusions are deliberately not consulted. A closed occurrence is still an
+ * occurrence: the weekly view lists it with a closure banner and the map dims
+ * its marker, and filtering it out would hide the very thing those cues exist to
+ * announce.
+ *
+ * @param {Object} venue - Venue object (needs .schedule)
+ * @param {Date} start - First date in the span
+ * @param {Date|null} [end=null] - Last date, or null for open-ended
+ * @returns {boolean}
+ */
+export function venueHasShowInRange(venue, start, end = null) {
+    const entries = venue?.schedule || [];
+    if (!entries.length) return false;
+    if (!start && !end) return true;
+
+    if (!end) {
+        const from = new Date(start);
+        from.setHours(0, 0, 0, 0);
+        return entries.some(entry => {
+            if (entry.frequency !== 'once') return true;
+            return entry.date ? parseLocalDate(entry.date) >= from : false;
+        });
+    }
+
+    return getDateRange(start, end).some(date =>
+        entries.some(entry => scheduleMatchesDate(entry, date))
+    );
 }
 
 /**
@@ -377,13 +427,19 @@ function venueMatchesDedicated(venue, query) {
  * Get active venues with coordinates (for map view).
  * Also filters out venues outside their activePeriod for today.
  * @param {Object} options - Filter options
+ * @param {boolean} [options.includeDedicated=true]
+ * @param {string} [options.searchQuery='']
+ * @param {{start: Date, end: Date|null}|null} [options.dateRange=null] - Only
+ *   venues with a show in this span (see venueHasShowInRange). Null = no date
+ *   constraint, which is the whole directory rather than the map's "All".
  * @returns {Object[]} Active venues with valid coordinates
  */
 export function getVenuesWithCoordinates(options = {}) {
-    const { includeDedicated = true, searchQuery = '' } = options;
+    const { includeDedicated = true, searchQuery = '', dateRange = null } = options;
     return getActiveVenues().filter(v =>
         v.coordinates?.lat && v.coordinates?.lng &&
-        venuePasses(v, { includeDedicated, searchQuery })
+        venuePasses(v, { includeDedicated, searchQuery }) &&
+        (!dateRange || venueHasShowInRange(v, dateRange.start, dateRange.end))
     );
 }
 

@@ -381,8 +381,10 @@ Tags are rendered as color-coded badges in VenueCard, VenueModal, VenueDetailPan
 
 ### Immersive Map Mode
 - `app.js` adds `body.view--map` class; CSS hides header/footer/nav, map fills viewport
-- Floating elements: `.map-controls` (left), `.map-view-switcher` (right), `.map-venue-card` (details)
+- Floating elements: `.map-date-filter` + `.map-controls` (left), `.map-view-switcher` (right), `.map-venue-card` (details)
 - Escape key: closes card first, then exits to Calendar view
+- **Date filter** (#215): All / This Week / Today, held in `mapDateFilter` state. "This week" is Sunday–Saturday of the current week, not the next seven days. Composes with search and the dedicated toggle; the predicate is `venueHasShowInRange()` in `js/services/venues.js`. Deliberately not in the URL — the spans are relative to "now"
+- Leaflet loads from a CDN *after* render, so `MapView.destroyed` gates the async `initMap()`. Skip that guard and a destroyed instance claims the live one's container, which leaves a map nothing is subscribed to — see functional spec §4
 
 ### Search Feature
 - Navigation updates `searchQuery` state; the views subscribe to that key. State is the only change channel — never `setState` and then `emit` the same change (#157)

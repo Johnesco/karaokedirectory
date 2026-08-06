@@ -764,6 +764,9 @@ body.view--map .app-layout__detail {
     left: 60px; /* Offset to avoid Leaflet's +/- zoom controls */
     display: flex;
     flex-direction: column;
+    align-items: flex-start; /* each control keeps its own width — without this
+                                the stretch default widens "Hide Dedicated" to
+                                match the date filter pill below it */
     gap: var(--spacing-sm);
     z-index: var(--z-map-ui);
 }
@@ -802,6 +805,44 @@ body.view--map .app-layout__detail {
     background: var(--color-primary);
     color: var(--color-white);
     border-color: var(--color-primary);
+}
+
+/* Date-range filter — segmented pill at the head of the control stack (#215).
+   Shares the view switcher's treatment: one card-coloured container, transparent
+   segments, the active one filled. */
+.map-date-filter {
+    display: flex;
+    gap: var(--spacing-xs);
+    background: var(--bg-card);
+    padding: var(--spacing-xs);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
+}
+
+.map-date-filter__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--size-icon-lg); /* 44px touch target */
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--border-radius);
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    white-space: nowrap;
+    transition: all var(--transition-fast);
+}
+
+.map-date-filter__btn:hover {
+    background: var(--color-gray-700);
+    color: var(--text-primary);
+}
+
+.map-date-filter__btn--active {
+    background: var(--color-primary);
+    color: var(--color-white);
 }
 
 /* Floating view switcher (right side) */
@@ -980,6 +1021,14 @@ body.view--map .app-layout__detail {
     .map-controls {
         top: var(--spacing-sm);
         left: 50px; /* Offset to avoid Leaflet's +/- zoom controls */
+    }
+
+    /* The date filter and the view switcher share the top band on a phone, and
+       the switcher is icon-only here. Tightening the segments keeps all three
+       labels on one line without the two colliding at 360px. */
+    .map-date-filter__btn {
+        padding: var(--spacing-sm);
+        font-size: var(--font-size-xs);
     }
 
     .map-view-switcher {

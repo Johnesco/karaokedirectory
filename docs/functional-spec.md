@@ -287,8 +287,46 @@ The map isn't date-scoped, so "today" (`new Date()`) is the reference date. `Map
 
 | Control | Position | Contents |
 |---------|----------|----------|
+| `.map-date-filter` | Top-left, above the rest of the stack | All / This Week / Today date filter |
 | `.map-controls` | Top-left | "Show/Hide Dedicated" toggle button |
 | `.map-view-switcher` | Top-right | Calendar and A-Z buttons to exit map view |
+
+### Date Filter
+
+Three segmented buttons decide which slice of the schedule the map plots. The map
+is otherwise the one view with no date dimension, which made "where's karaoke
+tonight?" a question only the calendar could answer.
+
+| Button | Plots venues with a show… | Span |
+|--------|---------------------------|------|
+| **All** (default) | at any point from today on | `startOfToday()` → open-ended |
+| **This Week** | on any day of the week we are in | Sunday 00:00 → Saturday 23:59 (`getWeekRange`) |
+| **Today** | on the current date | today → today |
+
+- **"This week" is the calendar week, not the next seven days.** Asked on a
+  Thursday, it still includes Sunday through Wednesday — the same framing the
+  weekly view uses.
+- **"All" is not "everything".** A venue whose only listing is a one-time event
+  that has already happened drops off the map; before this filter existed it was
+  plotted forever. Recurring entries always qualify, since they keep recurring.
+- **Closures still count.** A show excluded on a date (see [Exclusion Dates on
+  the Map](#exclusion-dates-on-the-map)) keeps its venue in the result — the
+  dimmed marker and "Closed Today" banner exist to announce that, and filtering
+  the venue out would suppress the announcement.
+- **The three filters compose.** Date filter, search, and the dedicated toggle
+  are separate gates in `updateMarkers()`; narrowing one leaves the others alone.
+- Selecting a filter repaints markers **in place** — the Leaflet instance is not
+  rebuilt, matching the dedicated toggle's contract (see §21, #157).
+- If the selected venue falls out of the plotted set, its floating card closes
+  rather than describing a pin that is no longer on the map.
+- State lives in `mapDateFilter` (`'all' | 'week' | 'today'`). It is deliberately
+  **not** in the URL — the spans are relative to "now", so a shared `?date=today`
+  link would mean something different tomorrow. It persists for the session, the
+  way `showDedicated` does.
+- The predicate is `venueHasShowInRange(venue, start, end)` in
+  `js/services/venues.js`, reached through `getVenuesWithCoordinates({ dateRange })`.
+  Bounded spans walk each date through `scheduleMatchesDate`, so the map and the
+  weekly calendar always agree about what happens on a given day.
 
 ### Escape Key
 
@@ -301,9 +339,22 @@ Displays "X of Y venues have map coordinates" at the bottom. If some venues lack
 
 ### Filtering
 
+- Respects the date filter — All / This Week / Today, see above
 - Respects the "Show dedicated" toggle — re-renders markers when changed
 - Respects the search query — only matching venues with coordinates shown
 - Only venues with valid `coordinates.lat` and `coordinates.lng` appear on the map
+
+> **Implementation note — the deep-link guard.** Leaflet is loaded from a CDN
+> after the view renders, so a MapView can be destroyed while its load is still
+> in flight. `app.js` boots `?view=map` with two `renderView()` calls (the
+> `setState` notification plus the explicit call), which is exactly that case.
+> Until #215 the dead instance still ran `initMap()` and claimed the live
+> instance's container; the survivor threw "Map container is already
+> initialized", kept `this.map` null, and every `updateMarkers()` returned early.
+> The map on screen belonged to a destroyed component with no subscriptions, so
+> the date filter, the dedicated toggle, and search all silently did nothing —
+> but only when the map was entered by URL, which is how shared links arrive.
+> `MapView.destroyed` is set in `onDestroy()` and checked before `initMap()`.
 
 ---
 
@@ -1257,6 +1308,7 @@ second notification renders every listening view a second time.
 | `view` | string | `'weekly'` | Base view: `weekly`, `alphabetical`, or `map`. What is actually on screen also depends on `hostFilter` — `router.resolveView()` combines the two |
 | `weekStart` | Date | Today | Start date for weekly view |
 | `showDedicated` | boolean | `true` | Whether dedicated venues are shown |
+| `mapDateFilter` | string | `'all'` | Which date span the map plots: `all`, `week`, or `today` ([Section 4](#4-map-view)). Map-only, and kept out of the URL because the spans are relative to "now" |
 | `searchQuery` | string | `''` | Current search text |
 | `hostFilter` | string | `''` | KJ/host filter, URL-driven via `?kj=`. `all` and `none` are route sentinels, not host names (ADR-011) |
 | `selectedVenue` | object/null | `null` | Currently selected venue |
@@ -1268,7 +1320,7 @@ Which view subscribes to which key:
 |---|---|
 | `WeeklyView` | `weekStart`, `showDedicated`, `searchQuery` |
 | `AlphabeticalView` | `showDedicated`, `searchQuery` |
-| `MapView` | `showDedicated`, `searchQuery` |
+| `MapView` | `showDedicated`, `searchQuery`, `mapDateFilter` |
 | `KJDossierView` | *(nothing)* — its only input is `hostFilter`, and a `hostFilter` change replaces the view instance outright |
 | `KJIndexView` | *(nothing)* — static listing |
 | `Navigation` | `view`, `weekStart`, `showDedicated`, `hostFilter`. Deliberately **not** `searchQuery`, which would re-render the input and lose focus mid-typing |

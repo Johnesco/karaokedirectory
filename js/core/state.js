@@ -11,6 +11,8 @@
  *   on screen also depends on hostFilter; router.resolveView() combines them.
  * - weekStart: Date for current week in weekly view
  * - showDedicated: Whether to show dedicated karaoke venues
+ * - mapDateFilter: Which date span the map plots — 'all' | 'week' | 'today'.
+ *   Map-only, so it stays out of the URL; entering the map always starts at 'all'.
  * - searchQuery: Global search filter text
  * - hostFilter: KJ/host name filter, URL-driven via ?kj= (substring match against host name/company only)
  * - selectedVenue: Currently selected venue object (for modal/detail pane)
@@ -28,6 +30,7 @@ const state = {
     view: 'weekly',
     weekStart: new Date(),
     showDedicated: true,
+    mapDateFilter: 'all',
     searchQuery: '',
     hostFilter: '',
     selectedVenue: null,
