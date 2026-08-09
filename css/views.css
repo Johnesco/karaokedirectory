@@ -242,11 +242,13 @@
     margin-top: var(--spacing-xl);
 }
 
+/* Inline padding matches .panel__header's so the section title lands on the same
+   line as the day names beneath it (#224). */
 .extended-section__header {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
-    padding: var(--spacing-md) var(--spacing-lg);
+    padding: var(--spacing-sm) var(--spacing-md);
     background: var(--color-gray-800);
     border-radius: var(--border-radius);
     margin-bottom: var(--spacing-md);
@@ -445,10 +447,16 @@
 /* Desktop: venues flow into a multi-column grid. A single column stretches
    one card across the full content width (~1300px on large screens). */
 @media (min-width: 769px) {
+    /* Row gap stays --spacing-sm: within a day, cards should read closer to each
+       other than the days do to each other (--spacing-md on .weekly-view__grid).
+       Only the column gap changes — 8px between two 320px columns read as a seam
+       rather than a gap (#224). */
     .day-card__venues,
     .letter-card__venues {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        column-gap: var(--spacing-md);
+        row-gap: var(--spacing-sm);
     }
 
     /* Equal-height cards within a grid row */
@@ -471,6 +479,20 @@
     /* Edge-to-edge cards only on index page */
     .page--edge-to-edge .day-card {
         border-radius: 0 0 var(--border-radius-swoop) 0;
+    }
+
+    /* The day card is already full-bleed here — .main-content's gutter is zeroed
+       above — so the body's inline padding was the second of two nested insets
+       spending 14.4% of a 390px screen on chrome. Dropping it lets the venue
+       card run to the edges, leaving its own padding as the page's single text
+       inset. The cards square off to match (#224). */
+    .page--edge-to-edge .day-card__content {
+        padding-inline: 0;
+    }
+
+    .page--edge-to-edge .day-card__venue-item .venue-card,
+    .page--edge-to-edge .venue-card__exclusion-banner {
+        border-radius: 0;
     }
 
     .page--edge-to-edge .day-card__header {
