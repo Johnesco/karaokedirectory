@@ -312,10 +312,22 @@
     box-shadow: var(--shadow-lg);
 }
 
+/* Every row inside the card carries a trailing margin to separate it from the
+   next one — but the last row has no next one, so it stacked onto the card's own
+   bottom padding and left 226 of 239 cards heavier at the bottom than the top.
+   Written against :last-child rather than .venue-tags because which element ends
+   the card depends on the venue's data (#224). */
+.venue-card > :last-child {
+    margin-bottom: 0;
+}
+
 .venue-card a {
     cursor: pointer;
 }
 
+/* Only .venue-card--full emits this — it is the one card whose header holds two
+   children (name + tags), so the flex row and gap are real. The compact card
+   renders the <h3> directly (#224). */
 .venue-card__header {
     display: flex;
     align-items: center;
@@ -323,10 +335,12 @@
     margin-bottom: var(--spacing-sm);
 }
 
+/* The name carries its own trailing space, so the compact card does not need a
+   wrapper whose only job was to hold a margin. */
 .venue-card__name {
     font-size: var(--font-size-lg);
     font-weight: 600;
-    margin: 0;
+    margin: 0 0 var(--spacing-sm);
 }
 
 .venue-card__link {
@@ -441,8 +455,12 @@ a.tag:focus-visible {
     padding: var(--spacing-lg);
 }
 
+/* Here the name is a flex item of .venue-card__header, which supplies the
+   spacing — the trailing margin it carries in the compact card would offset it
+   against the tags beside it. */
 .venue-card--full .venue-card__name {
     font-size: var(--font-size-lg);
+    margin-bottom: 0;
 }
 
 
@@ -586,11 +604,16 @@ a.tag:focus-visible {
     flex-direction: column;
 }
 
+/* The inline padding matches .panel__body's, so a panel has ONE text inset
+   rather than a header at --spacing-lg over a body at --spacing-md. That 8px
+   mismatch put the day name, the venue card's edge and the venue name on three
+   different vertical lines (#224). Block padding is --spacing-sm because the
+   calendar header is sticky and every pixel of it is chrome the whole scroll. */
 .panel__header {
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
-    padding: var(--spacing-md) var(--spacing-lg);
+    padding: var(--spacing-sm) var(--spacing-md);
     background: var(--color-gray-800);
     border-bottom: 1px solid var(--border-color);
     border-radius: var(--border-radius) var(--border-radius) var(--border-radius-swoop) 0;

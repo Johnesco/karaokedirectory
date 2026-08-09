@@ -26,6 +26,7 @@
 - Base styles target mobile devices
 - Media queries enhance for larger screens. The scale is **480 / 560 / 768 / 1400**, plus one `min-width: 1024px` rule for the map's docked venue card: 480px stacks schedule tables, 560px splits phone vs phablet nav, 769px+ enables multi-column venue grids, 1400px+ shows the desktop detail pane (see spec §19). `bingo.html` keeps its own game-specific scale.
 - Modal for venue details on mobile, side pane on desktop (1400px+)
+- **Mobile drives the layout; the wider breakpoints inherit** (#224). On `page--edge-to-edge` at ≤768px, `.main-content`'s inline padding is zero and the day-card body's is too, so venue cards run to both screen edges and the venue card's own padding is the page's **single text inset** — day name, venue name and day-card footer count all land on one line. At 769px+ there are two lines, because the day-card body keeps its gutter to carry the multi-column grid. See spec §19 "Density and alignment"
 
 ### 3. Separation of Concerns
 - **HTML:** Structure only (`index.html`, `about.html`, etc.)
@@ -447,7 +448,7 @@ Enforced by `scripts/check-css-load-order.js` — also run automatically in CI o
 ### BEM Naming
 - Block: `.venue-card`
 - Element: `.venue-card__header`
-- Modifier: `.venue-card--compact`
+- Modifier: `.venue-card--full` (the old `--compact` example named a class #166 deleted)
 
 ### CSS Variables (defined in `base.css`)
 - Colors: `--color-primary`, `--color-secondary`, `--bg-card`, etc.
@@ -455,6 +456,11 @@ Enforced by `scripts/check-css-load-order.js` — also run automatically in CI o
 - Typography: `--font-size-sm` through `--font-size-2xl`
 - Borders: `--border-radius`, `--border-color`
 - Transitions: `--transition-fast`, `--transition-normal`
+
+**The `--spacing-*` values are fixed. Tune density by pointing a selector at a different token, never by re-valuing the scale** (#224). Re-valuing one retunes every page that uses it, and `html { font-size: 14px }` at ≤480px is already a global multiplier on the whole scale — a second one compounds invisibly.
+
+### `.panel` is a three-surface primitive
+`.panel` / `__header` / `__title` / `__body` (extracted in #166) are shared by the calendar's day cards, the Alphabetical view's letter cards, **and** about.html's seven articles. Any edit is a three-surface change, and only the first has e2e coverage — check the other two by hand. `__header` and `__body` deliberately share the same inline padding so a panel has one text inset (#224).
 
 ### Standard Page Structure
 Use these semantic elements consistently:

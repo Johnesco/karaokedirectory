@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.28
+**Version:** 1.0.34
 **Last updated:** August 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -79,7 +79,8 @@ Each day card header displays:
 When expanded, shows:
 - One venue card per **matching schedule entry** (a venue with two events on the same date renders two cards, each showing its own event name, time, and host)
 - Footer with **unique venue count** (e.g., "14 venues" even if 15 cards rendered because one venue had two events)
-- **Venue card layout:** single column on mobile (≤768px); at 769px+ cards flow into a responsive grid (`repeat(auto-fill, minmax(320px, 1fr))` — 2 columns at ~1024px, up to 4 on large screens). Cards in the same grid row stretch to equal height. The same grid applies to letter cards in the Alphabetical view.
+- **Venue card layout:** single column on mobile (≤768px); at 769px+ cards flow into a responsive grid (`repeat(auto-fill, minmax(320px, 1fr))` — 2 columns at ~1024px, up to 4 on large screens), with a `--spacing-md` column gap and a `--spacing-sm` row gap. Cards in the same grid row stretch to equal height. The same grid applies to letter cards in the Alphabetical view.
+- **Full-bleed on mobile:** on `page--edge-to-edge` at ≤768px the day card's body carries no inline padding, so venue cards run to both screen edges and the venue card's own padding is the page's single text inset (§19 "Density and alignment"). Day cards are direct children of `.weekly-view__grid` — the `.weekly-view__day` wrapper that used to hold each one had no styling and was removed (#224).
 - **Closures:** a card whose date is excluded (§11 Schedule Exclusions) keeps its place but is dimmed with a strikethrough name and a bright "Closed" banner (`.venue-card--excluded`), so the venue is still findable rather than silently dropped.
 
 ### Sorting
@@ -1227,6 +1228,37 @@ No JPEG fallback is served. WebP has been universal since Safari 14 (2020),
 which is older than the `hwb()` and `paint-order` features `base.css` and
 `views.css` already require.
 
+On phones the photo's exposure is **vertical only**. `page--edge-to-edge` already
+zeroes `.main-content`'s inline padding, so nothing horizontal was showing
+through even before #224 made the venue cards full-bleed; what remains is the
+gap between day cards, the gaps between venue cards, and the header and footer
+bands. #224 spent card surface to buy text width there deliberately, and left
+the inter-day-card gap alone so the rhythm still reads.
+
+### Density and alignment
+
+**Mobile drives; the wider breakpoints inherit.**
+
+A panel has **one text inset**: `.panel__header` and `.panel__body` share
+`--spacing-md` inline padding. They used to differ (`lg` vs `md`), which put the
+day name, the venue card's box edge and the venue name on three different
+vertical lines. On a phone the day name, the venue name and the day-card footer
+count now all land on the same line; at 769px+ there are two lines, because the
+day-card body keeps its gutter to carry the multi-column grid.
+
+`.panel__header`'s block padding is `--spacing-sm`, not `--spacing-md`: the
+calendar header is sticky, so its height is chrome for the entire scroll.
+
+**Density is tuned per selector. The `--spacing-*` values are fixed.** Re-valuing
+a token retunes every page that uses it, and `html { font-size: 14px }` at ≤480px
+is already a global multiplier on the whole scale — a second one compounds
+invisibly. When something is too loose, point that selector at a smaller token.
+
+A row inside a venue card carries a trailing margin to separate it from the next
+row; `.venue-card > :last-child` zeroes it, so a card's bottom inset always
+equals its top one regardless of which element the venue's data happens to end
+with.
+
 ### Breakpoints
 
 The scale is **480 / 560 / 768 / 1400**, plus one `min-width: 1024px` rule for
@@ -1560,6 +1592,9 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 1 | Detail pane breakpoint | CLAUDE.md said "1200px+", code uses 1400px | CLAUDE.md updated to 1400px | **Resolved 2026-02** |
 | 2 | Social platforms | `url.js` supports bluesky but it was missing from CLAUDE.md venue schema | Added `bluesky` to socials in CLAUDE.md and functional spec | **Resolved 2026-02** |
 | 3 | Day name casing | Data file used lowercase day names ("friday"), docs showed capitalized ("Friday") | All day entries in `data.js` standardized to initial capital ("Friday"). Matching code uses `.toLowerCase()` so no breakage. Two missed entries fixed in v1.0.5. | **Resolved 2026-02** |
+| 4 | `.day-card__empty` looked dead | `.day-card--empty .day-card__content { display: none }` appears to make the "No karaoke scheduled" paragraph unreachable | It is reachable. `DayCard` renders the disclosure toggle for **any** past day, empty ones included, and `.day-card--past.day-card--expanded .day-card__content` (0,3,0) outranks the rule that hides it (0,2,0) — so a past day emptied by an active search expands to show it. Rule kept and the reasoning recorded in `views.css` (#224). | **Resolved 2026-08** |
+| 5 | Detail-surface trailing margin | The last `.venue-detail__section` keeps a full bottom margin on the modal (21px) and the desktop pane (24px), stacked on each surface's own padding | #224's `.venue-card > :last-child` rule reaches the A-Z inline card but not the other three surfaces, which hang `.venue-detail` on a non-`.venue-card` wrapper. Separately, `.venue-detail__host-name` / `__host-affiliation` leak 4px out of the last section by margin collapsing. Tracked separately. | **Open** |
+| 6 | A-Z full card bottom gap | `.venue-card--full`'s bottom inset can read far more than its `padding-bottom` — 41px against 24px on one card, up to 421px on others | **Not a defect.** It is the equal-height grid stretch documented in §2: cards in a row all take the row's height, and only the content-tallest one ends flush against its padding. Verified by setting `align-items: start`, which collapses every gap to `padding-bottom` (bar the 4px in item 5). An earlier draft of this table misattributed it to margin collapsing. | **Resolved 2026-08** |
 
 ---
 
@@ -1602,6 +1637,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-08 | 1.0.31 | #208: `renderTags()` deduplicates, so a tag renders at most once per card. `dedicated` and `special-event` are derived at render time and prepended by different modules; neither could see a stored copy, and `austin-deaf-club` had one — its card read "Special Event · LGBTQ+ · Special Event". The `dedicated` equivalent was latent. `validate-data.js` now warns when a venue stores a derived tag. Section 12 gains a "Derived tags" subsection; its badge class corrected from `.venue-tag` to `.tag`. | Claude Code |
 | 2026-08 | 1.0.32 | #210: Removed the stored `special-event` tag from `austin-deaf-club`, the only venue that carried a derived tag. The stored and derived forms assert different things — *this venue is tagged Special Event* vs *this show is a one-off* — and agreed only because that venue had a single one-time show. The compact calendar card is unchanged (it injects the tag); the modal, detail pane, A–Z card and map card no longer show it. Star icon and `.venue-card--special-event` are unaffected, both deriving from `frequency: "once"`. | Claude Code |
 | 2026-08 | 1.0.33 | #212: The submit form learned the `cities` registry — the City input is backed by a `<datalist>` from `js/data.json`, since #170 made `address.city` a closed vocabulary that `validate-data.js` hard-fails on while the form still emitted free text (it could produce `"Hutto/Round Rock"` verbatim). An unknown city still submits and the email flags it, mirroring the host fallback. Added the schema's `fifth` frequency, which the dropdown had never offered. Section 15 gains "City is a closed vocabulary". | Claude Code |
+| 2026-08 | 1.0.34 | #224: Mobile-first density pass on the weekly front page. Two DOM levels removed — `.weekly-view__day` (16 per page, no CSS rule anywhere) and `.venue-card__header` in the compact card (one child on all 239 cards); 255 fewer nodes, geometry byte-identical. `.panel__header` now shares `.panel__body`'s inline padding, so a panel has one text inset instead of two 8px apart — on a phone the day name, venue name and footer count land on one line. Venue cards run full-bleed at ≤768px on `page--edge-to-edge`, widening the text column from 330px to 358px on a 390px screen. `.venue-card > :last-child` zeroes the trailing margin that left 226 of 239 cards bottom-heavy. `.weekly-view`'s duplicate block padding, the extended-section chrome and the sticky header height all tightened. Four dead CSS rules deleted, including a `@media (max-width: 768px)` block that had been overridden by an identical-specificity rule 21 lines below it. Section 19 gains "Density and alignment"; Section 2 records the full-bleed rule; Known Discrepancies gains items 4 and 5. Header version corrected 1.0.28 → 1.0.34, five entries behind this log. | Claude Code |
 
 ---
 

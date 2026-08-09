@@ -104,13 +104,11 @@ export class VenueCard extends Component {
             <div class="${cardClass}" data-venue-id="${escapeHtml(venue.id)}">
                 ${exclusionBanner}
                 ${debugHtml}
-                <div class="venue-card__header">
-                    <h3 class="venue-card__name">
-                        <button class="venue-card__link" type="button">
-                            ${escapeHtml(venue.name)}
-                        </button>
-                    </h3>
-                </div>
+                <h3 class="venue-card__name">
+                    <button class="venue-card__link" type="button">
+                        ${escapeHtml(venue.name)}
+                    </button>
+                </h3>
                 ${eventName ? `<div class="venue-card__event-name"><i class="fa-solid fa-star"></i> ${schedule?.eventUrl ? `<a href="${escapeHtml(sanitizeUrl(schedule.eventUrl) || '')}" target="_blank" rel="noopener noreferrer" class="venue-card__event-link">${escapeHtml(eventName)} <i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : escapeHtml(eventName)}</div>` : ''}
                 ${showSchedule && timeDisplay ? `
                     <div class="venue-card__time">
@@ -142,6 +140,10 @@ export class VenueCard extends Component {
         // active period). `actions: false` drops the View Map / Directions / Share
         // button row to keep the long A–Z list light — full actions live in the
         // detail pane/modal opened on click.
+        // `.venue-card__header` survives here and only here: this is the one
+        // template where it holds two children, so its flex row and gap are
+        // real. The compact card put a single <h3> inside it, making the flex
+        // container and its gap inert on all 239 calendar cards (#224).
         return `
             <div class="venue-card venue-card--full venue-detail venue-detail--inline" data-venue-id="${escapeHtml(venue.id)}">
                 <div class="venue-card__header">

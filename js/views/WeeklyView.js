@@ -30,12 +30,10 @@ export class WeeklyView extends Component {
         const currentWeekStart = getWeekStart(weekStart);
         const dates = getWeekDates(currentWeekStart);
 
-        // Render current week
-        const currentWeekHtml = dates.map(date => `
-            <div class="weekly-view__day">
-                ${renderDayCard(date)}
-            </div>
-        `).join('');
+        // Render current week. Day cards are direct children of the grid — the
+        // .weekly-view__day wrapper they used to sit in had no CSS rule anywhere
+        // in css/, so it was a DOM level that did nothing (#224).
+        const currentWeekHtml = dates.map(date => renderDayCard(date)).join('');
 
         // Extended sections (Next Week, This Month, Next Month)
         const extendedSectionsHtml = this.renderExtendedSections(currentWeekStart, dates);

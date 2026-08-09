@@ -168,11 +168,7 @@ export function renderExtendedSection({ title, startDate, endDate, seenVenues, d
     // set is every venue that day, so the filter is a no-op and the invariant
     // "a section renders what it counted" holds without a branch.
     const dayCardsHtml = Array.from(venuesByDate.values())
-        .map(({ date, venues }) => `
-            <div class="weekly-view__day">
-                ${renderDayCard(date, new Set(venues.map(v => v.id)))}
-            </div>
-        `)
+        .map(({ date, venues }) => renderDayCard(date, new Set(venues.map(v => v.id))))
         .join('');
 
     // Dedup notice when recurring venues were hidden
