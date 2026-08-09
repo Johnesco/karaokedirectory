@@ -429,14 +429,13 @@ body.view--map .fab-group {
 
 
 /* Responsive breakpoints.
-   768px, not the 1200px this used to say: it tightens the main-content gutter,
-   which is a tablet-and-below concern, and 1200 is not on the scale (#166). */
-@media (max-width: 768px) {
-    .main-content {
-        padding: var(--spacing-md);
-    }
-}
+   768px, not the 1200px this used to say: it tightens the gutters, which is a
+   tablet-and-below concern, and 1200 is not on the scale (#166).
 
+   This was two adjacent @media (max-width: 768px) blocks. The first set
+   .main-content { padding: var(--spacing-md) } and was overridden by the
+   identical-specificity rule below it, 21 lines later — so that 16px never
+   applied at any viewport width. Merged (#224). */
 @media (max-width: 768px) {
     .site-header {
         padding: var(--spacing-lg) var(--spacing-xs);

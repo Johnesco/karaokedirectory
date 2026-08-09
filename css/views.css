@@ -77,7 +77,6 @@
 .day-card__toggle {
     position: absolute;
     inset: 0;
-    width: 100%;
     background: none;
     border: none;
     cursor: pointer;
@@ -206,10 +205,6 @@
     display: flex;
     flex-direction: column;
     gap: var(--spacing-sm);
-}
-
-.day-card__venue-item {
-    list-style: none;
 }
 
 .day-card__venue-item .venue-card {
@@ -441,11 +436,6 @@
     display: flex;
     flex-direction: column;
     gap: var(--spacing-sm);
-    list-style: none;
-}
-
-.letter-card__venue-item {
-    list-style: none;
 }
 
 .letter-card__venue-item .venue-card {
@@ -473,23 +463,11 @@
     }
 }
 
+/* Three rules lived here that restated the unconditional ones verbatim —
+   .day-card { scroll-margin-top } duplicated line 24, and the two sticky header
+   blocks duplicated .panel__header--sticky in components.css plus the `top`
+   offsets above. All no-ops at every width; deleted (#224). */
 @media (max-width: 768px) {
-    .day-card {
-        scroll-margin-top: var(--nav-height);
-    }
-
-    .day-card__header {
-        position: -webkit-sticky;
-        position: sticky;
-        top: var(--nav-height);
-    }
-
-    .letter-card__header {
-        position: -webkit-sticky;
-        position: sticky;
-        top: calc(var(--nav-height) + var(--az-index-height, 50px));
-    }
-
     /* Edge-to-edge cards only on index page */
     .page--edge-to-edge .day-card {
         border-radius: 0 0 var(--border-radius-swoop) 0;

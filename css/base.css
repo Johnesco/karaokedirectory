@@ -289,9 +289,6 @@ button {
     border: 0;
 }
 
-.text-center { text-align: center; }
-.text-muted { color: var(--text-muted); }
-
 /* Loading spinner */
 .loading {
     display: flex;
