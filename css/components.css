@@ -343,11 +343,17 @@
 }
 
 /* The name carries its own trailing space, so the compact card does not need a
-   wrapper whose only job was to hold a margin. */
+   wrapper whose only job was to hold a margin.
+
+   The venue name is what someone is scanning for, so it gets the loudest voice
+   on the card — a step up the scale from the body rows and heavier than them.
+   Its trailing margin is --spacing-xs, tighter than the gap below the tags, so
+   name and tags read as one unit and the details below read as another. */
 .venue-card__name {
-    font-size: var(--font-size-lg);
-    font-weight: 600;
-    margin: 0 0 var(--spacing-sm);
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    line-height: 1.25;
+    margin: 0 0 var(--spacing-xs);
 }
 
 .venue-card__link {
@@ -464,9 +470,9 @@ a.tag:focus-visible {
 
 /* Here the name is a flex item of .venue-card__header, which supplies the
    spacing — the trailing margin it carries in the compact card would offset it
-   against the tags beside it. */
+   against the tags beside it. Size is inherited so both cards speak at the
+   same volume. */
 .venue-card--full .venue-card__name {
-    font-size: var(--font-size-lg);
     margin-bottom: 0;
 }
 

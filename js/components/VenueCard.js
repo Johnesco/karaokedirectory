@@ -109,6 +109,7 @@ export class VenueCard extends Component {
                         ${escapeHtml(venue.name)}
                     </button>
                 </h3>
+                ${renderTags(tags, { dedicated: venue.dedicated })}
                 ${eventName ? `<div class="venue-card__event-name"><i class="fa-solid fa-star"></i> ${schedule?.eventUrl ? `<a href="${escapeHtml(sanitizeUrl(schedule.eventUrl) || '')}" target="_blank" rel="noopener noreferrer" class="venue-card__event-link">${escapeHtml(eventName)} <i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : escapeHtml(eventName)}</div>` : ''}
                 ${showSchedule && timeDisplay ? `
                     <div class="venue-card__time">
@@ -128,7 +129,6 @@ export class VenueCard extends Component {
                         Presented by ${escapeHtml(hostDisplay)}
                     </div>
                 ` : ''}
-                ${renderTags(tags, { dedicated: venue.dedicated })}
             </div>
         `;
     }

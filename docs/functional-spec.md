@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.35
+**Version:** 1.0.36
 **Last updated:** August 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -417,6 +417,8 @@ The navigation bar's height is tracked by a `ResizeObserver` and stored as CSS v
 ---
 
 ## 6 Venue Cards
+
+**Compact card order (#230):** venue name, tags, event name, time, "also" nights, address, host. The name is the card's anchor — `--font-size-xl` at weight 700 — and the tags sit directly beneath it, separated by `--spacing-xs` where the gap below the tags is `--spacing-sm`, so name and tags read as one unit and the details below as another. The A-Z full card inherits the same name size.
 
 **File:** `js/components/VenueCard.js`
 
@@ -1639,6 +1641,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-08 | 1.0.33 | #212: The submit form learned the `cities` registry — the City input is backed by a `<datalist>` from `js/data.json`, since #170 made `address.city` a closed vocabulary that `validate-data.js` hard-fails on while the form still emitted free text (it could produce `"Hutto/Round Rock"` verbatim). An unknown city still submits and the email flags it, mirroring the host fallback. Added the schema's `fifth` frequency, which the dropdown had never offered. Section 15 gains "City is a closed vocabulary". | Claude Code |
 | 2026-08 | 1.0.34 | #224: Mobile-first density pass on the weekly front page. Two DOM levels removed — `.weekly-view__day` (16 per page, no CSS rule anywhere) and `.venue-card__header` in the compact card (one child on all 239 cards); 255 fewer nodes, geometry byte-identical. `.panel__header` now shares `.panel__body`'s inline padding, so a panel has one text inset instead of two 8px apart — on a phone the day name, venue name and footer count land on one line. Venue cards run full-bleed at ≤768px on `page--edge-to-edge`, widening the text column from 330px to 358px on a 390px screen. `.venue-card > :last-child` zeroes the trailing margin that left 226 of 239 cards bottom-heavy. `.weekly-view`'s duplicate block padding, the extended-section chrome and the sticky header height all tightened. Four dead CSS rules deleted, including a `@media (max-width: 768px)` block that had been overridden by an identical-specificity rule 21 lines below it. Section 19 gains "Density and alignment"; Section 2 records the full-bleed rule; Known Discrepancies gains items 4 and 5. Header version corrected 1.0.28 → 1.0.34, five entries behind this log. | Claude Code |
 | 2026-08 | 1.0.35 | #226: Generalised #224's trailing-margin fix from `.venue-card` to `.venue-detail`. Since #161 the detail markup is one block hung on four wrappers, only one of which is a card — so the modal and the desktop pane still stacked a full `.venue-detail__section` bottom margin (21px and 24px) on their own padding. Added `.venue-detail > :last-child`, and zeroed `.venue-detail__host`'s last paragraph, whose 4px `--spacing-xs` margin collapsed out through both the host block and the section. All four surfaces now measure flush against their padding. Known Discrepancy 5 resolved. Discrepancy 6 records that the A-Z card's much larger bottom gap (up to 421px) is the equal-height grid stretch of §2, not a margin — an earlier draft of item 5 misdiagnosed it, and the correction is preserved so it is not repeated. | Claude Code |
+| 2026-08 | 1.0.36 | #230: The venue name anchors the compact card — `--font-size-xl` at weight 700, up from `lg`/600 — and `renderTags()` moves from the bottom of the card to directly under the name, so the descriptors sit next to the thing they describe. Name margin tightens to `--spacing-xs` against the tags' `--spacing-sm`, grouping the two. The `font-size` override on `.venue-card--full .venue-card__name` is dropped so both cards speak at the same volume. Section 6 gains the compact card order. The reorder was free because #224 wrote the trailing-margin rule against `:last-child` rather than `.venue-tags` — it is position-independent, so the card stays symmetric as its last element changes. | Claude Code |
 
 ---
 
