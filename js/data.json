@@ -1460,6 +1460,17 @@
           "host": {
             "kjId": "xpider-cantu"
           }
+        },
+        {
+          "frequency": "once",
+          "date": "2026-08-22",
+          "startTime": "19:30",
+          "endTime": "21:00",
+          "eventName": "Story-Oke: Rock Show",
+          "eventUrl": "https://www.facebook.com/share/19RfJYS9p1/",
+          "host": {
+            "companyId": "story-oke-austin"
+          }
         }
       ],
       "socials": {
