@@ -185,8 +185,10 @@
     font-size: var(--font-size-sm);
 }
 
+/* -dark, not -primary: white on --color-primary is 4.47:1, six hundredths under
+   the AA bar at this size. Same for the section count and the Accept button. */
 .day-card__today-badge {
-    background: var(--color-primary);
+    background: var(--color-primary-dark);
     color: var(--color-white);
     font-size: var(--font-size-xs);
     padding: var(--spacing-2xs) var(--spacing-sm);
@@ -278,7 +280,7 @@
 }
 
 .extended-section__count {
-    background: var(--color-primary);
+    background: var(--color-primary-dark);
     color: var(--color-white);
     font-size: var(--font-size-xs);
     font-weight: 600;

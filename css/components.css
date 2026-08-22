@@ -1363,9 +1363,9 @@ a.tag:focus-visible {
 }
 
 .consent-banner__btn--accept {
-    background: var(--color-primary);
+    background: var(--color-primary-dark);
     color: var(--color-white);
-    border-color: var(--color-primary);
+    border-color: var(--color-primary-dark);
 }
 
 .consent-banner__btn--accept:hover {
