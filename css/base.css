@@ -20,7 +20,7 @@
      * value under an honest name and `-dark` became genuinely dark (#165). */
     --color-primary-dark: #4f46e5;
     --color-primary: #6366f1;
-    --color-primary-light: #818cf8;
+    --color-primary-light: #9ca5fa;   /* was #818cf8 — 3.46:1 as the active tab label */
     --color-primary-pale: #d8c4ff;
 
     --color-secondary: #ec4899;
@@ -31,7 +31,9 @@
 
     --color-gray-200: #e5e7eb;
     --color-gray-300: #d1d5db;
-    --color-gray-400: #9ca3af;
+    /* Nudged from #9ca3af, which sat at 4.06:1 on the venue card — just under
+       the 4.5:1 AA bar. Only feeds --text-muted, so nothing else moves. */
+    --color-gray-400: #a5acb7;
     --color-gray-500: #6b7280;
     --color-gray-600: #4b5563;
     --color-gray-700: #374151;
@@ -49,8 +51,9 @@
     --color-social-youtube: #ff0000;
     --color-social-bluesky: #0085ff;
 
-    /* Accent — special-event venue cards */
-    --color-accent-special-event: #e91e63;
+    /* Accent — special-event venue cards. Only ever used as text, never a fill,
+       so it has to clear 4.5:1 on the card; #e91e63 managed 2.37:1. */
+    --color-accent-special-event: #f48caf;
 
     /* Karaoke-themed brand colors */
     --color-karaoke-header-start: #1e3a5f;
@@ -68,9 +71,13 @@
     --bg-overlay: rgba(0, 0, 0, 0.7);
 
     /* Text */
+    /* Each step clears 4.5:1 against the venue card (--color-gray-700), which is
+       the lightest surface body text lands on. The ramp shifted up one step:
+       muted was gray-500 at 2.13:1, less than half the AA bar. gray-500 keeps
+       its value — it still paints scrollbar thumbs and hover fills. */
     --text-primary: var(--color-primary-pale);
-    --text-secondary: var(--color-gray-400);
-    --text-muted: var(--color-gray-500);
+    --text-secondary: var(--color-gray-300);
+    --text-muted: var(--color-gray-400);
 
     /* Borders */
     --border-color: var(--color-gray-700);
