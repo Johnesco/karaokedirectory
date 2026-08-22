@@ -7,7 +7,7 @@
     },
     "lgbtq": {
       "label": "LGBTQ+",
-      "color": "#e040fb",
+      "color": "#c805e9",
       "textColor": "#fff"
     },
     "dive": {
@@ -18,16 +18,16 @@
     "sports-bar": {
       "label": "Sports Bar",
       "color": "#4caf50",
-      "textColor": "#fff"
+      "textColor": "#1f2937"
     },
     "country-bar": {
       "label": "Country Bar",
       "color": "#ff9800",
-      "textColor": "#fff"
+      "textColor": "#1f2937"
     },
     "21+": {
       "label": "21+",
-      "color": "#f44336",
+      "color": "#e91c0d",
       "textColor": "#fff"
     },
     "18+": {
@@ -38,12 +38,12 @@
     "all-ages": {
       "label": "All Ages",
       "color": "#2196f3",
-      "textColor": "#fff"
+      "textColor": "#1f2937"
     },
     "family-friendly": {
       "label": "Family",
       "color": "#03a9f4",
-      "textColor": "#fff"
+      "textColor": "#1f2937"
     },
     "smoking-inside": {
       "label": "Smoking Inside",
@@ -58,7 +58,7 @@
     "outdoor": {
       "label": "Outdoor",
       "color": "#4caf50",
-      "textColor": "#fff"
+      "textColor": "#1f2937"
     },
     "live-band-karaoke": {
       "label": "Live Band",
@@ -67,32 +67,32 @@
     },
     "billiards": {
       "label": "Billiards",
-      "color": "#607d8b",
+      "color": "#5e7b88",
       "textColor": "#fff"
     },
     "brewery": {
       "label": "Brewery",
       "color": "#ff5722",
-      "textColor": "#fff"
+      "textColor": "#1f2937"
     },
     "games": {
       "label": "Games",
       "color": "#00bcd4",
-      "textColor": "#fff"
+      "textColor": "#1f2937"
     },
     "craft-cocktails": {
       "label": "Craft Cocktails",
-      "color": "#e91e63",
+      "color": "#e6175d",
       "textColor": "#fff"
     },
     "neighborhood": {
       "label": "Neighborhood Bar",
       "color": "#9e9e9e",
-      "textColor": "#fff"
+      "textColor": "#1f2937"
     },
     "special-event": {
       "label": "Special Event",
-      "color": "#e91e63",
+      "color": "#e6175d",
       "textColor": "#ffffff"
     }
   },
