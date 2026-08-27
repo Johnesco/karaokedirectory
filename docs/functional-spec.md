@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.40
+**Version:** 1.0.42
 **Last updated:** August 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -334,10 +334,6 @@ tonight?" a question only the calendar could answer.
 
 - **If venue card is open** — closes the floating card
 - **If no card is open** — exits map view, returns to Weekly Calendar view
-
-### Venue Count Info
-
-Displays "X of Y venues have map coordinates" at the bottom. If some venues lack coordinates, shows a hint to add them — in practice via `node scripts/geocode-venues.js`, which patches `js/data.json` in place.
 
 ### Filtering
 
@@ -1647,6 +1643,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-08 | 1.0.36 | #230: The venue name anchors the compact card — `--font-size-xl` at weight 700, up from `lg`/600 — and `renderTags()` moves from the bottom of the card to directly under the name, so the descriptors sit next to the thing they describe. Name margin tightens to `--spacing-xs` against the tags' `--spacing-sm`, grouping the two. The `font-size` override on `.venue-card--full .venue-card__name` is dropped so both cards speak at the same volume. Section 6 gains the compact card order. The reorder was free because #224 wrote the trailing-margin rule against `:last-child` rather than `.venue-tags` — it is position-independent, so the card stays symmetric as its last element changes. | Claude Code |
 | 2026-08 | 1.0.37 | #229: WCAG AA contrast pass. axe-core found 474 `color-contrast` violations on the live site — 16 distinct colour combinations, four causes. The text ramp shifts up a step: `--text-secondary` to gray-300, `--text-muted` to gray-400 (it was gray-500 at **2.13:1**, less than half the AA bar, on the "Also every day" line of nearly every card), and `--color-gray-400` nudged to #a5acb7. `--color-gray-500` deliberately keeps its value — it paints scrollbar thumbs and hover fills, not just text. `--color-primary-light` and `--color-accent-special-event` lightened; the latter is only ever used as text. Tag palette split two ways: bright chips keep their brand colour and flip to dark ink, deep chips keep white text and darken. Badges move to `--color-primary-dark` (white on `--color-primary` is 4.47:1). Violations reach 0 at 1280px and 390px. Known Discrepancies gains item 7, recording that the CI contrast gate only ever covered the seven day headers. | Claude Code |
 | 2026-08 | 1.0.40 | #223: Per-show hosts now render. Two surfaces read `venue.host` instead of resolving the effective host: the compact card (`VenueCard.js`) and the detail sections (`render.js`). The Highball — no venue-level host, seven one-time shows each carrying its own host ref — showed no host on the calendar and no "Presented By" block on any of the four detail surfaces. The card now uses `resolveHostFor(venue, schedule)`; `renderHostSection` takes the venue and enumerates both scopes via `getVenueHosts`, deduplicating by display identity and attributing shows when a venue has more than one host. Per-show `website` and `socials` reach the page for the first time. Also fixes the masked case no venue has today — a venue with both a venue-level host and a per-show override would have shown the wrong host rather than none; covered by unit fixtures since the live data cannot reach it. Sections 6 and 7 updated. | Claude Code |
+| 2026-08 | 1.0.42 | #221: Deleted the map's venue-count bar. `.map-view__info` was built by `MapView.template()` on every render and displayed on none — `body.view--map .map-view__info { display: none }` applies whenever a map is on screen, which is the only time the element exists. Its hint also pointed at `editor.html`, retired to `_deprecated/` in favour of the curator. Removed the markup, six CSS rules (one of them equally unreachable under `.page--edge-to-edge`), and the now-unused `getAllVenues` import. Section 4's "Venue Count Info" heading went with it — the spec documented as a live feature something no visitor could ever see. Deleted rather than revived: it served the coordinate-backfill era and all 75 active venues are now geocoded, so it would read "75 of 75", and a status bar fights immersive mode. | Claude Code |
 
 ---
 
