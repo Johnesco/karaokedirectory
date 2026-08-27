@@ -14,7 +14,8 @@
     "validate": "node scripts/validate-data.js",
     "validate:css": "node scripts/check-css-load-order.js",
     "validate:contrast": "node scripts/check-contrast.js",
-    "validate:all": "npm run validate && npm run validate:css && npm run validate:contrast"
+    "validate:all": "npm run validate && npm run validate:css && npm run validate:contrast",
+    "curator:check": "node scripts/check-curator-drift.js"
   },
   "devDependencies": {
     "@playwright/test": "^1.52.0",

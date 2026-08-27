@@ -169,6 +169,7 @@ karaokedirectory/
 │   ├── geocode-venues.js  # Add coordinates to venues (patches data.json)
 │   ├── validate-data.js   # THE data validator (Ajv + supplementary checks) — CI gate
 │   ├── check-css-load-order.js  # CSS load order across HTML pages — CI gate
+│   ├── check-curator-drift.js   # Curator master vs js/data.json — run BEFORE exporting
 │   └── code-metrics.js    # Line/size snapshot by bucket (manual, writes metrics/snapshots/)
 │
 ├── schema/
@@ -479,6 +480,10 @@ Use these semantic elements consistently:
 
 `js/data.json` is **maintained externally** by the project owner. Day-to-day venue edits happen in a local-only curator tool that lives outside this repo (at the owner's `~/karaoke-curator/`). That tool writes `js/data.json`, which is the only venue data file (ADR-008).
 
+**Run `npm run curator:check` before every export.** The curator's Export writes `js/data.json` verbatim from its own master, with nothing in between — so a master that is behind the repo silently reverts whatever landed since it was last synced, and every other gate stays green (`validate-data.js` checks the file against the schema, not against what it replaced). A 17-day-stale master would have destroyed #229's contrast palette and #228's live event; the check exits non-zero only when the repo holds content the export would drop, and skips cleanly when no master is present (#237).
+
+The curator runs on **:8765** via `node server.js` (its `start.cmd`), with its own site preview on **:8766**. Serving it from a static file server instead makes browsing work while Save and Export both fail with `501 Unsupported method ('POST')`.
+
 If you're a contributor (or a Claude session that needs to add a venue inside this repo):
 
 1. Edit `js/data.json` directly. Add the venue object to the `listings` array, following the schema in the "Venue Data Format" section below.
@@ -510,7 +515,11 @@ npm run dev          # serve on http://localhost:8000
 npm run validate:all # venue data (Ajv + supplementary checks) and CSS load order
 npm run test:unit    # node --test — pure modules only, ~150ms
 npm test             # Playwright end-to-end, ~1.5 min
+
+npm run curator:check # curator master vs js/data.json — owner only, before exporting
 ```
+
+`curator:check` is deliberately **not** part of `validate:all` and not a CI gate: it compares against a file outside the repo that only the owner has, so it would skip on every CI run and for every other contributor. It is a pre-export guard, not a build gate.
 
 | Gate | Covers | Notes |
 |---|---|---|
