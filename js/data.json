@@ -96,6 +96,59 @@
       "textColor": "#ffffff"
     }
   },
+  "cities": {
+    "austin": {
+      "name": "Austin"
+    },
+    "buda": {
+      "name": "Buda"
+    },
+    "cedar-park": {
+      "name": "Cedar Park"
+    },
+    "del-valle": {
+      "name": "Del Valle"
+    },
+    "dripping-springs": {
+      "name": "Dripping Springs"
+    },
+    "elgin": {
+      "name": "Elgin"
+    },
+    "georgetown": {
+      "name": "Georgetown"
+    },
+    "hutto": {
+      "name": "Hutto"
+    },
+    "jonestown": {
+      "name": "Jonestown"
+    },
+    "kyle": {
+      "name": "Kyle"
+    },
+    "lakeway": {
+      "name": "Lakeway"
+    },
+    "leander": {
+      "name": "Leander"
+    },
+    "manchaca": {
+      "name": "Manchaca"
+    },
+    "manor": {
+      "name": "Manor"
+    },
+    "pflugerville": {
+      "name": "Pflugerville"
+    },
+    "round-rock": {
+      "name": "Round Rock"
+    },
+    "taylor": {
+      "name": "Taylor"
+    }
+  },
   "kjs": {
     "andy-hartsock": {
       "name": "Andy Hartsock"
@@ -230,59 +283,6 @@
     "texas-live-band-karaoke": {
       "name": "Texas Live Band Karaoke",
       "website": "https://www.facebook.com/texaslbk"
-    }
-  },
-  "cities": {
-    "austin": {
-      "name": "Austin"
-    },
-    "buda": {
-      "name": "Buda"
-    },
-    "cedar-park": {
-      "name": "Cedar Park"
-    },
-    "del-valle": {
-      "name": "Del Valle"
-    },
-    "dripping-springs": {
-      "name": "Dripping Springs"
-    },
-    "elgin": {
-      "name": "Elgin"
-    },
-    "georgetown": {
-      "name": "Georgetown"
-    },
-    "hutto": {
-      "name": "Hutto"
-    },
-    "jonestown": {
-      "name": "Jonestown"
-    },
-    "kyle": {
-      "name": "Kyle"
-    },
-    "lakeway": {
-      "name": "Lakeway"
-    },
-    "leander": {
-      "name": "Leander"
-    },
-    "manchaca": {
-      "name": "Manchaca"
-    },
-    "manor": {
-      "name": "Manor"
-    },
-    "pflugerville": {
-      "name": "Pflugerville"
-    },
-    "round-rock": {
-      "name": "Round Rock"
-    },
-    "taylor": {
-      "name": "Taylor"
     }
   },
   "listings": [
@@ -1401,9 +1401,9 @@
       "schedule": [
         {
           "frequency": "once",
-          "date": "2026-06-27",
-          "startTime": "21:00",
-          "endTime": "01:00",
+          "date": "2026-08-29",
+          "startTime": "19:00",
+          "endTime": "00:00",
           "eventName": "Karaoke with Xpider @ Highball!",
           "host": {
             "kjId": "xpider-cantu"
