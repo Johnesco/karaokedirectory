@@ -312,12 +312,19 @@
     box-shadow: var(--shadow-lg);
 }
 
-/* Every row inside the card carries a trailing margin to separate it from the
+/* Every row inside a card carries a trailing margin to separate it from the
    next one — but the last row has no next one, so it stacked onto the card's own
    bottom padding and left 226 of 239 cards heavier at the bottom than the top.
    Written against :last-child rather than .venue-tags because which element ends
-   the card depends on the venue's data (#224). */
-.venue-card > :last-child {
+   the card depends on the venue's data (#224).
+
+   Two blocks, because two different things end up last. `.venue-card` covers the
+   compact calendar card, which is not a `.venue-detail`. `.venue-detail` covers
+   the four surfaces that share the detail markup — scoping this to `.venue-card`
+   alone reached the A-Z inline card and missed the modal, the pane and the map
+   card, which hang `.venue-detail` on a wrapper that is not a card (#226). */
+.venue-card > :last-child,
+.venue-detail > :last-child {
     margin-bottom: 0;
 }
 
@@ -336,11 +343,17 @@
 }
 
 /* The name carries its own trailing space, so the compact card does not need a
-   wrapper whose only job was to hold a margin. */
+   wrapper whose only job was to hold a margin.
+
+   The venue name is what someone is scanning for, so it gets the loudest voice
+   on the card — a step up the scale from the body rows and heavier than them.
+   Its trailing margin is --spacing-xs, tighter than the gap below the tags, so
+   name and tags read as one unit and the details below read as another. */
 .venue-card__name {
-    font-size: var(--font-size-lg);
-    font-weight: 600;
-    margin: 0 0 var(--spacing-sm);
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    line-height: 1.25;
+    margin: 0 0 var(--spacing-xs);
 }
 
 .venue-card__link {
@@ -457,9 +470,9 @@ a.tag:focus-visible {
 
 /* Here the name is a flex item of .venue-card__header, which supplies the
    spacing — the trailing margin it carries in the compact card would offset it
-   against the tags beside it. */
+   against the tags beside it. Size is inherited so both cards speak at the
+   same volume. */
 .venue-card--full .venue-card__name {
-    font-size: var(--font-size-lg);
     margin-bottom: 0;
 }
 
@@ -729,6 +742,14 @@ a.tag:focus-visible {
 .venue-detail__host-affiliation {
     color: var(--text-secondary);
     margin-bottom: var(--spacing-xs);
+}
+
+/* The host block's last line. Its trailing margin has nothing to separate it
+   from, and neither .venue-detail__host nor .venue-detail__section carries a
+   bottom padding or border, so it collapsed straight out of both and landed as
+   4px of dead space under any card whose Host block ended it (#226). */
+.venue-detail__host > :last-child {
+    margin-bottom: 0;
 }
 
 .venue-detail__host-website {
