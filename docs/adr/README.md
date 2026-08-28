@@ -20,3 +20,4 @@ Format and threshold rule: see [sdlc-baseline `docs/adrs.md`](https://github.com
 | [010](010-static-on-netlify-only-constraint.md) | Static output on Netlify is the only architectural constraint | Accepted |
 | [011](011-entity-link-contract.md) | Entity link contract — every linkable thing is `{type, id}` | Accepted |
 | [012](012-generated-entity-pages.md) | Adopt a build step to generate static entity pages | Accepted |
+| [013](013-show-centric-presentation.md) | Venue-rooted storage, registry identity, show-centric presentation | Accepted |

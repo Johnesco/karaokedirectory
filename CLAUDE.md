@@ -44,6 +44,7 @@
 - **There is no second data source.** Supabase was parked by [ADR-009](docs/adr/009-park-supabase.md) — the scaffolding lives in `_deprecated/supabase/`, and `js/config.js`, the `useSupabase` flag, and the CDN bundle are gone. Re-entry trigger is written into that ADR: the moment the directory needs a *write* path.
 - Service layer abstracts data access (`js/services/venues.js`). It reads whatever `initVenues()` is handed, so the source is swappable — but there is only one source today (ADR-009)
 - Schedule matching logic handles complex recurrence patterns
+- **Three layers, three units (ADR-013):** storage's unit is the **venue**, identity's unit is the **registries**, presentation's unit is the **show** — the derived `{venue, schedule entry}` pair that `getVenueEventsForDate()` emits ("one row per show"). Views group shows; they do not own bespoke pipelines. A recurring named production (Story-Oke) is its host registry entry — "all its shows" is the host lens, not a new entity type
 
 ## Display Philosophy
 
@@ -189,7 +190,7 @@ karaokedirectory/
 │   ├── patterns.md        # 10 annotated implementation recipes
 │   ├── _sidebar.md        # Docsify sidebar navigation
 │   ├── .nojekyll          # GitHub Pages underscore file support
-│   ├── adr/               # ADR-001…008 + README index
+│   ├── adr/               # ADR-001…013 + README index
 │   └── spikes/            # Research write-ups
 │
 └── _deprecated/           # Archived old code (do not use)
@@ -638,6 +639,7 @@ Current ADRs:
 - [ADR-010](docs/adr/010-static-on-netlify-only-constraint.md) — **Static output on Netlify is the only architectural constraint** (supersedes 002, 003)
 - [ADR-011](docs/adr/011-entity-link-contract.md) — Entity link contract: every linkable thing is `{type, id}` over a registry with stable ids
 - [ADR-012](docs/adr/012-generated-entity-pages.md) — Adopt a build step: static entity pages generated from `js/data.json`
+- [ADR-013](docs/adr/013-show-centric-presentation.md) — Venue-rooted storage, registry identity, show-centric presentation: the **show** (a derived `{venue, schedule entry}` pair) is the unit of display; storage stays venue-rooted; series are represented by their host registry entry
 
 ## Security Considerations
 - Always use `escapeHtml()` when rendering user-provided content
