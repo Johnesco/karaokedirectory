@@ -16,7 +16,7 @@ import { formatTimeRange, getScheduleExclusion } from '../utils/date.js';
 import { buildMapUrl, formatAddress, sanitizeUrl } from '../utils/url.js';
 import { isDebugMode, getDebugHtml } from '../utils/debug.js';
 import { renderTags } from '../utils/tags.js';
-import { formatHostDisplay, renderScheduleContext, renderVenueDetailSections } from '../utils/render.js';
+import { formatHostDisplay, resolveHostFor, renderScheduleContext, renderVenueDetailSections } from '../utils/render.js';
 
 export class VenueCard extends Component {
     /**
@@ -94,8 +94,12 @@ export class VenueCard extends Component {
         const fullAddress = formatAddress(venue.address);
         const mapsUrl = buildMapUrl(venue.address, venue.name);
 
-        // KJ/Host info using shared utility
-        const hostDisplay = formatHostDisplay(venue.host);
+        // The host for THIS show, not the venue's default. The card already has
+        // the matched entry — it uses it three lines up for the time and the
+        // special-event badge — but read venue.host here, so a venue whose hosts
+        // all live on schedule entries showed no host at all, and one with both a
+        // venue host and an override would have shown the wrong one (#223).
+        const hostDisplay = formatHostDisplay(resolveHostFor(venue, schedule));
 
         // Debug info for schedule matching
         const debugHtml = getDebugHtml(venue, date);
