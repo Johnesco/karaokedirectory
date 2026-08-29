@@ -744,6 +744,22 @@ a.tag:focus-visible {
     margin-bottom: var(--spacing-xs);
 }
 
+/* Which shows this host covers. Only emitted when a venue has more than one
+   distinct host, so several hosts never read as one host for everything (#223). */
+.venue-detail__host-shows {
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-xs);
+}
+
+/* Separates stacked host blocks in the multi-host case. The single-host case
+   emits one block and is unaffected. */
+.venue-detail__host + .venue-detail__host {
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--border-color);
+}
+
 /* The host block's last line. Its trailing margin has nothing to separate it
    from, and neither .venue-detail__host nor .venue-detail__section carries a
    bottom padding or border, so it collapsed straight out of both and landed as

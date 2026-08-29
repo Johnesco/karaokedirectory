@@ -49,6 +49,26 @@ function hasPerShowHosts(venue) {
 }
 
 /**
+ * Human label for one schedule entry. Shared by the schedule table's Day column
+ * and the host section's attribution, so the two name a show the same way.
+ *
+ * `short` drops the event name from one-time entries, leaving the date. The
+ * table needs the name — it is the row's identity. The host section does not:
+ * listing four Highball nights in full repeats "Karaoke with Xpider @ Highball!"
+ * four times to say something the host's own name already said.
+ *
+ * @param {Object} entry
+ * @param {Object} [options]
+ * @param {boolean} [options.short=false]
+ * @returns {string}
+ */
+function scheduleEntryLabel(entry, { short = false } = {}) {
+    const f = formatScheduleEntry(entry, { showEvery: true });
+    if (entry.frequency !== 'once') return `${f.frequencyPrefix}${f.day}`;
+    return short ? f.day : `${f.frequencyPrefix} — ${f.day}`;
+}
+
+/**
  * Render a schedule table for venue details.
  * When any schedule entry has its own host (multi-host venue, e.g. The Highball),
  * a Host column is added. Otherwise the column is omitted and host info lives
@@ -66,11 +86,7 @@ export function renderScheduleTable(venue) {
 
     const rows = schedule.map(entry => {
         const formatted = formatScheduleEntry(entry, { showEvery: true });
-
-        // For one-time events, show event name/label and date together
-        const dayLabel = entry.frequency === 'once'
-            ? `${formatted.frequencyPrefix} — ${formatted.day}`
-            : `${formatted.frequencyPrefix}${formatted.day}`;
+        const dayLabel = scheduleEntryLabel(entry);
 
         const eventLink = entry.eventUrl
             ? ` <a href="${escapeHtml(sanitizeUrl(entry.eventUrl) || '')}" target="_blank" rel="noopener noreferrer" class="schedule-event-link" title="Event page"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>`
@@ -156,35 +172,88 @@ export function renderUpcomingClosures(venue) {
 }
 
 /**
- * Render the host/KJ section for venue details
- * @param {Object} host - Host object with name, affiliation, website, socials
- * @param {Object} options - Options for social links
- * @returns {string} HTML string or empty if no host
+ * One host's details — name, affiliation, website, socials.
+ * @param {Object} host
+ * @param {Object} options
+ * @param {string} [options.socialSize]
+ * @param {string} [options.shows] - Which shows this host covers, when the
+ *   venue has more than one host. Omitted for the single-host case.
+ * @returns {string} HTML string
  */
-export function renderHostSection(host, options = {}) {
-    if (!host) return '';
-
-    const { socialSize = 'fa-lg' } = options;
+function renderHostBlock(host, { socialSize = 'fa-lg', shows = '' } = {}) {
     const hostSocialsHtml = host.socials
         ? createSocialLinks(host.socials, { size: socialSize })
         : '';
 
     return `
+        <div class="venue-detail__host">
+            ${host.name ? `<p class="venue-detail__host-name">${escapeHtml(host.name)}</p>` : ''}
+            ${host.affiliation ? `<p class="venue-detail__host-affiliation">${escapeHtml(host.affiliation)}</p>` : ''}
+            ${shows ? `<p class="venue-detail__host-shows">${escapeHtml(shows)}</p>` : ''}
+            ${host.website ? `
+                <a href="${escapeHtml(sanitizeUrl(host.website) || '')}" target="_blank" rel="noopener noreferrer" class="venue-detail__host-website">
+                    <i class="fa-solid fa-globe"></i> Website
+                </a>
+            ` : ''}
+            ${hostSocialsHtml ? `
+                <p class="venue-detail__socials-label">KJ Social Media</p>
+                <div class="venue-detail__host-socials">${hostSocialsHtml}</div>
+            ` : ''}
+        </div>
+    `;
+}
+
+/**
+ * Render the "Presented By" section for venue details.
+ *
+ * Takes the venue, not a host. It used to take `venue.host`, which meant a venue
+ * whose hosts all live on schedule entries got no section at all — The Highball
+ * has no venue-level host and six one-time shows, each with its own host ref, so
+ * all four detail surfaces showed nothing (#223). `getVenueHosts` already
+ * enumerates both scopes and is what search and the KJ index use.
+ *
+ * Hosts are deduplicated by display identity rather than object identity:
+ * hydrateVenues builds a fresh object per entry from the registry refs, so the
+ * same KJ named on four separate entries would otherwise render four times.
+ *
+ * When more than one distinct host is present each block names the shows it
+ * covers, so several hosts never read as one host for everything. A venue-level
+ * host among per-show ones covers whatever the overrides do not — full-object
+ * override semantics, per CLAUDE.md.
+ *
+ * @param {Object} venue - Full venue object
+ * @param {Object} options - Options for social links
+ * @returns {string} HTML string, empty when the venue has no host at all
+ */
+export function renderHostSection(venue, options = {}) {
+    const entries = getVenueHosts(venue);
+    if (entries.length === 0) return '';
+
+    const { socialSize = 'fa-lg' } = options;
+
+    const byIdentity = new Map();
+    for (const { host, scope, scheduleEntry } of entries) {
+        const key = JSON.stringify([host.name || '', host.affiliation || '', host.website || '']);
+        if (!byIdentity.has(key)) byIdentity.set(key, { host, venueScoped: false, shows: [] });
+        const record = byIdentity.get(key);
+        if (scope === 'venue') record.venueScoped = true;
+        else if (scheduleEntry) record.shows.push(scheduleEntryLabel(scheduleEntry, { short: true }));
+    }
+
+    const distinct = [...byIdentity.values()];
+    const blocks = distinct.map(({ host, venueScoped, shows }) => {
+        // A lone host needs no attribution — it hosts everything the venue runs.
+        if (distinct.length === 1) return renderHostBlock(host, { socialSize });
+        const label = venueScoped
+            ? (shows.length ? `All other nights, plus ${shows.join(', ')}` : 'All other nights')
+            : shows.join(', ');
+        return renderHostBlock(host, { socialSize, shows: label });
+    }).join('');
+
+    return `
         <section class="venue-detail__section">
             <h3>Presented By</h3>
-            <div class="venue-detail__host">
-                ${host.name ? `<p class="venue-detail__host-name">${escapeHtml(host.name)}</p>` : ''}
-                ${host.affiliation ? `<p class="venue-detail__host-affiliation">${escapeHtml(host.affiliation)}</p>` : ''}
-                ${host.website ? `
-                    <a href="${escapeHtml(sanitizeUrl(host.website) || '')}" target="_blank" rel="noopener noreferrer" class="venue-detail__host-website">
-                        <i class="fa-solid fa-globe"></i> Website
-                    </a>
-                ` : ''}
-                ${hostSocialsHtml ? `
-                    <p class="venue-detail__socials-label">KJ Social Media</p>
-                    <div class="venue-detail__host-socials">${hostSocialsHtml}</div>
-                ` : ''}
-            </div>
+            ${blocks}
         </section>
     `;
 }
@@ -370,7 +439,7 @@ export function renderVenueDetailSections(venue, { hostSocialSize = 'fa-lg', act
             ${renderUpcomingClosures(venue)}
         </section>
 
-        ${renderHostSection(venue.host, { socialSize: hostSocialSize })}
+        ${renderHostSection(venue, { socialSize: hostSocialSize })}
 
         ${socialLinksHtml ? `
             <section class="venue-detail__section">
