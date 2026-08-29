@@ -102,9 +102,9 @@ function populateSuggestions() {
     }
 
     // Chips come from the directory's own renderer, so this form and the venue
-    // cards cannot drift apart again (#166). initTagConfig also injects the
-    // [data-tag] colour stylesheet, which replaced the inline style= that used
-    // to sit on each badge. Now a static import — #168 made this file a module.
+    // cards cannot drift apart again (#166). Colours are authored CSS since
+    // ADR-014 (#238) — components.css carries the [data-tag] palette, so this
+    // page gets them by loading the stylesheet, not from the data. Now a static import — #168 made this file a module.
     initTagConfig(tagDefinitions);
 
     grid.innerHTML = getUserSelectableTagIds().map(id => `

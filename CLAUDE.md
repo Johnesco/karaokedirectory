@@ -337,8 +337,8 @@ directory. Removed from the schema, `venueMatchesSearch`, `filterVenues`,
 Tags are defined in `tagDefinitions` at the top of `js/data.json`. Each tag has:
 - **id** (key): Machine-readable identifier
 - **label**: Human-readable display name
-- **color**: Background color (hex)
-- **textColor**: Text color for contrast
+
+**Colours are authored CSS, not data** (ADR-014, #238): `css/components.css` carries one `.tag[data-tag="<id>"]` rule per tag, holding the #229 WCAG palette. `data.json` stores no presentation values, so a stale curator export can never revert design work. A tag without a rule falls back to the neutral `.tag` surface.
 
 Available tags:
 | Tag ID | Label | Description |
@@ -365,7 +365,7 @@ Available tags:
 
 Tags are rendered as color-coded badges in VenueCard, VenueModal, VenueDetailPane and MapView using the `renderTags()` function from `js/utils/tags.js`.
 
-**`dedicated` and `special-event` are derived, not stored.** `renderTags()` prepends the first when `venue.dedicated` is true; `VenueCard` prepends the second when the entry it is rendering is `frequency: "once"`. `renderTags()` deduplicates the result, so listing either in a venue's `tags` no longer renders the badge twice (#208) — but it is still redundant, and `validate-data.js` warns about it.
+**`dedicated` and `special-event` are derived, not stored.** `renderTags()` prepends the first when `venue.dedicated` is true; `VenueCard` prepends the second when the entry it is rendering is `frequency: "once"`. `renderTags()` deduplicates the result, so listing either in a venue's `tags` no longer renders the badge twice (#208) — but it is still redundant, and `validate-data.js` warns about it. Since ADR-014, `validate-data.js` also warns if a tag definition still carries `color`/`textColor` — those fields are ignored; the palette lives in CSS.
 
 ## Key Technical Patterns
 
@@ -640,6 +640,7 @@ Current ADRs:
 - [ADR-011](docs/adr/011-entity-link-contract.md) — Entity link contract: every linkable thing is `{type, id}` over a registry with stable ids
 - [ADR-012](docs/adr/012-generated-entity-pages.md) — Adopt a build step: static entity pages generated from `js/data.json`
 - [ADR-013](docs/adr/013-show-centric-presentation.md) — Venue-rooted storage, registry identity, show-centric presentation: the **show** (a derived `{venue, schedule entry}` pair) is the unit of display; storage stays venue-rooted; series are represented by their host registry entry
+- [ADR-014](docs/adr/014-tag-colors-authored-css.md) — Tag colours are authored CSS; `data.json` is purely factual
 
 ## Security Considerations
 - Always use `escapeHtml()` when rendering user-provided content

@@ -21,3 +21,4 @@ Format and threshold rule: see [sdlc-baseline `docs/adrs.md`](https://github.com
 | [011](011-entity-link-contract.md) | Entity link contract — every linkable thing is `{type, id}` | Accepted |
 | [012](012-generated-entity-pages.md) | Adopt a build step to generate static entity pages | Accepted |
 | [013](013-show-centric-presentation.md) | Venue-rooted storage, registry identity, show-centric presentation | Accepted |
+| [014](014-tag-colors-authored-css.md) | Tag colours are authored CSS — `data.json` is purely factual | Accepted |

@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.40
+**Version:** 1.0.43
 **Last updated:** August 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -864,38 +864,38 @@ Supabase was wired but never switched on, and it decayed while dormant: the gene
 Tags are defined in the `tagDefinitions` object in `js/data.json`. Each tag has:
 - **id** (object key) — machine-readable identifier
 - **label** — human-readable display name
-- **color** — badge background color (hex)
-- **textColor** — badge text color (hex)
+
+Colours are **authored CSS** (ADR-014): one `.tag[data-tag="<id>"]` rule per tag in `css/components.css`, carrying the #229 WCAG palette. `data.json` stores no presentation values. The schema still accepts `color`/`textColor` so a not-yet-migrated curator master cannot hard-fail CI; `validate-data.js` warns when they linger.
 
 ### Current Tags (19)
 
-| Tag ID | Label | Color | Description |
-|--------|-------|-------|-------------|
-| `dedicated` | Dedicated | #673ab7 | Dedicated karaoke venue (auto-added when `dedicated: true`) |
-| `lgbtq` | LGBTQ+ | #e040fb | LGBTQ+ friendly venue |
-| `dive` | Dive Bar | #8d6e63 | Dive bar atmosphere |
-| `sports-bar` | Sports Bar | #4caf50 | Sports bar venue |
-| `country-bar` | Country Bar | #ff9800 | Country/western bar |
-| `21+` | 21+ | #f44336 | 21 and over only |
-| `18+` | 18+ | #ffc107 | 18 and over only |
-| `all-ages` | All Ages | #2196f3 | No age restriction |
-| `family-friendly` | Family | #03a9f4 | Family-friendly venue |
-| `smoking-inside` | Smoking Inside | #e90707 | Indoor smoking allowed |
-| `restaurant` | Restaurant | #795548 | Primarily a restaurant |
-| `outdoor` | Outdoor | #4caf50 | Significant outdoor/patio space |
-| `live-band-karaoke` | Live Band | #9c27b0 | Live band karaoke |
-| `billiards` | Billiards | #607d8b | Pool hall / billiards focus |
-| `brewery` | Brewery | #ff5722 | Brewery or distillery |
-| `games` | Games | #00bcd4 | Arcade, bowling, entertainment |
-| `craft-cocktails` | Craft Cocktails | #e91e63 | Upscale craft cocktail bar |
-| `neighborhood` | Neighborhood Bar | #9e9e9e | Casual neighborhood bar |
-| `special-event` | Special Event | #e91e63 | One-time special karaoke events |
+| Tag ID | Label | Description |
+|--------|-------|-------------|
+| `dedicated` | Dedicated | Dedicated karaoke venue (auto-added when `dedicated: true`) |
+| `lgbtq` | LGBTQ+ | LGBTQ+ friendly venue |
+| `dive` | Dive Bar | Dive bar atmosphere |
+| `sports-bar` | Sports Bar | Sports bar venue |
+| `country-bar` | Country Bar | Country/western bar |
+| `21+` | 21+ | 21 and over only |
+| `18+` | 18+ | 18 and over only |
+| `all-ages` | All Ages | No age restriction |
+| `family-friendly` | Family | Family-friendly venue |
+| `smoking-inside` | Smoking Inside | Indoor smoking allowed |
+| `restaurant` | Restaurant | Primarily a restaurant |
+| `outdoor` | Outdoor | Significant outdoor/patio space |
+| `live-band-karaoke` | Live Band | Live band karaoke |
+| `billiards` | Billiards | Pool hall / billiards focus |
+| `brewery` | Brewery | Brewery or distillery |
+| `games` | Games | Arcade, bowling, entertainment |
+| `craft-cocktails` | Craft Cocktails | Upscale craft cocktail bar |
+| `neighborhood` | Neighborhood Bar | Casual neighborhood bar |
+| `special-event` | Special Event | One-time special karaoke events |
 
 ### Rendering
 
 Tags render as color-coded inline badges using `renderTags(tags, options)` from `js/utils/tags.js`.
 - CSS classes: `.venue-tags` (container), `.tag` (individual badge, carrying `data-tag="<id>"`). *(This line read `.venue-tag` until #208; that class was replaced during #166 and exists only in a comment.)*
-- Colours come from `tagDefinitions` in `js/data.json` and are painted into one generated stylesheet keyed on `[data-tag]`, not inline styles
+- Colours are authored rules in `css/components.css` keyed on `[data-tag]` (ADR-014). The runtime injection that used to build them from `data.json` is gone; `initTagConfig()` stores labels only. *(The Color column this section used to carry had already drifted — it still showed the pre-#229 palette.)*
 
 #### Derived tags
 
@@ -1647,6 +1647,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-08 | 1.0.36 | #230: The venue name anchors the compact card — `--font-size-xl` at weight 700, up from `lg`/600 — and `renderTags()` moves from the bottom of the card to directly under the name, so the descriptors sit next to the thing they describe. Name margin tightens to `--spacing-xs` against the tags' `--spacing-sm`, grouping the two. The `font-size` override on `.venue-card--full .venue-card__name` is dropped so both cards speak at the same volume. Section 6 gains the compact card order. The reorder was free because #224 wrote the trailing-margin rule against `:last-child` rather than `.venue-tags` — it is position-independent, so the card stays symmetric as its last element changes. | Claude Code |
 | 2026-08 | 1.0.37 | #229: WCAG AA contrast pass. axe-core found 474 `color-contrast` violations on the live site — 16 distinct colour combinations, four causes. The text ramp shifts up a step: `--text-secondary` to gray-300, `--text-muted` to gray-400 (it was gray-500 at **2.13:1**, less than half the AA bar, on the "Also every day" line of nearly every card), and `--color-gray-400` nudged to #a5acb7. `--color-gray-500` deliberately keeps its value — it paints scrollbar thumbs and hover fills, not just text. `--color-primary-light` and `--color-accent-special-event` lightened; the latter is only ever used as text. Tag palette split two ways: bright chips keep their brand colour and flip to dark ink, deep chips keep white text and darken. Badges move to `--color-primary-dark` (white on `--color-primary` is 4.47:1). Violations reach 0 at 1280px and 390px. Known Discrepancies gains item 7, recording that the CI contrast gate only ever covered the seven day headers. | Claude Code |
 | 2026-08 | 1.0.40 | #223: Per-show hosts now render. Two surfaces read `venue.host` instead of resolving the effective host: the compact card (`VenueCard.js`) and the detail sections (`render.js`). The Highball — no venue-level host, seven one-time shows each carrying its own host ref — showed no host on the calendar and no "Presented By" block on any of the four detail surfaces. The card now uses `resolveHostFor(venue, schedule)`; `renderHostSection` takes the venue and enumerates both scopes via `getVenueHosts`, deduplicating by display identity and attributing shows when a venue has more than one host. Per-show `website` and `socials` reach the page for the first time. Also fixes the masked case no venue has today — a venue with both a venue-level host and a per-show override would have shown the wrong host rather than none; covered by unit fixtures since the live data cannot reach it. Sections 6 and 7 updated. | Claude Code |
+| 2026-08 | 1.0.43 | #238: Tag colours moved from `data.json` to authored CSS (ADR-014). `tagDefinitions` now carries labels only — 38 presentation values left the curator's file, `initTagConfig()` stopped injecting a stylesheet, and `buildTagStyles` plus its colour-validation machinery were deleted. The authored rules preserve the #229 WCAG palette exactly (axe verified 0 violations). Schema accepts the old fields as documented-ignored so a stale master cannot hard-fail CI; `validate-data.js` warns instead. The curator master was migrated in the same change. Section 12 rewritten; its Color column — which had drifted to the pre-#229 values — removed. | Claude Code |
 
 ---
 

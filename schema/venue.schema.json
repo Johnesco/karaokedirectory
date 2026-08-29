@@ -2,46 +2,62 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://karaokedirectory.com/schemas/venue.schema.json",
   "title": "Karaoke Venue Database",
-  "description": "Schema for js/data.json — the full venue listings database. Single source of truth for validate-data.js (CI), submit.html payload shape, the external curator tool, and future Supabase JSONB rows. Cross-reference constraints (e.g. tags must exist in tagDefinitions) are enforced as supplementary checks in scripts/validate-data.js since JSON Schema cannot express them.",
+  "description": "Schema for js/data.json \u2014 the full venue listings database. Single source of truth for validate-data.js (CI), submit.html payload shape, the external curator tool, and future Supabase JSONB rows. Cross-reference constraints (e.g. tags must exist in tagDefinitions) are enforced as supplementary checks in scripts/validate-data.js since JSON Schema cannot express them.",
   "type": "object",
-  "required": ["tagDefinitions", "listings"],
+  "required": [
+    "tagDefinitions",
+    "listings"
+  ],
   "additionalProperties": false,
   "properties": {
     "tagDefinitions": {
-      "description": "Map of tag id → { label, color, textColor }. Tag ids referenced by venue.tags[].",
+      "description": "Map of tag id \u2192 { label, color, textColor }. Tag ids referenced by venue.tags[].",
       "type": "object",
       "patternProperties": {
-        "^[a-z0-9][a-z0-9-]*$": { "$ref": "#/$defs/tagDefinition" },
-        "^[0-9]+\\+$": { "$ref": "#/$defs/tagDefinition" }
+        "^[a-z0-9][a-z0-9-]*$": {
+          "$ref": "#/$defs/tagDefinition"
+        },
+        "^[0-9]+\\+$": {
+          "$ref": "#/$defs/tagDefinition"
+        }
       },
       "additionalProperties": false
     },
     "kjs": {
-      "description": "Map of KJ id → { name, website?, socials? }. Referenced by host.kjId (ADR-007). A duo or named act is a single entry. Optional while the data migrates off inline hosts.",
+      "description": "Map of KJ id \u2192 { name, website?, socials? }. Referenced by host.kjId (ADR-007). A duo or named act is a single entry. Optional while the data migrates off inline hosts.",
       "type": "object",
       "patternProperties": {
-        "^[a-z0-9][a-z0-9-]*$": { "$ref": "#/$defs/registryEntry" }
+        "^[a-z0-9][a-z0-9-]*$": {
+          "$ref": "#/$defs/registryEntry"
+        }
       },
       "additionalProperties": false
     },
     "companies": {
-      "description": "Map of company id → { name, website?, socials? }. Referenced by host.companyId (ADR-007). Optional while the data migrates off inline hosts.",
+      "description": "Map of company id \u2192 { name, website?, socials? }. Referenced by host.companyId (ADR-007). Optional while the data migrates off inline hosts.",
       "type": "object",
       "patternProperties": {
-        "^[a-z0-9][a-z0-9-]*$": { "$ref": "#/$defs/registryEntry" }
+        "^[a-z0-9][a-z0-9-]*$": {
+          "$ref": "#/$defs/registryEntry"
+        }
       },
       "additionalProperties": false
     },
     "cities": {
-      "description": "Map of city id → { name }. The legal set of address.city values, closed because the frame is fixed at Austin-metro (#170). Ids are stable so a city can become a link target rather than a string (ADR-011). validate-data.js cross-checks every listing against this map.",
+      "description": "Map of city id \u2192 { name }. The legal set of address.city values, closed because the frame is fixed at Austin-metro (#170). Ids are stable so a city can become a link target rather than a string (ADR-011). validate-data.js cross-checks every listing against this map.",
       "type": "object",
       "patternProperties": {
         "^[a-z0-9][a-z0-9-]*$": {
           "type": "object",
-          "required": ["name"],
+          "required": [
+            "name"
+          ],
           "additionalProperties": false,
           "properties": {
-            "name": { "type": "string", "minLength": 1 }
+            "name": {
+              "type": "string",
+              "minLength": 1
+            }
           }
         }
       },
@@ -49,23 +65,43 @@
     },
     "listings": {
       "type": "array",
-      "items": { "$ref": "#/$defs/venue" }
+      "items": {
+        "$ref": "#/$defs/venue"
+      }
     }
   },
   "$defs": {
     "tagDefinition": {
       "type": "object",
-      "required": ["label", "color", "textColor"],
+      "required": [
+        "label"
+      ],
       "additionalProperties": false,
       "properties": {
-        "label": { "type": "string", "minLength": 1 },
-        "color": { "type": "string", "pattern": "^#[0-9a-fA-F]{3,8}$" },
-        "textColor": { "type": "string", "pattern": "^#[0-9a-fA-F]{3,8}$" }
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "color": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{3,8}$",
+          "description": "Ignored since ADR-014 \u2014 tag colours are authored in css/components.css. Accepted so a not-yet-migrated curator master does not hard-fail CI; validate-data.js warns instead."
+        },
+        "textColor": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{3,8}$",
+          "description": "Ignored since ADR-014 \u2014 see color."
+        }
       }
     },
     "venue": {
       "type": "object",
-      "required": ["id", "name", "address", "schedule"],
+      "required": [
+        "id",
+        "name",
+        "address",
+        "schedule"
+      ],
       "additionalProperties": false,
       "properties": {
         "id": {
@@ -73,7 +109,10 @@
           "pattern": "^[a-z0-9][a-z0-9-]*$",
           "description": "Lowercase, hyphenated slug, unique across listings."
         },
-        "name": { "type": "string", "minLength": 1 },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
         "active": {
           "type": "boolean",
           "description": "False to hide venue from all pages. Default true when omitted."
@@ -84,126 +123,232 @@
         },
         "tags": {
           "type": "array",
-          "items": { "type": "string", "minLength": 1 },
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
           "uniqueItems": true,
           "description": "Tag ids. Each must exist as a key in tagDefinitions (enforced in validate-data.js)."
         },
-        "address": { "$ref": "#/$defs/address" },
-        "coordinates": { "$ref": "#/$defs/coordinates" },
+        "address": {
+          "$ref": "#/$defs/address"
+        },
+        "coordinates": {
+          "$ref": "#/$defs/coordinates"
+        },
         "schedule": {
           "type": "array",
           "minItems": 1,
-          "items": { "$ref": "#/$defs/scheduleEntry" }
+          "items": {
+            "$ref": "#/$defs/scheduleEntry"
+          }
         },
-        "activePeriod": { "$ref": "#/$defs/activePeriod" },
+        "activePeriod": {
+          "$ref": "#/$defs/activePeriod"
+        },
         "host": {
           "$ref": "#/$defs/hostAssignment",
           "description": "Default host for shows that don't override it."
         },
         "socials": {
           "oneOf": [
-            { "type": "null" },
-            { "$ref": "#/$defs/socials" }
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/socials"
+            }
           ]
         },
         "phone": {
           "type": "string",
           "pattern": "^[-0-9+(). ]{7,}$",
-          "description": "Public phone number for the venue, rendered as a tel: link in detail views. The venue's line only — not a KJ/host or curator-internal number."
+          "description": "Public phone number for the venue, rendered as a tel: link in detail views. The venue's line only \u2014 not a KJ/host or curator-internal number."
         }
       }
     },
     "address": {
       "type": "object",
-      "required": ["street", "city", "state", "zip"],
+      "required": [
+        "street",
+        "city",
+        "state",
+        "zip"
+      ],
       "additionalProperties": false,
       "properties": {
-        "street": { "type": "string", "minLength": 1 },
+        "street": {
+          "type": "string",
+          "minLength": 1
+        },
         "city": {
           "type": "string",
           "minLength": 1,
           "description": "Must match a name in the top-level `cities` registry; validate-data.js cross-checks it."
         },
-        "state": { "type": "string", "minLength": 2, "maxLength": 2 },
-        "zip": { "type": "string", "pattern": "^\\d{5}(-\\d{4})?$" }
+        "state": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 2
+        },
+        "zip": {
+          "type": "string",
+          "pattern": "^\\d{5}(-\\d{4})?$"
+        }
       }
     },
     "coordinates": {
       "type": "object",
-      "required": ["lat", "lng"],
+      "required": [
+        "lat",
+        "lng"
+      ],
       "additionalProperties": false,
       "properties": {
-        "lat": { "type": "number" },
-        "lng": { "type": "number" }
+        "lat": {
+          "type": "number"
+        },
+        "lng": {
+          "type": "number"
+        }
       }
     },
     "activePeriod": {
       "type": "object",
-      "required": ["start"],
+      "required": [
+        "start"
+      ],
       "additionalProperties": false,
       "description": "Window during which the venue is active. 'end' is optional for open-ended seasonal venues (e.g. 'opened in March, no scheduled end').",
       "properties": {
-        "start": { "type": "string", "format": "date" },
-        "end": { "type": "string", "format": "date" }
+        "start": {
+          "type": "string",
+          "format": "date"
+        },
+        "end": {
+          "type": "string",
+          "format": "date"
+        }
       }
     },
     "scheduleEntry": {
       "type": "object",
-      "required": ["frequency", "startTime"],
+      "required": [
+        "frequency",
+        "startTime"
+      ],
       "additionalProperties": false,
       "properties": {
         "frequency": {
           "type": "string",
-          "enum": ["every", "first", "second", "third", "fourth", "fifth", "last", "once"]
+          "enum": [
+            "every",
+            "first",
+            "second",
+            "third",
+            "fourth",
+            "fifth",
+            "last",
+            "once"
+          ]
         },
         "day": {
           "type": "string",
-          "enum": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+          "enum": [
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday"
+          ]
         },
         "date": {
           "type": "string",
           "format": "date",
           "description": "Required when frequency is 'once'."
         },
-        "startTime": { "$ref": "#/$defs/timeOfDay" },
+        "startTime": {
+          "$ref": "#/$defs/timeOfDay"
+        },
         "endTime": {
           "oneOf": [
-            { "type": "null" },
-            { "$ref": "#/$defs/timeOfDay" }
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/timeOfDay"
+            }
           ],
           "description": "Null when the venue only advertises a start time."
         },
-        "eventName": { "type": "string", "minLength": 1 },
-        "eventUrl": { "type": "string", "format": "uri" },
+        "eventName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "eventUrl": {
+          "type": "string",
+          "format": "uri"
+        },
         "host": {
           "$ref": "#/$defs/hostAssignment",
-          "description": "Host for this show only. Fully replaces the venue-level host — fields are not merged."
+          "description": "Host for this show only. Fully replaces the venue-level host \u2014 fields are not merged."
         },
         "exclusions": {
           "type": "array",
           "description": "One-off dates on which the recurring event does not happen (e.g. private events, holidays).",
           "items": {
             "type": "object",
-            "required": ["date"],
+            "required": [
+              "date"
+            ],
             "additionalProperties": false,
             "properties": {
-              "date": { "type": "string", "format": "date" },
-              "reason": { "type": "string", "minLength": 1 }
+              "date": {
+                "type": "string",
+                "format": "date"
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
             }
           }
         },
         "socials": {
           "oneOf": [
-            { "type": "null" },
-            { "$ref": "#/$defs/socials" }
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/socials"
+            }
           ]
         }
       },
       "allOf": [
         {
-          "if": { "properties": { "frequency": { "const": "once" } }, "required": ["frequency"] },
-          "then": { "required": ["date"] },
-          "else": { "required": ["day"] }
+          "if": {
+            "properties": {
+              "frequency": {
+                "const": "once"
+              }
+            },
+            "required": [
+              "frequency"
+            ]
+          },
+          "then": {
+            "required": [
+              "date"
+            ]
+          },
+          "else": {
+            "required": [
+              "day"
+            ]
+          }
         }
       ]
     },
@@ -213,38 +358,70 @@
       "description": "HH:MM in 24-hour format."
     },
     "hostAssignment": {
-      "description": "Who runs a show. Either a registry ref pair (preferred, ADR-007) or the legacy inline object still accepted during the migration window. The two shapes are mutually exclusive — each forbids the other's properties — so oneOf is unambiguous.",
+      "description": "Who runs a show. Either a registry ref pair (preferred, ADR-007) or the legacy inline object still accepted during the migration window. The two shapes are mutually exclusive \u2014 each forbids the other's properties \u2014 so oneOf is unambiguous.",
       "oneOf": [
-        { "type": "null" },
-        { "$ref": "#/$defs/hostRef" },
-        { "$ref": "#/$defs/host" }
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/hostRef"
+        },
+        {
+          "$ref": "#/$defs/host"
+        }
       ]
     },
     "hostRef": {
       "type": "object",
       "additionalProperties": false,
-      "description": "Reference into the kjs/companies registries. At least one id required: companyId alone (a company runs the night, KJ unrecorded or rotating), kjId alone (independent), or both. The KJ↔company association lives here, on the show — never on the registry entries — so rosters stay derived and cannot go stale (ADR-007).",
+      "description": "Reference into the kjs/companies registries. At least one id required: companyId alone (a company runs the night, KJ unrecorded or rotating), kjId alone (independent), or both. The KJ\u2194company association lives here, on the show \u2014 never on the registry entries \u2014 so rosters stay derived and cannot go stale (ADR-007).",
       "properties": {
-        "kjId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
-        "companyId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" }
+        "kjId": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "companyId": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        }
       },
       "anyOf": [
-        { "required": ["kjId"] },
-        { "required": ["companyId"] }
+        {
+          "required": [
+            "kjId"
+          ]
+        },
+        {
+          "required": [
+            "companyId"
+          ]
+        }
       ]
     },
     "registryEntry": {
       "type": "object",
-      "required": ["name"],
+      "required": [
+        "name"
+      ],
       "additionalProperties": false,
       "description": "One KJ or one company. Shared shape for both registries.",
       "properties": {
-        "name": { "type": "string", "minLength": 1 },
-        "website": { "type": "string", "format": "uri" },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "website": {
+          "type": "string",
+          "format": "uri"
+        },
         "socials": {
           "oneOf": [
-            { "type": "null" },
-            { "$ref": "#/$defs/socials" }
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/socials"
+            }
           ]
         }
       }
@@ -254,19 +431,40 @@
       "additionalProperties": false,
       "description": "Legacy inline host, accepted during the migration window and emitted by submit.html for curator reconciliation. Superseded by hostRef.",
       "properties": {
-        "name": { "type": "string", "minLength": 1 },
-        "affiliation": { "type": "string", "minLength": 1 },
-        "website": { "type": "string", "format": "uri" },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "affiliation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "website": {
+          "type": "string",
+          "format": "uri"
+        },
         "socials": {
           "oneOf": [
-            { "type": "null" },
-            { "$ref": "#/$defs/socials" }
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/socials"
+            }
           ]
         }
       },
       "anyOf": [
-        { "required": ["name"] },
-        { "required": ["affiliation"] }
+        {
+          "required": [
+            "name"
+          ]
+        },
+        {
+          "required": [
+            "affiliation"
+          ]
+        }
       ]
     },
     "socials": {
@@ -274,13 +472,34 @@
       "additionalProperties": false,
       "minProperties": 1,
       "properties": {
-        "website": { "type": "string", "format": "uri" },
-        "facebook": { "type": "string", "format": "uri" },
-        "instagram": { "type": "string", "format": "uri" },
-        "twitter": { "type": "string", "format": "uri" },
-        "tiktok": { "type": "string", "format": "uri" },
-        "youtube": { "type": "string", "format": "uri" },
-        "bluesky": { "type": "string", "format": "uri" }
+        "website": {
+          "type": "string",
+          "format": "uri"
+        },
+        "facebook": {
+          "type": "string",
+          "format": "uri"
+        },
+        "instagram": {
+          "type": "string",
+          "format": "uri"
+        },
+        "twitter": {
+          "type": "string",
+          "format": "uri"
+        },
+        "tiktok": {
+          "type": "string",
+          "format": "uri"
+        },
+        "youtube": {
+          "type": "string",
+          "format": "uri"
+        },
+        "bluesky": {
+          "type": "string",
+          "format": "uri"
+        }
       }
     }
   }
