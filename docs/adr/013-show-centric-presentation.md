@@ -129,3 +129,42 @@ rejected.
 shows from three sources is exactly where per-fact freshness matters — the
 coarse version answers the question this ADR exists to answer with "somewhere
 on this venue, something was once confirmed."
+
+---
+
+## Clarification (2026-08-28) — host cardinality per show
+
+Appended after the direction review that followed this ADR's merge
+([#251](https://github.com/Johnesco/karaokedirectory/issues/251)); measured
+against `js/data.json` at 80 listings / 146 schedule entries. Existing text
+above is untouched.
+
+**A show carries at most one host ref — one `kjId` plus one `companyId` — and
+that stays deliberate.** The intuition "a show can have many KJs/hosts" is
+five different situations, four of which the model already serves:
+
+| Situation | Mechanism | Live usage |
+|---|---|---|
+| KJ works under a company | one ref pairing both ids (ADR-007) | 13 shows |
+| A duo performs together | the duo is its own registry **act** | 2 acts — `dj-cysum-and-mo`, `kj-armando-and-paola` |
+| Hosts alternate by calendar | frequency-split entries (first/third vs second/fourth), each free to carry its own host | mechanism live at 6 venues (all currently twice-monthly cadence; the rails carry alternation unchanged) |
+| KJ rotates or is unknown | company-only ref | 24 shows |
+| Two independent acts co-host one show | **not representable** | zero instances |
+
+The act model's cost is person-level identity, and the data already pays it
+once: `armando` hosts at two venues, `kj-armando-and-paola` at a third, and
+the person's dossier does not span the two ids. That split is the documented
+test case for the first deferral below — not a defect to fix pre-emptively.
+
+Two deferrals, with triggers in this ADR's own style:
+
+- **`members` on an act's registry entry**
+  (`kj-armando-and-paola: { name, members: ["armando", …] }`) — additive,
+  registry-only, no schedule migration, no curator schedule changes; person
+  dossiers become complete by derivation, the same derive-don't-store move as
+  ADR-007's rosters. *Trigger:* a real request for a person's dossier to span
+  their acts.
+- **`hosts[]` on the show** — the only shape that serves a jointly-hosted
+  one-off, at the cost of touching schema, hydration, render, search, dossier
+  and the curator's host picker at once. *Trigger:* a genuinely co-hosted
+  show entering the data.
