@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.40
+**Version:** 1.0.41
 **Last updated:** August 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -352,8 +352,8 @@ Displays "X of Y venues have map coordinates" at the bottom. If some venues lack
 
 > **Implementation note — the deep-link guard.** Leaflet is loaded from a CDN
 > after the view renders, so a MapView can be destroyed while its load is still
-> in flight. `app.js` boots `?view=map` with two `renderView()` calls (the
-> `setState` notification plus the explicit call), which is exactly that case.
+> in flight. `app.js` used to boot `?view=map` with two `renderView()` calls (the
+> `setState` notification plus the explicit call), which was exactly that case.
 > Until #215 the dead instance still ran `initMap()` and claimed the live
 > instance's container; the survivor threw "Map container is already
 > initialized", kept `this.map` null, and every `updateMarkers()` returned early.
@@ -361,6 +361,12 @@ Displays "X of Y venues have map coordinates" at the bottom. If some venues lack
 > the date filter, the dedicated toggle, and search all silently did nothing —
 > but only when the map was entered by URL, which is how shared links arrive.
 > `MapView.destroyed` is set in `onDestroy()` and checked before `initMap()`.
+>
+> **The double render itself is gone since #218** — `app.js` seeds `view` state
+> before subscribing, so a deep link renders once like the default does. Both
+> halves stay: the guard protects any future view that does async work in
+> `afterRender()`, and an e2e test asserts a non-default deep link costs no more
+> renders of `#main-content` than `?view=weekly`.
 
 ---
 
@@ -1647,6 +1653,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-08 | 1.0.36 | #230: The venue name anchors the compact card — `--font-size-xl` at weight 700, up from `lg`/600 — and `renderTags()` moves from the bottom of the card to directly under the name, so the descriptors sit next to the thing they describe. Name margin tightens to `--spacing-xs` against the tags' `--spacing-sm`, grouping the two. The `font-size` override on `.venue-card--full .venue-card__name` is dropped so both cards speak at the same volume. Section 6 gains the compact card order. The reorder was free because #224 wrote the trailing-margin rule against `:last-child` rather than `.venue-tags` — it is position-independent, so the card stays symmetric as its last element changes. | Claude Code |
 | 2026-08 | 1.0.37 | #229: WCAG AA contrast pass. axe-core found 474 `color-contrast` violations on the live site — 16 distinct colour combinations, four causes. The text ramp shifts up a step: `--text-secondary` to gray-300, `--text-muted` to gray-400 (it was gray-500 at **2.13:1**, less than half the AA bar, on the "Also every day" line of nearly every card), and `--color-gray-400` nudged to #a5acb7. `--color-gray-500` deliberately keeps its value — it paints scrollbar thumbs and hover fills, not just text. `--color-primary-light` and `--color-accent-special-event` lightened; the latter is only ever used as text. Tag palette split two ways: bright chips keep their brand colour and flip to dark ink, deep chips keep white text and darken. Badges move to `--color-primary-dark` (white on `--color-primary` is 4.47:1). Violations reach 0 at 1280px and 390px. Known Discrepancies gains item 7, recording that the CI contrast gate only ever covered the seven day headers. | Claude Code |
 | 2026-08 | 1.0.40 | #223: Per-show hosts now render. Two surfaces read `venue.host` instead of resolving the effective host: the compact card (`VenueCard.js`) and the detail sections (`render.js`). The Highball — no venue-level host, seven one-time shows each carrying its own host ref — showed no host on the calendar and no "Presented By" block on any of the four detail surfaces. The card now uses `resolveHostFor(venue, schedule)`; `renderHostSection` takes the venue and enumerates both scopes via `getVenueHosts`, deduplicating by display identity and attributing shows when a venue has more than one host. Per-show `website` and `socials` reach the page for the first time. Also fixes the masked case no venue has today — a venue with both a venue-level host and a per-show override would have shown the wrong host rather than none; covered by unit fixtures since the live data cannot reach it. Sections 6 and 7 updated. | Claude Code |
+| 2026-08 | 1.0.41 | #218: `app.js` rendered the initial view twice on any deep link that named a non-default view. `setState({ view })` notified the `view` subscriber *and* the explicit `renderView()` ran, so a view was built, destroyed and rebuilt before first paint; `?view=weekly` rendered once only because `setState` stays quiet when the value already matches. State is now seeded before the subscription, so one render covers both cases — the same ordering `hostFilter` already relied on. This was the root cause behind the frozen map in #215/#217; `MapView.destroyed` still guards the symptom, since any future view doing async work in `afterRender()` would hit it. Measured 5 renders of `#main-content` to 4 on `?view=map` and `?view=alphabetical`, with `?view=weekly` unchanged. Section 4 implementation note updated. | Claude Code |
 
 ---
 
