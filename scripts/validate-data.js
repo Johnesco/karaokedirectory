@@ -372,6 +372,62 @@ for (const venue of data.listings) {
     }
 }
 
+// ---- Zip/coordinate cluster check (#241) ----
+//
+// A venue's zip is validated for shape only, and the Austin-metro box above is
+// far too coarse to catch a zip that is wrong by one suburb: a curator export
+// once moved a Pflugerville venue to an Austin zip 14.7 km away and every gate
+// stayed green. Conversely a bad geocode can drop a pin 26 km from the address
+// it claims (oak-hill-social, geocoded to the east half of US-290).
+//
+// The check: flag a venue whose coordinates sit far from the centroid of the
+// OTHER venues sharing its zip. Zip -> city consistency was considered and
+// rejected — real ZIPs straddle municipalities, and two already do here
+// legitimately (78641 Leander/Cedar Park, 78734 Lakeway/Austin).
+//
+// Threshold 12 km, tuned against the data rather than guessed: the genuine
+// errors measured 14.7 km and 26 km, while the widest legitimate spreads are
+// 8.2 km (78665, Round Rock) and 10.4 km (78641, suburban ZIPs are large).
+// A warning, not a failure, same stance as the Austin-box check.
+//
+// Coverage is partial by construction — a zip with a single venue has no
+// cluster to check against — so the count is printed rather than implied.
+{
+    const CLUSTER_KM = 12;
+    const kmBetween = (a, b) => {
+        const dLat = (a.lat - b.lat) * 111;
+        const dLng = (a.lng - b.lng) * 96; // ~km per degree longitude at 30°N
+        return Math.hypot(dLat, dLng);
+    };
+    const byZip = new Map();
+    for (const v of data.listings) {
+        const zip = v.address?.zip;
+        if (!zip || typeof v.coordinates?.lat !== 'number' || typeof v.coordinates?.lng !== 'number') continue;
+        if (!byZip.has(zip)) byZip.set(zip, []);
+        byZip.get(zip).push(v);
+    }
+    let checkable = 0;
+    for (const [zip, vs] of byZip) {
+        if (vs.length < 2) continue;
+        checkable += vs.length;
+        for (const v of vs) {
+            const others = vs.filter(o => o !== v);
+            const centroid = {
+                lat: others.reduce((s, o) => s + o.coordinates.lat, 0) / others.length,
+                lng: others.reduce((s, o) => s + o.coordinates.lng, 0) / others.length,
+            };
+            const km = kmBetween(v.coordinates, centroid);
+            if (km > CLUSTER_KM) {
+                warnings.push(
+                    `${v.name} (${v.id}): coordinates sit ${km.toFixed(1)} km from the ` +
+                    `${others.length} other venue(s) in zip ${zip} — wrong zip or bad geocode?`
+                );
+            }
+        }
+    }
+    zipClusterCoverage = { checkable, total: data.listings.filter(v => v.coordinates).length };
+}
+
 // ---- Output ----
 console.log('=== Summary ===');
 console.log('Total venues:', data.listings.length);
@@ -398,6 +454,9 @@ if (warnings.length > 0) {
 }
 
 console.log('\n=== Data Quality (informational) ===');
+if (zipClusterCoverage) {
+    console.log(`Zip cluster check: ${zipClusterCoverage.checkable} of ${zipClusterCoverage.total} geocoded venues share a zip with another venue and were checked; the rest have no cluster to compare against`);
+}
 
 const names = data.listings.map(v => v.name);
 const dupeNames = names.filter((n, i) => names.indexOf(n) !== i);
