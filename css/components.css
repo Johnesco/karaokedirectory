@@ -454,6 +454,39 @@
     text-decoration: none;
 }
 
+/* Per-tag palette — authored here, not in data (ADR-014, #238).
+ *
+ * These colours used to live in data.json's tagDefinitions and were injected
+ * as a runtime stylesheet by initTagConfig() (#166 — which replaced two inline
+ * style= call sites; that reasoning still holds, this is authored CSS, not a
+ * return to inline styles). Moving them here makes data.json purely factual —
+ * the curator's file of facts (ADR-013 storage layer) — so a stale curator
+ * export can never revert design work again, as it nearly did to #229.
+ *
+ * The values ARE the #229 WCAG pass: bright chips keep their brand colour and
+ * carry dark ink (#1f2937); deep chips keep white text and were darkened to
+ * clear 4.5:1. Rerun axe color-contrast before changing any pair.
+ * A tag with no rule here falls back to the neutral surface above. */
+.tag[data-tag="dedicated"] { background: #673ab7; color: #fff; }
+.tag[data-tag="lgbtq"] { background: #c805e9; color: #fff; }
+.tag[data-tag="dive"] { background: #8d6e63; color: #fff; }
+.tag[data-tag="sports-bar"] { background: #4caf50; color: #1f2937; }
+.tag[data-tag="country-bar"] { background: #ff9800; color: #1f2937; }
+.tag[data-tag="21+"] { background: #e91c0d; color: #fff; }
+.tag[data-tag="18+"] { background: #ffc107; color: #333; }
+.tag[data-tag="all-ages"] { background: #2196f3; color: #1f2937; }
+.tag[data-tag="family-friendly"] { background: #03a9f4; color: #1f2937; }
+.tag[data-tag="smoking-inside"] { background: #e90707; color: #fff; }
+.tag[data-tag="restaurant"] { background: #795548; color: #fff; }
+.tag[data-tag="outdoor"] { background: #4caf50; color: #1f2937; }
+.tag[data-tag="live-band-karaoke"] { background: #9c27b0; color: #fff; }
+.tag[data-tag="billiards"] { background: #5e7b88; color: #fff; }
+.tag[data-tag="brewery"] { background: #ff5722; color: #1f2937; }
+.tag[data-tag="games"] { background: #00bcd4; color: #1f2937; }
+.tag[data-tag="craft-cocktails"] { background: #e6175d; color: #fff; }
+.tag[data-tag="neighborhood"] { background: #9e9e9e; color: #1f2937; }
+.tag[data-tag="special-event"] { background: #e6175d; color: #ffffff; }
+
 /* Hover/focus land on every tag, anchor or not, so wiring a destination later
    (a future `?tag=` link — ADR-011) needs no new component. Nothing is linked
    today; renderTagBadge() only emits an <a> when given an href. */

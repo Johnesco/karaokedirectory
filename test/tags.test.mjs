@@ -7,20 +7,20 @@
  * knows the condition. Neither prepend can see whether the venue also lists
  * that tag, so `renderTags` is where the two sources have to reconcile (#208).
  *
- * `initTagConfig` no-ops its stylesheet work when `document` is undefined,
- * which is what lets this run under `node --test` with no DOM.
+ * Colours are authored CSS since ADR-014 (#238) — initTagConfig stores labels
+ * only, which is why this runs under `node --test` with no DOM.
  */
 
 import { describe, it, before } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { renderTags, renderTagBadge, initTagConfig, getTagConfig, buildTagStyles } from '../js/utils/tags.js';
+import { renderTags, renderTagBadge, initTagConfig, getTagConfig } from '../js/utils/tags.js';
 
 const DEFS = {
-    dedicated: { label: 'Dedicated', color: '#7c3aed', textColor: '#ffffff' },
-    'special-event': { label: 'Special Event', color: '#ec4899', textColor: '#ffffff' },
-    lgbtq: { label: 'LGBTQ+', color: '#d946ef', textColor: '#ffffff' },
-    dive: { label: 'Dive Bar', color: '#a16207', textColor: '#ffffff' },
+    dedicated: { label: 'Dedicated' },
+    'special-event': { label: 'Special Event' },
+    lgbtq: { label: 'LGBTQ+' },
+    dive: { label: 'Dive Bar' },
 };
 
 /** Tag ids in render order, read back out of the emitted markup. */
@@ -92,35 +92,11 @@ describe('renderTagBadge', () => {
     });
 
     it('escapes a hostile label rather than emitting it raw', () => {
-        initTagConfig({ ...DEFS, evil: { label: '<img src=x onerror=alert(1)>', color: '#000', textColor: '#fff' } });
+        initTagConfig({ ...DEFS, evil: { label: '<img src=x onerror=alert(1)>' } });
         const out = renderTagBadge('evil');
         assert.equal(out.includes('<img'), false, 'raw markup survived');
         assert.match(out, /&lt;img/);
         initTagConfig(DEFS);
-    });
-});
-
-describe('buildTagStyles — colours come from curator data, so they are validated', () => {
-    it('emits one rule per tag', () => {
-        const css = buildTagStyles({ lgbtq: { color: '#d946ef', textColor: '#fff' } });
-        assert.equal(css, '.tag[data-tag="lgbtq"]{background:#d946ef;color:#fff}');
-    });
-
-    it('skips a colour that could break out of the rule', () => {
-        // A stylesheet has no escaping: a stray `}` would end the rule and
-        // start a new one, so bad values are dropped rather than emitted.
-        const css = buildTagStyles({ bad: { color: 'red}.x{display:none', textColor: '#fff' } });
-        assert.equal(css, '');
-    });
-
-    it('skips an id an attribute selector could not carry', () => {
-        assert.equal(buildTagStyles({ 'a"]{x': { color: '#fff', textColor: '#000' } }), '');
-    });
-
-    it('accepts the colour forms the data actually uses', () => {
-        for (const c of ['#fff', '#ffffff', 'rebeccapurple', 'rgb(1, 2, 3)', 'hsl(1, 2%, 3%)']) {
-            assert.notEqual(buildTagStyles({ t: { color: c, textColor: '#000' } }), '', c);
-        }
     });
 });
 

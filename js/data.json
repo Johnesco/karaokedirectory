@@ -1,99 +1,61 @@
 {
   "tagDefinitions": {
     "dedicated": {
-      "label": "Dedicated",
-      "color": "#673ab7",
-      "textColor": "#fff"
+      "label": "Dedicated"
     },
     "lgbtq": {
-      "label": "LGBTQ+",
-      "color": "#c805e9",
-      "textColor": "#fff"
+      "label": "LGBTQ+"
     },
     "dive": {
-      "label": "Dive Bar",
-      "color": "#8d6e63",
-      "textColor": "#fff"
+      "label": "Dive Bar"
     },
     "sports-bar": {
-      "label": "Sports Bar",
-      "color": "#4caf50",
-      "textColor": "#1f2937"
+      "label": "Sports Bar"
     },
     "country-bar": {
-      "label": "Country Bar",
-      "color": "#ff9800",
-      "textColor": "#1f2937"
+      "label": "Country Bar"
     },
     "21+": {
-      "label": "21+",
-      "color": "#e91c0d",
-      "textColor": "#fff"
+      "label": "21+"
     },
     "18+": {
-      "label": "18+",
-      "color": "#ffc107",
-      "textColor": "#333"
+      "label": "18+"
     },
     "all-ages": {
-      "label": "All Ages",
-      "color": "#2196f3",
-      "textColor": "#1f2937"
+      "label": "All Ages"
     },
     "family-friendly": {
-      "label": "Family",
-      "color": "#03a9f4",
-      "textColor": "#1f2937"
+      "label": "Family"
     },
     "smoking-inside": {
-      "label": "Smoking Inside",
-      "color": "#e90707",
-      "textColor": "#fff"
+      "label": "Smoking Inside"
     },
     "restaurant": {
-      "label": "Restaurant",
-      "color": "#795548",
-      "textColor": "#fff"
+      "label": "Restaurant"
     },
     "outdoor": {
-      "label": "Outdoor",
-      "color": "#4caf50",
-      "textColor": "#1f2937"
+      "label": "Outdoor"
     },
     "live-band-karaoke": {
-      "label": "Live Band",
-      "color": "#9c27b0",
-      "textColor": "#fff"
+      "label": "Live Band"
     },
     "billiards": {
-      "label": "Billiards",
-      "color": "#5e7b88",
-      "textColor": "#fff"
+      "label": "Billiards"
     },
     "brewery": {
-      "label": "Brewery",
-      "color": "#ff5722",
-      "textColor": "#1f2937"
+      "label": "Brewery"
     },
     "games": {
-      "label": "Games",
-      "color": "#00bcd4",
-      "textColor": "#1f2937"
+      "label": "Games"
     },
     "craft-cocktails": {
-      "label": "Craft Cocktails",
-      "color": "#e6175d",
-      "textColor": "#fff"
+      "label": "Craft Cocktails"
     },
     "neighborhood": {
-      "label": "Neighborhood Bar",
-      "color": "#9e9e9e",
-      "textColor": "#1f2937"
+      "label": "Neighborhood Bar"
     },
     "special-event": {
-      "label": "Special Event",
-      "color": "#e6175d",
-      "textColor": "#ffffff"
+      "label": "Special Event"
     }
   },
   "cities": {
