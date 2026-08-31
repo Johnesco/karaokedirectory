@@ -544,9 +544,6 @@
         border-radius: 0;
     }
 
-    .page--edge-to-edge .map-view__info {
-        border-radius: 0;
-    }
 }
 
 /* Map View */
@@ -561,30 +558,6 @@
     background: var(--color-gray-800);
 }
 
-.map-view__info {
-    margin-top: var(--spacing-md);
-    padding: var(--spacing-md);
-    background: var(--bg-card);
-    border-radius: var(--border-radius);
-    text-align: center;
-}
-
-.map-view__info p {
-    margin: 0;
-    color: var(--text-secondary);
-}
-
-.map-view__info i {
-    color: var(--color-primary);
-    margin-right: var(--spacing-sm);
-}
-
-.map-view__hint {
-    display: block;
-    font-size: var(--font-size-sm);
-    color: var(--text-muted);
-    margin-top: var(--spacing-xs);
-}
 
 
 
@@ -764,10 +737,6 @@ body.view--map .map-view__container {
     border-radius: 0;
 }
 
-/* Hide the info bar in immersive mode */
-body.view--map .map-view__info {
-    display: none;
-}
 
 /* Hide the two-pane layout detail pane */
 body.view--map .app-layout__detail {
