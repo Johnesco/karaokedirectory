@@ -553,14 +553,24 @@ When enabled:
 
 ## Working in this project
 
+**SDLC profile:** core+ops
+<!-- The site auto-deploys from `main` to a live public domain, so a bad merge is instantly live for real
+     visitors and rollback is a real operation (netlify.toml, .github/workflows/ci.yml).
+     Note: Supabase is parked (ADR-009), so security-basics' auth / injection / CSRF / IDOR sections
+     still do not apply — there is no backend. See https://github.com/Johnesco/sdlc-baseline/blob/main/docs/profiles.md -->
+
 This project uses the [sdlc-baseline](https://github.com/Johnesco/sdlc-baseline) universal workflow. Claude must follow these canonical docs:
 
-- [Workflow (7 steps)](https://github.com/Johnesco/sdlc-baseline/blob/main/docs/workflow.md) — ticket-first, documentation-aware
+- [Workflow (7 steps)](https://github.com/Johnesco/sdlc-baseline/blob/main/docs/workflow.md) — ticket-first, decide before you build, documentation-aware
 - [Roles & hat-switch protocol](https://github.com/Johnesco/sdlc-baseline/blob/main/docs/roles.md) — PO / BA / Dev / Documenter / QA
-- [Definition of Done](https://github.com/Johnesco/sdlc-baseline/blob/main/docs/definition-of-done.md) — exit criteria by issue type
+- [Definition of Done](https://github.com/Johnesco/sdlc-baseline/blob/main/docs/definition-of-done.md) — exit criteria by issue type, verification-first
 - [Severity & priority matrix](https://github.com/Johnesco/sdlc-baseline/blob/main/docs/severity-matrix.md)
 - [Commit, PR, and branch conventions](https://github.com/Johnesco/sdlc-baseline/blob/main/docs/commit-conventions.md)
-- [ADR protocol](https://github.com/Johnesco/sdlc-baseline/blob/main/docs/adrs.md) — when and how to record architectural decisions
+- [ADR protocol](https://github.com/Johnesco/sdlc-baseline/blob/main/docs/adrs.md) — the six-line stub, threshold rule, format
+- [Profiles](https://github.com/Johnesco/sdlc-baseline/blob/main/docs/profiles.md) — what `core+ops` requires
+- [Deployment](https://github.com/Johnesco/sdlc-baseline/blob/main/docs/deployment.md) — deploy patterns, config/secrets, rollback  *(ops)*
+- [CI/CD](https://github.com/Johnesco/sdlc-baseline/blob/main/docs/ci-cd.md) — GitHub Actions, branch protection — the ops gate  *(ops)*
+- [Incident response](https://github.com/Johnesco/sdlc-baseline/blob/main/docs/incident-response.md) — restore, investigate, prevent  *(ops)*
 
 The **Functional Specification** (`docs/functional-spec.md`) is this project's authoritative behavior record. CLAUDE.md and README.md are secondary but must stay consistent.
 
@@ -578,7 +588,9 @@ When sdlc-baseline updates, glance at its [CHANGELOG](https://github.com/Johnesc
 
 This project intentionally diverges from canonical sdlc-baseline guidance in these places:
 
-- _(none currently)_
+- **Profile `core+ops`** (sdlc-baseline v0.5.0). Declared for deployment, CI and incident response, which are all
+  live here. The server-side half of `security-basics` — authentication, SQL injection, CSRF, IDOR — does **not**
+  apply: Supabase is parked by [ADR-009](docs/adr/009-park-supabase.md) and the site is static.
 
 ### Project IDs
 
