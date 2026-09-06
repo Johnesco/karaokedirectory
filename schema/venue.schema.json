@@ -330,7 +330,21 @@
           "type": "string",
           "format": "date",
           "description": "Date a human last confirmed this show (ADR-013, #246). Absent means unrecorded, not wrong. Written by the curator; never backfilled."
+        },
+        "verifiedBy": {
+          "type": "string",
+          "enum": ["announcement", "check"],
+          "description": "The evidence behind lastVerified (#263): 'announcement' when the venue or host published it (flier, ad, post, text); 'check' when the curator confirmed it another way. Absent reads as 'check'."
+        },
+        "announcedFor": {
+          "type": "string",
+          "format": "date",
+          "description": "On a recurring entry: the specific night the latest announcement referred to (\"tonight at 8pm and every Thursday\"). That night's calendar card carries an Announced marker (#263). A one-time entry's own date is its night, so it never needs this."
         }
+      },
+      "dependentRequired": {
+        "verifiedBy": ["lastVerified"],
+        "announcedFor": ["lastVerified", "verifiedBy"]
       },
       "allOf": [
         {

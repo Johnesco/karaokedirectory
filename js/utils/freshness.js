@@ -44,11 +44,12 @@ export function isFreshLens() {
 }
 
 /**
- * One show's freshness as markup: "✓ Verified Aug 28 · 6d" or "Not verified",
- * with the state as a BEM modifier on the caller's block so each surface can
- * colour it. Empty string when the lens is off.
+ * One show's freshness as markup: "✓ Verified Aug 28 · 6d", "📣 Announced
+ * Sep 6 · today" when the evidence is an announcement (#263), or "Not
+ * verified" — with the state as a BEM modifier on the caller's block so each
+ * surface can colour it. Empty string when the lens is off.
  *
- * @param {Object} entry - Schedule entry (reads `lastVerified`)
+ * @param {Object} entry - Schedule entry (reads `lastVerified`, `verifiedBy`)
  * @param {Object} [options]
  * @param {string} [options.block='venue-card'] - BEM block to hang `__verified` on
  * @param {string} [options.tag='span'] - Wrapper element
@@ -66,6 +67,10 @@ export function renderFreshness(entry, { block = 'venue-card', tag = 'span', now
 
     const when = formatDateMonthDay(f.iso, now ? { now } : {});
     const age = f.days < 0 ? 'future' : f.days === 0 ? 'today' : `${f.days}d`;
-    return `<${tag} class="${cls}" title="Last verified ${escapeHtml(f.iso)}">`
-        + `<i class="fa-solid fa-check"></i> Verified ${escapeHtml(when)} · ${escapeHtml(age)}</${tag}>`;
+    // The evidence level (#263): the venue or host said so, or the curator checked.
+    const announced = entry?.verifiedBy === 'announcement';
+    const icon = announced ? 'fa-bullhorn' : 'fa-check';
+    const verb = announced ? 'Announced' : 'Verified';
+    return `<${tag} class="${cls}" title="Last verified ${escapeHtml(f.iso)}${announced ? ' — announced by the venue or host' : ''}">`
+        + `<i class="fa-solid ${icon}"></i> ${verb} ${escapeHtml(when)} · ${escapeHtml(age)}</${tag}>`;
 }

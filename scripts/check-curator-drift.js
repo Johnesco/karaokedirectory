@@ -39,9 +39,17 @@ const REPO_DATA = path.join(ROOT, 'js', 'data.json');
 const DEFAULT_MASTER = path.join(os.homedir(), 'karaoke-curator', 'data-curated.js');
 const MASTER = process.argv[2] || process.env.CURATOR_MASTER || DEFAULT_MASTER;
 
-/* Fields the master legitimately carries that the public file never has. These
-   are curator bookkeeping, not drift — the export strips them by design. */
-const CURATOR_ONLY_FIELDS = new Set(['_curatorMeta']);
+/* Keys the master legitimately carries that the public file never has: anything
+   underscore-prefixed, at any level (`_curatorMeta` on a venue, `_announcements`
+   on a schedule entry, #264). Curator bookkeeping, not drift — the export
+   strips them by design, and the curator's own safety check refuses an export
+   in which one survived. */
+const isCuratorOnly = (key) => key.startsWith('_');
+
+/* Verification fields (#246, #263) are compared by direction, not as identity:
+   the curator changes them routinely, and a stamped-but-unexported show must
+   read as pending, not as a fatal loss. See compareVenue. */
+const VERIFICATION_FIELDS = new Set(['lastVerified', 'verifiedBy', 'announcedFor']);
 
 const REGISTRIES = ['tagDefinitions', 'kjs', 'companies', 'cities'];
 
@@ -117,7 +125,7 @@ function compareVenue(repoV, masterV) {
         }
     }
     for (const field of Object.keys(masterV)) {
-        if (CURATOR_ONLY_FIELDS.has(field)) continue;
+        if (isCuratorOnly(field)) continue;
         if (repoV[field] === undefined) pending.push(`${repoV.id}.${field} is new in the master`);
     }
 
@@ -137,7 +145,11 @@ function compareVenue(repoV, masterV) {
     // lost + pending pair — with no id, an edit is indistinguishable from a
     // delete-and-add. That is pre-existing for every entry edit.
     const identity = (e) => {
-        const { lastVerified, ...rest } = e;
+        const rest = {};
+        for (const [k, val] of Object.entries(e)) {
+            if (VERIFICATION_FIELDS.has(k) || isCuratorOnly(k)) continue;
+            rest[k] = val;
+        }
         return canon(rest);
     };
     const repoEntries = repoV.schedule || [];
@@ -157,8 +169,19 @@ function compareVenue(repoV, masterV) {
         }
         const rv = r.lastVerified || '';
         const mv = m.lastVerified || '';
-        if (rv === mv) continue;
         const where = `${repoV.id} ${describeEntry(r)}`;
+        if (rv === mv) {
+            // Same date: the evidence level and the announced night (#263) can
+            // still differ. Absent verifiedBy reads as a plain check. A detail
+            // the repo has and the master lacks is content the export would
+            // strip; anything else is the master having moved on.
+            const detail = (e) => canon({ verifiedBy: e.verifiedBy || 'check', announcedFor: e.announcedFor || '' });
+            if (detail(r) === detail(m)) continue;
+            const repoOnly = (r.verifiedBy && !m.verifiedBy) || (r.announcedFor && !m.announcedFor);
+            if (repoOnly) lost.push(`${where}: repo has verification details the master lacks (${JSON.stringify({ verifiedBy: r.verifiedBy, announcedFor: r.announcedFor })}) — export would strip them`);
+            else pending.push(`${where}: verification details updated in master (${JSON.stringify({ verifiedBy: m.verifiedBy || 'check', announcedFor: m.announcedFor || null })})`);
+            continue;
+        }
         if (!rv) pending.push(`${where}: verified ${mv} in master, not yet exported`);
         else if (!mv) lost.push(`${where}: repo verified ${rv}, master has no date — export would strip it`);
         else if (mv > rv) pending.push(`${where}: re-verified ${mv} in master (repo has ${rv})`);

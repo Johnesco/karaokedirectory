@@ -34,7 +34,7 @@ test.describe('Freshness lens (?fresh=1)', () => {
     const lines = page.locator('.day-card .venue-card .venue-card__verified');
     expect(await cards.count()).toBeGreaterThan(0);
     expect(await lines.count()).toBe(await cards.count());
-    await expect(lines.first()).toContainText(/Verified|Not verified/);
+    await expect(lines.first()).toContainText(/Verified|Announced|Not verified/);
   });
 
   test('adds a Verified column to the detail schedule table', async ({ page }) => {

@@ -240,7 +240,9 @@ When adding or modifying venues in `js/data.json`, follow this structure:
         affiliation: "Some Karaoke Co",
         website: "https://..."
       },
-      lastVerified: "2026-08-28" // Optional: date a human last confirmed THIS show (ADR-013, #246). Curator-written; never backfilled
+      lastVerified: "2026-08-28", // Optional: date a human last confirmed THIS show (ADR-013, #246). Curator-written; never backfilled
+      verifiedBy: "announcement", // Optional: the evidence — "announcement" (venue/host published it) or "check" (absent = check) (#263)
+      announcedFor: "2026-09-10"  // Optional, recurring only: the night the announcement referred to; that card gets the Announced marker. Needs verifiedBy "announcement"
     },
     {
       frequency: "once",      // One-time special event
@@ -250,7 +252,8 @@ When adding or modifying venues in `js/data.json`, follow this structure:
       eventName: "Event Name", // Optional: display name for the event
       eventUrl: "https://...", // Optional: link to event page
       socials: { instagram: "https://..." }, // Optional: event-level social links (same shape as venue socials)
-      lastVerified: "2026-08-28" // Optional: same meaning as above — valid on any entry
+      lastVerified: "2026-08-28", // Optional: same meaning as above — valid on any entry
+      verifiedBy: "announcement"  // Optional: as above. A one-time entry's own date is its announced night, so no announcedFor
     }
   ],
   activePeriod: {             // Optional: limits when venue appears
@@ -407,7 +410,7 @@ Tags are rendered as color-coded badges in VenueCard, VenueModal, VenueDetailPan
 - `?kj=none` — venues with no listed host
 - `?kj=<id>` — KJ dossier (`KJDossierView`). Carries a **registry id**, matched exactly, so `?kj=armando` no longer also matches "KJ Armando and Paola". A non-id value still substring-matches names, so links shared before #124 Phase 5 keep working
 - `?debug=1` — debug mode (also `localStorage.debug=1`)
-- `?fresh=1` — freshness lens (#259): reveals each show's `lastVerified` on calendar cards, the detail schedule table and the KJ dossier. URL-only by decision — no `localStorage` twin. Read by `readLocation()`, initialised via `initFreshLens()` in `js/utils/freshness.js`
+- `?fresh=1` — freshness lens (#259): reveals each show's `lastVerified` and its evidence level ("Announced" vs "Verified", #263) on calendar cards, the detail schedule table and the KJ dossier. URL-only by decision — no `localStorage` twin. Read by `readLocation()`, initialised via `initFreshLens()` in `js/utils/freshness.js`
 - `#view=<v>&venue=<id>` — deep link to a selected venue. The hash records the **actual** view; a venue-less hash is cleared rather than left as `#view=weekly`
 - Legacy bare hashes (`#weekly`) are still honoured
 
@@ -490,6 +493,8 @@ The curator runs on **:8765** via `node server.js` (its `start.cmd`), with its o
 
 **Re-verifying a show is a one-click stamp in the curator** (#257). Every schedule row in the venue form, and every row of the dashboard's Shows / Overdue / Never verified tabs, has a ✓ that writes today's date into that entry's `lastVerified`; "✓ all" stamps every show at a venue. The dashboard ages the dates against a 60-day threshold and lists what is overdue or never verified. The date is public — it survives export — but no visitor-facing surface renders it by default; the opt-in `?fresh=1` lens is #259.
 
+**An announcement is the strongest stamp** (#264 curator, #263 repo). The 📣 on a schedule row (or a dashboard show row) records a flier, ad, post or text — the date seen, the night it refers to, the wording, a source link, an image uploaded into `~/karaoke-curator/announcements/<venue>/` — as curator-private `_announcements` history, and sets `lastVerified` to that date with `verifiedBy: "announcement"` and, for a recurring show, `announcedFor`. That night's calendar card then carries a public "Announced" line. Any plain check (✓ today, ✓ all, the dashboard ✓, a hand-edited date) drops the level back to check and clears the announced night; an older flier is recorded without moving the clock backwards. `curator:check` treats every underscore-prefixed key as curator-private and compares the verification fields by direction.
+
 If you're a contributor (or a Claude session that needs to add a venue inside this repo):
 
 1. Edit `js/data.json` directly. Add the venue object to the `listings` array, following the schema in the "Venue Data Format" section below.
@@ -549,7 +554,7 @@ When enabled:
 - Venue cards show their schedule match reason (e.g., "Every Friday", "First Saturday")
 - Hover over cards for detailed match info
 
-**Freshness lens** (`?fresh=1`, #259) is the sibling lens for data age: every calendar card gets "✓ Verified Aug 28 · 6d" or "Not verified", the detail schedule table grows a Verified column on all four surfaces, and the KJ dossier annotates each show. URL-only (no `localStorage`), off by default, and `renderFreshness()` returns `''` when off — so the public page emits no new markup, which `e2e/fresh-lens.spec.js` asserts. The curator's Preview button opens the site with it on.
+**Freshness lens** (`?fresh=1`, #259) is the sibling lens for data age: every calendar card gets "✓ Verified Aug 28 · 6d", "📣 Announced Sep 6 · today" when the venue or host announced it (#263), or "Not verified"; the detail schedule table grows a Verified column on all four surfaces, and the KJ dossier annotates each show. URL-only (no `localStorage`), off by default, and `renderFreshness()` returns `''` when off — so the public page emits no new markup, which `e2e/fresh-lens.spec.js` asserts. The curator's Preview button opens the site with it on.
 
 <!-- ============================================================
      WORKING IN THIS PROJECT

@@ -40,6 +40,17 @@ describe('renderFreshness', () => {
     assert.match(html, /title="Last verified 2026-08-28"/);
   });
 
+  it('words announcement-level evidence as "Announced" with a bullhorn (#263)', () => {
+    initFreshLens(true);
+    const html = renderFreshness(friday({ lastVerified: '2026-09-06', verifiedBy: 'announcement' }), { now: NOW });
+    assert.match(html, /fa-bullhorn/);
+    assert.match(html, /Announced Sep 6 · today/);
+    assert.match(html, /venue-card__verified--fresh/);
+    assert.doesNotMatch(html, /Verified Sep/);
+    // A plain check keeps the old wording, with or without the explicit level.
+    assert.match(renderFreshness(friday({ lastVerified: '2026-09-06', verifiedBy: 'check' }), { now: NOW }), /fa-check"><\/i> Verified Sep 6/);
+  });
+
   it('marks a show past the 60-day horizon overdue, and a same-day stamp as today', () => {
     initFreshLens(true);
     assert.match(renderFreshness(friday({ lastVerified: '2026-06-01' }), { now: NOW }), /--overdue/);
