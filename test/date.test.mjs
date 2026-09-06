@@ -34,6 +34,8 @@ import {
   daysSince,
   freshnessOf,
   FRESHNESS_HORIZON_DAYS,
+  toLocalISO,
+  isAnnouncedOn,
 } from '../js/utils/date.js';
 
 // January 2026 has five Fridays: 2, 9, 16, 23, 30.
@@ -389,5 +391,42 @@ describe('freshness helpers', () => {
     // Sep 6 minus 60 days is Jul 8: on the horizon is still fresh, one day past it is not.
     assert.equal(freshnessOf({ lastVerified: '2026-07-08' }, SEP(6)).state, 'fresh');
     assert.equal(freshnessOf({ lastVerified: '2026-07-07' }, SEP(6)).state, 'overdue');
+  });
+
+  it('toLocalISO is the local calendar day and round-trips parseLocalDate', () => {
+    assert.equal(toLocalISO(SEP(6)), '2026-09-06');
+    assert.equal(toLocalISO(new Date(2026, 0, 1)), '2026-01-01');
+    // Late evening stays on the same local day (toISOString would already be tomorrow in UTC+ zones, or yesterday west of UTC).
+    assert.equal(toLocalISO(new Date(2026, 8, 6, 23, 30)), '2026-09-06');
+    assert.equal(toLocalISO(parseLocalDate('2026-12-31')), '2026-12-31');
+  });
+});
+
+// ---- Announced nights (#263) ----------------------------------------------
+describe('isAnnouncedOn', () => {
+  const SUN = new Date(2026, 8, 6);   // 2026-09-06 is a Sunday
+  const recurring = (over = {}) => ({ frequency: 'every', day: 'Sunday', startTime: '20:00', endTime: '00:00', ...over });
+  const once = (over = {}) => ({ frequency: 'once', date: '2026-09-06', startTime: '20:00', endTime: '23:00', ...over });
+
+  it('marks a recurring show only on the night it was announced for', () => {
+    const e = recurring({ lastVerified: '2026-09-06', verifiedBy: 'announcement', announcedFor: '2026-09-06' });
+    assert.equal(isAnnouncedOn(e, SUN), true);
+    assert.equal(isAnnouncedOn(e, new Date(2026, 8, 13)), false);   // next Sunday
+  });
+
+  it('marks a one-time show on its own date when the evidence is an announcement', () => {
+    assert.equal(isAnnouncedOn(once({ lastVerified: '2026-09-05', verifiedBy: 'announcement' }), SUN), true);
+    assert.equal(isAnnouncedOn(once({ lastVerified: '2026-09-05', verifiedBy: 'announcement', date: '2026-09-07' }), SUN), false);
+  });
+
+  it('needs the announcement level — a later plain check clears the marker', () => {
+    assert.equal(isAnnouncedOn(recurring({ lastVerified: '2026-09-06', announcedFor: '2026-09-06' }), SUN), false);
+    assert.equal(isAnnouncedOn(recurring({ lastVerified: '2026-09-06', verifiedBy: 'check', announcedFor: '2026-09-06' }), SUN), false);
+    assert.equal(isAnnouncedOn(once({ lastVerified: '2026-09-05' }), SUN), false);
+  });
+
+  it('is false for nothing to compare', () => {
+    assert.equal(isAnnouncedOn(null, SUN), false);
+    assert.equal(isAnnouncedOn(recurring({ verifiedBy: 'announcement', announcedFor: '2026-09-06' }), null), false);
   });
 });

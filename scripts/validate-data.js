@@ -389,6 +389,40 @@ for (const venue of data.listings) {
     }
 }
 
+// ---- Announced nights (#263) ----
+// `announcedFor` names the night an announcement referred to, and that night's
+// calendar card carries the Announced marker. The schema already enforces the
+// hard rules (dependentRequired: it needs lastVerified and verifiedBy). What
+// JSON Schema cannot say is whether the marker will ever RENDER:
+//   - on a one-time entry the entry's own date is the night, so the field is
+//     redundant and ignored;
+//   - a night whose weekday is not the entry's day never matches, so the
+//     marker silently never appears;
+//   - a night long past is harmless (the marker is date-matched) but is
+//     clutter the curator's next announcement will overwrite anyway.
+// All three are warnings: none of them corrupts the public site.
+const ANNOUNCED_STALE_DAYS = 30;
+const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+for (const venue of data.listings) {
+    for (const entry of venue.schedule || []) {
+        if (!entry.announcedFor) continue;
+        const label = `${entry.day || entry.date || '?'} ${entry.startTime || ''}`.trim();
+        const night = new Date(entry.announcedFor + 'T00:00:00');
+        if (Number.isNaN(night.getTime())) continue;   // malformed: the schema already reported it
+        if (entry.frequency === 'once') {
+            warnings.push(`${venue.name} (${venue.id}) ${label} carries announcedFor ${entry.announcedFor} on a one-time show — its own date is the night; the field is ignored`);
+            continue;
+        }
+        if (entry.day && WEEKDAY_NAMES[night.getDay()] !== entry.day) {
+            warnings.push(`${venue.name} (${venue.id}) ${label} is announced for ${entry.announcedFor}, a ${WEEKDAY_NAMES[night.getDay()]} — the marker will never render on a ${entry.day} show`);
+        }
+        const ageDays = Math.round((TODAY - night) / 86400000);
+        if (ageDays > ANNOUNCED_STALE_DAYS) {
+            warnings.push(`${venue.name} (${venue.id}) ${label} is still announced for ${entry.announcedFor}, ${ageDays} days ago — clutter until the next announcement replaces it`);
+        }
+    }
+}
+
 // ---- Derived tags stored on the venue ----
 //
 // `dedicated` and `special-event` are DERIVED at render time — the first from

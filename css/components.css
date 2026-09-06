@@ -436,11 +436,9 @@
  * inline-style call sites: `.venue-tag` in the directory and `.tag-badge` on
  * the submit form. Both are this now (#166).
  *
- * Colours come from data.json's tagDefinitions, so they cannot be written here.
- * initTagConfig() in js/utils/tags.js injects one stylesheet keyed on
- * `[data-tag]` at load, which is what replaced the inline `style=` on both
- * sites. A tag with no definition simply falls back to the neutral surface
- * below rather than rendering unstyled.
+ * Colours are authored in the per-tag palette below (ADR-014) — data.json's
+ * tagDefinitions carry labels only. A tag with no rule there simply falls back
+ * to the neutral surface here rather than rendering unstyled.
  */
 .tag {
     display: inline-block;
@@ -1123,6 +1121,23 @@ a.tag:focus-visible {
 }
 
 .venue-card__event-name i {
+    font-size: var(--font-size-xs);
+}
+
+/* Announced for this night (#263) — the venue or host published it. Sits with
+   the special-event line: the two per-occurrence signals share one accent. */
+.venue-card__announced {
+    font-size: var(--font-size-sm);
+    color: var(--color-accent-special-event);
+    font-weight: 600;
+    margin-top: 2px;
+    margin-bottom: var(--spacing-xs);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.venue-card__announced i {
     font-size: var(--font-size-xs);
 }
 

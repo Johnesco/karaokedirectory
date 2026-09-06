@@ -168,3 +168,35 @@ Two deferrals, with triggers in this ADR's own style:
   one-off, at the cost of touching schema, hydration, render, search, dossier
   and the curator's host picker at once. *Trigger:* a genuinely co-hosted
   show entering the data.
+
+---
+
+## Clarification (2026-09-06) — evidence level and announced occurrences
+
+Appended after the announcements work
+([#263](https://github.com/Johnesco/karaokedirectory/issues/263),
+[#264](https://github.com/Johnesco/karaokedirectory/issues/264)); measured
+against `js/data.json` at 80 listings / 146 schedule entries. Existing text
+above is untouched.
+
+**The provenance deferral above is partly adopted, as an evidence *level*
+rather than a source type.** `verifiedBy: "announcement" | "check"` records
+what stands behind a show's `lastVerified`: the venue or host published it
+(a flier, an ad, a post, a text), or the curator confirmed it another way.
+The deferral's trigger — a display consumer — arrived: the `?fresh=1` lens
+reads the level, and the announcement's *night* (`announcedFor` on a
+recurring entry; a one-time entry's own date) puts a public "Announced" line
+on that night's calendar card. The `venue|kj|fan` distinction the deferral
+named is still not recorded: an announcement is by definition from the venue
+or host, and nothing yet needs to tell the two apart.
+
+Two things stay as decided above:
+
+- **Storage is still venue-rooted, the show still has no id.** An announcement
+  is curator-private history on the entry (`_announcements`, stripped on
+  export); the public file carries only the level and the two dates. The
+  per-entry granularity is the one this ADR chose for `lastVerified`.
+- **The marker is per occurrence, not per entry.** `announcedFor` names one
+  night; the marker is derived at render time by matching it against the day
+  being rendered (`isAnnouncedOn()`), the same derive-don't-store move as the
+  special-event star. A later plain check clears both the level and the night.

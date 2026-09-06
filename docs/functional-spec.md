@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.43
+**Version:** 1.0.44
 **Last updated:** September 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -418,7 +418,7 @@ The navigation bar's height is tracked by a `ResizeObserver` and stored as CSS v
 
 ## 6 Venue Cards
 
-**Compact card order (#230):** venue name, tags, event name, time, "also" nights, address, host. The name is the card's anchor — `--font-size-xl` at weight 700 — and the tags sit directly beneath it, separated by `--spacing-xs` where the gap below the tags is `--spacing-sm`, so name and tags read as one unit and the details below as another. The A-Z full card inherits the same name size.
+**Compact card order (#230):** venue name, tags, event name, announced marker (#263), time, "also" nights, address, host, and — under `?fresh=1` only — the freshness line. The name is the card's anchor — `--font-size-xl` at weight 700 — and the tags sit directly beneath it, separated by `--spacing-xs` where the gap below the tags is `--spacing-sm`, so name and tags read as one unit and the details below as another. The A-Z full card inherits the same name size.
 
 **File:** `js/components/VenueCard.js`
 
@@ -431,6 +431,7 @@ Used in: Weekly Calendar day cards, Map floating card summary.
 Displays:
 - **Venue name** — clickable button
 - **Special event indicator** — star icon + event name (for `frequency: "once"` events). If `eventUrl` is set, event name is a link. Adds `.venue-card--special-event` class and injects `special-event` tag.
+- **Announced marker** (#263) — bullhorn icon + "Announced", styled like the event-name line (`.venue-card__announced`), when the entry was announced for the night being rendered: a recurring entry whose `announcedFor` is that date, or a one-time entry on its own date, in both cases with `verifiedBy: "announcement"` (`isAnnouncedOn()` in `js/utils/date.js`). The one per-occurrence signal besides the star, and public for every visitor by decision — "they said so themselves, for tonight" is what a calendar is for. A later plain check clears it (§11 "Show Verification").
 - **Frequency + time** — clock icon + frequency label + time range. Format: "Every Friday · 9:00 PM - 1:00 AM" or "First Saturday · 9:00 PM - 1:00 AM". Frequency label is wrapped in `.venue-card__frequency` span with muted color. Skipped for `frequency: "once"` events (they already have event name line). If `eventUrl` is set (and not already shown as special event link), shows arrow link icon.
 - **Additional schedule indicator** — Shows which other days/dates a venue has karaoke, replacing the old "+N more" count. Format depends on schedule composition:
   - **"Everyday"** — When all 7 weekdays are covered by `frequency: "every"` entries. No icon, just the text.
@@ -702,6 +703,8 @@ The shape `{ tagDefinitions, listings }` is the contract — both the local file
       exclusions        array         OPTIONAL  Dates this show is skipped (see "Schedule Exclusions")
       socials           object|null   OPTIONAL  Event-level social links (same shape as venue `socials`)
       lastVerified      string        OPTIONAL  "YYYY-MM-DD" — date a human last confirmed this show (see "Show Verification")
+      verifiedBy        string        OPTIONAL  "announcement" | "check" — the evidence behind lastVerified; absent reads as "check"
+      announcedFor      string        OPTIONAL  "YYYY-MM-DD" — the night the latest announcement referred to; needs verifiedBy "announcement"
 
     One-time entry:
       frequency         string        "once"
@@ -712,6 +715,7 @@ The shape `{ tagDefinitions, listings }` is the contract — both the local file
       eventUrl          string        OPTIONAL  Link to event page
       socials           object|null   OPTIONAL  Event-level social links (same shape as venue `socials`)
       lastVerified      string        OPTIONAL  "YYYY-MM-DD" — date a human last confirmed this show (see "Show Verification")
+      verifiedBy        string        OPTIONAL  "announcement" | "check" — as above; the entry's own date is the announced night, so no announcedFor
 
   activePeriod          object        OPTIONAL  Limits when venue appears
     activePeriod.start  string        "YYYY-MM-DD"
@@ -829,7 +833,10 @@ A schedule entry may carry `lastVerified`: the `YYYY-MM-DD` date on which a huma
 - **Absent means unrecorded, not wrong.** The field is opt-in and is never backfilled — it says "a person confirmed this on that date", not "the file was touched". Editing a show's time does not clear it: whoever made the edit has just confirmed the new time.
 - **Written by the curator.** The external curator tool (§16) stamps it per show or for every show at a venue, and its dashboard ages the dates (#257). Nothing in this repo writes it.
 - **Validation** (`scripts/validate-data.js`): a date more than **60 days** old — the "week is the heartbeat" horizon, the same window as the upcoming-closures list — is a **warning**, not a failure. Entries without the field are not reported (on day one that would be 146 warnings saying nothing); coverage is printed instead (`Verified schedule entries: N of M`). A date in the **future** fails validation. Spent one-time events are skipped. `npm run curator:check` matches schedule entries on everything *except* this field and compares it by direction on its own, so a show stamped in the curator but not yet exported is a pending line rather than a phantom loss.
-- **Display by surface:** none by default. With `?fresh=1` (§18 "Freshness lens", #259) the calendar cards, the detail schedule table on all four surfaces, and the KJ dossier show the date and its age.
+- **Evidence level** (#263): `verifiedBy` says what stands behind the date — `"announcement"` when the venue or host published it (a flier, an ad, a post, a text), `"check"` when the curator confirmed it another way. Absent reads as check. The level is the *latest* evidence: recording an announcement sets it; any plain check clears it back to check. The announcement itself (wording, image, source) is curator-private and never exported.
+- **Announced night** (#263): on a recurring entry, `announcedFor` is the specific night the latest announcement referred to ("tonight at 8pm and every Thursday" → tonight). Invariant, enforced by the schema's `dependentRequired`: `announcedFor` ⇒ `verifiedBy: "announcement"` ⇒ `lastVerified`. A one-time entry never needs it — its own date is the night. A plain check clears it. The validator warns when it sits on a one-time entry, when its weekday is not the entry's day (the marker would never render), and when it is more than 30 days past.
+- **Older evidence never moves the clock backwards:** the curator records an old flier for the history, but `lastVerified`, the level and the announced night keep whatever newer evidence set them.
+- **Display by surface:** the Announced marker on that night's calendar card (§6) is public. Otherwise none by default. With `?fresh=1` (§18 "Freshness lens", #259) the calendar cards, the detail schedule table on all four surfaces, and the KJ dossier show the date, its age and the level ("Announced Sep 6 · today" / "Verified Aug 28 · 9d").
 
 ### Venue Count
 
@@ -1232,7 +1239,7 @@ The `<body>` carries the `page--readable` class, which constrains `.main-content
 A second opt-in lens, the same shape as debug mode but **URL-only** — no `localStorage` twin. It reveals each show's `lastVerified` (§11 "Show Verification"): the date a human last confirmed it, and how long ago. This is the answer to the display question ADR-013 §4 deferred, decided in #259: **the public default is unchanged**, and the dates are visible only to whoever asks.
 
 - **Indicator** — "Freshness lens" badge in the top-right corner (stacks under the debug badge when both are on)
-- **Calendar cards** (§6) — a last line after the host: "✓ Verified Aug 28 · 6d", or "Not verified"
+- **Calendar cards** (§6) — a last line after the host: "✓ Verified Aug 28 · 6d", "📣 Announced Sep 6 · today" when the evidence is an announcement (`verifiedBy`, #263), or "Not verified"
 - **Detail schedule table** (§7, §8) — a Verified column on all four surfaces, added by `renderScheduleTable()` on the same conditional pattern as the Host column. Never blank: "Not verified" rather than an empty cell, so the ≤480px stacked layout keeps the row
 - **KJ dossier** (§10) — the same line on every show row; "verify your listings" is that page's job
 - **States** — fresh (≤60 days, `--fresh`), overdue (>60, `--overdue`), never (`--never`), as BEM modifiers on `.venue-card__verified`, `.venue-detail__verified` and `.kj-dossier__verified`. Sixty days is `FRESHNESS_HORIZON_DAYS` in `js/utils/date.js`, the validator's horizon
@@ -1682,6 +1689,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-09 | 1.0.41 | #246: Schedule entries accept an optional `lastVerified` date — when a human last confirmed the show (ADR-013 §4: per show, never backfilled). `validate-data.js` warns past 60 days, fails on a future date, and prints coverage; `check-curator-drift.js` matches entries on everything except that date and compares it by direction, so stamping a show in the curator no longer reads as a fatal loss. New §11 "Show Verification". Display deliberately silent — the `?fresh=1` lens is #259. | Claude Code |
 | 2026-09 | 1.0.42 | #259: The freshness lens. `?fresh=1` reveals each show's `lastVerified` — "✓ Verified Aug 28 · 6d" or "Not verified" — on the calendar cards, as a Verified column in the detail schedule table on all four surfaces, and on the KJ dossier's show rows, with a corner indicator. URL-only and off by default: the owner's answer to the display question ADR-013 §4 deferred is that visitors see nothing unless they ask. New `js/utils/freshness.js`; `readLocation()` gains `fresh`; `date.js` gains `formatDateMonthDay()` (now also used for upcoming closures and the "Also" list), `daysSince()`, `freshnessOf()` and `FRESHNESS_HORIZON_DAYS`. New §18 subsection; §7 and §11 updated. | Claude Code |
 | 2026-08 | 1.0.43 | #238: Tag colours moved from `data.json` to authored CSS (ADR-014). `tagDefinitions` now carries labels only — 38 presentation values left the curator's file, `initTagConfig()` stopped injecting a stylesheet, and `buildTagStyles` plus its colour-validation machinery were deleted. The authored rules preserve the #229 WCAG palette exactly (axe verified 0 violations). Schema accepts the old fields as documented-ignored so a stale master cannot hard-fail CI; `validate-data.js` warns instead. The curator master was migrated in the same change. Section 12 rewritten; its Color column — which had drifted to the pre-#229 values — removed. | Claude Code |
+| 2026-09 | 1.0.44 | #263: Announcements. Schedule entries gain `verifiedBy` (`announcement` \| `check` — the evidence behind `lastVerified`; absent reads as check) and `announcedFor` (the night the latest announcement referred to), with `dependentRequired` so `announcedFor` ⇒ `verifiedBy` ⇒ `lastVerified`. The weekly calendar card carries a public "📣 Announced" line on that night (`.venue-card__announced`, `isAnnouncedOn()`), the `?fresh=1` lens says "Announced Sep 6 · today", the validator warns on an announced night that cannot render, and `curator:check` treats underscore-prefixed keys as curator-private at every level and compares the verification fields by direction. `date.js` gains `toLocalISO()`, folding two inline copies. The announcement itself stays in the curator (#264). Sections 6, 11, 18 updated; ADR-013 addendum. | Claude Code |
 
 ---
 
