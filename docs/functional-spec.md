@@ -3,8 +3,8 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.40
-**Last updated:** August 2026
+**Version:** 1.0.41
+**Last updated:** September 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
 
@@ -701,6 +701,7 @@ The shape `{ tagDefinitions, listings }` is the contract — both the local file
       eventUrl          string        OPTIONAL  Link to event page
       exclusions        array         OPTIONAL  Dates this show is skipped (see "Schedule Exclusions")
       socials           object|null   OPTIONAL  Event-level social links (same shape as venue `socials`)
+      lastVerified      string        OPTIONAL  "YYYY-MM-DD" — date a human last confirmed this show (see "Show Verification")
 
     One-time entry:
       frequency         string        "once"
@@ -710,6 +711,7 @@ The shape `{ tagDefinitions, listings }` is the contract — both the local file
       eventName         string        OPTIONAL  Display name for the event
       eventUrl          string        OPTIONAL  Link to event page
       socials           object|null   OPTIONAL  Event-level social links (same shape as venue `socials`)
+      lastVerified      string        OPTIONAL  "YYYY-MM-DD" — date a human last confirmed this show (see "Show Verification")
 
   activePeriod          object        OPTIONAL  Limits when venue appears
     activePeriod.start  string        "YYYY-MM-DD"
@@ -813,6 +815,21 @@ exclusions: [
   - **Weekly calendar** (§2) — dimmed card with a "Closed" banner on the excluded date
   - **Map** (§4) — dimmed marker; "Closed Today: [reason]" banner in the floating card
   - **Detail modal / desktop pane / map expanded card** (§7, §8) — "Closed Today: [reason]" banner plus an "Upcoming closures" list (next 60 days, e.g. "Jun 20 (Holiday), Jun 27")
+
+### Show Verification
+
+A schedule entry may carry `lastVerified`: the `YYYY-MM-DD` date on which a human last confirmed that this show is real and as listed — from a flier, an ad, a text, or the venue itself (ADR-013 §4, #246):
+
+```
+{ frequency: "every", day: "Friday", startTime: "21:00", endTime: "01:00",
+  lastVerified: "2026-08-28" }
+```
+
+- **Per show, not per venue.** ADR-013 rejected the venue-level form: a venue with seven shows from three sources is exactly where per-fact freshness matters.
+- **Absent means unrecorded, not wrong.** The field is opt-in and is never backfilled — it says "a person confirmed this on that date", not "the file was touched". Editing a show's time does not clear it: whoever made the edit has just confirmed the new time.
+- **Written by the curator.** The external curator tool (§16) stamps it per show or for every show at a venue, and its dashboard ages the dates (#257). Nothing in this repo writes it.
+- **Validation** (`scripts/validate-data.js`): a date more than **60 days** old — the "week is the heartbeat" horizon, the same window as the upcoming-closures list — is a **warning**, not a failure. Entries without the field are not reported (on day one that would be 146 warnings saying nothing); coverage is printed instead (`Verified schedule entries: N of M`). A date in the **future** fails validation. Spent one-time events are skipped. `npm run curator:check` matches schedule entries on everything *except* this field and compares it by direction on its own, so a show stamped in the curator but not yet exported is a pending line rather than a phantom loss.
+- **Display by surface:** none by default. No public surface shows the date; the opt-in `?fresh=1` lens that reveals it is #259 (documented in §18 once it ships).
 
 ### Venue Count
 
@@ -1647,6 +1664,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-08 | 1.0.36 | #230: The venue name anchors the compact card — `--font-size-xl` at weight 700, up from `lg`/600 — and `renderTags()` moves from the bottom of the card to directly under the name, so the descriptors sit next to the thing they describe. Name margin tightens to `--spacing-xs` against the tags' `--spacing-sm`, grouping the two. The `font-size` override on `.venue-card--full .venue-card__name` is dropped so both cards speak at the same volume. Section 6 gains the compact card order. The reorder was free because #224 wrote the trailing-margin rule against `:last-child` rather than `.venue-tags` — it is position-independent, so the card stays symmetric as its last element changes. | Claude Code |
 | 2026-08 | 1.0.37 | #229: WCAG AA contrast pass. axe-core found 474 `color-contrast` violations on the live site — 16 distinct colour combinations, four causes. The text ramp shifts up a step: `--text-secondary` to gray-300, `--text-muted` to gray-400 (it was gray-500 at **2.13:1**, less than half the AA bar, on the "Also every day" line of nearly every card), and `--color-gray-400` nudged to #a5acb7. `--color-gray-500` deliberately keeps its value — it paints scrollbar thumbs and hover fills, not just text. `--color-primary-light` and `--color-accent-special-event` lightened; the latter is only ever used as text. Tag palette split two ways: bright chips keep their brand colour and flip to dark ink, deep chips keep white text and darken. Badges move to `--color-primary-dark` (white on `--color-primary` is 4.47:1). Violations reach 0 at 1280px and 390px. Known Discrepancies gains item 7, recording that the CI contrast gate only ever covered the seven day headers. | Claude Code |
 | 2026-08 | 1.0.40 | #223: Per-show hosts now render. Two surfaces read `venue.host` instead of resolving the effective host: the compact card (`VenueCard.js`) and the detail sections (`render.js`). The Highball — no venue-level host, seven one-time shows each carrying its own host ref — showed no host on the calendar and no "Presented By" block on any of the four detail surfaces. The card now uses `resolveHostFor(venue, schedule)`; `renderHostSection` takes the venue and enumerates both scopes via `getVenueHosts`, deduplicating by display identity and attributing shows when a venue has more than one host. Per-show `website` and `socials` reach the page for the first time. Also fixes the masked case no venue has today — a venue with both a venue-level host and a per-show override would have shown the wrong host rather than none; covered by unit fixtures since the live data cannot reach it. Sections 6 and 7 updated. | Claude Code |
+| 2026-09 | 1.0.41 | #246: Schedule entries accept an optional `lastVerified` date — when a human last confirmed the show (ADR-013 §4: per show, never backfilled). `validate-data.js` warns past 60 days, fails on a future date, and prints coverage; `check-curator-drift.js` matches entries on everything except that date and compares it by direction, so stamping a show in the curator no longer reads as a fatal loss. New §11 "Show Verification". Display deliberately silent — the `?fresh=1` lens is #259. | Claude Code |
 
 ---
 

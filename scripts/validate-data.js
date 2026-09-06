@@ -5,9 +5,10 @@
  * (unique venue ids, tag-id and host-ref cross-reference) and data-quality
  * heuristics (minute-typo detection, noon end-time after evening start).
  *
- * Registry hygiene (unreferenced or same-named kjs/companies entries) and
- * stale venues (active, but every event is in the past) are reported as
- * warnings — worth a look, but not a build failure.
+ * Registry hygiene (unreferenced or same-named kjs/companies entries), stale
+ * venues (active, but every event is in the past) and shows whose
+ * `lastVerified` is more than 60 days old (#246) are reported as warnings —
+ * worth a look, but not a build failure.
  *
  * Exits non-zero on failure — suitable as a pre-commit / CI gate. Enforced
  * by .github/workflows/ci.yml.
@@ -346,6 +347,48 @@ for (const venue of data.listings) {
     }
 }
 
+// ---- Stale verification (#246) ----
+// `lastVerified` records the date a human last confirmed a show (ADR-013).
+// Sixty days is the "week is the heartbeat" horizon — the same window the
+// upcoming-closures list uses. Entries WITHOUT the field are not reported: it
+// is opt-in and never backfilled, so on day one that would be 146 warnings
+// saying nothing. Coverage is printed in the Data Quality block instead.
+// Spent one-time events are skipped — their date has passed, so re-confirming
+// them is not a job (the check above already reports them).
+//
+// Warned, not failed: only the curator can re-confirm a show, and a stale date
+// is still a true statement about when it was last checked.
+//
+// A date in the future IS a failure: no confirmation can have happened
+// tomorrow, so it can only be a typo.
+const STALE_VERIFIED_DAYS = 60;
+const verifiedCutoff = new Date(TODAY);
+verifiedCutoff.setDate(verifiedCutoff.getDate() - STALE_VERIFIED_DAYS);
+
+let verifiedEntries = 0;
+let totalEntries = 0;
+for (const venue of data.listings) {
+    for (const entry of venue.schedule || []) {
+        totalEntries += 1;
+        if (!entry.lastVerified) continue;
+        verifiedEntries += 1;
+
+        const label = `${entry.day || entry.date || '?'} ${entry.startTime || ''}`.trim();
+        const verified = new Date(entry.lastVerified + 'T00:00:00');
+        if (Number.isNaN(verified.getTime())) continue;   // malformed: the schema already reported it
+        if (verified > TODAY) {
+            fail(venue, `${label} has lastVerified ${entry.lastVerified}, which is in the future`);
+            continue;
+        }
+        if (entry.frequency === 'once' && entry.date && new Date(entry.date + 'T00:00:00') < TODAY) continue;
+        if (verified >= verifiedCutoff) continue;
+        warnings.push(
+            `${venue.name} (${venue.id}) ${label} was last verified ${entry.lastVerified}` +
+            ` — more than ${STALE_VERIFIED_DAYS} days ago`
+        );
+    }
+}
+
 // ---- Derived tags stored on the venue ----
 //
 // `dedicated` and `special-event` are DERIVED at render time — the first from
@@ -409,6 +452,9 @@ if (dupeNames.length > 0) {
 
 const cities = [...new Set(data.listings.map(v => v.address?.city))].sort();
 console.log('Cities covered:', cities.length);
+
+const verifiedPct = totalEntries ? Math.round((verifiedEntries / totalEntries) * 100) : 0;
+console.log(`Verified schedule entries: ${verifiedEntries} of ${totalEntries} (${verifiedPct}%)`);
 
 const lats = data.listings.map(v => v.coordinates?.lat).filter(Boolean);
 const lngs = data.listings.map(v => v.coordinates?.lng).filter(Boolean);
