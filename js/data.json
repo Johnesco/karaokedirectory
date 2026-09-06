@@ -1777,7 +1777,6 @@
     {
       "id": "the-lions-den-tea",
       "name": "The Lion's Den Tea",
-      "active": true,
       "dedicated": false,
       "address": {
         "street": "760 Airport Blvd Suite 168",
@@ -1789,16 +1788,16 @@
         {
           "frequency": "first",
           "day": "Thursday",
-          "startTime": "18:00",
-          "endTime": "22:00"
+          "startTime": "18:30",
+          "endTime": "21:00"
         }
       ],
       "host": {
         "companyId": "lions-den-tea"
       },
       "socials": {
-        "instagram": "https://www.instagram.com/lionsdentea/",
-        "facebook": "https://www.facebook.com/lionsdentea/"
+        "facebook": "https://www.facebook.com/lionsdentea/",
+        "instagram": "https://www.instagram.com/lionsdentea/"
       },
       "tags": [
         "lgbtq"
@@ -2264,8 +2263,8 @@
         "website": "https://www.oakhillsocial.com/"
       },
       "coordinates": {
-        "lat": 30.3290494,
-        "lng": -97.6599188
+        "lat": 30.234548,
+        "lng": -97.91115
       }
     },
     {

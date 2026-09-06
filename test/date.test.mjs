@@ -30,6 +30,10 @@ import {
   formatTimeRange,
   getWeekRange,
   startOfToday,
+  formatDateMonthDay,
+  daysSince,
+  freshnessOf,
+  FRESHNESS_HORIZON_DAYS,
 } from '../js/utils/date.js';
 
 // January 2026 has five Fridays: 2, 9, 16, 23, 30.
@@ -357,5 +361,33 @@ describe('time formatting', () => {
   it('formatTimeRange shows "Close" when there is no end time', () => {
     assert.equal(formatTimeRange('21:00', null), '9:00 PM - Close');
     assert.equal(formatTimeRange('21:00', undefined), '9:00 PM - Close');
+  });
+});
+
+// ---- Freshness (#246, #259) -------------------------------------------------
+// `now` is injected everywhere so these hold on any day the suite runs.
+describe('freshness helpers', () => {
+  const SEP = (d) => new Date(2026, 8, d);   // September 2026
+
+  it('formatDateMonthDay drops the year inside the current year and keeps it otherwise', () => {
+    assert.equal(formatDateMonthDay('2026-08-28', { now: SEP(6) }), 'Aug 28');
+    assert.equal(formatDateMonthDay('2025-08-28', { now: SEP(6) }), 'Aug 28, 2025');
+  });
+
+  it('daysSince counts whole days at local midnight, negative for the future', () => {
+    assert.equal(daysSince('2026-09-06', SEP(6)), 0);
+    assert.equal(daysSince('2026-08-28', SEP(6)), 9);
+    assert.equal(daysSince('2026-09-07', SEP(6)), -1);
+    // A span crossing the March DST change still counts calendar days.
+    assert.equal(daysSince('2026-03-01', new Date(2026, 2, 15)), 14);
+  });
+
+  it('freshnessOf: absent is "never", inside the horizon is fresh, past it is overdue', () => {
+    assert.equal(FRESHNESS_HORIZON_DAYS, 60);
+    assert.deepEqual(freshnessOf({}, SEP(6)), { state: 'never', days: null, iso: '' });
+    assert.deepEqual(freshnessOf({ lastVerified: '2026-08-28' }, SEP(6)), { state: 'fresh', days: 9, iso: '2026-08-28' });
+    // Sep 6 minus 60 days is Jul 8: on the horizon is still fresh, one day past it is not.
+    assert.equal(freshnessOf({ lastVerified: '2026-07-08' }, SEP(6)).state, 'fresh');
+    assert.equal(freshnessOf({ lastVerified: '2026-07-07' }, SEP(6)).state, 'overdue');
   });
 });

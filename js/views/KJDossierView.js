@@ -23,6 +23,7 @@ import { Component } from '../components/Component.js';
 import { getState } from '../core/state.js';
 import { getAllVenues, venuePasses, venueMatchesHost, hostMatches, resolveHostLabel } from '../services/venues.js';
 import { escapeHtml, getSortableName } from '../utils/string.js';
+import { renderFreshness } from '../utils/freshness.js';
 import {
     formatScheduleEntry,
     parseLocalDate,
@@ -213,6 +214,9 @@ export class KJDossierView extends Component {
         `;
     }
 
+    // Both renderers end with the freshness lens line (#259): this page's
+    // stated job is "verify your listings", so it is where a KJ would look
+    // for when each show was last confirmed. Empty unless ?fresh=1.
     renderRecurring(entry) {
         const { day, frequencyPrefix, time } = formatScheduleEntry(entry);
         return `
@@ -222,6 +226,7 @@ export class KJDossierView extends Component {
                     ${escapeHtml(frequencyPrefix)}${escapeHtml(day)}
                 </span>
                 <span class="kj-dossier__show-time">${escapeHtml(time)}</span>
+                ${renderFreshness(entry, { block: 'kj-dossier' })}
             </li>
         `;
     }
@@ -238,6 +243,7 @@ export class KJDossierView extends Component {
                 ${entry.eventName ? `
                     <span class="kj-dossier__show-event">${escapeHtml(entry.eventName)}</span>
                 ` : ''}
+                ${renderFreshness(entry, { block: 'kj-dossier' })}
             </li>
         `;
     }

@@ -15,6 +15,7 @@ import { escapeHtml } from '../utils/string.js';
 import { formatTimeRange, getScheduleExclusion } from '../utils/date.js';
 import { buildMapUrl, formatAddress, sanitizeUrl } from '../utils/url.js';
 import { isDebugMode, getDebugHtml } from '../utils/debug.js';
+import { renderFreshness } from '../utils/freshness.js';
 import { renderTags } from '../utils/tags.js';
 import { formatHostDisplay, resolveHostFor, renderScheduleContext, renderVenueDetailSections } from '../utils/render.js';
 
@@ -133,6 +134,7 @@ export class VenueCard extends Component {
                         Presented by ${escapeHtml(hostDisplay)}
                     </div>
                 ` : ''}
+                ${renderFreshness(schedule, { block: 'venue-card', tag: 'div' })}
             </div>
         `;
     }

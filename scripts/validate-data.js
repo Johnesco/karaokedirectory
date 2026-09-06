@@ -5,9 +5,10 @@
  * (unique venue ids, tag-id and host-ref cross-reference) and data-quality
  * heuristics (minute-typo detection, noon end-time after evening start).
  *
- * Registry hygiene (unreferenced or same-named kjs/companies entries) and
- * stale venues (active, but every event is in the past) are reported as
- * warnings — worth a look, but not a build failure.
+ * Registry hygiene (unreferenced or same-named kjs/companies entries), stale
+ * venues (active, but every event is in the past) and shows whose
+ * `lastVerified` is more than 60 days old (#246) are reported as warnings —
+ * worth a look, but not a build failure.
  *
  * Exits non-zero on failure — suitable as a pre-commit / CI gate. Enforced
  * by .github/workflows/ci.yml.
@@ -346,6 +347,48 @@ for (const venue of data.listings) {
     }
 }
 
+// ---- Stale verification (#246) ----
+// `lastVerified` records the date a human last confirmed a show (ADR-013).
+// Sixty days is the "week is the heartbeat" horizon — the same window the
+// upcoming-closures list uses. Entries WITHOUT the field are not reported: it
+// is opt-in and never backfilled, so on day one that would be 146 warnings
+// saying nothing. Coverage is printed in the Data Quality block instead.
+// Spent one-time events are skipped — their date has passed, so re-confirming
+// them is not a job (the check above already reports them).
+//
+// Warned, not failed: only the curator can re-confirm a show, and a stale date
+// is still a true statement about when it was last checked.
+//
+// A date in the future IS a failure: no confirmation can have happened
+// tomorrow, so it can only be a typo.
+const STALE_VERIFIED_DAYS = 60;
+const verifiedCutoff = new Date(TODAY);
+verifiedCutoff.setDate(verifiedCutoff.getDate() - STALE_VERIFIED_DAYS);
+
+let verifiedEntries = 0;
+let totalEntries = 0;
+for (const venue of data.listings) {
+    for (const entry of venue.schedule || []) {
+        totalEntries += 1;
+        if (!entry.lastVerified) continue;
+        verifiedEntries += 1;
+
+        const label = `${entry.day || entry.date || '?'} ${entry.startTime || ''}`.trim();
+        const verified = new Date(entry.lastVerified + 'T00:00:00');
+        if (Number.isNaN(verified.getTime())) continue;   // malformed: the schema already reported it
+        if (verified > TODAY) {
+            fail(venue, `${label} has lastVerified ${entry.lastVerified}, which is in the future`);
+            continue;
+        }
+        if (entry.frequency === 'once' && entry.date && new Date(entry.date + 'T00:00:00') < TODAY) continue;
+        if (verified >= verifiedCutoff) continue;
+        warnings.push(
+            `${venue.name} (${venue.id}) ${label} was last verified ${entry.lastVerified}` +
+            ` — more than ${STALE_VERIFIED_DAYS} days ago`
+        );
+    }
+}
+
 // ---- Derived tags stored on the venue ----
 //
 // `dedicated` and `special-event` are DERIVED at render time — the first from
@@ -387,6 +430,62 @@ for (const [tid, def] of Object.entries(data.tagDefinitions || {})) {
     }
 }
 
+// ---- Zip/coordinate cluster check (#241) ----
+//
+// A venue's zip is validated for shape only, and the Austin-metro box above is
+// far too coarse to catch a zip that is wrong by one suburb: a curator export
+// once moved a Pflugerville venue to an Austin zip 14.7 km away and every gate
+// stayed green. Conversely a bad geocode can drop a pin 26 km from the address
+// it claims (oak-hill-social, geocoded to the east half of US-290).
+//
+// The check: flag a venue whose coordinates sit far from the centroid of the
+// OTHER venues sharing its zip. Zip -> city consistency was considered and
+// rejected — real ZIPs straddle municipalities, and two already do here
+// legitimately (78641 Leander/Cedar Park, 78734 Lakeway/Austin).
+//
+// Threshold 12 km, tuned against the data rather than guessed: the genuine
+// errors measured 14.7 km and 26 km, while the widest legitimate spreads are
+// 8.2 km (78665, Round Rock) and 10.4 km (78641, suburban ZIPs are large).
+// A warning, not a failure, same stance as the Austin-box check.
+//
+// Coverage is partial by construction — a zip with a single venue has no
+// cluster to check against — so the count is printed rather than implied.
+{
+    const CLUSTER_KM = 12;
+    const kmBetween = (a, b) => {
+        const dLat = (a.lat - b.lat) * 111;
+        const dLng = (a.lng - b.lng) * 96; // ~km per degree longitude at 30°N
+        return Math.hypot(dLat, dLng);
+    };
+    const byZip = new Map();
+    for (const v of data.listings) {
+        const zip = v.address?.zip;
+        if (!zip || typeof v.coordinates?.lat !== 'number' || typeof v.coordinates?.lng !== 'number') continue;
+        if (!byZip.has(zip)) byZip.set(zip, []);
+        byZip.get(zip).push(v);
+    }
+    let checkable = 0;
+    for (const [zip, vs] of byZip) {
+        if (vs.length < 2) continue;
+        checkable += vs.length;
+        for (const v of vs) {
+            const others = vs.filter(o => o !== v);
+            const centroid = {
+                lat: others.reduce((s, o) => s + o.coordinates.lat, 0) / others.length,
+                lng: others.reduce((s, o) => s + o.coordinates.lng, 0) / others.length,
+            };
+            const km = kmBetween(v.coordinates, centroid);
+            if (km > CLUSTER_KM) {
+                warnings.push(
+                    `${v.name} (${v.id}): coordinates sit ${km.toFixed(1)} km from the ` +
+                    `${others.length} other venue(s) in zip ${zip} — wrong zip or bad geocode?`
+                );
+            }
+        }
+    }
+    zipClusterCoverage = { checkable, total: data.listings.filter(v => v.coordinates).length };
+}
+
 // ---- Output ----
 console.log('=== Summary ===');
 console.log('Total venues:', data.listings.length);
@@ -413,6 +512,9 @@ if (warnings.length > 0) {
 }
 
 console.log('\n=== Data Quality (informational) ===');
+if (zipClusterCoverage) {
+    console.log(`Zip cluster check: ${zipClusterCoverage.checkable} of ${zipClusterCoverage.total} geocoded venues share a zip with another venue and were checked; the rest have no cluster to compare against`);
+}
 
 const names = data.listings.map(v => v.name);
 const dupeNames = names.filter((n, i) => names.indexOf(n) !== i);
@@ -424,6 +526,9 @@ if (dupeNames.length > 0) {
 
 const cities = [...new Set(data.listings.map(v => v.address?.city))].sort();
 console.log('Cities covered:', cities.length);
+
+const verifiedPct = totalEntries ? Math.round((verifiedEntries / totalEntries) * 100) : 0;
+console.log(`Verified schedule entries: ${verifiedEntries} of ${totalEntries} (${verifiedPct}%)`);
 
 const lats = data.listings.map(v => v.coordinates?.lat).filter(Boolean);
 const lngs = data.listings.map(v => v.coordinates?.lng).filter(Boolean);

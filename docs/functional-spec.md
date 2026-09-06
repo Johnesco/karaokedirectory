@@ -4,7 +4,7 @@
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
 **Version:** 1.0.43
-**Last updated:** August 2026
+**Last updated:** September 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
 
@@ -493,7 +493,7 @@ The modal opens only when ALL of these conditions are met:
 | Closure banner | "Closed Today: [reason]" warning banner at the top, shown only when the venue is excluded on the current date (§11 Schedule Exclusions) |
 | Header | Venue name, event name (if special event), tags |
 | Location | Full address, "View Map" button, "Directions" button, "Share" button |
-| Schedule | Schedule table (all entries) + active period notice + "Upcoming closures" list (exclusion dates within the next 60 days) if applicable |
+| Schedule | Schedule table (all entries) + active period notice + "Upcoming closures" list (exclusion dates within the next 60 days) if applicable. Under `?fresh=1` (§18) the table gains a Verified column |
 | Host | Host name, company, website, social links |
 | Social Media | Venue social links (if any) |
 | Contact | Phone number link (if venue has phone field) |
@@ -701,6 +701,7 @@ The shape `{ tagDefinitions, listings }` is the contract — both the local file
       eventUrl          string        OPTIONAL  Link to event page
       exclusions        array         OPTIONAL  Dates this show is skipped (see "Schedule Exclusions")
       socials           object|null   OPTIONAL  Event-level social links (same shape as venue `socials`)
+      lastVerified      string        OPTIONAL  "YYYY-MM-DD" — date a human last confirmed this show (see "Show Verification")
 
     One-time entry:
       frequency         string        "once"
@@ -710,6 +711,7 @@ The shape `{ tagDefinitions, listings }` is the contract — both the local file
       eventName         string        OPTIONAL  Display name for the event
       eventUrl          string        OPTIONAL  Link to event page
       socials           object|null   OPTIONAL  Event-level social links (same shape as venue `socials`)
+      lastVerified      string        OPTIONAL  "YYYY-MM-DD" — date a human last confirmed this show (see "Show Verification")
 
   activePeriod          object        OPTIONAL  Limits when venue appears
     activePeriod.start  string        "YYYY-MM-DD"
@@ -813,6 +815,21 @@ exclusions: [
   - **Weekly calendar** (§2) — dimmed card with a "Closed" banner on the excluded date
   - **Map** (§4) — dimmed marker; "Closed Today: [reason]" banner in the floating card
   - **Detail modal / desktop pane / map expanded card** (§7, §8) — "Closed Today: [reason]" banner plus an "Upcoming closures" list (next 60 days, e.g. "Jun 20 (Holiday), Jun 27")
+
+### Show Verification
+
+A schedule entry may carry `lastVerified`: the `YYYY-MM-DD` date on which a human last confirmed that this show is real and as listed — from a flier, an ad, a text, or the venue itself (ADR-013 §4, #246):
+
+```
+{ frequency: "every", day: "Friday", startTime: "21:00", endTime: "01:00",
+  lastVerified: "2026-08-28" }
+```
+
+- **Per show, not per venue.** ADR-013 rejected the venue-level form: a venue with seven shows from three sources is exactly where per-fact freshness matters.
+- **Absent means unrecorded, not wrong.** The field is opt-in and is never backfilled — it says "a person confirmed this on that date", not "the file was touched". Editing a show's time does not clear it: whoever made the edit has just confirmed the new time.
+- **Written by the curator.** The external curator tool (§16) stamps it per show or for every show at a venue, and its dashboard ages the dates (#257). Nothing in this repo writes it.
+- **Validation** (`scripts/validate-data.js`): a date more than **60 days** old — the "week is the heartbeat" horizon, the same window as the upcoming-closures list — is a **warning**, not a failure. Entries without the field are not reported (on day one that would be 146 warnings saying nothing); coverage is printed instead (`Verified schedule entries: N of M`). A date in the **future** fails validation. Spent one-time events are skipped. `npm run curator:check` matches schedule entries on everything *except* this field and compares it by direction on its own, so a show stamped in the curator but not yet exported is a pending line rather than a phantom loss.
+- **Display by surface:** none by default. With `?fresh=1` (§18 "Freshness lens", #259) the calendar cards, the detail schedule table on all four surfaces, and the KJ dossier show the date and its age.
 
 ### Venue Count
 
@@ -1209,6 +1226,21 @@ The `<body>` carries the `page--readable` class, which constrains `.main-content
 - **Debug indicator** — "Debug Mode" badge in the top-right corner
 - **Venue cards** — show schedule match reason (e.g., "Every Friday", "First Saturday", "Once: 2026-03-15")
 - **Hover info** — detailed match information on card hover
+
+### Freshness lens (`?fresh=1`)
+
+A second opt-in lens, the same shape as debug mode but **URL-only** — no `localStorage` twin. It reveals each show's `lastVerified` (§11 "Show Verification"): the date a human last confirmed it, and how long ago. This is the answer to the display question ADR-013 §4 deferred, decided in #259: **the public default is unchanged**, and the dates are visible only to whoever asks.
+
+- **Indicator** — "Freshness lens" badge in the top-right corner (stacks under the debug badge when both are on)
+- **Calendar cards** (§6) — a last line after the host: "✓ Verified Aug 28 · 6d", or "Not verified"
+- **Detail schedule table** (§7, §8) — a Verified column on all four surfaces, added by `renderScheduleTable()` on the same conditional pattern as the Host column. Never blank: "Not verified" rather than an empty cell, so the ≤480px stacked layout keeps the row
+- **KJ dossier** (§10) — the same line on every show row; "verify your listings" is that page's job
+- **States** — fresh (≤60 days, `--fresh`), overdue (>60, `--overdue`), never (`--never`), as BEM modifiers on `.venue-card__verified`, `.venue-detail__verified` and `.kj-dossier__verified`. Sixty days is `FRESHNESS_HORIZON_DAYS` in `js/utils/date.js`, the validator's horizon
+- **Dates are absolute** ("Aug 28", with the year when it differs from the current one, via `formatDateMonthDay()`) — a relative "3 weeks ago" reads as a judgment
+- The flag is read by `readLocation()` in `js/core/router.js` and survives in-session navigation, because `writeLocation()` leaves query keys it does not own alone. Hard `?kj=` links rebuild the query and drop it — acceptable for a lens
+- **Generated `/venue/` pages** (§22) are static and script-free; the lens does not apply there
+- The curator's "Preview site" button opens the local site with the lens on
+- Implementation: `js/utils/freshness.js` — `initFreshLens(enabled)`, `isFreshLens()`, `renderFreshness(entry, { block, tag })`, which returns `''` when the lens is off so the default page emits no new markup (asserted by `e2e/fresh-lens.spec.js`)
 
 ---
 
@@ -1647,6 +1679,8 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-08 | 1.0.36 | #230: The venue name anchors the compact card — `--font-size-xl` at weight 700, up from `lg`/600 — and `renderTags()` moves from the bottom of the card to directly under the name, so the descriptors sit next to the thing they describe. Name margin tightens to `--spacing-xs` against the tags' `--spacing-sm`, grouping the two. The `font-size` override on `.venue-card--full .venue-card__name` is dropped so both cards speak at the same volume. Section 6 gains the compact card order. The reorder was free because #224 wrote the trailing-margin rule against `:last-child` rather than `.venue-tags` — it is position-independent, so the card stays symmetric as its last element changes. | Claude Code |
 | 2026-08 | 1.0.37 | #229: WCAG AA contrast pass. axe-core found 474 `color-contrast` violations on the live site — 16 distinct colour combinations, four causes. The text ramp shifts up a step: `--text-secondary` to gray-300, `--text-muted` to gray-400 (it was gray-500 at **2.13:1**, less than half the AA bar, on the "Also every day" line of nearly every card), and `--color-gray-400` nudged to #a5acb7. `--color-gray-500` deliberately keeps its value — it paints scrollbar thumbs and hover fills, not just text. `--color-primary-light` and `--color-accent-special-event` lightened; the latter is only ever used as text. Tag palette split two ways: bright chips keep their brand colour and flip to dark ink, deep chips keep white text and darken. Badges move to `--color-primary-dark` (white on `--color-primary` is 4.47:1). Violations reach 0 at 1280px and 390px. Known Discrepancies gains item 7, recording that the CI contrast gate only ever covered the seven day headers. | Claude Code |
 | 2026-08 | 1.0.40 | #223: Per-show hosts now render. Two surfaces read `venue.host` instead of resolving the effective host: the compact card (`VenueCard.js`) and the detail sections (`render.js`). The Highball — no venue-level host, seven one-time shows each carrying its own host ref — showed no host on the calendar and no "Presented By" block on any of the four detail surfaces. The card now uses `resolveHostFor(venue, schedule)`; `renderHostSection` takes the venue and enumerates both scopes via `getVenueHosts`, deduplicating by display identity and attributing shows when a venue has more than one host. Per-show `website` and `socials` reach the page for the first time. Also fixes the masked case no venue has today — a venue with both a venue-level host and a per-show override would have shown the wrong host rather than none; covered by unit fixtures since the live data cannot reach it. Sections 6 and 7 updated. | Claude Code |
+| 2026-09 | 1.0.41 | #246: Schedule entries accept an optional `lastVerified` date — when a human last confirmed the show (ADR-013 §4: per show, never backfilled). `validate-data.js` warns past 60 days, fails on a future date, and prints coverage; `check-curator-drift.js` matches entries on everything except that date and compares it by direction, so stamping a show in the curator no longer reads as a fatal loss. New §11 "Show Verification". Display deliberately silent — the `?fresh=1` lens is #259. | Claude Code |
+| 2026-09 | 1.0.42 | #259: The freshness lens. `?fresh=1` reveals each show's `lastVerified` — "✓ Verified Aug 28 · 6d" or "Not verified" — on the calendar cards, as a Verified column in the detail schedule table on all four surfaces, and on the KJ dossier's show rows, with a corner indicator. URL-only and off by default: the owner's answer to the display question ADR-013 §4 deferred is that visitors see nothing unless they ask. New `js/utils/freshness.js`; `readLocation()` gains `fresh`; `date.js` gains `formatDateMonthDay()` (now also used for upcoming closures and the "Also" list), `daysSince()`, `freshnessOf()` and `FRESHNESS_HORIZON_DAYS`. New §18 subsection; §7 and §11 updated. | Claude Code |
 | 2026-08 | 1.0.43 | #238: Tag colours moved from `data.json` to authored CSS (ADR-014). `tagDefinitions` now carries labels only — 38 presentation values left the curator's file, `initTagConfig()` stopped injecting a stylesheet, and `buildTagStyles` plus its colour-validation machinery were deleted. The authored rules preserve the #229 WCAG palette exactly (axe verified 0 violations). Schema accepts the old fields as documented-ignored so a stale master cannot hard-fail CI; `validate-data.js` warns instead. The curator master was migrated in the same change. Section 12 rewritten; its Color column — which had drifted to the pre-#229 values — removed. | Claude Code |
 
 ---

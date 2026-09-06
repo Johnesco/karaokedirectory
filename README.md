@@ -131,7 +131,8 @@ Know a karaoke spot that's missing? You can:
       day: "Friday",          // Day name, capitalized (for recurring events)
       startTime: "21:00",     // 24-hour format
       endTime: "01:00",       // Can cross midnight (optional)
-      eventUrl: "https://..." // Optional: link to event page
+      eventUrl: "https://...", // Optional: link to event page
+      lastVerified: "2026-08-28" // Optional: date a human last confirmed this show (never backfilled)
     },
     {
       frequency: "once",      // One-time special event
@@ -195,6 +196,8 @@ Tags are defined in `js/data.json` with custom colors. Search works with both ta
 ## Debug Mode
 
 Append `?debug=1` to the URL to see schedule match reasons on venue cards.
+
+Append `?fresh=1` to see when each show was last verified ("Verified Aug 28 · 6d" or "Not verified") on cards, in the detail schedule table, and on KJ pages. Off by default — nothing changes for visitors who don't ask.
 
 ## Contributing
 
