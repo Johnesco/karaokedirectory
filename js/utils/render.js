@@ -4,8 +4,9 @@
  */
 
 import { escapeHtml } from './string.js';
-import { formatScheduleEntry, formatActivePeriodText, scheduleMatchesDate, WEEKDAYS, getVenueExclusionForDate, getUpcomingExclusions, parseLocalDate, isPastOnceEvent } from './date.js';
+import { formatScheduleEntry, formatActivePeriodText, formatDateMonthDay, scheduleMatchesDate, WEEKDAYS, getVenueExclusionForDate, getUpcomingExclusions, isPastOnceEvent } from './date.js';
 import { buildMapUrl, buildDirectionsUrl, createSocialLinks, formatAddress, sanitizeUrl } from './url.js';
+import { isFreshLens, renderFreshness } from './freshness.js';
 
 /**
  * Resolve the effective host for a single show.
@@ -73,6 +74,11 @@ function scheduleEntryLabel(entry, { short = false } = {}) {
  * When any schedule entry has its own host (multi-host venue, e.g. The Highball),
  * a Host column is added. Otherwise the column is omitted and host info lives
  * in the venue-level "Presented By" section as before.
+ *
+ * Under the freshness lens (?fresh=1, #259) a Verified column is added too,
+ * on the same conditional pattern — so the four surfaces that share this
+ * table (modal, desktop pane, map expanded card, A–Z full card) all get it
+ * from one place, and the default page's markup is untouched.
  * @param {Object} venue - Full venue object (needs .schedule and optionally .host)
  * @returns {string} HTML string for schedule table
  */
@@ -83,6 +89,7 @@ export function renderScheduleTable(venue) {
     }
 
     const showHostColumn = hasPerShowHosts(venue);
+    const showVerifiedColumn = isFreshLens();
 
     const rows = schedule.map(entry => {
         const formatted = formatScheduleEntry(entry, { showEvery: true });
@@ -96,6 +103,12 @@ export function renderScheduleTable(venue) {
             ? `<td data-label="Host">${escapeHtml(formatHostDisplay(resolveHostFor(venue, entry)))}</td>`
             : '';
 
+        // Never an empty cell: "Not verified" is the point of the column, and
+        // the <480px layout hides empty cells (td:empty).
+        const verifiedCell = showVerifiedColumn
+            ? `<td data-label="Verified">${renderFreshness(entry, { block: 'venue-detail' })}</td>`
+            : '';
+
         // data-label drives the stacked card layout on small phones (<480px),
         // where the table collapses to label/value rows — see components.css.
         return `
@@ -103,6 +116,7 @@ export function renderScheduleTable(venue) {
                 <td data-label="Day">${dayLabel}${eventLink}</td>
                 <td data-label="Time">${formatted.time}</td>
                 ${hostCell}
+                ${verifiedCell}
             </tr>
         `;
     }).join('');
@@ -114,6 +128,7 @@ export function renderScheduleTable(venue) {
                     <th>Day</th>
                     <th>Time</th>
                     ${showHostColumn ? '<th>Host</th>' : ''}
+                    ${showVerifiedColumn ? '<th>Verified</th>' : ''}
                 </tr>
             </thead>
             <tbody>
@@ -164,7 +179,7 @@ export function renderUpcomingClosures(venue) {
     if (!upcoming.length) return '';
 
     const list = upcoming.map(ex => {
-        const label = parseLocalDate(ex.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const label = formatDateMonthDay(ex.date);
         return ex.reason ? `${escapeHtml(label)} (${escapeHtml(ex.reason)})` : escapeHtml(label);
     }).join(', ');
 
@@ -292,8 +307,7 @@ function buildAlsoText(otherEntries, allEntries) {
         if (entry.frequency === 'once') {
             // One-time events get their own entry: "Mar 15"
             const dateObj = new Date(entry.date + 'T12:00:00');
-            const label = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-            groups.push({ sort: dateObj.getTime(), text: label });
+            groups.push({ sort: dateObj.getTime(), text: formatDateMonthDay(entry.date) });
         } else {
             const dayKey = entry.day.toLowerCase();
             if (!dayMap.has(dayKey)) {

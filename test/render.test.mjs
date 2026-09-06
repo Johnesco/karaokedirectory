@@ -10,10 +10,11 @@
  * reading `venue.host` looked correct by accident. These fixtures construct it.
  */
 
-import { describe, it } from 'node:test';
+import { describe, it, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { resolveHostFor, getVenueHosts, renderHostSection } from '../js/utils/render.js';
+import { resolveHostFor, getVenueHosts, renderHostSection, renderScheduleTable } from '../js/utils/render.js';
+import { initFreshLens } from '../js/utils/freshness.js';
 
 const KJ_A = { name: 'KJ Alpha', website: 'https://alpha.example' };
 const KJ_B = { name: 'KJ Beta' };
@@ -108,5 +109,25 @@ describe('renderHostSection', () => {
     const html = renderHostSection(v);
     assert.doesNotMatch(html, /<script>/);
     assert.match(html, /&lt;script&gt;/);
+  });
+});
+
+describe('renderScheduleTable under the freshness lens (#259)', () => {
+  afterEach(() => initFreshLens(false));
+
+  it('has no Verified column by default, even when a date is stored', () => {
+    initFreshLens(false);
+    const html = renderScheduleTable({ schedule: [friday({ lastVerified: '2026-08-28' })] });
+    assert.doesNotMatch(html, /Verified/);
+  });
+
+  it('adds a Verified column when the lens is on, with no blank cell', () => {
+    initFreshLens(true);
+    const html = renderScheduleTable({ schedule: [friday({ lastVerified: '2026-08-28' }), friday({ day: 'Saturday' })] });
+    assert.match(html, /<th>Verified<\/th>/);
+    assert.match(html, /venue-detail__verified--fresh/);
+    assert.match(html, /Not verified/);
+    // An empty cell would be hidden by the <480px stacked layout (td:empty).
+    assert.doesNotMatch(html, /<td data-label="Verified"><\/td>/);
   });
 });

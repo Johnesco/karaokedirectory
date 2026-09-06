@@ -1322,6 +1322,58 @@ a.tag:focus-visible {
 }
 
 /* ============================================================================
+   Freshness lens
+   Enable with ?fresh=1 in URL (#259). Reveals each show's lastVerified on the
+   calendar cards, the detail schedule table and the KJ dossier. Nothing here
+   matches unless the lens emitted the markup, so the default page is untouched.
+   ============================================================================ */
+
+.fresh-indicator {
+    position: fixed;
+    top: var(--spacing-sm);
+    right: var(--spacing-sm);
+    background: var(--color-success);
+    color: var(--color-gray-900);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    z-index: var(--z-toast);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+/* Both lenses on: stack the badges rather than overlap them */
+.debug-mode .fresh-indicator {
+    top: calc(var(--spacing-sm) + 2rem);
+}
+
+.venue-card__verified,
+.venue-detail__verified,
+.kj-dossier__verified {
+    color: var(--text-muted);
+    font-size: var(--font-size-xs);
+    white-space: nowrap;
+}
+
+.venue-card__verified {
+    margin-top: var(--spacing-xs);
+}
+
+.venue-card__verified--fresh,
+.venue-detail__verified--fresh,
+.kj-dossier__verified--fresh {
+    color: var(--color-success);
+}
+
+.venue-card__verified--overdue,
+.venue-detail__verified--overdue,
+.kj-dossier__verified--overdue {
+    color: var(--color-warning);
+}
+
+/* ============================================================================
    Analytics consent banner
    Rendered by js/analytics.js on first visit; gates Microsoft Clarity loading
    ============================================================================ */
