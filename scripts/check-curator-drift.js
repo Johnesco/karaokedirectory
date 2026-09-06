@@ -17,6 +17,10 @@
  *   master ahead of repo  -> normal. That is the pending export.
  *   repo ahead of master  -> DANGEROUS. Export would drop it. Exits non-zero.
  *
+ * Schedule entries have no id, so they match on content. `lastVerified` is
+ * left out of that identity and compared by direction on its own (#246) —
+ * see compareVenue for why.
+ *
  * The master lives outside this repo and is not required. When it is absent
  * this exits 0 with a note, so CI and other contributors are unaffected.
  *
@@ -117,16 +121,51 @@ function compareVenue(repoV, masterV) {
         if (repoV[field] === undefined) pending.push(`${repoV.id}.${field} is new in the master`);
     }
 
-    // Schedule entries compare as a set: order carries no meaning.
+    // Schedule entries compare as a multiset: order carries no meaning, and two
+    // identical entries pair off one-to-one.
+    //
+    // `lastVerified` is matched separately (#246). It is the one field the
+    // curator changes routinely — every flier confirmed is a new date — so
+    // folding it into the identity would report each stamped-but-unexported
+    // show as a fatal loss and bury real drift in noise. An entry's identity
+    // is everything EXCEPT that date, and the dates of a matched pair are then
+    // compared by direction like any other field: the master being newer is a
+    // pending export; the repo being newer, or holding a date the master lacks,
+    // is content the export would strip.
+    //
+    // Editing a show's time AND verifying it in one pass still reports as a
+    // lost + pending pair — with no id, an edit is indistinguishable from a
+    // delete-and-add. That is pre-existing for every entry edit.
+    const identity = (e) => {
+        const { lastVerified, ...rest } = e;
+        return canon(rest);
+    };
     const repoEntries = repoV.schedule || [];
     const masterEntries = masterV.schedule || [];
-    const masterKeys = new Set(masterEntries.map(canon));
-    const repoKeys = new Set(repoEntries.map(canon));
-    for (const e of repoEntries) {
-        if (!masterKeys.has(canon(e))) lost.push(`${repoV.id} schedule entry missing from master: ${describeEntry(e)}`);
-    }
+    const pool = new Map();
     for (const e of masterEntries) {
-        if (!repoKeys.has(canon(e))) pending.push(`${repoV.id} new schedule entry in master: ${describeEntry(e)}`);
+        const key = identity(e);
+        if (!pool.has(key)) pool.set(key, []);
+        pool.get(key).push(e);
+    }
+    for (const r of repoEntries) {
+        const candidates = pool.get(identity(r));
+        const m = candidates && candidates.shift();
+        if (!m) {
+            lost.push(`${repoV.id} schedule entry missing from master: ${describeEntry(r)}`);
+            continue;
+        }
+        const rv = r.lastVerified || '';
+        const mv = m.lastVerified || '';
+        if (rv === mv) continue;
+        const where = `${repoV.id} ${describeEntry(r)}`;
+        if (!rv) pending.push(`${where}: verified ${mv} in master, not yet exported`);
+        else if (!mv) lost.push(`${where}: repo verified ${rv}, master has no date — export would strip it`);
+        else if (mv > rv) pending.push(`${where}: re-verified ${mv} in master (repo has ${rv})`);
+        else lost.push(`${where}: repo verified ${rv}, master still ${mv} — export would revert it`);
+    }
+    for (const unmatched of pool.values()) {
+        for (const e of unmatched) pending.push(`${repoV.id} new schedule entry in master: ${describeEntry(e)}`);
     }
 }
 

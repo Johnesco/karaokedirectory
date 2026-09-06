@@ -131,7 +131,8 @@ Know a karaoke spot that's missing? You can:
       day: "Friday",          // Day name, capitalized (for recurring events)
       startTime: "21:00",     // 24-hour format
       endTime: "01:00",       // Can cross midnight (optional)
-      eventUrl: "https://..." // Optional: link to event page
+      eventUrl: "https://...", // Optional: link to event page
+      lastVerified: "2026-08-28" // Optional: date a human last confirmed this show (never backfilled)
     },
     {
       frequency: "once",      // One-time special event

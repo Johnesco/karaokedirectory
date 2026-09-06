@@ -239,7 +239,8 @@ When adding or modifying venues in `js/data.json`, follow this structure:
         name: "Guest KJ",     // See "Per-show host override" below
         affiliation: "Some Karaoke Co",
         website: "https://..."
-      }
+      },
+      lastVerified: "2026-08-28" // Optional: date a human last confirmed THIS show (ADR-013, #246). Curator-written; never backfilled
     },
     {
       frequency: "once",      // One-time special event
@@ -248,7 +249,8 @@ When adding or modifying venues in `js/data.json`, follow this structure:
       endTime: "23:00",
       eventName: "Event Name", // Optional: display name for the event
       eventUrl: "https://...", // Optional: link to event page
-      socials: { instagram: "https://..." } // Optional: event-level social links (same shape as venue socials)
+      socials: { instagram: "https://..." }, // Optional: event-level social links (same shape as venue socials)
+      lastVerified: "2026-08-28" // Optional: same meaning as above — valid on any entry
     }
   ],
   activePeriod: {             // Optional: limits when venue appears
@@ -481,9 +483,11 @@ Use these semantic elements consistently:
 
 `js/data.json` is **maintained externally** by the project owner. Day-to-day venue edits happen in a local-only curator tool that lives outside this repo (at the owner's `~/karaoke-curator/`). That tool writes `js/data.json`, which is the only venue data file (ADR-008).
 
-**Run `npm run curator:check` before every export.** The curator's Export writes `js/data.json` verbatim from its own master, with nothing in between — so a master that is behind the repo silently reverts whatever landed since it was last synced, and every other gate stays green (`validate-data.js` checks the file against the schema, not against what it replaced). A 17-day-stale master would have destroyed #229's contrast palette and #228's live event; the check exits non-zero only when the repo holds content the export would drop, and skips cleanly when no master is present (#237).
+**Run `npm run curator:check` before every export.** The curator's Export writes `js/data.json` verbatim from its own master, with nothing in between — so a master that is behind the repo silently reverts whatever landed since it was last synced, and every other gate stays green (`validate-data.js` checks the file against the schema, not against what it replaced). A 17-day-stale master would have destroyed #229's contrast palette and #228's live event; the check exits non-zero only when the repo holds content the export would drop, and skips cleanly when no master is present (#237). Schedule entries match on everything **except** `lastVerified`, which is compared by direction on its own (#246): a show stamped in the master but not yet exported is a pending line, while a repo date the master lacks or trails is fatal.
 
 The curator runs on **:8765** via `node server.js` (its `start.cmd`), with its own site preview on **:8766**. Serving it from a static file server instead makes browsing work while Save and Export both fail with `501 Unsupported method ('POST')`.
+
+**Re-verifying a show is a one-click stamp in the curator** (#257). Every schedule row in the venue form, and every row of the dashboard's Shows / Overdue / Never verified tabs, has a ✓ that writes today's date into that entry's `lastVerified`; "✓ all" stamps every show at a venue. The dashboard ages the dates against a 60-day threshold and lists what is overdue or never verified. The date is public — it survives export — but no visitor-facing surface renders it by default; the opt-in `?fresh=1` lens is #259.
 
 If you're a contributor (or a Claude session that needs to add a venue inside this repo):
 

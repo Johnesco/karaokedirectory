@@ -197,6 +197,11 @@
             { "type": "null" },
             { "$ref": "#/$defs/socials" }
           ]
+        },
+        "lastVerified": {
+          "type": "string",
+          "format": "date",
+          "description": "Date a human last confirmed this show (ADR-013, #246). Absent means unrecorded, not wrong. Written by the curator; never backfilled."
         }
       },
       "allOf": [
