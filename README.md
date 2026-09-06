@@ -197,6 +197,8 @@ Tags are defined in `js/data.json` with custom colors. Search works with both ta
 
 Append `?debug=1` to the URL to see schedule match reasons on venue cards.
 
+Append `?fresh=1` to see when each show was last verified ("Verified Aug 28 · 6d" or "Not verified") on cards, in the detail schedule table, and on KJ pages. Off by default — nothing changes for visitors who don't ask.
+
 ## Contributing
 
 Contributions are welcome! Feel free to:

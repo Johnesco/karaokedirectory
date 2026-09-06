@@ -465,6 +465,60 @@ export function formatActivePeriodText(activePeriod) {
 }
 
 /**
+ * "Aug 28", or "Aug 28, 2025" when the year is not the current one — the
+ * short form every dated label on the site uses (upcoming closures, the
+ * "Also …" list, the freshness lens). Absolute on purpose: a relative
+ * "3 weeks ago" reads as a judgment, and rots on anything rendered once.
+ * @param {string} iso - YYYY-MM-DD
+ * @param {Object} [options]
+ * @param {Date} [options.now] - Reference date for the year check (injectable for tests)
+ * @returns {string}
+ */
+export function formatDateMonthDay(iso, { now = new Date() } = {}) {
+    const d = parseLocalDate(iso);
+    const opts = { month: 'short', day: 'numeric' };
+    if (d.getFullYear() !== now.getFullYear()) opts.year = 'numeric';
+    return d.toLocaleDateString('en-US', opts);
+}
+
+/**
+ * Whole days from a YYYY-MM-DD date to `asOf`, both taken at local midnight.
+ * Negative when the date is still ahead. Rounded rather than floored so a DST
+ * change inside the span cannot shave a day off.
+ * @param {string} iso - YYYY-MM-DD
+ * @param {Date} [asOf] - Reference point (defaults to today)
+ * @returns {number}
+ */
+export function daysSince(iso, asOf = startOfToday()) {
+    const from = parseLocalDate(iso);
+    const to = new Date(asOf);
+    to.setHours(0, 0, 0, 0);
+    return Math.round((to - from) / 86400000);
+}
+
+/**
+ * Days after which a show's verification counts as overdue. Sixty is the
+ * "week is the heartbeat" window (Display Philosophy #3), the same horizon
+ * `scripts/validate-data.js` warns past.
+ */
+export const FRESHNESS_HORIZON_DAYS = 60;
+
+/**
+ * How fresh a show's `lastVerified` is (ADR-013 §4, #246). "never" is an
+ * absent date — unrecorded, not wrong — which is why it is its own state
+ * rather than a very large number of days.
+ * @param {Object} entry - Schedule entry
+ * @param {Date} [asOf] - Reference point (defaults to today)
+ * @returns {{ state: 'never'|'fresh'|'overdue', days: number|null, iso: string }}
+ */
+export function freshnessOf(entry, asOf = startOfToday()) {
+    const iso = entry?.lastVerified;
+    if (!iso) return { state: 'never', days: null, iso: '' };
+    const days = daysSince(iso, asOf);
+    return { state: days > FRESHNESS_HORIZON_DAYS ? 'overdue' : 'fresh', days, iso };
+}
+
+/**
  * Get date range for next week (7 days after current week ends)
  * @param {Date} weekStart - Start of current week (Sunday)
  * @returns {{ start: Date, end: Date }} Start and end dates for next week

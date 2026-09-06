@@ -407,6 +407,7 @@ Tags are rendered as color-coded badges in VenueCard, VenueModal, VenueDetailPan
 - `?kj=none` — venues with no listed host
 - `?kj=<id>` — KJ dossier (`KJDossierView`). Carries a **registry id**, matched exactly, so `?kj=armando` no longer also matches "KJ Armando and Paola". A non-id value still substring-matches names, so links shared before #124 Phase 5 keep working
 - `?debug=1` — debug mode (also `localStorage.debug=1`)
+- `?fresh=1` — freshness lens (#259): reveals each show's `lastVerified` on calendar cards, the detail schedule table and the KJ dossier. URL-only by decision — no `localStorage` twin. Read by `readLocation()`, initialised via `initFreshLens()` in `js/utils/freshness.js`
 - `#view=<v>&venue=<id>` — deep link to a selected venue. The hash records the **actual** view; a venue-less hash is cleared rather than left as `#view=weekly`
 - Legacy bare hashes (`#weekly`) are still honoured
 
@@ -547,6 +548,8 @@ When enabled:
 - A "Debug Mode" indicator appears in the top-right corner
 - Venue cards show their schedule match reason (e.g., "Every Friday", "First Saturday")
 - Hover over cards for detailed match info
+
+**Freshness lens** (`?fresh=1`, #259) is the sibling lens for data age: every calendar card gets "✓ Verified Aug 28 · 6d" or "Not verified", the detail schedule table grows a Verified column on all four surfaces, and the KJ dossier annotates each show. URL-only (no `localStorage`), off by default, and `renderFreshness()` returns `''` when off — so the public page emits no new markup, which `e2e/fresh-lens.spec.js` asserts. The curator's Preview button opens the site with it on.
 
 <!-- ============================================================
      WORKING IN THIS PROJECT
