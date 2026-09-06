@@ -415,6 +415,21 @@ for (const venue of data.listings) {
     }
 }
 
+// ---- Presentation fields in tagDefinitions (ADR-014, #238) ----
+// Tag colours are authored in css/components.css. The schema still accepts
+// color/textColor so a not-yet-migrated curator master cannot hard-fail CI,
+// but anything carrying them is a master that needs re-syncing: the fields do
+// nothing, and their presence means the master predates the migration.
+for (const [tid, def] of Object.entries(data.tagDefinitions || {})) {
+    const stale = ['color', 'textColor'].filter(k => k in (def || {}));
+    if (stale.length) {
+        warnings.push(
+            `tagDefinitions["${tid}"] still carries ${stale.join(' + ')} — ignored since ` +
+            `ADR-014 (colours live in css/components.css); strip it from the curator master`
+        );
+    }
+}
+
 // ---- Zip/coordinate cluster check (#241) ----
 //
 // A venue's zip is validated for shape only, and the Austin-metro box above is
