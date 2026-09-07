@@ -1409,6 +1409,25 @@ a.tag:focus-visible {
     margin-top: var(--spacing-xs);
 }
 
+/* A–Z card: one line per verified show, labelled with the show (#271) */
+.venue-card__verified-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-xs);
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+}
+
+.venue-card__verified-row .venue-card__verified {
+    margin-top: 0;
+}
+
+.venue-card__verified-show::after {
+    content: ' ·';
+}
+
 .venue-card__verified--fresh,
 .venue-detail__verified--fresh,
 .kj-dossier__verified--fresh {

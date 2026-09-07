@@ -12,10 +12,10 @@
 
 import { Component } from './Component.js';
 import { escapeHtml } from '../utils/string.js';
-import { formatTimeRange, getScheduleExclusion, isAnnouncedOn } from '../utils/date.js';
+import { formatTimeRange, formatScheduleEntry, getScheduleExclusion, isAnnouncedOn } from '../utils/date.js';
 import { buildMapUrl, formatAddress, sanitizeUrl } from '../utils/url.js';
 import { isDebugMode, getDebugHtml } from '../utils/debug.js';
-import { renderFreshness } from '../utils/freshness.js';
+import { isFreshLens, renderFreshness } from '../utils/freshness.js';
 import { renderTags } from '../utils/tags.js';
 import { formatHostDisplay, resolveHostFor, renderScheduleContext, renderVenueDetailSections } from '../utils/render.js';
 
@@ -156,6 +156,21 @@ export class VenueCard extends Component {
         // template where it holds two children, so its flex row and gap are
         // real. The compact card put a single <h3> inside it, making the flex
         // container and its gap inert on all 239 calendar cards (#224).
+        // Under the freshness lens the compact card ends with its one show's
+        // freshness line; this card lists every show, so each verified one gets
+        // a line labelled with the show, and the A–Z listing reads like the
+        // calendar (#271). Unverified shows add nothing, and renderFreshness
+        // returns '' with the lens off, so the default page is untouched.
+        const verifiedLines = isFreshLens()
+            ? (venue.schedule || []).map(entry => {
+                const line = renderFreshness(entry, { block: 'venue-card', tag: 'div' });
+                if (!line) return '';
+                const f = formatScheduleEntry(entry, { showEvery: true });
+                const label = entry.frequency === 'once' ? f.day : `${f.frequencyPrefix}${f.day}`;
+                return `<div class="venue-card__verified-row"><span class="venue-card__verified-show">${escapeHtml(label)}</span>${line}</div>`;
+            }).join('')
+            : '';
+
         return `
             <div class="venue-card venue-card--full venue-detail venue-detail--inline" data-venue-id="${escapeHtml(venue.id)}">
                 <div class="venue-card__header">
@@ -167,6 +182,7 @@ export class VenueCard extends Component {
                     ${renderTags(venue.tags, { dedicated: venue.dedicated })}
                 </div>
                 ${renderVenueDetailSections(venue, { actions: false })}
+                ${verifiedLines}
             </div>
         `;
     }

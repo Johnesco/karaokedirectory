@@ -37,6 +37,25 @@ test.describe('Freshness lens (?fresh=1)', () => {
 
     await page.locator('.day-card:not(.day-card--past) .venue-card__link').first().click();
     await expect(page.locator('.venue-detail__schedule-table th', { hasText: 'Verified' })).toHaveCount(0);
+
+    // The A–Z cards' per-show lines (#271) are lens-only too.
+    await page.goto('/?view=alphabetical');
+    await expect(page.locator('.venue-card--full').first()).toBeVisible({ timeout: 15000 });
+    await expect(page.locator('.venue-card__verified-row')).toHaveCount(0);
+  });
+
+  test('lists one labelled line per verified show on the A–Z cards once shows are stamped (#271)', async ({ page }) => {
+    await stampEveryEntry(page);
+    await page.goto('/?view=alphabetical&fresh=1');
+    await expect(page.locator('.venue-card--full').first()).toBeVisible({ timeout: 15000 });
+
+    // Every show is stamped, so each card has exactly one line per schedule row.
+    const mismatched = await page.evaluate(() => [...document.querySelectorAll('.venue-card--full')]
+      .map(c => [c.querySelectorAll('.venue-detail__schedule-table tbody tr').length, c.querySelectorAll('.venue-card__verified-row').length])
+      .filter(([rows, lines]) => rows !== lines).length);
+    expect(mismatched).toBe(0);
+    await expect(page.locator('.venue-card--full .venue-card__verified-row').first()).toContainText(/Verified .* · today/);
+    await expect(page.locator('.venue-card--full .venue-card__verified-row .venue-card__verified-show').first()).not.toBeEmpty();
   });
 
   test('with the lens on, an unverified show still says nothing (#267)', async ({ page }) => {
