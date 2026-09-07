@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.45
+**Version:** 1.0.46
 **Last updated:** September 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -334,10 +334,6 @@ tonight?" a question only the calendar could answer.
 
 - **If venue card is open** — closes the floating card
 - **If no card is open** — exits map view, returns to Weekly Calendar view
-
-### Venue Count Info
-
-Displays "X of Y venues have map coordinates" at the bottom. If some venues lack coordinates, shows a hint to add them — in practice via `node scripts/geocode-venues.js`, which patches `js/data.json` in place.
 
 ### Filtering
 
@@ -1697,6 +1693,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-08 | 1.0.43 | #238: Tag colours moved from `data.json` to authored CSS (ADR-014). `tagDefinitions` now carries labels only — 38 presentation values left the curator's file, `initTagConfig()` stopped injecting a stylesheet, and `buildTagStyles` plus its colour-validation machinery were deleted. The authored rules preserve the #229 WCAG palette exactly (axe verified 0 violations). Schema accepts the old fields as documented-ignored so a stale master cannot hard-fail CI; `validate-data.js` warns instead. The curator master was migrated in the same change. Section 12 rewritten; its Color column — which had drifted to the pre-#229 values — removed. | Claude Code |
 | 2026-09 | 1.0.44 | #263: Announcements. Schedule entries gain `verifiedBy` (`announcement` \| `check` — the evidence behind `lastVerified`; absent reads as check) and `announcedFor` (the night the latest announcement referred to), with `dependentRequired` so `announcedFor` ⇒ `verifiedBy` ⇒ `lastVerified`. The weekly calendar card carries a public "📣 Announced" line on that night (`.venue-card__announced`, `isAnnouncedOn()`), the `?fresh=1` lens says "Announced Sep 6 · today", the validator warns on an announced night that cannot render, and `curator:check` treats underscore-prefixed keys as curator-private at every level and compares the verification fields by direction. `date.js` gains `toLocalISO()`, folding two inline copies. The announcement itself stays in the curator (#264). Sections 6, 11, 18 updated; ADR-013 addendum. | Claude Code |
 | 2026-08 | 1.0.45 | #218: `app.js` rendered the initial view twice on any deep link that named a non-default view. `setState({ view })` notified the `view` subscriber *and* the explicit `renderView()` ran, so a view was built, destroyed and rebuilt before first paint; `?view=weekly` rendered once only because `setState` stays quiet when the value already matches. State is now seeded before the subscription, so one render covers both cases — the same ordering `hostFilter` already relied on. This was the root cause behind the frozen map in #215/#217; `MapView.destroyed` still guards the symptom, since any future view doing async work in `afterRender()` would hit it. Measured 5 renders of `#main-content` to 4 on `?view=map` and `?view=alphabetical`, with `?view=weekly` unchanged. Section 4 implementation note updated. | Claude Code |
+| 2026-08 | 1.0.46 | #221: Deleted the map's venue-count bar. `.map-view__info` was built by `MapView.template()` on every render and displayed on none — `body.view--map .map-view__info { display: none }` applies whenever a map is on screen, which is the only time the element exists. Its hint also pointed at `editor.html`, retired to `_deprecated/` in favour of the curator. Removed the markup, six CSS rules (one of them equally unreachable under `.page--edge-to-edge`), and the now-unused `getAllVenues` import. Section 4's "Venue Count Info" heading went with it — the spec documented as a live feature something no visitor could ever see. Deleted rather than revived: it served the coordinate-backfill era and all 75 active venues are now geocoded, so it would read "75 of 75", and a status bar fights immersive mode. | Claude Code |
 
 ---
 

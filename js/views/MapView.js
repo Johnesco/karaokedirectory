@@ -8,7 +8,7 @@
 import { Component } from '../components/Component.js';
 import { getState, setState, subscribe } from '../core/state.js';
 import { emit, Events } from '../core/events.js';
-import { getVenuesWithCoordinates, getAllVenues } from '../services/venues.js';
+import { getVenuesWithCoordinates } from '../services/venues.js';
 import { escapeHtml } from '../utils/string.js';
 import { buildDirectionsUrl, shareVenue } from '../utils/url.js';
 import { renderTags } from '../utils/tags.js';
@@ -125,25 +125,22 @@ export class MapView extends Component {
     }
 
     template() {
-        const venuesWithCoords = getVenuesWithCoordinates();
-        const totalVenues = getAllVenues().length;
         const showDedicated = getState('showDedicated');
         const activeDateFilter = getState('mapDateFilter');
 
+        // No venue-count bar. `.map-view__info` read "X of Y venues have map
+        // coordinates" and was built on every render and displayed on none —
+        // `body.view--map .map-view__info { display: none }` applied whenever a
+        // map was on screen, which is the only time the element existed. Its
+        // hint also pointed at `editor.html`, retired to _deprecated/ in favour
+        // of the curator; coordinates come from scripts/geocode-venues.js now.
+        //
+        // Deleted rather than revived: it served the backfill era, and all 75
+        // active venues are geocoded, so it would read "75 of 75". A status bar
+        // also fights immersive mode, which is the map's whole design (#221).
         return `
             <div class="map-view">
                 <div class="map-view__container" id="venue-map"></div>
-                <div class="map-view__info">
-                    <p>
-                        <i class="fa-solid fa-map-pin"></i>
-                        ${venuesWithCoords.length} of ${totalVenues} venues have map coordinates.
-                        ${venuesWithCoords.length < totalVenues ? `
-                            <span class="map-view__hint">
-                                Add coordinates in the editor to show more venues.
-                            </span>
-                        ` : ''}
-                    </p>
-                </div>
 
                 <!-- Floating Controls (left side) -->
                 <div class="map-controls">
