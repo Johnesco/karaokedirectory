@@ -3312,6 +3312,45 @@
       "host": {
         "companyId": "starling-karaoke"
       }
+    },
+    {
+      "id": "homespun-kitchen-and-bar",
+      "name": "Homespun Kitchen and Bar",
+      "dedicated": false,
+      "address": {
+        "street": "131 E Mercer St.",
+        "city": "Dripping Springs",
+        "state": "TX",
+        "zip": "78620"
+      },
+      "schedule": [
+        {
+          "frequency": "first",
+          "day": "Monday",
+          "startTime": "18:30",
+          "endTime": "21:30",
+          "eventUrl": "https://www.facebook.com/photo/?fbid=122235936422299398&set=a.122102434820299398",
+          "lastVerified": "2026-09-07"
+        },
+        {
+          "frequency": "third",
+          "day": "Monday",
+          "startTime": "18:30",
+          "endTime": "21:30",
+          "eventUrl": "https://www.facebook.com/photo/?fbid=122235936422299398&set=a.122102434820299398"
+        }
+      ],
+      "coordinates": {
+        "lat": 30.192465,
+        "lng": -98.086619
+      },
+      "tags": [
+        "restaurant"
+      ],
+      "socials": {
+        "website": "https://www.homespunkitchenandbar.com/",
+        "facebook": "https://www.facebook.com/homespunkitchenandbar/"
+      }
     }
   ]
 }
