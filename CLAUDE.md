@@ -554,7 +554,7 @@ When enabled:
 - Venue cards show their schedule match reason (e.g., "Every Friday", "First Saturday")
 - Hover over cards for detailed match info
 
-**Freshness lens** (`?fresh=1`, #259) is the sibling lens for data age: every calendar card gets "✓ Verified Aug 28 · 6d", "📣 Announced Sep 6 · today" when the venue or host announced it (#263), or "Not verified"; the detail schedule table grows a Verified column on all four surfaces, and the KJ dossier annotates each show. URL-only (no `localStorage`), off by default, and `renderFreshness()` returns `''` when off — so the public page emits no new markup, which `e2e/fresh-lens.spec.js` asserts. The curator's Preview button opens the site with it on.
+**Freshness lens** (`?fresh=1`, #259) is the sibling lens for data age: a verified show's calendar card gets "✓ Verified Aug 28 · 6d", or "📣 Announced Sep 6 · today" when the venue or host announced it (#263); an unverified show gets nothing (#267). The detail schedule table grows a Verified column on all four surfaces when some show at the venue is verified, and the KJ dossier annotates each verified show. URL-only (no `localStorage`), off by default, and `renderFreshness()` returns `''` when off — so the public page emits no new markup, which `e2e/fresh-lens.spec.js` asserts. The curator's Preview button opens the site with it on.
 
 <!-- ============================================================
      WORKING IN THIS PROJECT

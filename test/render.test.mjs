@@ -121,13 +121,19 @@ describe('renderScheduleTable under the freshness lens (#259)', () => {
     assert.doesNotMatch(html, /Verified/);
   });
 
-  it('adds a Verified column when the lens is on, with no blank cell', () => {
+  it('adds a Verified column when the lens is on and some show is verified; unverified rows stay empty (#267)', () => {
     initFreshLens(true);
     const html = renderScheduleTable({ schedule: [friday({ lastVerified: '2026-08-28' }), friday({ day: 'Saturday' })] });
     assert.match(html, /<th>Verified<\/th>/);
     assert.match(html, /venue-detail__verified--fresh/);
-    assert.match(html, /Not verified/);
-    // An empty cell would be hidden by the <480px stacked layout (td:empty).
-    assert.doesNotMatch(html, /<td data-label="Verified"><\/td>/);
+    assert.doesNotMatch(html, /Not verified/);
+    // The unverified row's cell is empty, so the <480px stacked layout hides it.
+    assert.match(html, /<td data-label="Verified"><\/td>/);
+  });
+
+  it('adds no column at all when nothing at the venue is verified (#267)', () => {
+    initFreshLens(true);
+    const html = renderScheduleTable({ schedule: [friday(), friday({ day: 'Saturday' })] });
+    assert.doesNotMatch(html, /Verified/);
   });
 });
