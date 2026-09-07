@@ -15,6 +15,7 @@ import { MapView } from './views/MapView.js';
 import { KJDossierView } from './views/KJDossierView.js';
 import { KJIndexView } from './views/KJIndexView.js';
 import { initDebugMode, isDebugMode } from './utils/debug.js';
+import { initFreshLens } from './utils/freshness.js';
 import { initTagConfig } from './utils/tags.js';
 import { readLocation, writeLocation, onLocationChange, resolveView, DEFAULT_VIEW } from './core/router.js';
 import { initFabs } from './components/fabs.js';
@@ -62,6 +63,10 @@ async function init() {
 
     // Initialize debug mode (check for ?debug=1 in URL)
     initDebugMode();
+
+    // Freshness lens (?fresh=1, #259). The router reads the URL; this only
+    // takes the answer.
+    initFreshLens(readLocation().fresh);
 
     // Load venue data
     await loadData();

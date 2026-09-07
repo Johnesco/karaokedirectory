@@ -1,63 +1,27 @@
 /**
  * Tag configuration and rendering utilities
  * Tags provide descriptive information about venue characteristics (type, policies, amenities)
- * Configuration is loaded from js/data.json at runtime
+ * Labels are loaded from js/data.json at runtime; colours are authored CSS.
  */
 
 import { html } from './string.js';
 
-// Tag configuration - initialized from js/data.json
+// Tag labels - initialized from js/data.json
 let tagConfig = {};
 
-const STYLE_ELEMENT_ID = 'tag-colors';
-
-/** Only ids a CSS attribute selector can safely carry. */
-const SAFE_TAG_ID = /^[a-zA-Z0-9_+-]+$/;
-/** Colours are curator-written; accept the forms CSS actually takes. */
-const SAFE_COLOR = /^(#[0-9a-fA-F]{3,8}|[a-zA-Z]+|rgba?\([\d\s.,%]+\)|hsla?\([\d\s.,%]+\))$/;
-
 /**
- * Build one stylesheet for every tag colour, keyed on `[data-tag]`.
+ * Initialize tag configuration from data.
  *
- * Tag colours live in data.json, so they cannot be written into a stylesheet
- * ahead of time — which is why both call sites used to emit an inline
- * `style="background:…"`. One generated sheet replaces both (#166), and keeps
- * the colours out of the markup where a CSP would object to them.
+ * This used to also inject a stylesheet built from the definitions' colour
+ * fields. Colours are authored in css/components.css since ADR-014 (#238) —
+ * data.json is purely factual, so a stale curator export can no longer revert
+ * design work. Any color/textColor still present in the data is ignored here
+ * and warned about by validate-data.js.
  *
- * Values are validated rather than escaped: anything that is not a plain id or
- * a recognisable colour is skipped, because a stylesheet has no equivalent of
- * HTML escaping — a stray `}` would end the rule and start a new one.
- *
- * @param {Object} definitions
- * @returns {string} CSS text
- */
-export function buildTagStyles(definitions) {
-    return Object.entries(definitions || {})
-        .filter(([id, def]) =>
-            SAFE_TAG_ID.test(id) && def && SAFE_COLOR.test(String(def.color || '')) &&
-            SAFE_COLOR.test(String(def.textColor || ''))
-        )
-        .map(([id, def]) =>
-            `.tag[data-tag="${id}"]{background:${def.color};color:${def.textColor}}`
-        )
-        .join('\n');
-}
-
-/**
- * Initialize tag configuration from data, and paint the tag colours.
  * @param {Object} definitions - Tag definitions from the data file's tagDefinitions
  */
 export function initTagConfig(definitions) {
     tagConfig = definitions || {};
-
-    if (typeof document === 'undefined') return;   // unit tests, build scripts
-    let el = document.getElementById(STYLE_ELEMENT_ID);
-    if (!el) {
-        el = document.createElement('style');
-        el.id = STYLE_ELEMENT_ID;
-        document.head.appendChild(el);
-    }
-    el.textContent = buildTagStyles(tagConfig);
 }
 
 /**

@@ -239,7 +239,10 @@ When adding or modifying venues in `js/data.json`, follow this structure:
         name: "Guest KJ",     // See "Per-show host override" below
         affiliation: "Some Karaoke Co",
         website: "https://..."
-      }
+      },
+      lastVerified: "2026-08-28", // Optional: date a human last confirmed THIS show (ADR-013, #246). Curator-written; never backfilled
+      verifiedBy: "announcement", // Optional: the evidence — "announcement" (venue/host published it) or "check" (absent = check) (#263)
+      announcedFor: "2026-09-10"  // Optional, recurring only: the night the announcement referred to; that card gets the Announced marker. Needs verifiedBy "announcement"
     },
     {
       frequency: "once",      // One-time special event
@@ -248,7 +251,9 @@ When adding or modifying venues in `js/data.json`, follow this structure:
       endTime: "23:00",
       eventName: "Event Name", // Optional: display name for the event
       eventUrl: "https://...", // Optional: link to event page
-      socials: { instagram: "https://..." } // Optional: event-level social links (same shape as venue socials)
+      socials: { instagram: "https://..." }, // Optional: event-level social links (same shape as venue socials)
+      lastVerified: "2026-08-28", // Optional: same meaning as above — valid on any entry
+      verifiedBy: "announcement"  // Optional: as above. A one-time entry's own date is its announced night, so no announcedFor
     }
   ],
   activePeriod: {             // Optional: limits when venue appears
@@ -337,8 +342,8 @@ directory. Removed from the schema, `venueMatchesSearch`, `filterVenues`,
 Tags are defined in `tagDefinitions` at the top of `js/data.json`. Each tag has:
 - **id** (key): Machine-readable identifier
 - **label**: Human-readable display name
-- **color**: Background color (hex)
-- **textColor**: Text color for contrast
+
+**Colours are authored CSS, not data** (ADR-014, #238): `css/components.css` carries one `.tag[data-tag="<id>"]` rule per tag, holding the #229 WCAG palette. `data.json` stores no presentation values, so a stale curator export can never revert design work. A tag without a rule falls back to the neutral `.tag` surface.
 
 Available tags:
 | Tag ID | Label | Description |
@@ -365,7 +370,7 @@ Available tags:
 
 Tags are rendered as color-coded badges in VenueCard, VenueModal, VenueDetailPane and MapView using the `renderTags()` function from `js/utils/tags.js`.
 
-**`dedicated` and `special-event` are derived, not stored.** `renderTags()` prepends the first when `venue.dedicated` is true; `VenueCard` prepends the second when the entry it is rendering is `frequency: "once"`. `renderTags()` deduplicates the result, so listing either in a venue's `tags` no longer renders the badge twice (#208) — but it is still redundant, and `validate-data.js` warns about it.
+**`dedicated` and `special-event` are derived, not stored.** `renderTags()` prepends the first when `venue.dedicated` is true; `VenueCard` prepends the second when the entry it is rendering is `frequency: "once"`. `renderTags()` deduplicates the result, so listing either in a venue's `tags` no longer renders the badge twice (#208) — but it is still redundant, and `validate-data.js` warns about it. Since ADR-014, `validate-data.js` also warns if a tag definition still carries `color`/`textColor` — those fields are ignored; the palette lives in CSS.
 
 ## Key Technical Patterns
 
@@ -405,6 +410,7 @@ Tags are rendered as color-coded badges in VenueCard, VenueModal, VenueDetailPan
 - `?kj=none` — venues with no listed host
 - `?kj=<id>` — KJ dossier (`KJDossierView`). Carries a **registry id**, matched exactly, so `?kj=armando` no longer also matches "KJ Armando and Paola". A non-id value still substring-matches names, so links shared before #124 Phase 5 keep working
 - `?debug=1` — debug mode (also `localStorage.debug=1`)
+- `?fresh=1` — freshness lens (#259): reveals each show's `lastVerified` and its evidence level ("Announced" vs "Verified", #263) on calendar cards, the detail schedule table and the KJ dossier. URL-only by decision — no `localStorage` twin. Read by `readLocation()`, initialised via `initFreshLens()` in `js/utils/freshness.js`
 - `#view=<v>&venue=<id>` — deep link to a selected venue. The hash records the **actual** view; a venue-less hash is cleared rather than left as `#view=weekly`
 - Legacy bare hashes (`#weekly`) are still honoured
 
@@ -481,9 +487,13 @@ Use these semantic elements consistently:
 
 `js/data.json` is **maintained externally** by the project owner. Day-to-day venue edits happen in a local-only curator tool that lives outside this repo (at the owner's `~/karaoke-curator/`). That tool writes `js/data.json`, which is the only venue data file (ADR-008).
 
-**Run `npm run curator:check` before every export.** The curator's Export writes `js/data.json` verbatim from its own master, with nothing in between — so a master that is behind the repo silently reverts whatever landed since it was last synced, and every other gate stays green (`validate-data.js` checks the file against the schema, not against what it replaced). A 17-day-stale master would have destroyed #229's contrast palette and #228's live event; the check exits non-zero only when the repo holds content the export would drop, and skips cleanly when no master is present (#237).
+**Run `npm run curator:check` before every export.** The curator's Export writes `js/data.json` verbatim from its own master, with nothing in between — so a master that is behind the repo silently reverts whatever landed since it was last synced, and every other gate stays green (`validate-data.js` checks the file against the schema, not against what it replaced). A 17-day-stale master would have destroyed #229's contrast palette and #228's live event; the check exits non-zero only when the repo holds content the export would drop, and skips cleanly when no master is present (#237). Schedule entries match on everything **except** `lastVerified`, which is compared by direction on its own (#246): a show stamped in the master but not yet exported is a pending line, while a repo date the master lacks or trails is fatal.
 
 The curator runs on **:8765** via `node server.js` (its `start.cmd`), with its own site preview on **:8766**. Serving it from a static file server instead makes browsing work while Save and Export both fail with `501 Unsupported method ('POST')`.
+
+**Re-verifying a show is a one-click stamp in the curator** (#257). Every schedule row in the venue form, and every row of the dashboard's Shows / Overdue / Never verified tabs, has a ✓ that writes today's date into that entry's `lastVerified`; "✓ all" stamps every show at a venue. The dashboard ages the dates against a 60-day threshold and lists what is overdue or never verified. The date is public — it survives export — but no visitor-facing surface renders it by default; the opt-in `?fresh=1` lens is #259.
+
+**An announcement is the strongest stamp** (#264 curator, #263 repo). The 📣 on a schedule row (or a dashboard show row) records a flier, ad, post or text — the date seen, the night it refers to, the wording, a source link, an image uploaded into `~/karaoke-curator/announcements/<venue>/` — as curator-private `_announcements` history, and sets `lastVerified` to that date with `verifiedBy: "announcement"` and, for a recurring show, `announcedFor`. That night's calendar card then carries a public "Announced" line. Any plain check (✓ today, ✓ all, the dashboard ✓, a hand-edited date) drops the level back to check and clears the announced night; an older flier is recorded without moving the clock backwards. `curator:check` treats every underscore-prefixed key as curator-private and compares the verification fields by direction.
 
 If you're a contributor (or a Claude session that needs to add a venue inside this repo):
 
@@ -543,6 +553,8 @@ When enabled:
 - A "Debug Mode" indicator appears in the top-right corner
 - Venue cards show their schedule match reason (e.g., "Every Friday", "First Saturday")
 - Hover over cards for detailed match info
+
+**Freshness lens** (`?fresh=1`, #259) is the sibling lens for data age: every calendar card gets "✓ Verified Aug 28 · 6d", "📣 Announced Sep 6 · today" when the venue or host announced it (#263), or "Not verified"; the detail schedule table grows a Verified column on all four surfaces, and the KJ dossier annotates each show. URL-only (no `localStorage`), off by default, and `renderFreshness()` returns `''` when off — so the public page emits no new markup, which `e2e/fresh-lens.spec.js` asserts. The curator's Preview button opens the site with it on.
 
 <!-- ============================================================
      WORKING IN THIS PROJECT
@@ -640,6 +652,7 @@ Current ADRs:
 - [ADR-011](docs/adr/011-entity-link-contract.md) — Entity link contract: every linkable thing is `{type, id}` over a registry with stable ids
 - [ADR-012](docs/adr/012-generated-entity-pages.md) — Adopt a build step: static entity pages generated from `js/data.json`
 - [ADR-013](docs/adr/013-show-centric-presentation.md) — Venue-rooted storage, registry identity, show-centric presentation: the **show** (a derived `{venue, schedule entry}` pair) is the unit of display; storage stays venue-rooted; series are represented by their host registry entry
+- [ADR-014](docs/adr/014-tag-colors-authored-css.md) — Tag colours are authored CSS; `data.json` is purely factual
 
 ## Security Considerations
 - Always use `escapeHtml()` when rendering user-provided content

@@ -436,11 +436,9 @@
  * inline-style call sites: `.venue-tag` in the directory and `.tag-badge` on
  * the submit form. Both are this now (#166).
  *
- * Colours come from data.json's tagDefinitions, so they cannot be written here.
- * initTagConfig() in js/utils/tags.js injects one stylesheet keyed on
- * `[data-tag]` at load, which is what replaced the inline `style=` on both
- * sites. A tag with no definition simply falls back to the neutral surface
- * below rather than rendering unstyled.
+ * Colours are authored in the per-tag palette below (ADR-014) — data.json's
+ * tagDefinitions carry labels only. A tag with no rule there simply falls back
+ * to the neutral surface here rather than rendering unstyled.
  */
 .tag {
     display: inline-block;
@@ -453,6 +451,39 @@
     color: var(--text-primary);
     text-decoration: none;
 }
+
+/* Per-tag palette — authored here, not in data (ADR-014, #238).
+ *
+ * These colours used to live in data.json's tagDefinitions and were injected
+ * as a runtime stylesheet by initTagConfig() (#166 — which replaced two inline
+ * style= call sites; that reasoning still holds, this is authored CSS, not a
+ * return to inline styles). Moving them here makes data.json purely factual —
+ * the curator's file of facts (ADR-013 storage layer) — so a stale curator
+ * export can never revert design work again, as it nearly did to #229.
+ *
+ * The values ARE the #229 WCAG pass: bright chips keep their brand colour and
+ * carry dark ink (#1f2937); deep chips keep white text and were darkened to
+ * clear 4.5:1. Rerun axe color-contrast before changing any pair.
+ * A tag with no rule here falls back to the neutral surface above. */
+.tag[data-tag="dedicated"] { background: #673ab7; color: #fff; }
+.tag[data-tag="lgbtq"] { background: #c805e9; color: #fff; }
+.tag[data-tag="dive"] { background: #8d6e63; color: #fff; }
+.tag[data-tag="sports-bar"] { background: #4caf50; color: #1f2937; }
+.tag[data-tag="country-bar"] { background: #ff9800; color: #1f2937; }
+.tag[data-tag="21+"] { background: #e91c0d; color: #fff; }
+.tag[data-tag="18+"] { background: #ffc107; color: #333; }
+.tag[data-tag="all-ages"] { background: #2196f3; color: #1f2937; }
+.tag[data-tag="family-friendly"] { background: #03a9f4; color: #1f2937; }
+.tag[data-tag="smoking-inside"] { background: #e90707; color: #fff; }
+.tag[data-tag="restaurant"] { background: #795548; color: #fff; }
+.tag[data-tag="outdoor"] { background: #4caf50; color: #1f2937; }
+.tag[data-tag="live-band-karaoke"] { background: #9c27b0; color: #fff; }
+.tag[data-tag="billiards"] { background: #5e7b88; color: #fff; }
+.tag[data-tag="brewery"] { background: #ff5722; color: #1f2937; }
+.tag[data-tag="games"] { background: #00bcd4; color: #1f2937; }
+.tag[data-tag="craft-cocktails"] { background: #e6175d; color: #fff; }
+.tag[data-tag="neighborhood"] { background: #9e9e9e; color: #1f2937; }
+.tag[data-tag="special-event"] { background: #e6175d; color: #ffffff; }
 
 /* Hover/focus land on every tag, anchor or not, so wiring a destination later
    (a future `?tag=` link — ADR-011) needs no new component. Nothing is linked
@@ -1093,6 +1124,23 @@ a.tag:focus-visible {
     font-size: var(--font-size-xs);
 }
 
+/* Announced for this night (#263) — the venue or host published it. Sits with
+   the special-event line: the two per-occurrence signals share one accent. */
+.venue-card__announced {
+    font-size: var(--font-size-sm);
+    color: var(--color-accent-special-event);
+    font-weight: 600;
+    margin-top: 2px;
+    margin-bottom: var(--spacing-xs);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.venue-card__announced i {
+    font-size: var(--font-size-xs);
+}
+
 /* Event URL links (compact card + schedule list) */
 .venue-card__event-link {
     color: inherit;
@@ -1319,6 +1367,58 @@ a.tag:focus-visible {
 
 .debug-indicator i {
     font-size: var(--font-size-sm);
+}
+
+/* ============================================================================
+   Freshness lens
+   Enable with ?fresh=1 in URL (#259). Reveals each show's lastVerified on the
+   calendar cards, the detail schedule table and the KJ dossier. Nothing here
+   matches unless the lens emitted the markup, so the default page is untouched.
+   ============================================================================ */
+
+.fresh-indicator {
+    position: fixed;
+    top: var(--spacing-sm);
+    right: var(--spacing-sm);
+    background: var(--color-success);
+    color: var(--color-gray-900);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    z-index: var(--z-toast);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+/* Both lenses on: stack the badges rather than overlap them */
+.debug-mode .fresh-indicator {
+    top: calc(var(--spacing-sm) + 2rem);
+}
+
+.venue-card__verified,
+.venue-detail__verified,
+.kj-dossier__verified {
+    color: var(--text-muted);
+    font-size: var(--font-size-xs);
+    white-space: nowrap;
+}
+
+.venue-card__verified {
+    margin-top: var(--spacing-xs);
+}
+
+.venue-card__verified--fresh,
+.venue-detail__verified--fresh,
+.kj-dossier__verified--fresh {
+    color: var(--color-success);
+}
+
+.venue-card__verified--overdue,
+.venue-detail__verified--overdue,
+.kj-dossier__verified--overdue {
+    color: var(--color-warning);
 }
 
 /* ============================================================================
