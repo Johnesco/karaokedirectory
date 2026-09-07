@@ -78,7 +78,9 @@ function scheduleEntryLabel(entry, { short = false } = {}) {
  * Under the freshness lens (?fresh=1, #259) a Verified column is added too,
  * on the same conditional pattern — so the four surfaces that share this
  * table (modal, desktop pane, map expanded card, A–Z full card) all get it
- * from one place, and the default page's markup is untouched.
+ * from one place, and the default page's markup is untouched. It appears only
+ * when some show here is verified (#267): an unverified show says nothing,
+ * so a venue with nothing verified gets no column at all.
  * @param {Object} venue - Full venue object (needs .schedule and optionally .host)
  * @returns {string} HTML string for schedule table
  */
@@ -89,7 +91,7 @@ export function renderScheduleTable(venue) {
     }
 
     const showHostColumn = hasPerShowHosts(venue);
-    const showVerifiedColumn = isFreshLens();
+    const showVerifiedColumn = isFreshLens() && schedule.some(entry => entry.lastVerified);
 
     const rows = schedule.map(entry => {
         const formatted = formatScheduleEntry(entry, { showEvery: true });
@@ -103,8 +105,8 @@ export function renderScheduleTable(venue) {
             ? `<td data-label="Host">${escapeHtml(formatHostDisplay(resolveHostFor(venue, entry)))}</td>`
             : '';
 
-        // Never an empty cell: "Not verified" is the point of the column, and
-        // the <480px layout hides empty cells (td:empty).
+        // An unverified show leaves the cell empty, and the <480px stacked
+        // layout hides empty cells (td:empty) — which is the point (#267).
         const verifiedCell = showVerifiedColumn
             ? `<td data-label="Verified">${renderFreshness(entry, { block: 'venue-detail' })}</td>`
             : '';

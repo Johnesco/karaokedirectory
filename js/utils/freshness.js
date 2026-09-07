@@ -44,10 +44,12 @@ export function isFreshLens() {
 }
 
 /**
- * One show's freshness as markup: "✓ Verified Aug 28 · 6d", "📣 Announced
- * Sep 6 · today" when the evidence is an announcement (#263), or "Not
- * verified" — with the state as a BEM modifier on the caller's block so each
- * surface can colour it. Empty string when the lens is off.
+ * One show's freshness as markup: "✓ Verified Aug 28 · 6d", or "📣 Announced
+ * Sep 6 · today" when the evidence is an announcement (#263) — with the state
+ * as a BEM modifier on the caller's block so each surface can colour it.
+ * Empty string when the lens is off, and ALSO for an unverified show (#267):
+ * the lens is an internal testing aid, and a card with nothing to say should
+ * say nothing.
  *
  * @param {Object} entry - Schedule entry (reads `lastVerified`, `verifiedBy`)
  * @param {Object} [options]
@@ -60,10 +62,8 @@ export function renderFreshness(entry, { block = 'venue-card', tag = 'span', now
     if (!lensOn) return '';
 
     const f = freshnessOf(entry, now);
+    if (f.state === 'never') return '';
     const cls = `${block}__verified ${block}__verified--${f.state}`;
-    if (f.state === 'never') {
-        return `<${tag} class="${cls}">Not verified</${tag}>`;
-    }
 
     const when = formatDateMonthDay(f.iso, now ? { now } : {});
     const age = f.days < 0 ? 'future' : f.days === 0 ? 'today' : `${f.days}d`;
