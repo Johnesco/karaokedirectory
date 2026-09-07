@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.44
+**Version:** 1.0.45
 **Last updated:** September 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -352,8 +352,8 @@ Displays "X of Y venues have map coordinates" at the bottom. If some venues lack
 
 > **Implementation note — the deep-link guard.** Leaflet is loaded from a CDN
 > after the view renders, so a MapView can be destroyed while its load is still
-> in flight. `app.js` boots `?view=map` with two `renderView()` calls (the
-> `setState` notification plus the explicit call), which is exactly that case.
+> in flight. `app.js` used to boot `?view=map` with two `renderView()` calls (the
+> `setState` notification plus the explicit call), which was exactly that case.
 > Until #215 the dead instance still ran `initMap()` and claimed the live
 > instance's container; the survivor threw "Map container is already
 > initialized", kept `this.map` null, and every `updateMarkers()` returned early.
@@ -361,6 +361,12 @@ Displays "X of Y venues have map coordinates" at the bottom. If some venues lack
 > the date filter, the dedicated toggle, and search all silently did nothing —
 > but only when the map was entered by URL, which is how shared links arrive.
 > `MapView.destroyed` is set in `onDestroy()` and checked before `initMap()`.
+>
+> **The double render itself is gone since #218** — `app.js` seeds `view` state
+> before subscribing, so a deep link renders once like the default does. Both
+> halves stay: the guard protects any future view that does async work in
+> `afterRender()`, and an e2e test asserts a non-default deep link costs no more
+> renders of `#main-content` than `?view=weekly`.
 
 ---
 
@@ -1690,6 +1696,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-09 | 1.0.42 | #259: The freshness lens. `?fresh=1` reveals each show's `lastVerified` — "✓ Verified Aug 28 · 6d" or "Not verified" — on the calendar cards, as a Verified column in the detail schedule table on all four surfaces, and on the KJ dossier's show rows, with a corner indicator. URL-only and off by default: the owner's answer to the display question ADR-013 §4 deferred is that visitors see nothing unless they ask. New `js/utils/freshness.js`; `readLocation()` gains `fresh`; `date.js` gains `formatDateMonthDay()` (now also used for upcoming closures and the "Also" list), `daysSince()`, `freshnessOf()` and `FRESHNESS_HORIZON_DAYS`. New §18 subsection; §7 and §11 updated. | Claude Code |
 | 2026-08 | 1.0.43 | #238: Tag colours moved from `data.json` to authored CSS (ADR-014). `tagDefinitions` now carries labels only — 38 presentation values left the curator's file, `initTagConfig()` stopped injecting a stylesheet, and `buildTagStyles` plus its colour-validation machinery were deleted. The authored rules preserve the #229 WCAG palette exactly (axe verified 0 violations). Schema accepts the old fields as documented-ignored so a stale master cannot hard-fail CI; `validate-data.js` warns instead. The curator master was migrated in the same change. Section 12 rewritten; its Color column — which had drifted to the pre-#229 values — removed. | Claude Code |
 | 2026-09 | 1.0.44 | #263: Announcements. Schedule entries gain `verifiedBy` (`announcement` \| `check` — the evidence behind `lastVerified`; absent reads as check) and `announcedFor` (the night the latest announcement referred to), with `dependentRequired` so `announcedFor` ⇒ `verifiedBy` ⇒ `lastVerified`. The weekly calendar card carries a public "📣 Announced" line on that night (`.venue-card__announced`, `isAnnouncedOn()`), the `?fresh=1` lens says "Announced Sep 6 · today", the validator warns on an announced night that cannot render, and `curator:check` treats underscore-prefixed keys as curator-private at every level and compares the verification fields by direction. `date.js` gains `toLocalISO()`, folding two inline copies. The announcement itself stays in the curator (#264). Sections 6, 11, 18 updated; ADR-013 addendum. | Claude Code |
+| 2026-08 | 1.0.45 | #218: `app.js` rendered the initial view twice on any deep link that named a non-default view. `setState({ view })` notified the `view` subscriber *and* the explicit `renderView()` ran, so a view was built, destroyed and rebuilt before first paint; `?view=weekly` rendered once only because `setState` stays quiet when the value already matches. State is now seeded before the subscription, so one render covers both cases — the same ordering `hostFilter` already relied on. This was the root cause behind the frozen map in #215/#217; `MapView.destroyed` still guards the symptom, since any future view doing async work in `afterRender()` would hit it. Measured 5 renders of `#main-content` to 4 on `?view=map` and `?view=alphabetical`, with `?view=weekly` unchanged. Section 4 implementation note updated. | Claude Code |
 
 ---
 

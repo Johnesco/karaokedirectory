@@ -71,4 +71,47 @@ test.describe('Navigation — view switching & week navigation', () => {
     await expect(page.locator('.map-view')).toBeVisible({ timeout: 10000 });
   });
 
+  // #218: a deep link used to render its view twice — setState notified the
+  // `view` subscriber AND the explicit renderView() ran, so a view was built,
+  // destroyed and rebuilt before first paint. `?view=weekly` rendered once,
+  // because setState only notifies on an actual change.
+  //
+  // Asserted as a comparison rather than an absolute count: what matters is
+  // that a non-default deep link costs no more renders than the default one.
+  // Hard-coding a number would pin unrelated renders from other subscriptions.
+  test('a deep link renders its view no more often than the default does', async ({ page }) => {
+    // Counted from document-start on `document`: module scripts run before
+    // DOMContentLoaded, so a later attach misses the first render, and
+    // documentElement does not exist yet at this point.
+    //
+    // A fresh page per measurement, because addInitScript accumulates — reusing
+    // one page installs a second observer on the next navigation and doubles
+    // the count.
+    const countRenders = async (url, ready) => {
+      const p = await page.context().newPage();
+      await p.addInitScript(() => {
+        window.__renders = 0;
+        new MutationObserver((muts) => {
+          for (const m of muts) {
+            if (m.type === 'childList' && m.target && m.target.id === 'main-content'
+                && m.addedNodes.length) window.__renders++;
+          }
+        }).observe(document, { childList: true, subtree: true });
+      });
+      await p.goto(url);
+      await expect(p.locator(ready).first()).toBeVisible({ timeout: 10000 });
+      const n = await p.evaluate(() => window.__renders);
+      await p.close();
+      return n;
+    };
+
+    const baseline = await countRenders('/?view=weekly', '.day-card');
+    const alphabetical = await countRenders('/?view=alphabetical', '.alphabetical-view');
+    const map = await countRenders('/?view=map', '.map-view');
+
+    expect(baseline).toBeGreaterThan(0);
+    expect(alphabetical).toBeLessThanOrEqual(baseline);
+    expect(map).toBeLessThanOrEqual(baseline);
+  });
+
 });
