@@ -79,7 +79,7 @@ describe('readLocation — query', () => {
     it('defaults cleanly on a bare URL', () => {
         at(ORIGIN + '/');
         assert.deepEqual(readLocation(), {
-            view: null, venueId: null, hostFilter: '', debug: false, isLegacyHashView: false,
+            view: null, venueId: null, hostFilter: '', debug: false, fresh: false, isLegacyHashView: false,
         });
     });
 });

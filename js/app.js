@@ -15,6 +15,7 @@ import { MapView } from './views/MapView.js';
 import { KJDossierView } from './views/KJDossierView.js';
 import { KJIndexView } from './views/KJIndexView.js';
 import { initDebugMode, isDebugMode } from './utils/debug.js';
+import { initFreshLens } from './utils/freshness.js';
 import { initTagConfig } from './utils/tags.js';
 import { readLocation, writeLocation, onLocationChange, resolveView, DEFAULT_VIEW } from './core/router.js';
 import { initFabs } from './components/fabs.js';
@@ -62,6 +63,10 @@ async function init() {
 
     // Initialize debug mode (check for ?debug=1 in URL)
     initDebugMode();
+
+    // Freshness lens (?fresh=1, #259). The router reads the URL; this only
+    // takes the answer.
+    initFreshLens(readLocation().fresh);
 
     // Load venue data
     await loadData();
@@ -116,10 +121,6 @@ async function init() {
         writeLocation({ venueId: null });
     });
 
-    // Subscribe to view changes. renderView() reads state itself, so it cannot
-    // be handed a stale view name.
-    subscribe('view', () => renderView());
-
     const location = readLocation();
     const initialView = location.view || DEFAULT_VIEW;
 
@@ -127,10 +128,28 @@ async function init() {
         setState({ hostFilter: location.hostFilter });
     }
 
-    // Sync state to match the URL-driven initial view, then render.
-    // setState alone won't trigger the subscriber if the value matches the
-    // default ('weekly'), so we always call renderView explicitly as well.
+    // Seed state from the URL BEFORE subscribing, then render exactly once.
+    //
+    // Order matters. With the subscription in place first, `?view=map` rendered
+    // twice: setState notified the subscriber (setState only notifies on an
+    // actual change), and the explicit renderView() below ran again — building,
+    // destroying and rebuilding a view before the first paint. `?view=weekly`
+    // rendered once, because the value already matched the default and setState
+    // stayed quiet. The explicit call existed to cover exactly that case.
+    //
+    // Seeding first makes the notify impossible, so one render covers both. The
+    // hostFilter setState above already relies on the same ordering — its
+    // subscriber is registered further down.
+    //
+    // This was the root cause behind the frozen map in #215/#217: MapView loads
+    // Leaflet from a CDN after render, so the discarded first instance finished
+    // initialising into the live one's container. That symptom is separately
+    // guarded by `MapView.destroyed`; this removes the cause (#218).
     setState({ view: initialView });
+
+    // renderView() reads state itself, so it cannot be handed a stale view name.
+    subscribe('view', () => renderView());
+
     renderView();
 
     // Keep ?kj= in the URL in sync with hostFilter state and re-render the view

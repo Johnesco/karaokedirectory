@@ -98,8 +98,11 @@ function parseHash(rawHash) {
  * shareable form and `#view=` exists for in-session deep links. A bare legacy
  * hash (`#weekly`) is still honoured — those links are in the wild.
  *
+ * `fresh` is the freshness lens (#259): URL-only by decision, so unlike
+ * `debug` it has no localStorage twin.
+ *
  * @returns {{view: string|null, venueId: string|null, hostFilter: string,
- *            debug: boolean, isLegacyHashView: boolean}}
+ *            debug: boolean, fresh: boolean, isLegacyHashView: boolean}}
  */
 export function readLocation() {
     const query = new URLSearchParams(window.location.search);
@@ -119,6 +122,7 @@ export function readLocation() {
         venueId: typeof hash.venue === 'string' && hash.venue ? hash.venue : null,
         hostFilter: query.get('kj') || '',
         debug: query.get('debug') === '1',
+        fresh: query.get('fresh') === '1',
         isLegacyHashView: !!legacyView,
     };
 }

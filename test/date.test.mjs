@@ -30,6 +30,12 @@ import {
   formatTimeRange,
   getWeekRange,
   startOfToday,
+  formatDateMonthDay,
+  daysSince,
+  freshnessOf,
+  FRESHNESS_HORIZON_DAYS,
+  toLocalISO,
+  isAnnouncedOn,
 } from '../js/utils/date.js';
 
 // January 2026 has five Fridays: 2, 9, 16, 23, 30.
@@ -357,5 +363,70 @@ describe('time formatting', () => {
   it('formatTimeRange shows "Close" when there is no end time', () => {
     assert.equal(formatTimeRange('21:00', null), '9:00 PM - Close');
     assert.equal(formatTimeRange('21:00', undefined), '9:00 PM - Close');
+  });
+});
+
+// ---- Freshness (#246, #259) -------------------------------------------------
+// `now` is injected everywhere so these hold on any day the suite runs.
+describe('freshness helpers', () => {
+  const SEP = (d) => new Date(2026, 8, d);   // September 2026
+
+  it('formatDateMonthDay drops the year inside the current year and keeps it otherwise', () => {
+    assert.equal(formatDateMonthDay('2026-08-28', { now: SEP(6) }), 'Aug 28');
+    assert.equal(formatDateMonthDay('2025-08-28', { now: SEP(6) }), 'Aug 28, 2025');
+  });
+
+  it('daysSince counts whole days at local midnight, negative for the future', () => {
+    assert.equal(daysSince('2026-09-06', SEP(6)), 0);
+    assert.equal(daysSince('2026-08-28', SEP(6)), 9);
+    assert.equal(daysSince('2026-09-07', SEP(6)), -1);
+    // A span crossing the March DST change still counts calendar days.
+    assert.equal(daysSince('2026-03-01', new Date(2026, 2, 15)), 14);
+  });
+
+  it('freshnessOf: absent is "never", inside the horizon is fresh, past it is overdue', () => {
+    assert.equal(FRESHNESS_HORIZON_DAYS, 60);
+    assert.deepEqual(freshnessOf({}, SEP(6)), { state: 'never', days: null, iso: '' });
+    assert.deepEqual(freshnessOf({ lastVerified: '2026-08-28' }, SEP(6)), { state: 'fresh', days: 9, iso: '2026-08-28' });
+    // Sep 6 minus 60 days is Jul 8: on the horizon is still fresh, one day past it is not.
+    assert.equal(freshnessOf({ lastVerified: '2026-07-08' }, SEP(6)).state, 'fresh');
+    assert.equal(freshnessOf({ lastVerified: '2026-07-07' }, SEP(6)).state, 'overdue');
+  });
+
+  it('toLocalISO is the local calendar day and round-trips parseLocalDate', () => {
+    assert.equal(toLocalISO(SEP(6)), '2026-09-06');
+    assert.equal(toLocalISO(new Date(2026, 0, 1)), '2026-01-01');
+    // Late evening stays on the same local day (toISOString would already be tomorrow in UTC+ zones, or yesterday west of UTC).
+    assert.equal(toLocalISO(new Date(2026, 8, 6, 23, 30)), '2026-09-06');
+    assert.equal(toLocalISO(parseLocalDate('2026-12-31')), '2026-12-31');
+  });
+});
+
+// ---- Announced nights (#263) ----------------------------------------------
+describe('isAnnouncedOn', () => {
+  const SUN = new Date(2026, 8, 6);   // 2026-09-06 is a Sunday
+  const recurring = (over = {}) => ({ frequency: 'every', day: 'Sunday', startTime: '20:00', endTime: '00:00', ...over });
+  const once = (over = {}) => ({ frequency: 'once', date: '2026-09-06', startTime: '20:00', endTime: '23:00', ...over });
+
+  it('marks a recurring show only on the night it was announced for', () => {
+    const e = recurring({ lastVerified: '2026-09-06', verifiedBy: 'announcement', announcedFor: '2026-09-06' });
+    assert.equal(isAnnouncedOn(e, SUN), true);
+    assert.equal(isAnnouncedOn(e, new Date(2026, 8, 13)), false);   // next Sunday
+  });
+
+  it('marks a one-time show on its own date when the evidence is an announcement', () => {
+    assert.equal(isAnnouncedOn(once({ lastVerified: '2026-09-05', verifiedBy: 'announcement' }), SUN), true);
+    assert.equal(isAnnouncedOn(once({ lastVerified: '2026-09-05', verifiedBy: 'announcement', date: '2026-09-07' }), SUN), false);
+  });
+
+  it('needs the announcement level — a later plain check clears the marker', () => {
+    assert.equal(isAnnouncedOn(recurring({ lastVerified: '2026-09-06', announcedFor: '2026-09-06' }), SUN), false);
+    assert.equal(isAnnouncedOn(recurring({ lastVerified: '2026-09-06', verifiedBy: 'check', announcedFor: '2026-09-06' }), SUN), false);
+    assert.equal(isAnnouncedOn(once({ lastVerified: '2026-09-05' }), SUN), false);
+  });
+
+  it('is false for nothing to compare', () => {
+    assert.equal(isAnnouncedOn(null, SUN), false);
+    assert.equal(isAnnouncedOn(recurring({ verifiedBy: 'announcement', announcedFor: '2026-09-06' }), null), false);
   });
 });

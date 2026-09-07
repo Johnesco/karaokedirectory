@@ -172,10 +172,7 @@ export function scheduleMatchesDate(schedule, date) {
     // reason: an irregular date is genuinely a departure from the recurring
     // baseline, which is what Display Philosophy §4 marks.
     if (frequency === 'once') {
-        const y = date.getFullYear();
-        const m = String(date.getMonth() + 1).padStart(2, '0');
-        const d = String(date.getDate()).padStart(2, '0');
-        return schedule.date === `${y}-${m}-${d}`;
+        return schedule.date === toLocalISO(date);
     }
 
     // Check if day of week matches
@@ -227,10 +224,7 @@ export function scheduleMatchesDate(schedule, date) {
 export function getScheduleExclusion(schedule, date) {
     if (!schedule?.exclusions?.length) return null;
 
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, '0');
-    const d = String(date.getDate()).padStart(2, '0');
-    const dateStr = `${y}-${m}-${d}`;
+    const dateStr = toLocalISO(date);
 
     // Objects only. A bare `"2026-12-25"` string used to be accepted here and
     // was documented in CLAUDE.md as valid — but the schema requires an object
@@ -377,6 +371,20 @@ export function parseLocalDate(s) {
 }
 
 /**
+ * The inverse of parseLocalDate: a Date's LOCAL calendar day as YYYY-MM-DD.
+ * `toISOString().slice(0, 10)` is the UTC day, which is yesterday's date every
+ * evening west of UTC — the same trap parseLocalDate guards on the way in.
+ * @param {Date} date
+ * @returns {string} YYYY-MM-DD
+ */
+export function toLocalISO(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+}
+
+/**
  * Check if a date is within a range
  * @param {Date} date - Date to check
  * @param {string|null} startDate - Start date as YYYY-MM-DD
@@ -462,6 +470,77 @@ export function formatActivePeriodText(activePeriod) {
     }
 
     return '';
+}
+
+/**
+ * "Aug 28", or "Aug 28, 2025" when the year is not the current one — the
+ * short form every dated label on the site uses (upcoming closures, the
+ * "Also …" list, the freshness lens). Absolute on purpose: a relative
+ * "3 weeks ago" reads as a judgment, and rots on anything rendered once.
+ * @param {string} iso - YYYY-MM-DD
+ * @param {Object} [options]
+ * @param {Date} [options.now] - Reference date for the year check (injectable for tests)
+ * @returns {string}
+ */
+export function formatDateMonthDay(iso, { now = new Date() } = {}) {
+    const d = parseLocalDate(iso);
+    const opts = { month: 'short', day: 'numeric' };
+    if (d.getFullYear() !== now.getFullYear()) opts.year = 'numeric';
+    return d.toLocaleDateString('en-US', opts);
+}
+
+/**
+ * Whole days from a YYYY-MM-DD date to `asOf`, both taken at local midnight.
+ * Negative when the date is still ahead. Rounded rather than floored so a DST
+ * change inside the span cannot shave a day off.
+ * @param {string} iso - YYYY-MM-DD
+ * @param {Date} [asOf] - Reference point (defaults to today)
+ * @returns {number}
+ */
+export function daysSince(iso, asOf = startOfToday()) {
+    const from = parseLocalDate(iso);
+    const to = new Date(asOf);
+    to.setHours(0, 0, 0, 0);
+    return Math.round((to - from) / 86400000);
+}
+
+/**
+ * Days after which a show's verification counts as overdue. Sixty is the
+ * "week is the heartbeat" window (Display Philosophy #3), the same horizon
+ * `scripts/validate-data.js` warns past.
+ */
+export const FRESHNESS_HORIZON_DAYS = 60;
+
+/**
+ * How fresh a show's `lastVerified` is (ADR-013 §4, #246). "never" is an
+ * absent date — unrecorded, not wrong — which is why it is its own state
+ * rather than a very large number of days.
+ * @param {Object} entry - Schedule entry
+ * @param {Date} [asOf] - Reference point (defaults to today)
+ * @returns {{ state: 'never'|'fresh'|'overdue', days: number|null, iso: string }}
+ */
+export function freshnessOf(entry, asOf = startOfToday()) {
+    const iso = entry?.lastVerified;
+    if (!iso) return { state: 'never', days: null, iso: '' };
+    const days = daysSince(iso, asOf);
+    return { state: days > FRESHNESS_HORIZON_DAYS ? 'overdue' : 'fresh', days, iso };
+}
+
+/**
+ * Whether a show was announced for a specific night (#263) — the venue or host
+ * published it ("tonight at 8pm"), so that night's card carries the Announced
+ * marker. A recurring entry names the night in `announcedFor`; a one-time
+ * entry's own date is the night, so the announcement level alone is enough.
+ * Both require `verifiedBy: "announcement"` — a later plain check clears it.
+ * @param {Object} entry - Schedule entry
+ * @param {Date} date - The calendar day being rendered
+ * @returns {boolean}
+ */
+export function isAnnouncedOn(entry, date) {
+    if (!entry || !date || entry.verifiedBy !== 'announcement') return false;
+    const iso = toLocalISO(date);
+    if (entry.frequency === 'once') return entry.date === iso;
+    return entry.announcedFor === iso;
 }
 
 /**
