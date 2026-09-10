@@ -409,11 +409,13 @@
           "frequency": "every",
           "day": "Friday",
           "startTime": "21:30",
-          "endTime": "01:30"
+          "endTime": "01:30",
+          "lastVerified": "2026-09-10"
         }
       ],
-      "host": null,
-      "socials": null,
+      "host": {
+        "kjId": "erin-hierholzer"
+      },
       "coordinates": {
         "lat": 30.4790993,
         "lng": -97.6780171
@@ -2845,19 +2847,16 @@
       },
       "schedule": [
         {
-          "frequency": "second",
+          "frequency": "every",
           "day": "Thursday",
           "startTime": "20:00",
-          "endTime": "00:00"
-        },
-        {
-          "frequency": "fourth",
-          "day": "Thursday",
-          "startTime": "20:00",
-          "endTime": "00:00"
+          "endTime": "00:00",
+          "lastVerified": "2026-09-10",
+          "verifiedBy": "announcement"
         }
       ],
       "host": {
+        "kjId": "erin-hierholzer",
         "companyId": "all-about-music"
       },
       "coordinates": {
@@ -2950,17 +2949,18 @@
       "schedule": [
         {
           "frequency": "every",
-          "day": "Monday",
-          "startTime": "20:00",
-          "endTime": "23:00"
+          "day": "Sunday",
+          "startTime": "22:30",
+          "endTime": "01:30",
+          "lastVerified": "2026-09-10"
         }
       ],
       "host": {
         "kjId": "erin-hierholzer"
       },
       "socials": {
-        "instagram": "https://www.instagram.com/the_usual_atx/",
-        "website": "https://theusualatx.bar/"
+        "website": "https://theusualatx.bar/",
+        "instagram": "https://www.instagram.com/the_usual_atx/"
       },
       "coordinates": {
         "lat": 30.3956428,
@@ -3140,14 +3140,16 @@
           "frequency": "every",
           "day": "Wednesday",
           "startTime": "20:00",
-          "endTime": "23:00"
+          "endTime": "00:00",
+          "lastVerified": "2026-09-10"
         }
       ],
-      "host": null,
-      "socials": null,
       "coordinates": {
         "lat": 30.439478,
         "lng": -97.620416
+      },
+      "host": {
+        "kjId": "erin-hierholzer"
       }
     },
     {
