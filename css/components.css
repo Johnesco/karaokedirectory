@@ -1409,6 +1409,14 @@ a.tag:focus-visible {
     margin-top: var(--spacing-xs);
 }
 
+/* Upcoming: the confirmed night has not arrived yet (ADR-015). Shares the
+   special-event accent with the public Announced line it accompanies. */
+.venue-card__verified--upcoming,
+.venue-detail__verified--upcoming,
+.kj-dossier__verified--upcoming {
+    color: var(--color-accent-special-event);
+}
+
 .venue-card__verified--fresh,
 .venue-detail__verified--fresh,
 .kj-dossier__verified--fresh {

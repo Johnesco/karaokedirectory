@@ -3,7 +3,10 @@
  *
  * The contract the e2e suite leans on: with the lens OFF the helper returns
  * '' (so the default page carries no new markup at all); with it ON a
- * verified entry gets a line and an unverified one still gets nothing (#267).
+ * confirmed entry gets a line and an unconfirmed one still gets nothing
+ * (#267). The wording follows the one thing the date says - the night it
+ * confirms (ADR-015) - so it reads forwards before that night, backwards
+ * after.
  * No DOM here — initFreshLens guards its document access, which is what makes
  * it callable from Node.
  */
@@ -32,29 +35,35 @@ describe('renderFreshness', () => {
     assert.equal(renderFreshness(friday({ lastVerified: '' }), { now: NOW }), '');
   });
 
-  it('shows the date and age of a verified show', () => {
+  it('shows the night and how long ago it was, once it has passed', () => {
     initFreshLens(true);
     const html = renderFreshness(friday({ lastVerified: '2026-08-28' }), { now: NOW });
     assert.match(html, /venue-card__verified--fresh/);
     assert.match(html, /Verified Aug 28 · 9d/);
-    assert.match(html, /title="Last verified 2026-08-28"/);
+    assert.match(html, /title="Latest evidence confirms the show on 2026-08-28"/);
   });
 
-  it('words announcement-level evidence as "Announced" with a bullhorn (#263)', () => {
+  it('reads forwards for a night that has not arrived (ADR-015)', () => {
     initFreshLens(true);
-    const html = renderFreshness(friday({ lastVerified: '2026-09-06', verifiedBy: 'announcement' }), { now: NOW });
+    const html = renderFreshness(friday({ lastVerified: '2026-10-02' }), { now: NOW });
     assert.match(html, /fa-bullhorn/);
-    assert.match(html, /Announced Sep 6 · today/);
-    assert.match(html, /venue-card__verified--fresh/);
-    assert.doesNotMatch(html, /Verified Sep/);
-    // A plain check keeps the old wording, with or without the explicit level.
-    assert.match(renderFreshness(friday({ lastVerified: '2026-09-06', verifiedBy: 'check' }), { now: NOW }), /fa-check"><\/i> Verified Sep 6/);
+    assert.match(html, /Announced for Oct 2/);
+    assert.match(html, /venue-card__verified--upcoming/);
+    // No age ahead of the night: "26 days until" is not what a reader wants.
+    assert.doesNotMatch(html, /·/);
   });
 
-  it('marks a show past the 60-day horizon overdue, and a same-day stamp as today', () => {
+  it('says "today" on the night itself, with no evidence level to choose', () => {
+    initFreshLens(true);
+    const html = renderFreshness(friday({ lastVerified: '2026-09-06' }), { now: NOW });
+    assert.match(html, /fa-check"><\/i> Verified today/);
+    assert.match(html, /venue-card__verified--fresh/);
+    assert.doesNotMatch(html, /Sep 6/);
+  });
+
+  it('marks a night past the 60-day horizon overdue', () => {
     initFreshLens(true);
     assert.match(renderFreshness(friday({ lastVerified: '2026-06-01' }), { now: NOW }), /--overdue/);
-    assert.match(renderFreshness(friday({ lastVerified: '2026-09-06' }), { now: NOW }), /· today/);
   });
 
   it("hangs the modifier on the caller's block and honours the tag", () => {

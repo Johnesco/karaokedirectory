@@ -173,6 +173,12 @@ Two deferrals, with triggers in this ADR's own style:
 
 ## Clarification (2026-09-06) — evidence level and announced occurrences
 
+> **Superseded by [ADR-015](015-one-confirmation-per-show-date.md) (2026-09-11).**
+> The evidence *level* described below (`verifiedBy`, `announcedFor`) is removed:
+> a show now carries one date, the night the latest evidence confirms. The rest
+> of ADR-013 stands, including per-show `lastVerified` itself and the
+> derive-don't-store treatment of the marker. Kept for the record.
+
 Appended after the announcements work
 ([#263](https://github.com/Johnesco/karaokedirectory/issues/263),
 [#264](https://github.com/Johnesco/karaokedirectory/issues/264)); measured

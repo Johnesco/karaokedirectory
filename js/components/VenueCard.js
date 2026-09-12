@@ -67,10 +67,11 @@ export class VenueCard extends Component {
         const isSpecialEvent = schedule?.frequency === 'once';
         // Excluded: a recurring entry suppressed on this specific date (e.g. holiday, private event)
         const exclusion = (schedule && date) ? getScheduleExclusion(schedule, date) : null;
-        // Announced: the venue or host published this specific night (#263). A
-        // public marker — the one per-occurrence signal besides the star — because
-        // "they said so themselves, for tonight" is exactly the news a calendar
-        // is for. Data comes from the curator's announcement flow.
+        // Announced: this is the night the latest evidence confirms (ADR-015,
+        // #275) — `lastVerified` IS that night, so the marker is a date match.
+        // A public marker, the one per-occurrence signal besides the star,
+        // because "this one is confirmed for tonight" is exactly the news a
+        // calendar is for. Data comes from the curator's poster flow.
         const announced = (schedule && date) ? isAnnouncedOn(schedule, date) : false;
         // No `venue-card--compact` modifier: the compact card IS the base
         // `.venue-card`, and the modifier carried no rules — it was emitted on
@@ -121,7 +122,7 @@ export class VenueCard extends Component {
                 </h3>
                 ${renderTags(tags, { dedicated: venue.dedicated })}
                 ${eventName ? `<div class="venue-card__event-name"><i class="fa-solid fa-star"></i> ${schedule?.eventUrl ? `<a href="${escapeHtml(sanitizeUrl(schedule.eventUrl) || '')}" target="_blank" rel="noopener noreferrer" class="venue-card__event-link">${escapeHtml(eventName)} <i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : escapeHtml(eventName)}</div>` : ''}
-                ${announced ? `<div class="venue-card__announced" title="Announced by the venue or host for this night (verified ${escapeHtml(schedule.lastVerified || '')})"><i class="fa-solid fa-bullhorn"></i> Announced</div>` : ''}
+                ${announced ? '<div class="venue-card__announced" title="Confirmed for this night"><i class="fa-solid fa-bullhorn"></i> Announced</div>' : ''}
                 ${showSchedule && timeDisplay ? `
                     <div class="venue-card__time">
                         <i class="fa-regular fa-clock"></i> ${frequencyHtml}${timeDisplay}

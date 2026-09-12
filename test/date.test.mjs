@@ -36,6 +36,8 @@ import {
   FRESHNESS_HORIZON_DAYS,
   toLocalISO,
   isAnnouncedOn,
+  nextOccurrence,
+  lastOccurrenceOnOrBefore,
 } from '../js/utils/date.js';
 
 // January 2026 has five Fridays: 2, 9, 16, 23, 30.
@@ -393,6 +395,15 @@ describe('freshness helpers', () => {
     assert.equal(freshnessOf({ lastVerified: '2026-07-07' }, SEP(6)).state, 'overdue');
   });
 
+  it('freshnessOf: a night that has not arrived is "upcoming", not fresh (ADR-015)', () => {
+    // The date is a SHOW date now, so the future is normal rather than a typo:
+    // nothing has decayed, the night simply has not happened.
+    assert.deepEqual(freshnessOf({ lastVerified: '2026-10-01' }, SEP(6)), { state: 'upcoming', days: -25, iso: '2026-10-01' });
+    // The boundary: today is fresh, tomorrow is upcoming.
+    assert.equal(freshnessOf({ lastVerified: '2026-09-06' }, SEP(6)).state, 'fresh');
+    assert.equal(freshnessOf({ lastVerified: '2026-09-07' }, SEP(6)).state, 'upcoming');
+  });
+
   it('toLocalISO is the local calendar day and round-trips parseLocalDate', () => {
     assert.equal(toLocalISO(SEP(6)), '2026-09-06');
     assert.equal(toLocalISO(new Date(2026, 0, 1)), '2026-01-01');
@@ -402,31 +413,82 @@ describe('freshness helpers', () => {
   });
 });
 
-// ---- Announced nights (#263) ----------------------------------------------
+// ---- Announced nights (ADR-015, #275) -------------------------------------
+// `lastVerified` IS the confirmed night, so the marker is a date equality.
+// There is no evidence level and no separate field for recurring shows: a
+// poster and a phone call say the same thing about the same night.
 describe('isAnnouncedOn', () => {
   const SUN = new Date(2026, 8, 6);   // 2026-09-06 is a Sunday
   const recurring = (over = {}) => ({ frequency: 'every', day: 'Sunday', startTime: '20:00', endTime: '00:00', ...over });
   const once = (over = {}) => ({ frequency: 'once', date: '2026-09-06', startTime: '20:00', endTime: '23:00', ...over });
 
-  it('marks a recurring show only on the night it was announced for', () => {
-    const e = recurring({ lastVerified: '2026-09-06', verifiedBy: 'announcement', announcedFor: '2026-09-06' });
+  it('marks the confirmed night and no other', () => {
+    const e = recurring({ lastVerified: '2026-09-06' });
     assert.equal(isAnnouncedOn(e, SUN), true);
-    assert.equal(isAnnouncedOn(e, new Date(2026, 8, 13)), false);   // next Sunday
+    assert.equal(isAnnouncedOn(e, new Date(2026, 8, 13)), false);   // next Sunday: same show, unconfirmed
   });
 
-  it('marks a one-time show on its own date when the evidence is an announcement', () => {
-    assert.equal(isAnnouncedOn(once({ lastVerified: '2026-09-05', verifiedBy: 'announcement' }), SUN), true);
-    assert.equal(isAnnouncedOn(once({ lastVerified: '2026-09-05', verifiedBy: 'announcement', date: '2026-09-07' }), SUN), false);
+  it('treats a one-time show the same way - no special case for its own date', () => {
+    assert.equal(isAnnouncedOn(once({ lastVerified: '2026-09-06' }), SUN), true);
+    // Confirmed for a different night than the event: the marker follows the
+    // confirmation, and the validator warns that it will never render.
+    assert.equal(isAnnouncedOn(once({ lastVerified: '2026-09-07' }), SUN), false);
   });
 
-  it('needs the announcement level — a later plain check clears the marker', () => {
-    assert.equal(isAnnouncedOn(recurring({ lastVerified: '2026-09-06', announcedFor: '2026-09-06' }), SUN), false);
-    assert.equal(isAnnouncedOn(recurring({ lastVerified: '2026-09-06', verifiedBy: 'check', announcedFor: '2026-09-06' }), SUN), false);
-    assert.equal(isAnnouncedOn(once({ lastVerified: '2026-09-05' }), SUN), false);
+  it('marks a future night once the calendar reaches it', () => {
+    const e = recurring({ lastVerified: '2026-10-04' });
+    assert.equal(isAnnouncedOn(e, SUN), false);
+    assert.equal(isAnnouncedOn(e, new Date(2026, 9, 4)), true);
   });
 
   it('is false for nothing to compare', () => {
     assert.equal(isAnnouncedOn(null, SUN), false);
-    assert.equal(isAnnouncedOn(recurring({ verifiedBy: 'announcement', announcedFor: '2026-09-06' }), null), false);
+    assert.equal(isAnnouncedOn(recurring(), SUN), false);          // no date recorded
+    assert.equal(isAnnouncedOn(recurring({ lastVerified: '2026-09-06' }), null), false);
+  });
+});
+
+// ---- Occurrence walks (ADR-015, #275) -------------------------------------
+// The curator imports these rather than carrying its own copy of the schedule
+// rules: `nextOccurrence` is the night a confirmation stamps, and
+// `lastOccurrenceOnOrBefore` is the migration rule for dates recorded under
+// the old "day I saw it" meaning.
+describe('nextOccurrence / lastOccurrenceOnOrBefore', () => {
+  const FRI = parseLocalDate('2026-09-11');   // a Friday
+  const every = (day, over = {}) => ({ frequency: 'every', day, ...over });
+
+  it('returns the day itself when the show runs that day', () => {
+    assert.equal(nextOccurrence(every('Friday'), { from: FRI }), '2026-09-11');
+  });
+
+  it('walks forward to the next matching night', () => {
+    assert.equal(nextOccurrence(every('Sunday'), { from: FRI }), '2026-09-13');
+    assert.equal(nextOccurrence({ frequency: 'first', day: 'Monday' }, { from: FRI }), '2026-10-05');
+    assert.equal(nextOccurrence({ frequency: 'last', day: 'Saturday' }, { from: FRI }), '2026-09-26');
+  });
+
+  it('skips an excluded night', () => {
+    const e = every('Friday', { exclusions: [{ date: '2026-09-11', reason: 'Closed' }] });
+    assert.equal(nextOccurrence(e, { from: FRI }), '2026-09-18');
+  });
+
+  it('handles one-time events: its own date ahead, null once spent', () => {
+    assert.equal(nextOccurrence({ frequency: 'once', date: '2026-12-01' }, { from: FRI }), '2026-12-01');
+    assert.equal(nextOccurrence({ frequency: 'once', date: '2026-01-01' }, { from: FRI }), null);
+  });
+
+  it('returns null past the horizon, and is null-safe', () => {
+    assert.equal(nextOccurrence(every('Friday'), { from: FRI, horizonDays: 0 }), '2026-09-11');
+    assert.equal(nextOccurrence(every('Sunday'), { from: FRI, horizonDays: 1 }), null);
+    assert.equal(nextOccurrence(null), null);
+  });
+
+  it('lastOccurrenceOnOrBefore walks back - the migration rule', () => {
+    // A Friday show stamped on a Thursday: the real night is the Friday before.
+    assert.equal(lastOccurrenceOnOrBefore(every('Friday'), '2026-09-10'), '2026-09-04');
+    assert.equal(lastOccurrenceOnOrBefore(every('Sunday'), '2026-09-10'), '2026-09-06');
+    // A date that already is a real night stays put.
+    assert.equal(lastOccurrenceOnOrBefore(every('Thursday'), '2026-09-10'), '2026-09-10');
+    assert.equal(lastOccurrenceOnOrBefore(every('Friday'), null), null);
   });
 });

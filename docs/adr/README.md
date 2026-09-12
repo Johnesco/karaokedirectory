@@ -22,3 +22,4 @@ Format and threshold rule: see [sdlc-baseline `docs/adrs.md`](https://github.com
 | [012](012-generated-entity-pages.md) | Adopt a build step to generate static entity pages | Accepted |
 | [013](013-show-centric-presentation.md) | Venue-rooted storage, registry identity, show-centric presentation | Accepted |
 | [014](014-tag-colors-authored-css.md) | Tag colours are authored CSS — `data.json` is purely factual | Accepted |
+| [015](015-one-confirmation-per-show-date.md) | One confirmation, anchored to the show date | Accepted |

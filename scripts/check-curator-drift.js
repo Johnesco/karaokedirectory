@@ -49,7 +49,7 @@ const isCuratorOnly = (key) => key.startsWith('_');
 /* Verification fields (#246, #263) are compared by direction, not as identity:
    the curator changes them routinely, and a stamped-but-unexported show must
    read as pending, not as a fatal loss. See compareVenue. */
-const VERIFICATION_FIELDS = new Set(['lastVerified', 'verifiedBy', 'announcedFor']);
+const VERIFICATION_FIELDS = new Set(['lastVerified']);
 
 const REGISTRIES = ['tagDefinitions', 'kjs', 'companies', 'cities'];
 
@@ -132,14 +132,15 @@ function compareVenue(repoV, masterV) {
     // Schedule entries compare as a multiset: order carries no meaning, and two
     // identical entries pair off one-to-one.
     //
-    // `lastVerified` is matched separately (#246). It is the one field the
-    // curator changes routinely — every flier confirmed is a new date — so
+    // `lastVerified` is matched separately (#246, ADR-015). It is the one field
+    // the curator changes routinely — every poster confirmed is a new date — so
     // folding it into the identity would report each stamped-but-unexported
     // show as a fatal loss and bury real drift in noise. An entry's identity
     // is everything EXCEPT that date, and the dates of a matched pair are then
     // compared by direction like any other field: the master being newer is a
     // pending export; the repo being newer, or holding a date the master lacks,
-    // is content the export would strip.
+    // is content the export would strip. Later dates sort later as strings,
+    // which is what makes ">" the right comparison for an ISO date.
     //
     // Editing a show's time AND verifying it in one pass still reports as a
     // lost + pending pair — with no id, an edit is indistinguishable from a
@@ -170,22 +171,11 @@ function compareVenue(repoV, masterV) {
         const rv = r.lastVerified || '';
         const mv = m.lastVerified || '';
         const where = `${repoV.id} ${describeEntry(r)}`;
-        if (rv === mv) {
-            // Same date: the evidence level and the announced night (#263) can
-            // still differ. Absent verifiedBy reads as a plain check. A detail
-            // the repo has and the master lacks is content the export would
-            // strip; anything else is the master having moved on.
-            const detail = (e) => canon({ verifiedBy: e.verifiedBy || 'check', announcedFor: e.announcedFor || '' });
-            if (detail(r) === detail(m)) continue;
-            const repoOnly = (r.verifiedBy && !m.verifiedBy) || (r.announcedFor && !m.announcedFor);
-            if (repoOnly) lost.push(`${where}: repo has verification details the master lacks (${JSON.stringify({ verifiedBy: r.verifiedBy, announcedFor: r.announcedFor })}) — export would strip them`);
-            else pending.push(`${where}: verification details updated in master (${JSON.stringify({ verifiedBy: m.verifiedBy || 'check', announcedFor: m.announcedFor || null })})`);
-            continue;
-        }
-        if (!rv) pending.push(`${where}: verified ${mv} in master, not yet exported`);
-        else if (!mv) lost.push(`${where}: repo verified ${rv}, master has no date — export would strip it`);
-        else if (mv > rv) pending.push(`${where}: re-verified ${mv} in master (repo has ${rv})`);
-        else lost.push(`${where}: repo verified ${rv}, master still ${mv} — export would revert it`);
+        if (rv === mv) continue;
+        if (!rv) pending.push(`${where}: confirmed for ${mv} in master, not yet exported`);
+        else if (!mv) lost.push(`${where}: repo confirmed for ${rv}, master has no date — export would strip it`);
+        else if (mv > rv) pending.push(`${where}: re-confirmed for ${mv} in master (repo has ${rv})`);
+        else lost.push(`${where}: repo confirmed for ${rv}, master still ${mv} — export would revert it`);
     }
     for (const unmatched of pool.values()) {
         for (const e of unmatched) pending.push(`${repoV.id} new schedule entry in master: ${describeEntry(e)}`);

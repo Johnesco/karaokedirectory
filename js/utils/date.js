@@ -512,35 +512,92 @@ export function daysSince(iso, asOf = startOfToday()) {
 export const FRESHNESS_HORIZON_DAYS = 60;
 
 /**
- * How fresh a show's `lastVerified` is (ADR-013 §4, #246). "never" is an
- * absent date — unrecorded, not wrong — which is why it is its own state
- * rather than a very large number of days.
+ * How fresh a show's `lastVerified` is (ADR-015, #275). The date is a SHOW
+ * date — the night the latest evidence confirms — so it can sit in the
+ * future, which is its own state: nothing has decayed yet, the night simply
+ * has not arrived. "never" is an absent date — unrecorded, not wrong — which
+ * is why it too is a state rather than a very large number of days.
  * @param {Object} entry - Schedule entry
  * @param {Date} [asOf] - Reference point (defaults to today)
- * @returns {{ state: 'never'|'fresh'|'overdue', days: number|null, iso: string }}
+ * @returns {{ state: 'never'|'upcoming'|'fresh'|'overdue', days: number|null, iso: string }}
  */
 export function freshnessOf(entry, asOf = startOfToday()) {
     const iso = entry?.lastVerified;
     if (!iso) return { state: 'never', days: null, iso: '' };
     const days = daysSince(iso, asOf);
+    if (days < 0) return { state: 'upcoming', days, iso };
     return { state: days > FRESHNESS_HORIZON_DAYS ? 'overdue' : 'fresh', days, iso };
 }
 
 /**
- * Whether a show was announced for a specific night (#263) — the venue or host
- * published it ("tonight at 8pm"), so that night's card carries the Announced
- * marker. A recurring entry names the night in `announcedFor`; a one-time
- * entry's own date is the night, so the announcement level alone is enough.
- * Both require `verifiedBy: "announcement"` — a later plain check clears it.
+ * Whether this night is the one the latest evidence confirms (ADR-015, #275),
+ * so its calendar card carries the Announced marker.
+ *
+ * `lastVerified` IS the confirmed night, so this is a date equality and nothing
+ * more — no evidence level to consult, no separate field for recurring shows,
+ * no special case for one-time ones. The marker stays per occurrence rather
+ * than per entry: the same derive-don't-store move as the special-event star.
+ *
  * @param {Object} entry - Schedule entry
  * @param {Date} date - The calendar day being rendered
  * @returns {boolean}
  */
 export function isAnnouncedOn(entry, date) {
-    if (!entry || !date || entry.verifiedBy !== 'announcement') return false;
-    const iso = toLocalISO(date);
-    if (entry.frequency === 'once') return entry.date === iso;
-    return entry.announcedFor === iso;
+    if (!entry?.lastVerified || !date) return false;
+    return entry.lastVerified === toLocalISO(date);
+}
+
+/**
+ * The first date on or after `from` that this show runs — its next night.
+ * Walks forward one day at a time with the real matcher, so every frequency,
+ * and any exclusion, is honoured by construction rather than re-implemented.
+ *
+ * This is what the curator stamps when a poster or a phone call confirms a
+ * show: it imports this module rather than carrying its own copy of the
+ * schedule rules (#276).
+ *
+ * @param {Object} entry - Schedule entry
+ * @param {Object} [options]
+ * @param {Date} [options.from] - Earliest date to consider (defaults to today)
+ * @param {number} [options.horizonDays=366] - How far forward to look
+ * @returns {string|null} YYYY-MM-DD, or null if it does not run inside the horizon
+ */
+export function nextOccurrence(entry, { from = startOfToday(), horizonDays = 366 } = {}) {
+    if (!entry) return null;
+    const cursor = new Date(from);
+    cursor.setHours(0, 0, 0, 0);
+    for (let i = 0; i <= horizonDays; i += 1) {
+        if (scheduleMatchesDate(entry, cursor) && !getScheduleExclusion(entry, cursor)) {
+            return toLocalISO(cursor);
+        }
+        cursor.setDate(cursor.getDate() + 1);
+    }
+    return null;
+}
+
+/**
+ * The latest date on or before `iso` that this show runs. The mirror of
+ * `nextOccurrence`, and the migration rule for dates recorded under the old
+ * model (#275): a stamp used to mean "the day I saw the evidence", which is
+ * often not a night the show runs, so it moves BACK to the last real night.
+ * Backwards and never forwards — moving it forward would put a public
+ * Announced line on a night nothing has confirmed yet.
+ *
+ * @param {Object} entry - Schedule entry
+ * @param {string} iso - YYYY-MM-DD to search back from (inclusive)
+ * @param {number} [horizonDays=366] - How far back to look
+ * @returns {string|null} YYYY-MM-DD, or null if it does not run inside the horizon
+ */
+export function lastOccurrenceOnOrBefore(entry, iso, horizonDays = 366) {
+    if (!entry || !iso) return null;
+    const cursor = parseLocalDate(iso);
+    for (let i = 0; i <= horizonDays; i += 1) {
+        if (scheduleMatchesDate(entry, cursor) && !getScheduleExclusion(entry, cursor)) {
+            return toLocalISO(cursor);
+        }
+        cursor.setDate(cursor.getDate() - 1);
+    }
+    return null;
 }
 
 /**

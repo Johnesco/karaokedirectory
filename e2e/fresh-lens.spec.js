@@ -15,7 +15,13 @@ function todayLocalISO() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-/** Serve data.json with lastVerified = today on every schedule entry. */
+/**
+ * Serve data.json with every schedule entry confirmed for today.
+ *
+ * Today rather than a past date because the lens words the line from the
+ * confirmed night (ADR-015): today reads "Verified today" on every surface,
+ * with no dependence on which day the suite happens to run.
+ */
 async function stampEveryEntry(page) {
   const iso = todayLocalISO();
   await page.route('**/js/data.json', async (route) => {
@@ -66,7 +72,7 @@ test.describe('Freshness lens (?fresh=1)', () => {
     const lines = page.locator('.day-card .venue-card .venue-card__verified');
     expect(await cards.count()).toBeGreaterThan(0);
     expect(await lines.count()).toBe(await cards.count());
-    await expect(lines.first()).toContainText(/Verified .* · today/);
+    await expect(lines.first()).toContainText('Verified today');
   });
 
   test('adds a Verified column to the detail schedule table once shows are stamped', async ({ page }) => {

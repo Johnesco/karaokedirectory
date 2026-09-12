@@ -132,7 +132,7 @@ Know a karaoke spot that's missing? You can:
       startTime: "21:00",     // 24-hour format
       endTime: "01:00",       // Can cross midnight (optional)
       eventUrl: "https://...", // Optional: link to event page
-      lastVerified: "2026-08-28" // Optional: date a human last confirmed this show (never backfilled)
+      lastVerified: "2026-10-02" // Optional: the show date the latest evidence confirms; may be in the future
     },
     {
       frequency: "once",      // One-time special event
@@ -197,9 +197,9 @@ Tags are defined in `js/data.json` (id and label); their colours are authored in
 
 Append `?debug=1` to the URL to see schedule match reasons on venue cards.
 
-Append `?fresh=1` to see when each verified show was last confirmed ("Verified Aug 28 · 6d", or "Announced Sep 6 · today" when the venue or host announced it) on cards, in the detail schedule table, and on KJ pages. Shows nobody has verified yet show nothing. Off by default — nothing changes for visitors who don't ask.
+Append `?fresh=1` to see which night each show was last confirmed for — "Announced for Oct 1" before that night, "Verified today" on it, "Verified Aug 28 · 9d" after — on cards, in the detail schedule table, and on KJ pages. Shows nobody has confirmed yet show nothing. Off by default — nothing changes for visitors who don't ask.
 
-One thing every visitor does see: when a venue or host has announced a particular night ("tonight at 8pm"), that night's calendar card carries an "Announced" line, the way a one-time show carries its star.
+One thing every visitor does see: when a particular night has been confirmed — a flier, a post, a phone call — that night's calendar card carries an "Announced" line, the way a one-time show carries its star.
 
 ## Contributing
 

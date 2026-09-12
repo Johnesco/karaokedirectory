@@ -410,7 +410,7 @@
           "day": "Friday",
           "startTime": "21:30",
           "endTime": "01:30",
-          "lastVerified": "2026-09-10"
+          "lastVerified": "2026-09-04"
         }
       ],
       "host": {
@@ -2851,8 +2851,7 @@
           "day": "Thursday",
           "startTime": "20:00",
           "endTime": "00:00",
-          "lastVerified": "2026-09-10",
-          "verifiedBy": "announcement"
+          "lastVerified": "2026-09-10"
         }
       ],
       "host": {
@@ -2952,7 +2951,7 @@
           "day": "Sunday",
           "startTime": "22:30",
           "endTime": "01:30",
-          "lastVerified": "2026-09-10"
+          "lastVerified": "2026-09-06"
         }
       ],
       "host": {
@@ -3141,7 +3140,7 @@
           "day": "Wednesday",
           "startTime": "20:00",
           "endTime": "00:00",
-          "lastVerified": "2026-09-10"
+          "lastVerified": "2026-09-09"
         }
       ],
       "coordinates": {
