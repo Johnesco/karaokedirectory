@@ -28,6 +28,8 @@
  *   npm run curator:check
  *   node scripts/check-curator-drift.js [path/to/data-curated.js]
  *   CURATOR_MASTER=/some/path npm run curator:check
+ *   REPO_DATA=/tmp/main-data.json CURATOR_BASE=~/karaoke-curator/last-published.json \
+ *       node scripts/check-curator-drift.js     # what scripts/publish-data.js runs
  */
 
 const fs = require('fs');
@@ -35,9 +37,24 @@ const os = require('os');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
-const REPO_DATA = path.join(ROOT, 'js', 'data.json');
+// The public file to compare against. Normally the working copy; the publish
+// script points it at what `main` actually holds, which is the thing a publish
+// would overwrite.
+const REPO_DATA = process.env.REPO_DATA || path.join(ROOT, 'js', 'data.json');
 const DEFAULT_MASTER = path.join(os.homedir(), 'karaoke-curator', 'data-curated.js');
 const MASTER = process.argv[2] || process.env.CURATOR_MASTER || DEFAULT_MASTER;
+
+/* The last thing this curator published, if it has ever published (#277).
+   Without it the check is two-way and has to treat every repo/master
+   difference as content at risk. That made ORDINARY EDITING fatal: rename a
+   venue, fix an address, move a show half an hour, and the repo's old value
+   looks like something the export would destroy. It is the master's job to
+   hold newer values.
+
+   With a base, the question becomes answerable: a repo value is at risk only
+   where it differs from what we last published, because that means someone
+   ELSE changed it. Everything else the master differs on is our own edit. */
+const BASE = process.env.CURATOR_BASE || path.join(path.dirname(MASTER), 'last-published.json');
 
 /* Keys the master legitimately carries that the public file never has: anything
    underscore-prefixed, at any level (`_curatorMeta` on a venue, `_announcements`
@@ -97,16 +114,19 @@ const lost = [];        // repo content the export would drop -> fatal
 const pending = [];     // master content not yet exported     -> informational
 
 function compareRegistry(name, repoReg = {}, masterReg = {}) {
+    const baseReg = (base && base[name]) || null;
+    const publishedSame = (id, field, rv) => baseReg && baseReg[id] && canon(baseReg[id][field]) === canon(rv);
     for (const [id, repoVal] of Object.entries(repoReg)) {
         const masterVal = masterReg[id];
         if (masterVal === undefined) {
-            lost.push(`${name}.${id} exists in the repo but not in the master`);
+            if (baseReg && baseReg[id] !== undefined) pending.push(`${name}.${id} removed in master (edited since our last publish)`);
+            else lost.push(`${name}.${id} exists in the repo but not in the master`);
             continue;
         }
         for (const [field, rv] of Object.entries(repoVal)) {
-            if (canon(rv) !== canon(masterVal[field])) {
-                lost.push(`${name}.${id}.${field}: repo ${JSON.stringify(rv)} -> master ${JSON.stringify(masterVal[field])}`);
-            }
+            if (canon(rv) === canon(masterVal[field])) continue;
+            if (publishedSame(id, field, rv)) pending.push(`${name}.${id}.${field} edited in master: ${JSON.stringify(rv)} -> ${JSON.stringify(masterVal[field])}`);
+            else lost.push(`${name}.${id}.${field}: repo ${JSON.stringify(rv)} -> master ${JSON.stringify(masterVal[field])}`);
         }
     }
     for (const id of Object.keys(masterReg)) {
@@ -118,11 +138,14 @@ function compareVenue(repoV, masterV) {
     for (const [field, rv] of Object.entries(repoV)) {
         if (field === 'schedule') continue;                 // handled below
         const mv = masterV[field];
-        if (mv === undefined) {
-            lost.push(`${repoV.id}.${field} exists in the repo but not in the master`);
-        } else if (canon(rv) !== canon(mv)) {
-            lost.push(`${repoV.id}.${field}: repo ${JSON.stringify(rv)} -> master ${JSON.stringify(mv)}`);
-        }
+        if (canon(rv) === canon(mv)) continue;
+        const ours = weLastPublished(repoV.id, field, rv);
+        const what = mv === undefined
+            ? `${repoV.id}.${field} removed in master`
+            : `${repoV.id}.${field}: repo ${JSON.stringify(rv)} -> master ${JSON.stringify(mv)}`;
+        if (ours) pending.push(`${what} (edited since our last publish)`);
+        else if (mv === undefined) lost.push(`${repoV.id}.${field} exists in the repo but not in the master`);
+        else lost.push(what);
     }
     for (const field of Object.keys(masterV)) {
         if (isCuratorOnly(field)) continue;
@@ -161,18 +184,32 @@ function compareVenue(repoV, masterV) {
         if (!pool.has(key)) pool.set(key, []);
         pool.get(key).push(e);
     }
+    // An entry the base also had, in the same shape, is one WE published — so
+    // the master no longer having it is our own edit or deletion, not a loss.
+    const baseEntries = (baseById.get(repoV.id) || {}).schedule || [];
+    const basePool = new Set(baseEntries.map(identity));
+    // The same question for the date: if the repo still holds the date WE
+    // published, the master differing is our own correction, in either
+    // direction. A curator may legitimately move a date back — fixing a stamp
+    // that named the wrong night — and that must not read as destroying work.
+    const baseNight = new Map(baseEntries.map((e) => [identity(e), e.lastVerified || '']));
+
     for (const r of repoEntries) {
         const candidates = pool.get(identity(r));
         const m = candidates && candidates.shift();
         if (!m) {
-            lost.push(`${repoV.id} schedule entry missing from master: ${describeEntry(r)}`);
+            if (basePool.has(identity(r))) pending.push(`${repoV.id} schedule entry edited or removed in master: ${describeEntry(r)}`);
+            else lost.push(`${repoV.id} schedule entry missing from master: ${describeEntry(r)}`);
             continue;
         }
         const rv = r.lastVerified || '';
         const mv = m.lastVerified || '';
         const where = `${repoV.id} ${describeEntry(r)}`;
         if (rv === mv) continue;
+        // Ours to change: the repo still holds the date we published.
+        const oursToChange = base && baseNight.has(identity(r)) && baseNight.get(identity(r)) === rv;
         if (!rv) pending.push(`${where}: confirmed for ${mv} in master, not yet exported`);
+        else if (oursToChange) pending.push(`${where}: changed in master, ${rv} → ${mv || '(none)'} (edited since our last publish)`);
         else if (!mv) lost.push(`${where}: repo confirmed for ${rv}, master has no date — export would strip it`);
         else if (mv > rv) pending.push(`${where}: re-confirmed for ${mv} in master (repo has ${rv})`);
         else lost.push(`${where}: repo confirmed for ${rv}, master still ${mv} — export would revert it`);
@@ -202,6 +239,20 @@ try {
     process.exit(1);
 }
 
+let base = null;
+if (fs.existsSync(BASE)) {
+    try { base = JSON.parse(fs.readFileSync(BASE, 'utf8')); }
+    catch (err) { console.error(`WARNING: ignoring unreadable ${BASE}: ${err.message}`); }
+}
+const baseById = new Map(base ? (base.listings || []).map((v) => [v.id, v]) : []);
+/* Did WE publish this exact value? Then the master differing from it is our
+   own edit, not someone else's work about to be overwritten. */
+const weLastPublished = (venueId, field, repoValue) => {
+    if (!base) return false;
+    const bv = baseById.get(venueId);
+    return !!bv && canon(bv[field]) === canon(repoValue);
+};
+
 const countOf = (o) => ({
     listings: (o.listings || []).length,
     schedule: (o.listings || []).reduce((n, v) => n + (v.schedule || []).length, 0),
@@ -214,6 +265,9 @@ const mc = countOf(master);
 console.log('=== Curator drift check ===');
 console.log(`master: ${MASTER}`);
 console.log(`repo:   ${path.relative(ROOT, REPO_DATA)}`);
+console.log(base
+    ? `base:   ${BASE} (three-way — repo content is at risk only where it differs from our last publish)`
+    : `base:   none (strict — every repo/master difference counts as content at risk)`);
 console.log('');
 console.log('                 repo   master');
 for (const k of Object.keys(rc)) {
@@ -229,7 +283,8 @@ for (const v of (repo.listings || [])) {
     repoIds.add(v.id);
     const mv = masterById.get(v.id);
     if (!mv) {
-        lost.push(`venue "${v.id}" exists in the repo but not in the master`);
+        if (baseById.has(v.id)) pending.push(`venue "${v.id}" removed in master (edited since our last publish)`);
+        else lost.push(`venue "${v.id}" exists in the repo but not in the master`);
         continue;
     }
     compareVenue(v, mv);
