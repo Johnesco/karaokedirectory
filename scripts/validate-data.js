@@ -6,9 +6,10 @@
  * heuristics (minute-typo detection, noon end-time after evening start).
  *
  * Registry hygiene (unreferenced or same-named kjs/companies entries), stale
- * venues (active, but every event is in the past) and shows whose
- * `lastVerified` is more than 60 days old (#246) are reported as warnings —
- * worth a look, but not a build failure.
+ * venues (active, but every event is in the past) and shows whose confirmed
+ * night is more than 60 days past, or is not a night the show runs at all
+ * (ADR-015, #275), are reported as warnings — worth a look, but not a build
+ * failure.
  *
  * Exits non-zero on failure — suitable as a pre-commit / CI gate. Enforced
  * by .github/workflows/ci.yml.
@@ -347,23 +348,52 @@ for (const venue of data.listings) {
     }
 }
 
-// ---- Stale verification (#246) ----
-// `lastVerified` records the date a human last confirmed a show (ADR-013).
-// Sixty days is the "week is the heartbeat" horizon — the same window the
-// upcoming-closures list uses. Entries WITHOUT the field are not reported: it
-// is opt-in and never backfilled, so on day one that would be 146 warnings
-// saying nothing. Coverage is printed in the Data Quality block instead.
-// Spent one-time events are skipped — their date has passed, so re-confirming
-// them is not a job (the check above already reports them).
+// Does a schedule entry run on a given date? A deliberate mirror of
+// `scheduleMatchesDate` in js/utils/date.js — the calendar's own matcher —
+// because this script is CommonJS and that module is ESM, and the scripts
+// layer already mirrors app logic rather than importing it (see the escapeHtml
+// and resolveHostFor mirrors in build-pages.js). The rules it copies (weekday,
+// ordinal-of-month, "last", exclusions) have not changed in the project's
+// history; test/date.test.mjs pins the real one against the same cases.
+const ENTRY_WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const ORDINALS = ['first', 'second', 'third', 'fourth', 'fifth'];
+function entryRunsOn(entry, date, iso) {
+    if (entry.exclusions?.some(ex => ex?.date === iso)) return false;
+    if (entry.frequency === 'once') return entry.date === iso;
+    if (!entry.day || ENTRY_WEEKDAYS[date.getDay()] !== entry.day) return false;
+    if (entry.frequency === 'every') return true;
+    if (entry.frequency === 'last') {
+        const nextWeek = new Date(date);
+        nextWeek.setDate(nextWeek.getDate() + 7);
+        return nextWeek.getMonth() !== date.getMonth();
+    }
+    return ORDINALS.indexOf(entry.frequency) === Math.ceil(date.getDate() / 7) - 1;
+}
+
+// ---- Confirmed show dates (ADR-015, #275) ----
+// `lastVerified` is the SHOW date the latest evidence confirms — a night this
+// show runs — not the day the evidence was seen. That makes two things
+// checkable that were not before:
 //
-// Warned, not failed: only the curator can re-confirm a show, and a stale date
-// is still a true statement about when it was last checked.
+//   - A date the entry does not actually match can never render the Announced
+//     marker, so the confirmation is invisible. Warned, because the date is
+//     still a true record of what was confirmed; only the display is lost.
+//   - A FUTURE date is now normal, not a typo: a flier for Oct 1 confirms
+//     Oct 1. Only an absurd one fails, which keeps the fat-finger guard
+//     (typing 2126 for 2026) without rejecting ordinary lookahead.
 //
-// A date in the future IS a failure: no confirmation can have happened
-// tomorrow, so it can only be a typo.
+// Past 60 days — the "week is the heartbeat" horizon — is still a warning
+// rather than a failure: only the curator can re-confirm a show, and a stale
+// date is still a true statement about the last night anyone confirmed.
+// Entries WITHOUT the field are not reported: it is opt-in and never
+// backfilled, so on day one that would be 142 warnings saying nothing.
+// Coverage is printed in the Data Quality block instead.
 const STALE_VERIFIED_DAYS = 60;
+const FUTURE_VERIFIED_LIMIT_DAYS = 366;
 const verifiedCutoff = new Date(TODAY);
 verifiedCutoff.setDate(verifiedCutoff.getDate() - STALE_VERIFIED_DAYS);
+const futureLimit = new Date(TODAY);
+futureLimit.setDate(futureLimit.getDate() + FUTURE_VERIFIED_LIMIT_DAYS);
 
 let verifiedEntries = 0;
 let totalEntries = 0;
@@ -376,50 +406,30 @@ for (const venue of data.listings) {
         const label = `${entry.day || entry.date || '?'} ${entry.startTime || ''}`.trim();
         const verified = new Date(entry.lastVerified + 'T00:00:00');
         if (Number.isNaN(verified.getTime())) continue;   // malformed: the schema already reported it
-        if (verified > TODAY) {
-            fail(venue, `${label} has lastVerified ${entry.lastVerified}, which is in the future`);
+
+        if (verified > futureLimit) {
+            fail(venue, `${label} has lastVerified ${entry.lastVerified}, more than ${FUTURE_VERIFIED_LIMIT_DAYS} days away — that is a typo, not lookahead`);
             continue;
         }
-        if (entry.frequency === 'once' && entry.date && new Date(entry.date + 'T00:00:00') < TODAY) continue;
+
+        // Does the show actually run that night? `scheduleMatchesDate` is the
+        // same function the calendar uses, so this asks exactly the question
+        // the marker will ask at render time.
+        if (!entryRunsOn(entry, verified, entry.lastVerified)) {
+            warnings.push(
+                `${venue.name} (${venue.id}) ${label} is confirmed for ${entry.lastVerified},` +
+                ' which is not a night this show runs — the Announced marker will never render'
+            );
+            continue;
+        }
+
+        if (verified >= TODAY) continue;                  // an upcoming night cannot be stale
+        if (entry.frequency === 'once') continue;         // a spent one-time event is not re-confirmable
         if (verified >= verifiedCutoff) continue;
         warnings.push(
-            `${venue.name} (${venue.id}) ${label} was last verified ${entry.lastVerified}` +
+            `${venue.name} (${venue.id}) ${label} was last confirmed for ${entry.lastVerified}` +
             ` — more than ${STALE_VERIFIED_DAYS} days ago`
         );
-    }
-}
-
-// ---- Announced nights (#263) ----
-// `announcedFor` names the night an announcement referred to, and that night's
-// calendar card carries the Announced marker. The schema already enforces the
-// hard rules (dependentRequired: it needs lastVerified and verifiedBy). What
-// JSON Schema cannot say is whether the marker will ever RENDER:
-//   - on a one-time entry the entry's own date is the night, so the field is
-//     redundant and ignored;
-//   - a night whose weekday is not the entry's day never matches, so the
-//     marker silently never appears;
-//   - a night long past is harmless (the marker is date-matched) but is
-//     clutter the curator's next announcement will overwrite anyway.
-// All three are warnings: none of them corrupts the public site.
-const ANNOUNCED_STALE_DAYS = 30;
-const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-for (const venue of data.listings) {
-    for (const entry of venue.schedule || []) {
-        if (!entry.announcedFor) continue;
-        const label = `${entry.day || entry.date || '?'} ${entry.startTime || ''}`.trim();
-        const night = new Date(entry.announcedFor + 'T00:00:00');
-        if (Number.isNaN(night.getTime())) continue;   // malformed: the schema already reported it
-        if (entry.frequency === 'once') {
-            warnings.push(`${venue.name} (${venue.id}) ${label} carries announcedFor ${entry.announcedFor} on a one-time show — its own date is the night; the field is ignored`);
-            continue;
-        }
-        if (entry.day && WEEKDAY_NAMES[night.getDay()] !== entry.day) {
-            warnings.push(`${venue.name} (${venue.id}) ${label} is announced for ${entry.announcedFor}, a ${WEEKDAY_NAMES[night.getDay()]} — the marker will never render on a ${entry.day} show`);
-        }
-        const ageDays = Math.round((TODAY - night) / 86400000);
-        if (ageDays > ANNOUNCED_STALE_DAYS) {
-            warnings.push(`${venue.name} (${venue.id}) ${label} is still announced for ${entry.announcedFor}, ${ageDays} days ago — clutter until the next announcement replaces it`);
-        }
     }
 }
 

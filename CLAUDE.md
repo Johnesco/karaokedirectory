@@ -240,9 +240,8 @@ When adding or modifying venues in `js/data.json`, follow this structure:
         affiliation: "Some Karaoke Co",
         website: "https://..."
       },
-      lastVerified: "2026-08-28", // Optional: date a human last confirmed THIS show (ADR-013, #246). Curator-written; never backfilled
-      verifiedBy: "announcement", // Optional: the evidence — "announcement" (venue/host published it) or "check" (absent = check) (#263)
-      announcedFor: "2026-09-10"  // Optional, recurring only: the night the announcement referred to; that card gets the Announced marker. Needs verifiedBy "announcement"
+      lastVerified: "2026-10-02"  // Optional: the SHOW DATE the latest evidence confirms (ADR-015, #275) — not the day it was seen.
+                                  // May be in the future; that night's card carries the Announced marker. Curator-derived; never backfilled
     },
     {
       frequency: "once",      // One-time special event
@@ -252,8 +251,7 @@ When adding or modifying venues in `js/data.json`, follow this structure:
       eventName: "Event Name", // Optional: display name for the event
       eventUrl: "https://...", // Optional: link to event page
       socials: { instagram: "https://..." }, // Optional: event-level social links (same shape as venue socials)
-      lastVerified: "2026-08-28", // Optional: same meaning as above — valid on any entry
-      verifiedBy: "announcement"  // Optional: as above. A one-time entry's own date is its announced night, so no announcedFor
+      lastVerified: "2026-03-15"  // Optional: same meaning as above — the confirmed night, normally the event's own date
     }
   ],
   activePeriod: {             // Optional: limits when venue appears
@@ -410,7 +408,7 @@ Tags are rendered as color-coded badges in VenueCard, VenueModal, VenueDetailPan
 - `?kj=none` — venues with no listed host
 - `?kj=<id>` — KJ dossier (`KJDossierView`). Carries a **registry id**, matched exactly, so `?kj=armando` no longer also matches "KJ Armando and Paola". A non-id value still substring-matches names, so links shared before #124 Phase 5 keep working
 - `?debug=1` — debug mode (also `localStorage.debug=1`)
-- `?fresh=1` — freshness lens (#259): reveals each show's `lastVerified` and its evidence level ("Announced" vs "Verified", #263) on calendar cards, the detail schedule table and the KJ dossier. URL-only by decision — no `localStorage` twin. Read by `readLocation()`, initialised via `initFreshLens()` in `js/utils/freshness.js`
+- `?fresh=1` — freshness lens (#259): reveals each show's confirmed night on calendar cards, the detail schedule table and the KJ dossier, worded from that night (ADR-015) — "Announced for Oct 1" ahead of it, "Verified today" on it, "Verified Aug 28 · 9d" after. URL-only by decision — no `localStorage` twin. Read by `readLocation()`, initialised via `initFreshLens()` in `js/utils/freshness.js`
 - `#view=<v>&venue=<id>` — deep link to a selected venue. The hash records the **actual** view; a venue-less hash is cleared rather than left as `#view=weekly`
 - Legacy bare hashes (`#weekly`) are still honoured
 
@@ -491,9 +489,9 @@ Use these semantic elements consistently:
 
 The curator runs on **:8765** via `node server.js` (its `start.cmd`), with its own site preview on **:8766**. Serving it from a static file server instead makes browsing work while Save and Export both fail with `501 Unsupported method ('POST')`.
 
-**Re-verifying a show is a one-click stamp in the curator** (#257). Every schedule row in the venue form, and every row of the dashboard's Shows / Overdue / Never verified tabs, has a ✓ that writes today's date into that entry's `lastVerified`; "✓ all" stamps every show at a venue. The dashboard ages the dates against a 60-day threshold and lists what is overdue or never verified. The date is public — it survives export — but no visitor-facing surface renders it by default; the opt-in `?fresh=1` lens is #259.
+**Confirming a show is one button in the curator** (#276). Its Posters screen reads a folder of unprocessed posters, and one Confirm per matching show records the confirmation, stamps that show's next night, files the poster and moves on. It works the same for a phone call, just without an image. The dashboard ages the dates against a 60-day threshold and lists what is overdue or never confirmed.
 
-**An announcement is the strongest stamp** (#264 curator, #263 repo). The 📣 on a schedule row (or a dashboard show row) records a flier, ad, post or text — the date seen, the night it refers to, the wording, a source link, an image uploaded into `~/karaoke-curator/announcements/<venue>/` — as curator-private `_announcements` history, and sets `lastVerified` to that date with `verifiedBy: "announcement"` and, for a recurring show, `announcedFor`. That night's calendar card then carries a public "Announced" line. Any plain check (✓ today, ✓ all, the dashboard ✓, a hand-edited date) drops the level back to check and clears the announced night; an older flier is recorded without moving the clock backwards. `curator:check` treats every underscore-prefixed key as curator-private and compares the verification fields by direction.
+**Announcements are their own list, not a field on a show** (#276 curator, #275 repo). A record is `{{ seen, for?, show?, text?, source?, image? }}` in a top-level `_announcements` array in the curator master, pointing at a schedule entry by a curator-private `_id`. It does not have to point at anything: a poster can be captured before the venue or the show exists, and linked later. The public `lastVerified` is **derived** — the latest `for` among the records pointing at a show — so it cannot move backwards and there is nothing to clear or demote. The records themselves never leave the curator: export copies five named top-level keys and strips every underscore key at any depth.
 
 If you're a contributor (or a Claude session that needs to add a venue inside this repo):
 
@@ -554,7 +552,7 @@ When enabled:
 - Venue cards show their schedule match reason (e.g., "Every Friday", "First Saturday")
 - Hover over cards for detailed match info
 
-**Freshness lens** (`?fresh=1`, #259) is the sibling lens for data age: a verified show's calendar card gets "✓ Verified Aug 28 · 6d", or "📣 Announced Sep 6 · today" when the venue or host announced it (#263); an unverified show gets nothing (#267). The detail schedule table grows a Verified column on all four surfaces when some show at the venue is verified, and the KJ dossier annotates each verified show. URL-only (no `localStorage`), off by default, and `renderFreshness()` returns `''` when off — so the public page emits no new markup, which `e2e/fresh-lens.spec.js` asserts. The curator's Preview button opens the site with it on.
+**Freshness lens** (`?fresh=1`, #259) is the sibling lens for data age, worded from the confirmed night (ADR-015): "📣 Announced for Oct 1" before that night, "✓ Verified today" on it, "✓ Verified Aug 28 · 9d" after. An unconfirmed show gets nothing (#267). The detail schedule table grows a Verified column on all four surfaces when some show at the venue is confirmed, and the KJ dossier annotates each one. URL-only (no `localStorage`), off by default, and `renderFreshness()` returns `''` when off — so the public page emits no new markup, which `e2e/fresh-lens.spec.js` asserts. The curator's Preview button opens the site with it on.
 
 <!-- ============================================================
      WORKING IN THIS PROJECT
@@ -653,6 +651,7 @@ Current ADRs:
 - [ADR-012](docs/adr/012-generated-entity-pages.md) — Adopt a build step: static entity pages generated from `js/data.json`
 - [ADR-013](docs/adr/013-show-centric-presentation.md) — Venue-rooted storage, registry identity, show-centric presentation: the **show** (a derived `{venue, schedule entry}` pair) is the unit of display; storage stays venue-rooted; series are represented by their host registry entry
 - [ADR-014](docs/adr/014-tag-colors-authored-css.md) — Tag colours are authored CSS; `data.json` is purely factual
+- [ADR-015](docs/adr/015-one-confirmation-per-show-date.md) — **One confirmation, anchored to the show date**: a show carries one public date, the night the latest evidence confirms (supersedes the ADR-013 evidence-level addendum)
 
 ## Security Considerations
 - Always use `escapeHtml()` when rendering user-provided content
