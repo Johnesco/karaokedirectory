@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.47
+**Version:** 1.0.48
 **Last updated:** September 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -1242,6 +1242,7 @@ A second opt-in lens, the same shape as debug mode but **URL-only** — no `loca
 
 - **Indicator** — "Freshness lens" badge in the top-right corner (stacks under the debug badge when both are on)
 - **Calendar cards** (§6) — a last line after the host: "✓ Verified Aug 28 · 6d", or "📣 Announced Sep 6 · today" when the evidence is an announcement (`verifiedBy`, #263). An unverified show gets **nothing** (#267): the lens is an internal testing aid, and a card with nothing to say says nothing
+- **A–Z cards** (§3) — one line per verified show at the foot of the card, labelled with the show ("First Monday · ✓ Verified Sep 7 · today"), so the listing reads like the calendar (#271); the schedule table's Verified column stays
 - **Detail schedule table** (§7, §8) — a Verified column on all four surfaces, added by `renderScheduleTable()` on the same conditional pattern as the Host column, and only when some show at the venue is verified. Unverified rows leave the cell empty, which the ≤480px stacked layout hides
 - **KJ dossier** (§10) — the same line on every show row; "verify your listings" is that page's job
 - **States** — fresh (≤60 days, `--fresh`) and overdue (>60, `--overdue`), as BEM modifiers on `.venue-card__verified`, `.venue-detail__verified` and `.kj-dossier__verified`; "never" renders nothing. Sixty days is `FRESHNESS_HORIZON_DAYS` in `js/utils/date.js`, the validator's horizon
@@ -1695,6 +1696,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-08 | 1.0.45 | #218: `app.js` rendered the initial view twice on any deep link that named a non-default view. `setState({ view })` notified the `view` subscriber *and* the explicit `renderView()` ran, so a view was built, destroyed and rebuilt before first paint; `?view=weekly` rendered once only because `setState` stays quiet when the value already matches. State is now seeded before the subscription, so one render covers both cases — the same ordering `hostFilter` already relied on. This was the root cause behind the frozen map in #215/#217; `MapView.destroyed` still guards the symptom, since any future view doing async work in `afterRender()` would hit it. Measured 5 renders of `#main-content` to 4 on `?view=map` and `?view=alphabetical`, with `?view=weekly` unchanged. Section 4 implementation note updated. | Claude Code |
 | 2026-08 | 1.0.46 | #221: Deleted the map's venue-count bar. `.map-view__info` was built by `MapView.template()` on every render and displayed on none — `body.view--map .map-view__info { display: none }` applies whenever a map is on screen, which is the only time the element exists. Its hint also pointed at `editor.html`, retired to `_deprecated/` in favour of the curator. Removed the markup, six CSS rules (one of them equally unreachable under `.page--edge-to-edge`), and the now-unused `getAllVenues` import. Section 4's "Venue Count Info" heading went with it — the spec documented as a live feature something no visitor could ever see. Deleted rather than revived: it served the coordinate-backfill era and all 75 active venues are now geocoded, so it would read "75 of 75", and a status bar fights immersive mode. | Claude Code |
 | 2026-09 | 1.0.47 | #267: Under the `?fresh=1` lens an unverified show now renders nothing — no "Not verified" line on the card, no cell in the schedule table, nothing on the dossier row — and the table's Verified column appears only when some show at the venue is verified. The lens is an internal testing aid; the only public signal remains the Announced marker (#263). Section 18 and the §7 sections table updated; the lens e2e stamps every served entry in flight so its lens-on assertions stay deterministic. | Claude Code |
+| 2026-09 | 1.0.48 | #271: Under the `?fresh=1` lens the A–Z cards list one line per verified show at the foot of the card, labelled with the show ("First Monday · ✓ Verified Sep 7 · today"), so the listing reads like the calendar. The schedule table's Verified column stays; unverified shows add nothing; nothing renders with the lens off. Section 18 updated. | Claude Code |
 
 ---
 
