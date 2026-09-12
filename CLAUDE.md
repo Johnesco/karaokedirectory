@@ -171,6 +171,7 @@ karaokedirectory/
 │   ├── validate-data.js   # THE data validator (Ajv + supplementary checks) — CI gate
 │   ├── check-css-load-order.js  # CSS load order across HTML pages — CI gate
 │   ├── check-curator-drift.js   # Curator master vs js/data.json — run BEFORE exporting
+│   ├── publish-data.js          # Take an export live: gates, then a PR (#277)
 │   └── code-metrics.js    # Line/size snapshot by bucket (manual, writes metrics/snapshots/)
 │
 ├── schema/
@@ -526,9 +527,19 @@ npm run test:unit    # node --test — pure modules only, ~150ms
 npm test             # Playwright end-to-end, ~1.5 min
 
 npm run curator:check # curator master vs js/data.json — owner only, before exporting
+npm run data:publish:dry  # what a publish would send live, without sending it
+npm run data:publish      # gates, then open the data PR (no ticket by design)
 ```
 
 `curator:check` is deliberately **not** part of `validate:all` and not a CI gate: it compares against a file outside the repo that only the owner has, so it would skip on every CI run and for every other contributor. It is a pre-export guard, not a build gate.
+
+It runs in one of two modes (#277). With a record of the last publish
+(`~/karaoke-curator/last-published.json`, written by `scripts/publish-data.js`) it is
+**three-way**: a repo value is at risk only where it differs from what was last
+published, because that means someone else changed it. Without that record it is
+**strict**, and every repo/master difference counts as content at risk — which is why
+an ordinary edit (a rename, a corrected address, a show moved half an hour) used to
+read as fatal.
 
 | Gate | Covers | Notes |
 |---|---|---|
@@ -588,7 +599,12 @@ When sdlc-baseline updates, glance at its [CHANGELOG](https://github.com/Johnesc
 
 This project intentionally diverges from canonical sdlc-baseline guidance in these places:
 
-- _(none currently)_
+- **Publishing venue data carries no ticket.** `npm run data:publish` (the curator's
+  Publish button) opens a PR straight from an export, with no GitHub Issue behind it.
+  Rationale: updating venue data is daily operation, not development — it happens
+  several times a week, changes no code, and is gated by `validate-data.js` and
+  `check-curator-drift.js` rather than by review. Building the tooling still follows
+  the normal process (#275, #276, #277). Everything that touches code keeps its ticket.
 
 ### Project IDs
 

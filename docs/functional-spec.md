@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.48
+**Version:** 1.0.49
 **Last updated:** September 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -1192,6 +1192,16 @@ This spec section previously described the in-repo editor's UI in detail; that c
 
 ---
 
+### Publishing Venue Data
+
+Venue data reaches the live site by pull request, because `main` is protected. `scripts/publish-data.js` (the curator's Publish button, or `npm run data:publish`) does the mechanical part: it reads what `main` currently holds, runs `check-curator-drift.js` against that and `validate-data.js` against the export, summarises the difference, then creates a branch, commits `js/data.json` and opens the PR. The owner merges it; Netlify deploys from `main`.
+
+- **No ticket.** Publishing venue data is daily operation, not development. Recorded as an explicit deviation in CLAUDE.md rather than left as a rule being quietly broken.
+- **It works against GitHub, not the checkout.** A routine data publish has no business touching a working tree that may be mid-feature, on another branch, or dirty. The branch, the commit and the file all go through the API.
+- **Two steps in the UI.** The button runs a dry run first, showing what would go out and what the live site would lose; only then does the real one appear. A publish sends other people's data out, so it should not be one click away from a stale master.
+- **It stops on drift.** If `main` holds anything the export would destroy, nothing is created and the log says what. That is the gate that catches a stale master.
+- **`last-published.json`** records what was published, next to the curator master. It is what makes `curator:check` three-way on the next run (§"Show Verification", #277): without it, every ordinary edit reads as content at risk.
+
 ## 17 About Page
 
 **File:** `about.html`
@@ -1698,6 +1708,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-08 | 1.0.46 | #221: Deleted the map's venue-count bar. `.map-view__info` was built by `MapView.template()` on every render and displayed on none — `body.view--map .map-view__info { display: none }` applies whenever a map is on screen, which is the only time the element exists. Its hint also pointed at `editor.html`, retired to `_deprecated/` in favour of the curator. Removed the markup, six CSS rules (one of them equally unreachable under `.page--edge-to-edge`), and the now-unused `getAllVenues` import. Section 4's "Venue Count Info" heading went with it — the spec documented as a live feature something no visitor could ever see. Deleted rather than revived: it served the coordinate-backfill era and all 75 active venues are now geocoded, so it would read "75 of 75", and a status bar fights immersive mode. | Claude Code |
 | 2026-09 | 1.0.47 | #267: Under the `?fresh=1` lens an unverified show now renders nothing — no "Not verified" line on the card, no cell in the schedule table, nothing on the dossier row — and the table's Verified column appears only when some show at the venue is verified. The lens is an internal testing aid; the only public signal remains the Announced marker (#263). Section 18 and the §7 sections table updated; the lens e2e stamps every served entry in flight so its lens-on assertions stay deterministic. | Claude Code |
 | 2026-09 | 1.0.48 | #275: One confirmation per show (ADR-015). `verifiedBy` and `announcedFor` are removed; `lastVerified` is redefined as the **show date the latest evidence confirms** and may be in the future. `isAnnouncedOn()` becomes a date equality, `freshnessOf()` gains an `upcoming` state, and the lens reads "Announced for Oct 1" / "Verified today" / "Verified Aug 28 · 9d". The validator warns when a date is not a night the show runs and fails only past 366 days ahead; `date.js` gains `nextOccurrence()` and `lastOccurrenceOnOrBefore()`, which the curator imports instead of copying schedule rules. Three of the five stored dates migrated back to real show nights. Sections 6, 11, 18; ADR-013 addendum superseded. | Claude Code |
+| 2026-09 | 1.0.49 | #277: Publish button. New `scripts/publish-data.js` takes a curator export live — drift check against what `main` holds, validator, then a branch, a commit and a PR through the GitHub API, with no ticket by design. `check-curator-drift.js` gains a three-way mode: with a record of the last publish, a repo value is at risk only where it differs from that, so an ordinary edit (a rename, a corrected address, a show moved half an hour, a date corrected backwards) is informational rather than fatal. Strict mode is unchanged when no record exists. New section 16 "Publishing Venue Data"; CLAUDE.md gains its first project-specific deviation. | Claude Code |
 
 ---
 
