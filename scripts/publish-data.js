@@ -21,8 +21,8 @@
  *   6. remember what we published, as the base for next time
  *
  * Usage:
- *   node scripts/publish-data.js [--dry-run] [--export <file>] [--master <file>]
- *                                [--branch <name>] [--repo owner/name]
+ *   node scripts/publish-data.js [--dry-run] [--adopt-baseline] [--export <file>]
+ *                                [--master <file>] [--branch <name>] [--repo owner/name]
  *
  * `gh` must be installed and authenticated. It is found on PATH, via GH_PATH,
  * or at the usual Windows location.
@@ -47,6 +47,7 @@ function parseArgs(argv) {
         else if (a === '--master') out.master = argv[++i];
         else if (a === '--branch') out.branch = argv[++i];
         else if (a === '--repo') out.repo = argv[++i];
+        else if (a === '--adopt-baseline') out.adoptBaseline = true;
         else if (a === '--help' || a === '-h') out.help = true;
     }
     return out;
@@ -134,8 +135,16 @@ function prTitle(sum, now = new Date()) {
     return `Curator publish ${stamp}${bits.length ? ' \u2014 ' + bits.join(', ') : ''}`;
 }
 
-function prBody(sum, pending) {
+function prBody(sum, pending, adoptedBaseline) {
     const lines = ['Routine data publish from the curator.', ''];
+    if (adoptedBaseline) {
+        lines.push(
+            '> **First publish.** There was no record of a previous one, so every difference',
+            '> below was reviewed by hand and the live file was adopted as the baseline',
+            '> (`--adopt-baseline`, #285). Later publishes compare against it automatically.',
+            '',
+        );
+    }
     const section = (title, items) => {
         if (!items.length) return;
         lines.push(`**${title}**`, '');
@@ -162,12 +171,59 @@ function prBody(sum, pending) {
     return lines.join('\n');
 }
 
+/**
+ * What to do about the baseline before publishing (#285).
+ *
+ * The three-way base is written BY a successful publish, so the FIRST publish has
+ * none, runs strict, and is refused by exactly the ordinary edits the base exists
+ * to allow. Seeding it automatically would be worse than the bug: with base equal
+ * to the repo, nothing can ever differ from it, and the check that exists to catch
+ * a stale master silently passes forever.
+ *
+ * So the first publish is a reviewed step. Three outcomes:
+ *   'proceed'    - business as usual (a base exists, or there is nothing to review)
+ *   'need-adopt' - first publish with real differences: show them, ask for the flag
+ *   'adopt-now'  - the flag was given: record the baseline and go
+ *
+ * @param {{baseExists: boolean, driftOk: boolean, adopt: boolean}} state
+ * @returns {'proceed'|'need-adopt'|'adopt-now'}
+ */
+function baselineDecision({ baseExists, driftOk, adopt }) {
+    if (baseExists) return 'proceed';
+    if (driftOk) return 'proceed';      // nothing to review; the publish writes the base anyway
+    return adopt ? 'adopt-now' : 'need-adopt';
+}
+
+/** What to tell someone facing their first publish. */
+function firstPublishNotice(items) {
+    return [
+        '',
+        '=== This is the first publish, and there is no baseline yet ===',
+        '',
+        'Every later publish compares three ways: the live file, your master, and a',
+        'record of what you last published. That record is written BY a publish, so',
+        'this one has nothing to compare against and had to assume the worst about',
+        'each difference below.',
+        '',
+        'Read them. Each should be a change YOU made in the curator:',
+        '',
+        ...items.map((i) => '  - ' + i),
+        '',
+        'If any line is something you did NOT do, stop: your master is behind the live',
+        'site, and publishing would revert someone else\'s work. Reconcile first.',
+        '',
+        'If they are all yours, run it again with --adopt-baseline. That records the',
+        'live file as your starting point and publishes. You only ever do this once.',
+        '',
+    ].join('\n');
+}
+
 // ---------------------------------------------------------------- main
 
 function main() {
     const args = parseArgs(process.argv.slice(2));
     if (args.help) {
-        console.log('Usage: node scripts/publish-data.js [--dry-run] [--export <file>] [--master <file>] [--branch <name>] [--repo owner/name]');
+        console.log('Usage: node scripts/publish-data.js [--dry-run] [--adopt-baseline] [--export <file>] [--master <file>] [--branch <name>] [--repo owner/name]');
         return 0;
     }
 
@@ -222,14 +278,56 @@ function main() {
     }
 
     // ---- 2. drift, against main and our last publish -----------------------
-    const drift = spawnSync(process.execPath, [path.join(__dirname, 'check-curator-drift.js'), master], {
+    // Which baseline the check reads. Normally the real one; a dry run that adopts
+    // points this at a scratch copy so that nothing is recorded.
+    let adoptBase = basePath;
+    const runDrift = () => spawnSync(process.execPath, [path.join(__dirname, 'check-curator-drift.js'), master], {
         encoding: 'utf8',
-        env: { ...process.env, REPO_DATA: mainFile, CURATOR_BASE: basePath },
+        env: { ...process.env, REPO_DATA: mainFile, CURATOR_BASE: adoptBase },
     });
+    let drift = runDrift();
     process.stdout.write(drift.stdout || '');
+
+    const baseExisted = fs.existsSync(basePath);
+    let adoptedBaseline = false;
+    const decision = baselineDecision({
+        baseExists: baseExisted,
+        driftOk: drift.status === 0,
+        adopt: !!args.adoptBaseline,
+    });
+
+    if (decision === 'need-adopt') {
+        const items = (drift.stdout || '').split('\n')
+            .filter((l) => l.startsWith('- ')).map((l) => l.slice(2));
+        console.error(firstPublishNotice(items));
+        return 1;
+    }
+
+    if (decision === 'adopt-now') {
+        // Adopt the live file as the starting point, then ask again - the second
+        // run is three-way, so an edit reads as pending and only someone else's
+        // work would still be fatal.
+        //
+        // A DRY RUN adopts into a scratch file and leaves the real one alone. A
+        // dry run that wrote the baseline would let someone agree to the one-time
+        // review, wander off without publishing, and leave every later publish
+        // silently permissive - which is the safety this whole flag exists for.
+        adoptBase = args.dryRun ? path.join(tmp, 'baseline-preview.json') : basePath;
+        console.log(args.dryRun
+            ? '\n--adopt-baseline (dry run): previewing against the live file. Nothing is recorded.'
+            : '\n--adopt-baseline: recording the live js/data.json as the baseline for future publishes.');
+        fs.copyFileSync(mainFile, adoptBase);
+        adoptedBaseline = true;
+        drift = runDrift();
+        process.stdout.write('\n=== re-checked against the adopted baseline ===\n');
+        process.stdout.write(drift.stdout || '');
+    }
+
     if (drift.status !== 0) {
         console.error('\nPublish stopped: the live site holds content this export would destroy (above).');
-        console.error('Someone changed js/data.json since your last publish. Reconcile, then try again.');
+        console.error(baseExisted || adoptedBaseline
+            ? 'Someone changed js/data.json since your last publish. Reconcile, then try again.'
+            : 'Even with a fresh baseline this does not reconcile. Look at the master.');
         return 1;
     }
     const pending = (drift.stdout || '').split('\n').filter((l) => l.startsWith('- ')).map((l) => l.slice(2));
@@ -254,7 +352,7 @@ function main() {
 
     const sum = summarizeDiff(mainJson, exported);
     const title = prTitle(sum);
-    const body = prBody(sum, pending);
+    const body = prBody(sum, pending, adoptedBaseline);
 
     console.log('');
     if (sum.confirmed.length) console.log(`shows confirmed: ${sum.confirmed.length}`);
@@ -266,6 +364,7 @@ function main() {
 
     if (args.dryRun) {
         console.log('\n--- dry run, nothing created ---');
+        if (adoptedBaseline) console.log('(the baseline was previewed, not recorded - run without --dry-run to adopt it for real)');
         console.log(`branch: ${branch}`);
         console.log(`title:  ${title}`);
         console.log('body:');
@@ -319,6 +418,6 @@ function main() {
     }
 }
 
-module.exports = { summarizeDiff, prTitle, prBody, branchName, parseArgs };
+module.exports = { summarizeDiff, prTitle, prBody, branchName, parseArgs, baselineDecision, firstPublishNotice };
 
 if (require.main === module) process.exit(main());

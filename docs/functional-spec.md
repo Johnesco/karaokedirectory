@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.49
+**Version:** 1.0.50
 **Last updated:** September 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -1200,6 +1200,7 @@ Venue data reaches the live site by pull request, because `main` is protected. `
 - **It works against GitHub, not the checkout.** A routine data publish has no business touching a working tree that may be mid-feature, on another branch, or dirty. The branch, the commit and the file all go through the API.
 - **Two steps in the UI.** The button runs a dry run first, showing what would go out and what the live site would lose; only then does the real one appear. A publish sends other people's data out, so it should not be one click away from a stale master.
 - **It stops on drift.** If `main` holds anything the export would destroy, nothing is created and the log says what. That is the gate that catches a stale master.
+- **The first publish is a reviewed step** (#285). The baseline is written *by* a publish, so publish number one has none, runs strict, and would be refused by the very edits the baseline exists to allow. It does not fail silently: it names every difference and asks for `--adopt-baseline` (a button in the curator) confirming each one is the curator's own work. Seeding the baseline automatically was rejected — a baseline equal to the live file can never differ from it, which would disable the stale-master check permanently. A dry run previews the adoption without recording it.
 - **`last-published.json`** records what was published, next to the curator master. It is what makes `curator:check` three-way on the next run (§"Show Verification", #277): without it, every ordinary edit reads as content at risk.
 
 ## 17 About Page
@@ -1709,6 +1710,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-09 | 1.0.47 | #267: Under the `?fresh=1` lens an unverified show now renders nothing — no "Not verified" line on the card, no cell in the schedule table, nothing on the dossier row — and the table's Verified column appears only when some show at the venue is verified. The lens is an internal testing aid; the only public signal remains the Announced marker (#263). Section 18 and the §7 sections table updated; the lens e2e stamps every served entry in flight so its lens-on assertions stay deterministic. | Claude Code |
 | 2026-09 | 1.0.48 | #275: One confirmation per show (ADR-015). `verifiedBy` and `announcedFor` are removed; `lastVerified` is redefined as the **show date the latest evidence confirms** and may be in the future. `isAnnouncedOn()` becomes a date equality, `freshnessOf()` gains an `upcoming` state, and the lens reads "Announced for Oct 1" / "Verified today" / "Verified Aug 28 · 9d". The validator warns when a date is not a night the show runs and fails only past 366 days ahead; `date.js` gains `nextOccurrence()` and `lastOccurrenceOnOrBefore()`, which the curator imports instead of copying schedule rules. Three of the five stored dates migrated back to real show nights. Sections 6, 11, 18; ADR-013 addendum superseded. | Claude Code |
 | 2026-09 | 1.0.49 | #277: Publish button. New `scripts/publish-data.js` takes a curator export live — drift check against what `main` holds, validator, then a branch, a commit and a PR through the GitHub API, with no ticket by design. `check-curator-drift.js` gains a three-way mode: with a record of the last publish, a repo value is at risk only where it differs from that, so an ordinary edit (a rename, a corrected address, a show moved half an hour, a date corrected backwards) is informational rather than fatal. Strict mode is unchanged when no record exists. New section 16 "Publishing Venue Data"; CLAUDE.md gains its first project-specific deviation. | Claude Code |
+| 2026-09 | 1.0.50 | #285: the first publish is a reviewed step rather than a silent refusal. `publish-data.js` detects a missing baseline, prints every difference, and requires `--adopt-baseline` (a button in the curator) to record the live file as the starting point and proceed. Auto-seeding was rejected: a baseline equal to the live file disables the stale-master check permanently. A dry run previews the adoption into a scratch file and records nothing. New `baselineDecision()` and `firstPublishNotice()`, both unit-tested. | Claude Code |
 
 ---
 
