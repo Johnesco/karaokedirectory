@@ -1576,7 +1576,7 @@
       "schedule": [
         {
           "frequency": "every",
-          "day": "Wednesday",
+          "day": "Friday",
           "startTime": "19:00",
           "endTime": "23:00"
         }
@@ -1585,7 +1585,6 @@
         "kjId": "jason-lynum",
         "companyId": "cpr-mobile-djs"
       },
-      "socials": null,
       "coordinates": {
         "lat": 30.413296837711,
         "lng": -97.927601334553
@@ -2154,9 +2153,10 @@
       "schedule": [
         {
           "frequency": "every",
-          "day": "Friday",
+          "day": "Thursday",
           "startTime": "19:00",
-          "endTime": "22:00"
+          "endTime": "22:00",
+          "lastVerified": "2026-10-01"
         }
       ],
       "socials": {
