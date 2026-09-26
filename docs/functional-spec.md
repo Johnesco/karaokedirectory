@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.50
+**Version:** 1.0.51
 **Last updated:** September 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -856,20 +856,13 @@ The `getSortableName()` utility strips leading articles for sorting purposes. "T
 
 ### Storage and Data Flow
 
-Venue data lives in one file:
+Venue data lives in one file: **`js/data.json`** — the canonical authoring source and the only runtime source. Written by the external curator; also edited directly by contributors. The browser fetches it at runtime (ADR-008); there is no generated copy.
 
-- **`js/data.json`** — the canonical authoring source AND the **currently active runtime source**. Written by the external curator; also edited directly by contributors. The browser fetches it at runtime (ADR-008); there is no generated copy.
-- **Supabase** — fully wired but **currently disabled** via `useSupabase: false` in `js/config.js`. The infrastructure (schema migrations, seed pipeline, service layer) is in place for when expansion (#17 National Expansion) requires it. See issue #47 for the JSONB redesign that's ready to push.
+The load path is a single step. `loadData()` in `js/app.js` makes one `fetch` of `js/data.json`, resolved against the module's own URL so it holds wherever the page is served from, then hands the result to `initTagConfig()` and `initVenues()`. Nothing is cached between visits — there is no `sessionStorage` layer — so every page load reads the file fresh. If the fetch fails, `#main-content` shows an "Error Loading Data" message carrying the error text.
 
-Runtime fetch priority (configured in `js/config.js` via the `useSupabase` flag):
+The debug indicator (`?debug=1`) still ends in a source label, `Debug Mode | local-json`. It is a constant now that there is only one source, not a report of which of several served the page.
 
-1. `sessionStorage` cache (30-minute TTL)
-2. Supabase via `js/services/supabase.js` `fetchVenueData()`
-3. `fetch` of `js/data.json`
-
-The debug indicator (`?debug=1`) shows which source served the current page: `cache`, `supabase`, or `local-json`.
-
-Because the data arrives by `fetch`, the site must be served over http(s) — opening `index.html` from the filesystem will not work, as `fetch` is blocked on `file://` origins. Use `python -m http.server` or `npx serve` (see README).
+Because the data arrives by `fetch`, the site must be served over http(s) — opening `index.html` from the filesystem will not work, as `fetch` is blocked on `file://` origins. Use `npm run dev`, which serves the repo on `http://localhost:8000`; without Node, any static server works (see README).
 
 #### Supabase — parked (ADR-009)
 
@@ -1711,6 +1704,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-09 | 1.0.48 | #275: One confirmation per show (ADR-015). `verifiedBy` and `announcedFor` are removed; `lastVerified` is redefined as the **show date the latest evidence confirms** and may be in the future. `isAnnouncedOn()` becomes a date equality, `freshnessOf()` gains an `upcoming` state, and the lens reads "Announced for Oct 1" / "Verified today" / "Verified Aug 28 · 9d". The validator warns when a date is not a night the show runs and fails only past 366 days ahead; `date.js` gains `nextOccurrence()` and `lastOccurrenceOnOrBefore()`, which the curator imports instead of copying schedule rules. Three of the five stored dates migrated back to real show nights. Sections 6, 11, 18; ADR-013 addendum superseded. | Claude Code |
 | 2026-09 | 1.0.49 | #277: Publish button. New `scripts/publish-data.js` takes a curator export live — drift check against what `main` holds, validator, then a branch, a commit and a PR through the GitHub API, with no ticket by design. `check-curator-drift.js` gains a three-way mode: with a record of the last publish, a repo value is at risk only where it differs from that, so an ordinary edit (a rename, a corrected address, a show moved half an hour, a date corrected backwards) is informational rather than fatal. Strict mode is unchanged when no record exists. New section 16 "Publishing Venue Data"; CLAUDE.md gains its first project-specific deviation. | Claude Code |
 | 2026-09 | 1.0.50 | #285: the first publish is a reviewed step rather than a silent refusal. `publish-data.js` detects a missing baseline, prints every difference, and requires `--adopt-baseline` (a button in the curator) to record the live file as the starting point and proceed. Auto-seeding was rejected: a baseline equal to the live file disables the stale-master check permanently. A dry run previews the adoption into a scratch file and records nothing. New `baselineDecision()` and `firstPublishNotice()`, both unit-tested. | Claude Code |
+| 2026-09 | 1.0.51 | #290: §11 "Storage and Data Flow" rewritten to match the code. It still described Supabase as wired but disabled through `js/config.js`, and a three-step fetch chain (a 30-minute `sessionStorage` cache, Supabase `fetchVenueData()`, then `js/data.json`) — all removed by ADR-009, and contradicted by the "Supabase — parked" subsection directly below. The load path is one `fetch` of `js/data.json` in `loadData()`, with no cache. The debug indicator's source label is a constant `local-json`, not a choice among three. Serving instructions point at `npm run dev` rather than `python -m http.server` / `npx serve`. | Claude Code |
 
 ---
 
