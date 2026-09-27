@@ -183,15 +183,32 @@ function durationOf(startTime, endTime) {
 // ---------------------------------------------------------------- model
 
 /**
+ * Whether an ISO date falls inside something's `activePeriod` — a venue's or a
+ * schedule entry's. A mirror of `isActiveOn` in js/utils/date.js (ADR-016);
+ * ISO dates sort as text.
+ */
+function inLifespan(thing, iso) {
+    const p = thing && thing.activePeriod;
+    if (!p) return true;
+    return (!p.start || p.start <= iso) && (!p.end || iso <= p.end);
+}
+
+/**
  * Every (venue, scheduleEntry) pair with its effective host ids.
  * Host resolution mirrors js/utils/render.js resolveHostFor: an entry-level
  * host is a full swap, not a field merge.
+ *
+ * Only shows running on `today` (ADR-016), the rule every date-less surface in
+ * the app follows. A page is a date-less surface fixed at build time: a show
+ * that ended is gone, one that has not started is not announced, and a switch
+ * appears at the first deploy on or after its date.
  */
-function showsOf(data) {
+function showsOf(data, { today = todayInTz() } = {}) {
     const out = [];
     for (const venue of data.listings || []) {
         if (venue.active === false) continue;
         for (const entry of venue.schedule || []) {
+            if (!inLifespan(entry, today)) continue;
             const host = entry.host || venue.host || null;
             out.push({
                 venue,
@@ -334,7 +351,8 @@ const MONTH_WEEK = { first: 1, second: 2, third: 3, fourth: 4, last: -1 };
  *
  * The mapping falls out of the data model almost exactly: `every` is a weekly
  * repeat, the ordinals are monthly repeats with `byMonthWeek`, `exclusions`
- * are `exceptDate`, and `activePeriod` bounds the whole thing.
+ * are `exceptDate`, and `activePeriod` — the venue's and the show's own —
+ * bounds the whole thing.
  */
 function scheduleNode(entry, venue) {
     const node = { '@type': 'Schedule', scheduleTimezone: TZ };
@@ -355,9 +373,17 @@ function scheduleNode(entry, venue) {
     const skipped = (entry.exclusions || []).map((x) => x && x.date).filter(Boolean);
     if (skipped.length) node.exceptDate = skipped.length === 1 ? skipped[0] : skipped;
 
-    const period = venue.activePeriod || {};
-    if (period.start) node.startDate = period.start;
-    if (period.end) node.endDate = period.end;
+    // Bounded by whichever window is tighter, the venue's or the show's own
+    // (ADR-016). A current show with a known end carries it, so search engines
+    // stop at the right night even if no deploy follows the switch.
+    const venuePeriod = venue.activePeriod || {};
+    const showPeriod = entry.activePeriod || {};
+    const later = (a, b) => (a && b ? (a > b ? a : b) : a || b);
+    const earlier = (a, b) => (a && b ? (a < b ? a : b) : a || b);
+    const startDate = later(venuePeriod.start, showPeriod.start);
+    const endDate = earlier(venuePeriod.end, showPeriod.end);
+    if (startDate) node.startDate = startDate;
+    if (endDate) node.endDate = endDate;
 
     return node;
 }

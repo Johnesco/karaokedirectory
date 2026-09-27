@@ -27,6 +27,7 @@ import { renderFreshness } from '../utils/freshness.js';
 import {
     formatScheduleEntry,
     parseLocalDate,
+    activeEntries,
     WEEKDAYS
 } from '../utils/date.js';
 import { resolveHostFor, getVenueHosts } from '../utils/render.js';
@@ -124,7 +125,8 @@ export class KJDossierView extends Component {
             .filter(v => venuePasses(v))
             .filter(v => !hasNamedHost(v))
             .map(v => {
-                const recurring = (v.schedule || [])
+                // Shows running today only — ADR-016, as the detail table.
+                const recurring = activeEntries(v.schedule)
                     .filter(e => e.frequency !== 'once')
                     .sort((a, b) => {
                         const aIdx = WEEKDAYS.indexOf(a.day?.toLowerCase());
@@ -166,8 +168,10 @@ export class KJDossierView extends Component {
             .map(v => {
                 // Same predicate the venue filter uses. Substring-matching here
                 // separately meant a dossier reached by registry id matched the
-                // venue but none of its shows (#124 Phase 5).
-                const kjEntries = (v.schedule || []).filter(e =>
+                // venue but none of its shows (#124 Phase 5). Shows running
+                // today only (ADR-016): an ended show drops off the dossier and
+                // one that has not started is not announced.
+                const kjEntries = activeEntries(v.schedule).filter(e =>
                     hostMatches(resolveHostFor(v, e), kjName)
                 );
 

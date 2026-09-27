@@ -42,6 +42,8 @@
 - **Single source: `js/data.json`** (#102, ADR-006). Dev scripts, the curator, and the browser all read this one file — the browser fetches it at runtime (ADR-008), so there is no generated copy to keep in sync.
 - Because data arrives by `fetch`, the site must be served over http(s). Opening `index.html` from disk won't work (`fetch` is blocked on `file://`).
 - **There is no second data source.** Supabase was parked by [ADR-009](docs/adr/009-park-supabase.md) — the scaffolding lives in `_deprecated/supabase/`, and `js/config.js`, the `useSupabase` flag, and the CDN bundle are gone. Re-entry trigger is written into that ADR: the moment the directory needs a *write* path.
+- **`data.json` stands in for a database** until it converts to a relational (or more fitting) one. Shape new data so it maps cleanly onto tables: the schema is the column types, `validate-data.js` the constraints (a rule a table would enforce belongs there, not in a view), git the audit log, and `activePeriod` a validity range. See functional spec §11 "`data.json` as a stand-in database"
+- **Time lives at two levels, both `activePeriod`** (ADR-016): a venue's bounds the venue, a schedule entry's bounds that show. `scheduleMatchesDate()` honours the show's window, so date-aware surfaces answer for their date; surfaces with no date (detail table, host section, search, KJ views, generated pages) list shows running today via `activeEntries()`. Nothing announces a coming change — it just happens on its date
 - Service layer abstracts data access (`js/services/venues.js`). It reads whatever `initVenues()` is handed, so the source is swappable — but there is only one source today (ADR-009)
 - Schedule matching logic handles complex recurrence patterns
 - **Three layers, three units (ADR-013):** storage's unit is the **venue**, identity's unit is the **registries**, presentation's unit is the **show** — the derived `{venue, schedule entry}` pair that `getVenueEventsForDate()` emits ("one row per show"). Views group shows; they do not own bespoke pipelines. A recurring named production (Story-Oke) is its host registry entry — "all its shows" is the host lens, not a new entity type
@@ -177,7 +179,7 @@ karaokedirectory/
 ├── schema/
 │   └── venue.schema.json  # Authoritative venue schema (ADR-005)
 │
-├── e2e/                   # Playwright specs (12 files) — run by `npm test`, gated in CI
+├── e2e/                   # Playwright specs (15 files) — run by `npm test`, gated in CI
 ├── test/                  # node --test unit specs — run by `npm run test:unit`
 │   ├── date.test.mjs      # Schedule matching, exclusions, date ranges
 │   └── venues.test.mjs    # venuePasses, search predicates, host hydration
@@ -236,6 +238,10 @@ When adding or modifying venues in `js/data.json`, follow this structure:
       exclusions: [           // Optional: dates this recurring show is skipped (holiday/closure)
         { date: "2026-12-25", reason: "Holiday" }  // objects only — reason optional. A bare date string is NOT accepted (#169)
       ],
+      activePeriod: {         // Optional: the show's lifespan (ADR-016, #288) — its known first and/or last night.
+        end: "2026-10-14"     // At least one bound; a missing one is open. Written only when known, never backfilled.
+      },                      // A change = end the old entry + a new entry with `start`; a correction = edit in place.
+                              // Not allowed on "once" entries. Remove the entry 30 days after `end` (validator warns)
       host: {                 // Optional: overrides venue-level host for this show only
         name: "Guest KJ",     // See "Per-show host override" below
         affiliation: "Some Karaoke Co",
@@ -545,7 +551,7 @@ read as fatal.
 |---|---|---|
 | `validate:all` | `js/data.json` against `schema/venue.schema.json`, plus cross-row checks and data-quality warnings; CSS load order on all 4 pages | Non-zero exit fails CI. Warnings are informational and do not fail |
 | `test:unit` | `js/utils/date.js`, `js/utils/hosts.js`, and the pure predicates in `js/services/venues.js` | **Pure modules only.** View classes belong to e2e — do not unit test them |
-| `npm test` | Behaviour across all 4 pages, 12 spec files | Starts its own server on **:3456**, so it will not collide with `npm run dev` |
+| `npm test` | Behaviour across all 4 pages, 15 spec files | Starts its own server on **:3456**, so it will not collide with `npm run dev` |
 
 Notes that will bite you otherwise:
 
@@ -668,6 +674,7 @@ Current ADRs:
 - [ADR-013](docs/adr/013-show-centric-presentation.md) — Venue-rooted storage, registry identity, show-centric presentation: the **show** (a derived `{venue, schedule entry}` pair) is the unit of display; storage stays venue-rooted; series are represented by their host registry entry
 - [ADR-014](docs/adr/014-tag-colors-authored-css.md) — Tag colours are authored CSS; `data.json` is purely factual
 - [ADR-015](docs/adr/015-one-confirmation-per-show-date.md) — **One confirmation, anchored to the show date**: a show carries one public date, the night the latest evidence confirms (supersedes the ADR-013 evidence-level addendum)
+- [ADR-016](docs/adr/016-show-lifespan.md) — **A show's lifespan, recorded as it becomes known**: an optional `activePeriod` on the schedule entry, never backfilled; a change is an end plus a start; no announcement; ended shows removed 30 days after their end
 
 ## Security Considerations
 - Always use `escapeHtml()` when rendering user-provided content

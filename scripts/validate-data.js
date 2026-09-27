@@ -9,7 +9,13 @@
  * venues (active, but every event is in the past) and shows whose confirmed
  * night is more than 60 days past, or is not a night the show runs at all
  * (ADR-015, #275), are reported as warnings — worth a look, but not a build
- * failure.
+ * failure. So are the lifespan checks (ADR-016): a show that ended more than
+ * 30 days ago, an exclusion outside its show's lifespan, a venue with nothing
+ * running today, and two lives of one show that overlap.
+ *
+ * js/data.json stands in for a database until it converts to one. The schema
+ * is its column types and this script is its constraints — where a table would
+ * carry a CHECK or an exclusion constraint, the rule lives here.
  *
  * Exits non-zero on failure — suitable as a pre-commit / CI gate. Enforced
  * by .github/workflows/ci.yml.
@@ -115,6 +121,17 @@ function checkHostRef(venue, host, where) {
     }
 }
 
+/**
+ * A window that ends before it starts is empty — the thing it bounds would
+ * never appear. JSON Schema cannot compare two fields, so the CHECK lives here.
+ * Applies at both levels, venue and show (ADR-016). ISO dates sort as text.
+ */
+function checkPeriodOrder(venue, period, where) {
+    if (period?.start && period?.end && period.start > period.end) {
+        fail(venue, `${where} starts ${period.start}, after it ends ${period.end}`);
+    }
+}
+
 // Generous box around the Austin metro. Every venue in the directory sits well
 // inside it; the point is to catch a sign flip or a wrong-city geocode, not to
 // police the edges of the service area.
@@ -216,11 +233,13 @@ for (const venue of data.listings) {
     // duplicate a stronger check with a weaker one.
 
     checkHostRef(venue, venue.host, 'host');
+    checkPeriodOrder(venue, venue.activePeriod, 'activePeriod');
 
     if (Array.isArray(venue.schedule)) {
         venue.schedule.forEach((entry, i) => {
             const prefix = `schedule[${i}]`;
             checkHostRef(venue, entry.host, `${prefix}.host`);
+            checkPeriodOrder(venue, entry.activePeriod, `${prefix}.activePeriod`);
 
             // Minute-typo heuristic — start times should land on :00/:15/:30/:45.
             // Catches things like 17:03 that should have been 17:00.
@@ -302,16 +321,54 @@ for (const [label, registry] of [['kjs', KJS], ['companies', COMPANIES], ['citie
 const TODAY = new Date();
 TODAY.setHours(0, 0, 0, 0);
 
+/** Local YYYY-MM-DD, to compare against the data's date strings as text. */
+function isoOf(d) {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+const TODAY_ISO = isoOf(TODAY);
+
+// A show's lifespan (ADR-016). A mirror of `isActiveOn` in js/utils/date.js,
+// for the same reason `entryRunsOn` below mirrors `scheduleMatchesDate`.
+function inLifespan(thing, iso) {
+    const p = thing?.activePeriod;
+    if (!p) return true;
+    return (!p.start || p.start <= iso) && (!p.end || iso <= p.end);
+}
+function hasEnded(entry, iso) {
+    const end = entry?.activePeriod?.end;
+    return Boolean(end) && end < iso;
+}
+
 for (const venue of data.listings) {
     if (venue.active === false) continue;
     const schedule = Array.isArray(venue.schedule) ? venue.schedule : [];
 
-    const hasRecurring = schedule.some(e => e.frequency !== 'once');
+    // A recurring show that has ended is as spent as a past one-time event.
+    const hasRecurring = schedule.some(e => e.frequency !== 'once' && !hasEnded(e, TODAY_ISO));
     const hasUpcoming = schedule.some(e => {
         if (e.frequency !== 'once' || !e.date) return false;
         return new Date(e.date + 'T00:00:00') >= TODAY;
     });
-    if (hasRecurring || hasUpcoming) continue;
+    if (hasRecurring || hasUpcoming) {
+        // Something is coming, but is anything running now? Every surface with
+        // no date of its own lists only shows running today (ADR-016), so a
+        // venue whose shows all start later shows an empty schedule until then.
+        // That is right between KJs; for a venue that has not opened yet, the
+        // venue's own activePeriod keeps it hidden instead.
+        const listedToday = schedule.some(e => inLifespan(e, TODAY_ISO));
+        if (!listedToday && inLifespan(venue, TODAY_ISO)) {
+            const first = schedule
+                .map(e => e.activePeriod?.start)
+                .filter(s => s && s > TODAY_ISO)
+                .sort()[0];
+            warnings.push(
+                `${venue.name} (${venue.id}) has no show running today — the first starts ${first}, ` +
+                'so its schedule lists nothing until then. If the venue itself opens that day, ' +
+                'put the start on the venue\'s activePeriod instead'
+            );
+        }
+        continue;
+    }
 
     const lastDate = schedule.map(e => e.date).filter(Boolean).sort().pop();
     warnings.push(
@@ -348,6 +405,74 @@ for (const venue of data.listings) {
     }
 }
 
+// ---- Ended shows (ADR-016) ----
+// The recurring twin of the check above, with the same 30-day grace: a show
+// whose lifespan ended more than STALE_ONCE_DAYS ago can no longer match a
+// date anyone is likely to look at. We keep no history of shows — git holds
+// what was published — so the curator removes it. Warned, not failed, for the
+// reason above, and because a date-driven failure would turn CI red on a day
+// nothing changed.
+//
+// Exclusions outside a show's lifespan are reported here too: the show is not
+// running that night, so the exclusion can never apply.
+const staleCutoffIso = isoOf(staleCutoff);
+
+for (const venue of data.listings) {
+    for (const entry of venue.schedule || []) {
+        const label = `${entry.day || entry.date || '?'} ${entry.startTime || ''}`.trim();
+        const end = entry.activePeriod?.end;
+        if (end && end < staleCutoffIso) {
+            warnings.push(
+                `${venue.name} (${venue.id}) ${label} ended ${end}, more than ${STALE_ONCE_DAYS} days ago — ` +
+                'remove it (ADR-016: no history is kept; git has what was published)'
+            );
+        }
+        for (const ex of entry.exclusions || []) {
+            if (ex?.date && !inLifespan(entry, ex.date)) {
+                warnings.push(
+                    `${venue.name} (${venue.id}) ${label} excludes ${ex.date}, which is outside the show's ` +
+                    'activePeriod — it can never apply'
+                );
+            }
+        }
+    }
+}
+
+// ---- Overlapping lives of one show (ADR-016) ----
+// The exclusion constraint a table would carry. Two recurring entries at one
+// venue with the same frequency and day are two lives of the same slot, and
+// they must not both be alive on the same night: the likely cause is a change
+// that opened the new entry without ending the old one, which renders both.
+// Start time is left out of the key on purpose, so a change of time is caught
+// too. No venue in the data runs two shows on one day pattern; if one ever
+// does, this is the warning that says so.
+{
+    const OPEN_START = '0000-01-01';
+    const OPEN_END = '9999-12-31';
+    const overlaps = (a, b) =>
+        (a?.start || OPEN_START) <= (b?.end || OPEN_END) &&
+        (b?.start || OPEN_START) <= (a?.end || OPEN_END);
+
+    for (const venue of data.listings) {
+        const recurring = (venue.schedule || [])
+            .map((entry, i) => ({ entry, i }))
+            .filter(({ entry }) => entry.frequency !== 'once');
+        for (let a = 0; a < recurring.length; a += 1) {
+            for (let b = a + 1; b < recurring.length; b += 1) {
+                const x = recurring[a].entry;
+                const y = recurring[b].entry;
+                if (x.frequency !== y.frequency || x.day !== y.day) continue;
+                if (!overlaps(x.activePeriod, y.activePeriod)) continue;
+                warnings.push(
+                    `${venue.name} (${venue.id}) schedule[${recurring[a].i}] and schedule[${recurring[b].i}] ` +
+                    `are both ${x.frequency} ${x.day} and alive on the same nights — ` +
+                    'end the old one the day before the new one starts'
+                );
+            }
+        }
+    }
+}
+
 // Does a schedule entry run on a given date? A deliberate mirror of
 // `scheduleMatchesDate` in js/utils/date.js — the calendar's own matcher —
 // because this script is CommonJS and that module is ESM, and the scripts
@@ -358,6 +483,7 @@ for (const venue of data.listings) {
 const ENTRY_WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const ORDINALS = ['first', 'second', 'third', 'fourth', 'fifth'];
 function entryRunsOn(entry, date, iso) {
+    if (!inLifespan(entry, iso)) return false;   // ADR-016, as scheduleMatchesDate
     if (entry.exclusions?.some(ex => ex?.date === iso)) return false;
     if (entry.frequency === 'once') return entry.date === iso;
     if (!entry.day || ENTRY_WEEKDAYS[date.getDay()] !== entry.day) return false;
@@ -425,6 +551,7 @@ for (const venue of data.listings) {
 
         if (verified >= TODAY) continue;                  // an upcoming night cannot be stale
         if (entry.frequency === 'once') continue;         // a spent one-time event is not re-confirmable
+        if (hasEnded(entry, TODAY_ISO)) continue;         // nor is a show that has ended (ADR-016)
         if (verified >= verifiedCutoff) continue;
         warnings.push(
             `${venue.name} (${venue.id}) ${label} was last confirmed for ${entry.lastVerified}` +

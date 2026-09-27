@@ -38,6 +38,9 @@ import {
   isAnnouncedOn,
   nextOccurrence,
   lastOccurrenceOnOrBefore,
+  isActiveOn,
+  activeEntries,
+  getUpcomingExclusions,
 } from '../js/utils/date.js';
 
 // January 2026 has five Fridays: 2, 9, 16, 23, 30.
@@ -490,5 +493,100 @@ describe('nextOccurrence / lastOccurrenceOnOrBefore', () => {
     // A date that already is a real night stays put.
     assert.equal(lastOccurrenceOnOrBefore(every('Thursday'), '2026-09-10'), '2026-09-10');
     assert.equal(lastOccurrenceOnOrBefore(every('Friday'), null), null);
+  });
+});
+
+describe('show lifespan — activePeriod on a schedule entry (ADR-016)', () => {
+  const friday = (activePeriod) => ({ frequency: 'every', day: 'Friday', startTime: '21:00', activePeriod });
+
+  it('isActiveOn: no activePeriod, or a missing bound, is open', () => {
+    assert.equal(isActiveOn({}, JAN(9)), true);
+    assert.equal(isActiveOn(friday({ start: '2026-01-16' }), JAN(30)), true);
+    assert.equal(isActiveOn(friday({ end: '2026-01-16' }), JAN(2)), true);
+    assert.equal(isActiveOn(null, JAN(9)), true);
+  });
+
+  it('isActiveOn: both bounds are inclusive', () => {
+    const p = friday({ start: '2026-01-09', end: '2026-01-23' });
+    assert.equal(isActiveOn(p, JAN(8)), false);
+    assert.equal(isActiveOn(p, JAN(9)), true);
+    assert.equal(isActiveOn(p, JAN(23)), true);
+    assert.equal(isActiveOn(p, JAN(24)), false);
+  });
+
+  it('isActiveOn is the same question at the venue level', () => {
+    const venue = { activePeriod: { start: '2026-06-01', end: '2026-08-31' } };
+    assert.equal(isActiveOn(venue, new Date(2026, 5, 1)), true);
+    assert.equal(isActiveOn(venue, new Date(2026, 8, 1)), false);
+  });
+
+  it('a show stops matching after its end — the last night still runs', () => {
+    const e = friday({ end: '2026-01-16' });
+    assert.equal(scheduleMatchesDate(e, JAN(9)), true);
+    assert.equal(scheduleMatchesDate(e, JAN(16)), true);
+    assert.equal(scheduleMatchesDate(e, JAN(23)), false);
+  });
+
+  it('a show does not match before its start — the first night runs', () => {
+    const e = friday({ start: '2026-01-16' });
+    assert.equal(scheduleMatchesDate(e, JAN(9)), false);
+    assert.equal(scheduleMatchesDate(e, JAN(16)), true);
+    assert.equal(scheduleMatchesDate(e, JAN(30)), true);
+  });
+
+  it('a change is an end plus a start: exactly one of the two runs on any night', () => {
+    const before = { frequency: 'every', day: 'Tuesday', activePeriod: { end: '2026-01-14' } };
+    const after = { frequency: 'every', day: 'Thursday', activePeriod: { start: '2026-01-15' } };
+    const nights = (e) => [6, 8, 13, 15, 20, 22].filter(d => scheduleMatchesDate(e, JAN(d)));
+    assert.deepEqual(nights(before), [6, 13]);
+    assert.deepEqual(nights(after), [15, 22]);
+  });
+
+  it('an ordinal show inside a window still obeys its ordinal', () => {
+    const e = { frequency: 'last', day: 'Friday', activePeriod: { start: '2026-01-20' } };
+    assert.equal(scheduleMatchesDate(e, JAN(23)), false, 'in the window, but the fourth, not the last');
+    assert.equal(scheduleMatchesDate(e, JAN(30)), true);
+  });
+
+  it('an exclusion outside the lifespan finds nothing — the show is not running', () => {
+    const e = { ...friday({ end: '2026-01-16' }), exclusions: [{ date: '2026-01-23', reason: 'Holiday' }] };
+    assert.equal(getVenueExclusionForDate({ schedule: [e] }, JAN(23)), null);
+  });
+
+  it('activeEntries keeps the shows running on the reference date', () => {
+    const ended = friday({ end: '2026-01-09' });
+    const running = friday();
+    const later = friday({ start: '2026-02-01' });
+    const once = { frequency: 'once', date: '2026-01-02' };
+    assert.deepEqual(activeEntries([ended, running, later, once], JAN(16)), [running, once],
+      'one-time entries carry no window, so they always pass');
+    assert.deepEqual(activeEntries(undefined, JAN(16)), []);
+  });
+
+  it('nextOccurrence waits for the start and stops at the end', () => {
+    assert.equal(nextOccurrence(friday({ start: '2026-01-16' }), { from: JAN(1) }), '2026-01-16');
+    assert.equal(nextOccurrence(friday({ end: '2026-01-09' }), { from: JAN(10) }), null);
+  });
+
+  it('lastOccurrenceOnOrBefore never reaches back past the start', () => {
+    assert.equal(lastOccurrenceOnOrBefore(friday({ start: '2026-01-16' }), '2026-01-20'), '2026-01-16');
+    assert.equal(lastOccurrenceOnOrBefore(friday({ start: '2026-01-16' }), '2026-01-12'), null);
+  });
+
+  it('getUpcomingExclusions skips an exclusion that falls after the show ends', () => {
+    // Relative to the real today: the function has no injectable clock.
+    const iso = (days) => {
+      const d = startOfToday();
+      d.setDate(d.getDate() + days);
+      return toLocalISO(d);
+    };
+    const weekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][
+      new Date(`${iso(7)}T12:00:00`).getDay()];
+    const show = (activePeriod) => ({
+      frequency: 'every', day: weekday, activePeriod,
+      exclusions: [{ date: iso(7), reason: 'Holiday' }],
+    });
+    assert.equal(getUpcomingExclusions({ schedule: [show()] }).length, 1);
+    assert.equal(getUpcomingExclusions({ schedule: [show({ end: iso(3) })] }).length, 0);
   });
 });

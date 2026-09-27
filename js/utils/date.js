@@ -154,6 +154,36 @@ export function isCurrentWeek(weekStart) {
 }
 
 /**
+ * Whether a date falls inside something's `activePeriod` — a venue's or a
+ * schedule entry's. One concept at two levels (ADR-016): the window during
+ * which the thing exists. No `activePeriod`, or a missing bound, is open.
+ * @param {Object} thing - Venue or schedule entry
+ * @param {Date} date - Date to check
+ * @returns {boolean}
+ */
+export function isActiveOn(thing, date) {
+    const period = thing?.activePeriod;
+    if (!period) return true;
+    return isDateInRange(date, period.start, period.end);
+}
+
+/**
+ * The entries a surface with no date of its own lists: those whose lifespan
+ * includes today (ADR-016). The detail schedule table, the host section, search
+ * and the KJ views ask this; the calendar asks `scheduleMatchesDate` for its
+ * own date instead. A show that has not started yet is left out rather than
+ * labelled — "Every Thursday" with no date reads as now, and the switch is not
+ * announced. One-time entries carry no window and always pass; surfaces that
+ * drop spent ones still do so with `isPastOnceEvent`.
+ * @param {Object[]} schedule - A venue's schedule
+ * @param {Date} [asOf] - Reference date (defaults to today)
+ * @returns {Object[]}
+ */
+export function activeEntries(schedule, asOf = startOfToday()) {
+    return (schedule || []).filter(entry => isActiveOn(entry, asOf));
+}
+
+/**
  * Check if a schedule matches a specific date
  * Handles "every", "first", "second", etc. patterns
  * @param {Object} schedule - Schedule object with frequency and day
@@ -162,6 +192,12 @@ export function isCurrentWeek(weekStart) {
  */
 export function scheduleMatchesDate(schedule, date) {
     const { frequency, day } = schedule;
+
+    // A show's lifespan (ADR-016): outside its own activePeriod it does not
+    // run, whatever its pattern says. Checked here, the single matcher, so the
+    // calendar, the extended sections, the map filter, the closure banner and
+    // next/lastOccurrence all inherit it.
+    if (!isActiveOn(schedule, date)) return false;
 
     // One-time special event: compare exact date string.
     //
@@ -279,6 +315,9 @@ export function getUpcomingExclusions(venue, days = 60) {
             const dateStr = ex?.date;
             if (!dateStr || seen.has(dateStr)) continue;
             const d = parseLocalDate(dateStr);
+            // Outside the show's lifespan the exclusion can never apply
+            // (ADR-016) — the show is not running that night anyway.
+            if (!isActiveOn(entry, d)) continue;
             if (d > today && d <= horizon) {
                 seen.add(dateStr);
                 upcoming.push({ date: dateStr, reason: ex.reason || null });
