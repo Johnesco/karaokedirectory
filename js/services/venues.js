@@ -31,7 +31,7 @@
  * second implementation waiting to disagree with the first.
  */
 
-import { scheduleMatchesDate, isDateInRange, getDateRange, parseLocalDate } from '../utils/date.js';
+import { scheduleMatchesDate, isActiveOn, activeEntries, getDateRange, parseLocalDate } from '../utils/date.js';
 import { getSortableName, containsIgnoreCase } from '../utils/string.js';
 import { getTagConfig } from '../utils/tags.js';
 import { getVenueHosts } from '../utils/render.js';
@@ -50,18 +50,6 @@ let registryIds = new Set();
  */
 function isVenueActive(venue) {
     return venue.active !== false;
-}
-
-/**
- * Check if a venue's activePeriod includes the given date.
- * Venues without an activePeriod are always considered active.
- * @param {Object} venue - Venue object
- * @param {Date} date - Date to check
- * @returns {boolean} True if the venue is in its active window on `date`
- */
-function isVenueActiveOn(venue, date) {
-    if (!venue.activePeriod) return true;
-    return isDateInRange(date, venue.activePeriod.start, venue.activePeriod.end);
 }
 
 /**
@@ -88,7 +76,7 @@ function getActiveVenues() {
 export function venuePasses(venue, { date = null, includeDedicated = true, searchQuery = '' } = {}) {
     if (!includeDedicated && venue.dedicated) return false;
     if (searchQuery && !venueMatchesSearch(venue, searchQuery)) return false;
-    if (!isVenueActiveOn(venue, date || new Date())) return false;
+    if (!isActiveOn(venue, date || new Date())) return false;
     return true;
 }
 
@@ -101,10 +89,10 @@ export function venuePasses(venue, { date = null, includeDedicated = true, searc
  *
  * Two modes, because "all future shows" is not a finite span:
  *
- *   - **Open-ended** (`end` is null) — a recurring entry qualifies on sight,
- *     since it keeps recurring; only `once` entries have a date to fall behind.
- *     This is what separates "All" from today's unfiltered map: a venue whose
- *     sole listing is last month's special event drops off.
+ *   - **Open-ended** (`end` is null) — a recurring entry qualifies unless its
+ *     lifespan ended before `start` (ADR-016); a `once` entry qualifies unless
+ *     its date is behind. This is what separates "All" from today's unfiltered
+ *     map: a venue whose sole listing is last month's special event drops off.
  *   - **Bounded** — walks each date in the span and asks `scheduleMatchesDate`,
  *     the same matcher the weekly calendar uses, so the two views agree about
  *     what happens on a given day.
@@ -128,7 +116,10 @@ export function venueHasShowInRange(venue, start, end = null) {
         const from = new Date(start);
         from.setHours(0, 0, 0, 0);
         return entries.some(entry => {
-            if (entry.frequency !== 'once') return true;
+            if (entry.frequency !== 'once') {
+                const ends = entry.activePeriod?.end;
+                return !ends || parseLocalDate(ends) >= from;
+            }
             return entry.date ? parseLocalDate(entry.date) >= from : false;
         });
     }
@@ -292,12 +283,12 @@ export function venueMatchesSearch(venue, query) {
     // Search in affiliation
     if (containsIgnoreCase(venue.host?.affiliation, q)) return true;
 
-    // Search in per-show hosts (multi-host venues like The Highball)
-    if (Array.isArray(venue.schedule)) {
-        for (const entry of venue.schedule) {
-            if (containsIgnoreCase(entry.host?.name, q)) return true;
-            if (containsIgnoreCase(entry.host?.affiliation, q)) return true;
-        }
+    // Search in per-show hosts (multi-host venues like The Highball). Only
+    // shows running today: a host whose show ended must stop matching, and one
+    // whose show has not started is not announced (ADR-016).
+    for (const entry of activeEntries(venue.schedule)) {
+        if (containsIgnoreCase(entry.host?.name, q)) return true;
+        if (containsIgnoreCase(entry.host?.affiliation, q)) return true;
     }
 
     // Search in tags (by ID or label)

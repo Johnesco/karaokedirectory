@@ -88,7 +88,8 @@ export function getVenueDebugInfo(venue, date) {
                 frequency: sched.frequency,
                 day: sched.day,
                 startTime: sched.startTime,
-                endTime: sched.endTime
+                endTime: sched.endTime,
+                activePeriod: sched.activePeriod
             });
         }
     }
@@ -111,6 +112,12 @@ export function getVenueDebugInfo(venue, date) {
     } else {
         matchReason = `${capitalize(primary.frequency)} ${capitalize(primary.day)}`;
     }
+
+    // The show's own lifespan (ADR-016), so a switch can be checked by eye
+    // without the public page ever saying it is coming.
+    const period = primary.activePeriod;
+    if (period?.start) matchReason += ` · from ${period.start}`;
+    if (period?.end) matchReason += ` · until ${period.end}`;
 
     return {
         matchReason,

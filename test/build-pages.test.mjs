@@ -42,6 +42,22 @@ describe('showsOf', () => {
     assert.equal(sat.kjId, null);
     assert.equal(sat.companyId, 'show-level');
   });
+
+  it('keeps only shows running on the build date (ADR-016)', () => {
+    const fixture = {
+      listings: [{
+        id: 'v', name: 'V',
+        schedule: [
+          { frequency: 'every', day: 'Tuesday', activePeriod: { end: '2026-10-14' } },
+          { frequency: 'every', day: 'Thursday', activePeriod: { start: '2026-10-15' } },
+          { frequency: 'once', date: '2026-11-01' },
+        ],
+      }],
+    };
+    const days = (today) => showsOf(fixture, { today }).map((s) => s.entry.day || s.entry.date);
+    assert.deepEqual(days('2026-10-14'), ['Tuesday', '2026-11-01'], 'the last night is still a running night');
+    assert.deepEqual(days('2026-10-15'), ['Thursday', '2026-11-01'], 'the switch lands at the first build on its date');
+  });
 });
 
 describe('entitiesOf', () => {
@@ -248,6 +264,17 @@ describe('scheduleNode — a rule, not a list of dates', () => {
     const s = scheduleNode({ frequency: 'every', day: 'Friday' }, { id: 'v', name: 'V', activePeriod: { start: '2026-06-01', end: '2026-08-31' } });
     assert.equal(s.startDate, '2026-06-01');
     assert.equal(s.endDate, '2026-08-31');
+  });
+
+  it('carries the show\'s own lifespan, taking the tighter bound of the two (ADR-016)', () => {
+    const season = { id: 'v', name: 'V', activePeriod: { start: '2026-06-01', end: '2026-08-31' } };
+    const inside = scheduleNode({ frequency: 'every', day: 'Friday', activePeriod: { start: '2026-07-01' } }, season);
+    assert.equal(inside.startDate, '2026-07-01');
+    assert.equal(inside.endDate, '2026-08-31');
+
+    const open = scheduleNode({ frequency: 'every', day: 'Friday', activePeriod: { end: '2026-10-14' } }, { id: 'v', name: 'V' });
+    assert.equal(open.startDate, undefined);
+    assert.equal(open.endDate, '2026-10-14');
   });
 });
 

@@ -1,6 +1,6 @@
 # ADR-016: A show's lifespan, recorded as it becomes known
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-09-26
 **Tickets:** #288
 **Related:** [ADR-013](013-show-centric-presentation.md) (the show is the unit of presentation) · [ADR-015](015-one-confirmation-per-show-date.md) (a date means the night it is about) · #169 (the 30-day grace for spent one-time events)
@@ -80,12 +80,12 @@ This is how venue-level `activePeriod` already behaves (`venuePasses()` checks
 the calendar's date, `getVenuesSorted()` checks today), so the entry level adds
 no new rule, only a second place it applies.
 
-"Current today" is one predicate, replacing `isPastOnceEvent()`: a `once` entry
-is current until its date passes; a recurring entry is current when today falls
-inside its window. A future `once` row stays listed because its date is printed
-on its face. A future recurring row is hidden because "Every Thursday" with no
-date reads as *now*, and labelling it would be the announcement this decision
-declines.
+"Current today" is `activeEntries()`: the entries whose window includes today.
+A `once` entry carries no window and always passes; the surfaces that already
+dropped spent one-time events (the map card, the "Also" line) still do so with
+`isPastOnceEvent()`, and the others are unchanged for them. A future recurring
+row is hidden because "Every Thursday" with no date reads as *now*, and
+labelling it would be the announcement this decision declines.
 
 **5. Ended entries are removed 30 days after `end`.** We keep no history of
 shows, in the public file or in the curator master. For 30 days an ended entry
@@ -157,29 +157,42 @@ schema definition already exist.
   night this show runs" check for `lastVerified` all inherit it with no further
   change. A confirmation for a night after a show's end is reported by a check
   that already exists.
-- `isPastOnceEvent()` becomes the general "current today" predicate, used by
-  every date-less surface. The detail schedule table, the KJ views and
-  `venueMatchesSearch()` gain a filter they have never had, so an ended show's
-  host stops matching search.
+- `isActiveOn()` answers for venues and shows alike, and `activeEntries()` is
+  the date-less rule. The detail schedule table, the host section, the KJ views
+  and `venueMatchesSearch()` gain a filter they have never had, so an ended
+  show's host stops matching search. The "Also" line on a calendar card reads
+  other shows as of the card's own date rather than today. Nothing changes for
+  an entry without a window, so the data as it stands renders exactly as before.
+- Debug mode (`?debug=1`) appends the window to a card's match reason
+  ("Every Tuesday · until 2026-10-14"), so a switch can be checked by eye
+  without the public page saying it is coming.
 - JSON-LD `Schedule` bounds become the intersection of the venue's and the
   entry's windows. A current show with a known end carries `endDate`, so search
   engines stop at the right night even if no deploy happens, which is the rot
   `scheduleNode()` exists to prevent. Entries not current at build time get no
   event node, matching the visible page.
-- `validate-data.js` gains: `start` after `end` (fail); `activePeriod` on a
-  `once` entry (schema); an `end` more than 30 days past (warn: prune it); an
-  exclusion outside its entry's window (warn: it can never apply). The "active
-  venue with no upcoming events" check stops counting ended recurring entries,
-  and the stale-confirmation warning skips them.
+- `validate-data.js` gains: `start` after `end` (fail, at both levels);
+  `activePeriod` on a `once` entry, or an empty one (schema); an `end` more than
+  30 days past (warn: prune it); an exclusion outside its entry's window (warn:
+  it can never apply); two recurring entries at one venue with the same
+  frequency and day whose windows overlap (warn: a change that did not end the
+  old entry — the exclusion constraint a table would carry); and an active
+  venue with nothing running today but a show starting later (warn: its
+  schedule lists nothing until then). The "active venue with no upcoming
+  events" check stops counting ended recurring entries, and the
+  stale-confirmation warning skips them.
 - The curator gains the change action and the 30-day prune. Because the prune
   removes the entry from the master itself, the export and the master never
   differ by it, and `check-curator-drift.js` needs no rule for it. This is work
   outside the repo, tracked on #288.
-- **If storage moves to a database** (ADR-009's trigger, a write path): the
-  window maps to a date-range column on the show row, with a constraint against
-  overlapping versions of the same show, and git's role as history passes to an
-  audit table. The public shape does not change. A write path is also where a
-  lineage link between versions would start to earn its keep.
+- **`data.json` stands in for a database until it converts to one.** The owner
+  intends that conversion (to a relational or otherwise more fitting store);
+  until then the JSON is shaped so it maps cleanly. The schema is the column
+  types, `validate-data.js` the constraints, git the audit log. On conversion
+  the window becomes a date-range column on the show row, the overlap warning
+  becomes an exclusion constraint, and git's role as history passes to an audit
+  table. The public shape does not change. A write path (ADR-009's trigger) is
+  also where a lineage link between versions would start to earn its keep.
 
 ### Deferred, with triggers
 

@@ -151,6 +151,22 @@ describe('venueHasShowInRange — the map date filter (#215)', () => {
   it('no span at all is no constraint', () => {
     assert.equal(venueHasShowInRange(venue(), null, null), true);
   });
+
+  it('open-ended: a recurring show that ended before the span drops off (ADR-016)', () => {
+    const ended = venue({ schedule: [{ frequency: 'every', day: 'Friday', activePeriod: { end: '2026-01-02' } }] });
+    const endsLater = venue({ schedule: [{ frequency: 'every', day: 'Friday', activePeriod: { end: '2026-01-30' } }] });
+    const startsLater = venue({ schedule: [{ frequency: 'every', day: 'Friday', activePeriod: { start: '2026-03-06' } }] });
+    assert.equal(venueHasShowInRange(ended, JAN(4), null), false);
+    assert.equal(venueHasShowInRange(endsLater, JAN(4), null), true);
+    assert.equal(venueHasShowInRange(startsLater, JAN(4), null), true, 'a show still to come is a future show');
+  });
+
+  it('bounded: a span before a show starts or after it ends is empty (ADR-016)', () => {
+    const v = venue({ schedule: [{ frequency: 'every', day: 'Friday', activePeriod: { start: '2026-01-16', end: '2026-01-23' } }] });
+    assert.equal(venueHasShowInRange(v, JAN(4), JAN(10)), false);
+    assert.equal(venueHasShowInRange(v, JAN(11), JAN(17)), true);
+    assert.equal(venueHasShowInRange(v, JAN(25), JAN(31)), false);
+  });
 });
 
 describe('venueMatchesSearch', () => {
@@ -191,6 +207,26 @@ describe('venueMatchesSearch', () => {
       schedule: [{ frequency: 'once', date: '2026-01-30', eventName: 'Halloween Spooktacular' }],
     });
     assert.equal(venueMatchesSearch(v, 'spooktacular'), false);
+  });
+
+  it('matches only the per-show hosts of shows running today (ADR-016)', () => {
+    // Search has no date of its own, so it answers for today. Relative to the
+    // real clock: venueMatchesSearch takes no reference date.
+    const iso = (days) => {
+      const d = new Date();
+      d.setDate(d.getDate() + days);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    };
+    const v = venue({
+      schedule: [
+        { frequency: 'every', day: 'Tuesday', host: { name: 'KJ Departed' }, activePeriod: { end: iso(-1) } },
+        { frequency: 'every', day: 'Thursday', host: { name: 'KJ Current' } },
+        { frequency: 'every', day: 'Friday', host: { name: 'KJ Upcoming' }, activePeriod: { start: iso(10) } },
+      ],
+    });
+    assert.equal(venueMatchesSearch(v, 'current'), true);
+    assert.equal(venueMatchesSearch(v, 'departed'), false, 'an ended show no longer matches');
+    assert.equal(venueMatchesSearch(v, 'upcoming'), false, 'a show still to come is not announced');
   });
 });
 
