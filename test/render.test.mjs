@@ -13,7 +13,7 @@
 import { describe, it, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { resolveHostFor, getVenueHosts, renderHostSection, renderScheduleTable } from '../js/utils/render.js';
+import { resolveHostFor, getVenueHosts, renderHostSection, renderScheduleTable, getScheduleContext } from '../js/utils/render.js';
 import { initFreshLens } from '../js/utils/freshness.js';
 
 const KJ_A = { name: 'KJ Alpha', website: 'https://alpha.example' };
@@ -135,5 +135,57 @@ describe('renderScheduleTable under the freshness lens (#259)', () => {
     initFreshLens(true);
     const html = renderScheduleTable({ schedule: [friday(), friday({ day: 'Saturday' })] });
     assert.doesNotMatch(html, /Verified/);
+  });
+});
+
+describe('show lifespan on date-less surfaces (ADR-016)', () => {
+  // These surfaces answer for today, so the fixtures are relative to the real
+  // clock: an ended show, a running one, and one still to come.
+  const iso = (days) => {
+    const d = new Date();
+    d.setDate(d.getDate() + days);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  };
+  const ended = friday({ day: 'Tuesday', host: KJ_A, activePeriod: { end: iso(-1) } });
+  const running = friday({ day: 'Thursday' });
+  const upcoming = friday({ day: 'Saturday', host: KJ_B, activePeriod: { start: iso(10) } });
+  const venue = { schedule: [ended, running, upcoming] };
+
+  it('the schedule table lists only the show running today', () => {
+    const html = renderScheduleTable(venue);
+    assert.match(html, /Thursday/);
+    assert.doesNotMatch(html, /Tuesday/, 'an ended show is gone');
+    assert.doesNotMatch(html, /Saturday/, 'a show still to come is not announced');
+  });
+
+  it('the table says there is nothing to list when no show is running', () => {
+    assert.match(renderScheduleTable({ schedule: [ended, upcoming] }), /No schedule information available/);
+  });
+
+  it('getVenueHosts drops the hosts of shows not running on the reference date', () => {
+    assert.deepEqual(getVenueHosts(venue), []);
+    const later = new Date();
+    later.setDate(later.getDate() + 11);
+    assert.deepEqual(getVenueHosts(venue, later).map((h) => h.host), [KJ_B]);
+  });
+
+  it('the "Also" list reads other shows as of the card\'s own date', () => {
+    // Both card dates are Mondays, so neither lands on a night one of the
+    // fixture's shows runs — that would drop it from "Also" for a different
+    // reason (a show on the card's own night) and make the test weekday-bound.
+    const monday = (from, step) => {
+      const d = new Date();
+      d.setDate(d.getDate() + from);
+      while (d.getDay() !== 1) d.setDate(d.getDate() + step);
+      return d;
+    };
+    const before = monday(-1, -1);   // inside the ended show's life
+    const after = monday(10, 1);     // inside the upcoming show's life
+    // A card before the switch mentions the show that was running then, not the one to come.
+    assert.match(getScheduleContext(venue, running, before).moreText, /Tue/);
+    assert.doesNotMatch(getScheduleContext(venue, running, before).moreText, /Sat/);
+    // A card after it mentions the new show, not the ended one.
+    assert.match(getScheduleContext(venue, running, after).moreText, /Sat/);
+    assert.doesNotMatch(getScheduleContext(venue, running, after).moreText, /Tue/);
   });
 });

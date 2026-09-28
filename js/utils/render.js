@@ -4,7 +4,7 @@
  */
 
 import { escapeHtml } from './string.js';
-import { formatScheduleEntry, formatActivePeriodText, formatDateMonthDay, scheduleMatchesDate, WEEKDAYS, getVenueExclusionForDate, getUpcomingExclusions, isPastOnceEvent } from './date.js';
+import { formatScheduleEntry, formatActivePeriodText, formatDateMonthDay, scheduleMatchesDate, WEEKDAYS, getVenueExclusionForDate, getUpcomingExclusions, isPastOnceEvent, activeEntries, startOfToday } from './date.js';
 import { buildMapUrl, buildDirectionsUrl, createSocialLinks, formatAddress, sanitizeUrl } from './url.js';
 import { isFreshLens, renderFreshness } from './freshness.js';
 
@@ -29,13 +29,18 @@ export function resolveHostFor(venue, scheduleEntry) {
  * host; both still appear here because both are genuinely associated with the
  * venue (the venue host covers the non-overridden shows).
  *
+ * Per-show hosts come only from shows running on `asOf` (ADR-016): a KJ whose
+ * show ended is no longer associated with the venue, and one whose show has not
+ * started yet is not announced.
+ *
  * @param {Object} venue
+ * @param {Date} [asOf] - Reference date (defaults to today)
  * @returns {Array<{ host: Object, scope: 'venue'|'show', scheduleEntry: Object|null }>}
  */
-export function getVenueHosts(venue) {
+export function getVenueHosts(venue, asOf = startOfToday()) {
     const hosts = [];
     if (venue?.host) hosts.push({ host: venue.host, scope: 'venue', scheduleEntry: null });
-    for (const entry of venue?.schedule || []) {
+    for (const entry of activeEntries(venue?.schedule, asOf)) {
         if (entry.host) hosts.push({ host: entry.host, scope: 'show', scheduleEntry: entry });
     }
     return hosts;
@@ -85,8 +90,10 @@ function scheduleEntryLabel(entry, { short = false } = {}) {
  * @returns {string} HTML string for schedule table
  */
 export function renderScheduleTable(venue) {
-    const schedule = venue?.schedule;
-    if (!schedule || schedule.length === 0) {
+    // Shows running today only (ADR-016). The table has no date of its own, so
+    // an ended show is gone and a not-yet-started one waits for its first night.
+    const schedule = activeEntries(venue?.schedule);
+    if (schedule.length === 0) {
         return '<p>No schedule information available.</p>';
     }
 
@@ -147,8 +154,9 @@ export function renderScheduleTable(venue) {
  * @returns {string} HTML string of <div> elements, or empty string
  */
 export function renderScheduleCompact(schedule) {
-    if (!schedule || schedule.length === 0) return '';
-    return schedule.map(entry => {
+    const live = activeEntries(schedule);   // ADR-016, as renderScheduleTable
+    if (live.length === 0) return '';
+    return live.map(entry => {
         const { fullText } = formatScheduleEntry(entry, { showEvery: false });
         const eventLink = entry.eventUrl
             ? ` <a href="${escapeHtml(sanitizeUrl(entry.eventUrl) || '')}" target="_blank" rel="noopener noreferrer" class="schedule-event-link" title="Event page"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>`
@@ -374,7 +382,12 @@ export function getScheduleContext(venue, schedule, currentDate = null) {
     // not a record, and there's no way to tell from the text that it's gone. Same
     // reasoning as the map card (#88). Recurring entries are never affected —
     // isPastOnceEvent() only ever returns true for `once`.
-    const otherEntries = (venue.schedule || []).filter(s => {
+    //
+    // Recurring entries are read as of the card's own date (ADR-016): a card
+    // for a night after a show moved lists the new nights, and a card before it
+    // does not mention a show that has not started.
+    const live = activeEntries(venue.schedule, currentDate || startOfToday());
+    const otherEntries = live.filter(s => {
         if (s === schedule) return false;
         if (currentDate && scheduleMatchesDate(s, currentDate)) return false;
         if (isPastOnceEvent(s)) return false;
@@ -384,7 +397,7 @@ export function getScheduleContext(venue, schedule, currentDate = null) {
     const moreCount = otherEntries.length;
     let moreText = '';
     if (moreCount > 0) {
-        moreText = buildAlsoText(otherEntries, venue.schedule);
+        moreText = buildAlsoText(otherEntries, live);
     }
 
     return { frequencyLabel, moreCount, moreText };

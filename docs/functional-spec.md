@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.51
+**Version:** 1.0.52
 **Last updated:** September 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -94,6 +94,8 @@ When expanded, shows:
 Below the time row, each card shows a small calendar icon and an "Also …" line listing the venue's other dates/days. To avoid confusing self-reference, this list **excludes any schedule entry that also matches the current card's date** — so a card rendered for May 30 will never list "May 30" in its Also line, even if the venue has another event that day (which would render as a separate card immediately adjacent).
 
 It also **excludes one-time events whose date has passed**, for the same reason the map card does (§4): "Also May 30" reads as an invitation rather than a record, and nothing in the text marks it as gone. Recurring entries are never affected. When a venue's only other entries are past one-times, no "Also" line renders at all.
+
+Recurring entries are read **as of the card's own date** (§11 "Show Lifespan"): a card for a night after a show moved lists the new nights, and a card before it does not mention a show that has not started.
 
 ### Interaction
 
@@ -458,7 +460,7 @@ Displays everything in compact mode plus:
 
 ### Debug Info
 
-When debug mode is enabled (`?debug=1`), compact cards show the schedule match reason at the top (e.g., "Every Friday", "First Saturday").
+When debug mode is enabled (`?debug=1`), compact cards show the schedule match reason at the top (e.g., "Every Friday", "First Saturday"). A show with its own lifespan (§11 "Show Lifespan") adds it: "Every Tuesday · until 2026-10-14", "Every Thursday · from 2026-10-15" — so a switch can be checked by eye without the public page saying it is coming.
 
 ### Click Behavior
 
@@ -621,6 +623,8 @@ The Navigation component does **not** re-render when search changes, to preserve
 
 Venues with an `activePeriod` field only appear when the current date falls within `activePeriod.start` and `activePeriod.end` (inclusive). This is automatic — no user control.
 
+A schedule entry can carry its own `activePeriod` too — the show's lifespan (§11 "Show Lifespan", ADR-016). The same rule at the other level: outside its window the show does not appear.
+
 ### KJ Index (`?kj=all`)
 
 - **URL-driven:** `index.html?kj=all` renders `KJIndexView` — an alphabetical directory of every unique KJ name in the dataset.
@@ -703,10 +707,11 @@ The shape `{ tagDefinitions, listings }` is the contract — both the local file
       endTime           string|null   24-hour format "HH:MM" or null (open-ended)
       eventUrl          string        OPTIONAL  Link to event page
       exclusions        array         OPTIONAL  Dates this show is skipped (see "Schedule Exclusions")
+      activePeriod      object        OPTIONAL  The show's lifespan — { start?, end? }, at least one (see "Show Lifespan")
       socials           object|null   OPTIONAL  Event-level social links (same shape as venue `socials`)
       lastVerified      string        OPTIONAL  "YYYY-MM-DD" — the show date the latest evidence confirms; may be in the future (see "Show Verification")
 
-    One-time entry:
+    One-time entry (no activePeriod — its date is its whole life):
       frequency         string        "once"
       date              string        "YYYY-MM-DD"
       startTime         string        24-hour format "HH:MM"
@@ -818,6 +823,34 @@ exclusions: [
   - **Weekly calendar** (§2) — dimmed card with a "Closed" banner on the excluded date
   - **Map** (§4) — dimmed marker; "Closed Today: [reason]" banner in the floating card
   - **Detail modal / desktop pane / map expanded card** (§7, §8) — "Closed Today: [reason]" banner plus an "Upcoming closures" list (next 60 days, e.g. "Jun 20 (Holiday), Jun 27")
+- Exclusions are **interruptions inside a show's life** — a holiday, a temporary closing. A show's start and end belong in its `activePeriod` ("Show Lifespan" below), not in a run of exclusions. An exclusion outside that window can never apply: it is left out of "Upcoming closures" and the validator warns about it.
+
+### Show Lifespan
+
+A recurring schedule entry may carry its own `activePeriod`: the **known first and last night of that show**, each written when the real-world date becomes known (ADR-016, #288). The same field and shape as the venue-level one, and the same helper evaluates both (`isActiveOn()` in `js/utils/date.js`).
+
+```
+{ frequency: "every", day: "Tuesday",  startTime: "21:00", activePeriod: { end: "2026-10-14" } },
+{ frequency: "every", day: "Thursday", startTime: "21:00", activePeriod: { start: "2026-10-15" } }
+```
+
+- **Either bound alone, never backfilled.** At least one of `start` / `end`; a missing bound is open. No `start` means "running since before we knew" — the honest reading of every entry that predates the field. The date an entry was added is not the date the show started, so it is never written as one.
+- **A change is an end plus a start; a correction is an edit.** When a show moves nights, changes host or changes time **on a date**, the old entry gets `end` (the day before) and a new entry opens with `start`. When a fact was simply wrong, it is edited in place with no dates. The new entry is a new show: confirmations (`lastVerified`) do not carry across.
+- **Not allowed on `once` entries** — the schema rejects it. A one-time event's date is already its whole life.
+- **No announcement.** Nothing public says "moving to Thursdays" or "starting Oct 15"; the switch simply happens on its date.
+  - **Surfaces that ask about a date answer for that date** — the weekly calendar, the extended sections, the map's date filter, `nextOccurrence()` and `lastOccurrenceOnOrBefore()`. The check lives in `scheduleMatchesDate()`, so all of them inherit it. The "Also" line on a calendar card reads other shows as of the card's date (§2).
+  - **Surfaces with no date of their own answer for today** — the detail schedule table on all four surfaces, the map card, the "Presented By" section, search's per-show host match, the KJ index and dossier, and the generated `/venue/`, `/kj/` and `/company/` pages. They list shows running today via `activeEntries()`: an ended show is gone, and one that has not started waits for its first night rather than being labelled. This mirrors venue-level `activePeriod`, which the calendar checks for its date and the A–Z and map check for today.
+  - **Accepted cost:** during the lookahead the calendar can show the new show while its detail table still lists the old one, because the table knows only today. The card itself names the right night, and the disagreement ends on the switch date.
+- **Ended shows are removed 30 days after `end`** — the grace a spent one-time event gets (#169). No history of shows is kept, in the public file or the curator master; git holds what was published. For those 30 days an ended show still renders on past dates (this week's collapsed days, a week navigated back).
+- **Validation** (`scripts/validate-data.js` — the constraint layer while `data.json` stands in for a database):
+  - `start` after `end` **fails**, at both levels.
+  - An `end` more than 30 days past is a **warning**: remove the entry. Warned, not failed — a date-driven failure would turn CI red on a day nothing changed.
+  - An exclusion outside its show's window is a **warning**: it can never apply.
+  - Two recurring entries at one venue with the same frequency and day whose windows overlap are a **warning** — two lives of one slot alive on the same nights, usually a change that opened the new entry without ending the old one. Start time is not part of the key, so a change of time is caught too.
+  - An active venue with no show running today but one starting later is a **warning**: its schedule lists nothing until then. Right between KJs; for a venue that has not opened yet, the venue's own `activePeriod` keeps it hidden instead.
+  - A `lastVerified` night outside the window is caught by the existing "not a night this show runs" check, which honours the lifespan.
+- **JSON-LD:** a recurring show's `Schedule` is bounded by the tighter of the venue's and the show's windows (§22).
+- **Written by the curator** (§16), whose change action performs the split from one date and whose export drops a show 30 days after its end — curator-side work tracked on #288.
 
 ### Show Verification
 
@@ -873,6 +906,19 @@ Supabase was wired but never switched on, and it decayed while dormant: the gene
 [ADR-009](adr/009-park-supabase.md) parked it. Removed from the running app: `js/config.js` and its `useSupabase` flag, `js/services/supabase.js`, the fallback branch in `loadData()`, and the jsdelivr `<script>` tag every visitor was downloading. The schema, migrations `001`–`004`, and the seed generator are preserved in `_deprecated/supabase/`; the reasoning behind the JSONB design is in [ADR-001](adr/001-supabase-schema-jsonb.md).
 
 **Re-entry trigger** — reopen the decision when the directory needs a *write* path: public submissions landing somewhere other than the curator's inbox, or a second curator. Validation of `js/data.json` itself is unaffected and still runs in CI (`node scripts/validate-data.js`).
+
+#### `data.json` as a stand-in database
+
+Until the directory converts to a relational (or otherwise more fitting) database, `js/data.json` plays that role, and its shapes are chosen to map cleanly onto tables when it does. The layers line up as:
+
+| Database concept | Here |
+|---|---|
+| Column types, NOT NULL, enums | `schema/venue.schema.json` (Ajv) |
+| CHECK, foreign-key and exclusion constraints | `scripts/validate-data.js` — failures for broken data, warnings for rows that need curation |
+| Audit log / history | git — every publish is a commit (§16) |
+| Rows with a validity range | `activePeriod` on a venue or a show (§11 "Show Lifespan"), a date range column when it converts |
+
+A rule a table would enforce with a constraint belongs in the validator, not in the views.
 
 ---
 
@@ -985,7 +1031,9 @@ The day-of-week of the target date must match `schedule.day`. Comparison is **ca
 
 ### Active Period Filtering
 
-Separate from schedule matching. If a venue has `activePeriod`, it only appears when the current viewing date is within `activePeriod.start` and `activePeriod.end` (both inclusive). Checked via `isDateInRange()`.
+Separate from schedule matching. If a venue has `activePeriod`, it only appears when the current viewing date is within `activePeriod.start` and `activePeriod.end` (both inclusive). Checked via `isActiveOn()`, which wraps `isDateInRange()`.
+
+A schedule entry's own `activePeriod` — the show's lifespan (§11 "Show Lifespan") — *is* part of schedule matching: `scheduleMatchesDate()` returns false outside it, before the frequency is consulted.
 
 ### Time Formatting
 
@@ -1571,7 +1619,7 @@ Every show on a page follows its entity node in the same `@graph` as a **`MusicE
 | `startDate` / `endDate` | `frequency: "once"` only |
 | `eventSchedule` | everything else |
 
-**Recurring shows are described by a rule, not by a list of dates.** A `Schedule` node carries `byDay`, `repeatFrequency` (`P1W` for `every`, `P1M` for the ordinals), `byMonthWeek` (1–4, and **-1** for `last`), `exceptDate` from `exclusions`, and `startDate`/`endDate` from `activePeriod`.
+**Recurring shows are described by a rule, not by a list of dates.** A `Schedule` node carries `byDay`, `repeatFrequency` (`P1W` for `every`, `P1M` for the ordinals), `byMonthWeek` (1–4, and **-1** for `last`), `exceptDate` from `exclusions`, and `startDate`/`endDate` from the tighter of the venue's and the show's own `activePeriod` (ADR-016) — so a show with a known end stops in search results on the right night even if no deploy follows. Shows not running on the build date get no event node, matching the visible page.
 
 This is the decision worth remembering: Netlify builds **on push, not on a timer**. Concrete dates baked at build time would silently rot between deploys, and an expired event costs a page its eligibility rather than merely wasting a field. A rule stays true however long the gap.
 
@@ -1705,6 +1753,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-09 | 1.0.49 | #277: Publish button. New `scripts/publish-data.js` takes a curator export live — drift check against what `main` holds, validator, then a branch, a commit and a PR through the GitHub API, with no ticket by design. `check-curator-drift.js` gains a three-way mode: with a record of the last publish, a repo value is at risk only where it differs from that, so an ordinary edit (a rename, a corrected address, a show moved half an hour, a date corrected backwards) is informational rather than fatal. Strict mode is unchanged when no record exists. New section 16 "Publishing Venue Data"; CLAUDE.md gains its first project-specific deviation. | Claude Code |
 | 2026-09 | 1.0.50 | #285: the first publish is a reviewed step rather than a silent refusal. `publish-data.js` detects a missing baseline, prints every difference, and requires `--adopt-baseline` (a button in the curator) to record the live file as the starting point and proceed. Auto-seeding was rejected: a baseline equal to the live file disables the stale-master check permanently. A dry run previews the adoption into a scratch file and records nothing. New `baselineDecision()` and `firstPublishNotice()`, both unit-tested. | Claude Code |
 | 2026-09 | 1.0.51 | #290: §11 "Storage and Data Flow" rewritten to match the code. It still described Supabase as wired but disabled through `js/config.js`, and a three-step fetch chain (a 30-minute `sessionStorage` cache, Supabase `fetchVenueData()`, then `js/data.json`) — all removed by ADR-009, and contradicted by the "Supabase — parked" subsection directly below. The load path is one `fetch` of `js/data.json` in `loadData()`, with no cache. The debug indicator's source label is a constant `local-json`, not a choice among three. Serving instructions point at `npm run dev` rather than `python -m http.server` / `npx serve`. | Claude Code |
+| 2026-09 | 1.0.52 | #288: Show lifespan (ADR-016). A recurring schedule entry may carry its own `activePeriod` — the known first and last night of that show, each optional and never backfilled; a change is an end plus a start, a correction an edit. `scheduleMatchesDate()` honours it, so every date-aware surface inherits it; surfaces with no date list only shows running today (`activeEntries()`), with no announcement of what is coming. `isActiveOn()` now answers for venues and shows alike. The validator fails a window that ends before it starts and warns on a show ended 30+ days, an exclusion outside its window, overlapping lives of one slot, and a venue with nothing running today. JSON-LD takes the tighter window; debug mode shows it. `data.json` is named as a stand-in database, the validator as its constraint layer. New §11 "Show Lifespan"; §2, §6, §10, §11, §13, §22 updated. | Claude Code |
 
 ---
 

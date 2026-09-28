@@ -550,6 +550,7 @@ case 'alternate':
 ### Gotchas
 
 - `scheduleMatchesDate()` does NOT evaluate times — it only determines if a venue appears on a given date. Time display is handled separately by `formatTimeRange()`.
+- The real function checks the show's own `activePeriod` first (ADR-016, `isActiveOn()`), before any frequency logic — the sketch above leaves it out. A new frequency inherits the lifespan check for free; don't re-check the window inside a `case`.
 - The "last" detection works by checking if the date + 7 days crosses a month boundary. This is correct even when "last" and "fourth" overlap.
 - Day comparison is always case-insensitive (`.toLowerCase()`). Store day names capitalized in data but don't rely on case in matching logic.
 

@@ -231,6 +231,22 @@
         }
       }
     },
+    "entryActivePeriod": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "description": "A show's lifespan (ADR-016): the known first and last night of this schedule entry, each written only when the real-world date is known and never backfilled. Either bound may appear alone; a missing bound is open. A change (a show moving nights, changing host or time on a date) ends the old entry and opens a new one; a correction edits in place with no dates. validate-data.js checks start <= end and warns once 'end' is more than 30 days past.",
+      "properties": {
+        "start": {
+          "type": "string",
+          "format": "date"
+        },
+        "end": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
     "scheduleEntry": {
       "type": "object",
       "required": [
@@ -295,9 +311,12 @@
           "$ref": "#/$defs/hostAssignment",
           "description": "Host for this show only. Fully replaces the venue-level host \u2014 fields are not merged."
         },
+        "activePeriod": {
+          "$ref": "#/$defs/entryActivePeriod"
+        },
         "exclusions": {
           "type": "array",
-          "description": "One-off dates on which the recurring event does not happen (e.g. private events, holidays).",
+          "description": "One-off dates on which the recurring event does not happen (e.g. private events, holidays, a temporary closing). Interruptions inside a show's life; its start and end belong in activePeriod (ADR-016).",
           "items": {
             "type": "object",
             "required": [
@@ -347,7 +366,10 @@
           "then": {
             "required": [
               "date"
-            ]
+            ],
+            "properties": {
+              "activePeriod": false
+            }
           },
           "else": {
             "required": [
