@@ -241,7 +241,8 @@ When adding or modifying venues in `js/data.json`, follow this structure:
       activePeriod: {         // Optional: the show's lifespan (ADR-016, #288) — its known first and/or last night.
         end: "2026-10-14"     // At least one bound; a missing one is open. Written only when known, never backfilled.
       },                      // A change = end the old entry + a new entry with `start`; a correction = edit in place.
-                              // Not allowed on "once" entries. Remove the entry 30 days after `end` (validator warns)
+                              // Not allowed on "once" entries. Due for removal 30 days after `end`: the curator's
+                              // "To prune" tab flags it and removes it only when asked (validator warns)
       host: {                 // Optional: overrides venue-level host for this show only
         name: "Guest KJ",     // See "Per-show host override" below
         affiliation: "Some Karaoke Co",
@@ -499,6 +500,8 @@ The curator runs on **:8765** via `node server.js` (its `start.cmd`), with its o
 **Confirming a show is one button in the curator** (#276). Its Posters screen reads a folder of unprocessed posters, and one Confirm per matching show records the confirmation, stamps that show's next night, files the poster and moves on. It works the same for a phone call, just without an image. The dashboard ages the dates against a 60-day threshold and lists what is overdue or never confirmed.
 
 **Announcements are their own list, not a field on a show** (#276 curator, #275 repo). A record is `{ seen, for?, show?, text?, source?, image? }` in a top-level `_announcements` array in the curator master, pointing at a schedule entry by a curator-private `_id`. It does not have to point at anything: a poster can be captured before the venue or the show exists, and linked later. The public `lastVerified` is **derived** — the latest `for` among the records pointing at a show — so it cannot move backwards and there is nothing to clear or demote. The records themselves never leave the curator: export copies five named top-level keys and strips every underscore key at any depth.
+
+**A show's lifespan is set in the curator, and pruning is flagged, never automatic** (#288, ADR-016). Each schedule row has a lifespan panel — first/last night, and **Split** for a change on a date (the old show ends the day before; a copy with a fresh `_id` and no confirmation starts that day). Only records for nights inside a show's lifespan count toward its derived `lastVerified`. The dashboard's **"To prune"** tab lists every show more than 30 days past its last night (ended recurring shows and spent one-time events) and the header counts them; nothing is removed on Save or Export — each removal is the owner's click, and records about a removed show are kept, unlinked, marked as an ended show.
 
 If you're a contributor (or a Claude session that needs to add a venue inside this repo):
 

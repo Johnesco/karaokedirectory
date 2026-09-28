@@ -87,15 +87,17 @@ dropped spent one-time events (the map card, the "Also" line) still do so with
 row is hidden because "Every Thursday" with no date reads as *now*, and
 labelling it would be the announcement this decision declines.
 
-**5. Ended entries are removed 30 days after `end`.** We keep no history of
-shows, in the public file or in the curator master. For 30 days an ended entry
-still renders on the past dates that can still be viewed (this week's collapsed
-days, a week navigated back); after that it is deleted, and git holds what was
+**5. Ended entries are removed once `end` is 30 days past — flagged, then
+removed on the curator's say-so.** We keep no history of shows, in the public
+file or in the curator master. For 30 days an ended entry still renders on the
+past dates that can still be viewed (this week's collapsed days, a week
+navigated back); after that it is due for removal, and git holds what was
 published. Thirty days is the grace a spent `once` entry already gets (#169),
-and an ended recurring show is the same situation. `validate-data.js` warns
-rather than fails past that point, for the reason #169 gives: a date-driven
-failure would turn CI red on a day nothing changed, and removing rows is
-curation.
+and an ended recurring show is the same situation. Nothing removes it
+automatically: the curator lists everything past the grace in a section of its
+own and removes a show only when asked. `validate-data.js` warns rather than
+fails past that point, for the reason #169 gives: a date-driven failure would
+turn CI red on a day nothing changed, and removing rows is curation.
 
 **6. A new entry is a new show.** The replacement gets a fresh curator `_id`,
 so announcements and the derived `lastVerified` do not carry across. That is
@@ -181,10 +183,14 @@ schema definition already exist.
   schedule lists nothing until then). The "active venue with no upcoming
   events" check stops counting ended recurring entries, and the
   stale-confirmation warning skips them.
-- The curator gains the change action and the 30-day prune. Because the prune
-  removes the entry from the master itself, the export and the master never
-  differ by it, and `check-curator-drift.js` needs no rule for it. This is work
-  outside the repo, tracked on #288.
+- The curator gains a lifespan panel on each schedule row (first and last
+  night, and a Split action for a change on a date) and a "To prune" section:
+  every show more than 30 days past its last night — ended recurring shows and
+  spent one-time events alike — flagged in its own dashboard tab and counted in
+  the header, removed one at a time or all at once, always behind a
+  confirmation, never on Save or Export. Removal edits the master itself, so
+  the export and the master never differ by it, and `check-curator-drift.js`
+  needs no rule for it. This is work outside the repo, tracked on #288.
 - **`data.json` stands in for a database until it converts to one.** The owner
   intends that conversion (to a relational or otherwise more fitting store);
   until then the JSON is shaped so it maps cleanly. The schema is the column
