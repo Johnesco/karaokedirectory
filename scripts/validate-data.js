@@ -409,9 +409,10 @@ for (const venue of data.listings) {
 // The recurring twin of the check above, with the same 30-day grace: a show
 // whose lifespan ended more than STALE_ONCE_DAYS ago can no longer match a
 // date anyone is likely to look at. We keep no history of shows — git holds
-// what was published — so the curator removes it. Warned, not failed, for the
-// reason above, and because a date-driven failure would turn CI red on a day
-// nothing changed.
+// what was published — so it is due for removal: the curator's "To prune" tab
+// lists it, and removes it when asked (never automatically). Warned, not
+// failed, for the reason above, and because a date-driven failure would turn
+// CI red on a day nothing changed.
 //
 // Exclusions outside a show's lifespan are reported here too: the show is not
 // running that night, so the exclusion can never apply.
