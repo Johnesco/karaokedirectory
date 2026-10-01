@@ -2153,9 +2153,21 @@
       "schedule": [
         {
           "frequency": "every",
+          "day": "Friday",
+          "startTime": "19:00",
+          "endTime": "22:00",
+          "activePeriod": {
+            "end": "2026-09-30"
+          }
+        },
+        {
+          "frequency": "every",
           "day": "Thursday",
           "startTime": "19:00",
           "endTime": "22:00",
+          "activePeriod": {
+            "start": "2026-10-01"
+          },
           "lastVerified": "2026-10-01"
         }
       ],
