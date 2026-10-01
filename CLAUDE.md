@@ -180,9 +180,14 @@ karaokedirectory/
 │   └── venue.schema.json  # Authoritative venue schema (ADR-005)
 │
 ├── e2e/                   # Playwright specs (15 files) — run by `npm test`, gated in CI
-├── test/                  # node --test unit specs — run by `npm run test:unit`
-│   ├── date.test.mjs      # Schedule matching, exclusions, date ranges
-│   └── venues.test.mjs    # venuePasses, search predicates, host hydration
+├── test/                  # node --test unit specs (11 files) — run by `npm run test:unit`
+│   ├── date.test.mjs      # Schedule matching, exclusions, lifespans, date ranges
+│   ├── venues.test.mjs    # venuePasses, search predicates, host hydration
+│   ├── render.test.mjs    # Host resolution, schedule table, "Also" line
+│   ├── build-pages.test.mjs       # Generated entity pages, JSON-LD
+│   ├── check-curator-drift.test.mjs  # Curator master vs data.json comparison
+│   ├── publish-data.test.mjs      # Publish gates and baseline handling
+│   └── freshness / router / string / tags / url .test.mjs  # one per module
 │
 ├── metrics/snapshots/     # Output of scripts/code-metrics.js (manual, occasional)
 │
@@ -193,7 +198,7 @@ karaokedirectory/
 │   ├── patterns.md        # 10 annotated implementation recipes
 │   ├── _sidebar.md        # Docsify sidebar navigation
 │   ├── .nojekyll          # GitHub Pages underscore file support
-│   ├── adr/               # ADR-001…013 + README index
+│   ├── adr/               # ADR-001…016 + README index
 │   └── spikes/            # Research write-ups
 │
 └── _deprecated/           # Archived old code (do not use)
@@ -677,7 +682,7 @@ Current ADRs:
 - [ADR-013](docs/adr/013-show-centric-presentation.md) — Venue-rooted storage, registry identity, show-centric presentation: the **show** (a derived `{venue, schedule entry}` pair) is the unit of display; storage stays venue-rooted; series are represented by their host registry entry
 - [ADR-014](docs/adr/014-tag-colors-authored-css.md) — Tag colours are authored CSS; `data.json` is purely factual
 - [ADR-015](docs/adr/015-one-confirmation-per-show-date.md) — **One confirmation, anchored to the show date**: a show carries one public date, the night the latest evidence confirms (supersedes the ADR-013 evidence-level addendum)
-- [ADR-016](docs/adr/016-show-lifespan.md) — **A show's lifespan, recorded as it becomes known**: an optional `activePeriod` on the schedule entry, never backfilled; a change is an end plus a start; no announcement; ended shows removed 30 days after their end
+- [ADR-016](docs/adr/016-show-lifespan.md) — **A show's lifespan, recorded as it becomes known**: an optional `activePeriod` on the schedule entry, never backfilled; a change is an end plus a start; no announcement; shows 30+ days past their last night are flagged in the curator's "To prune" tab and removed only when the owner asks
 
 ## Security Considerations
 - Always use `escapeHtml()` when rendering user-provided content
