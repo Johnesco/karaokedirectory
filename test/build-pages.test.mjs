@@ -367,6 +367,9 @@ describe('graphFor — over the real dataset', () => {
       if (v.active === false) continue;
       for (const s of v.schedule || []) {
         if (s.frequency === 'once' && (!s.date || s.date < today)) continue;
+        // A show outside its own lifespan today gets no page row and no event (ADR-016).
+        const p = s.activePeriod;
+        if (p && ((p.start && today < p.start) || (p.end && today > p.end))) continue;
         expected++;
       }
     }
