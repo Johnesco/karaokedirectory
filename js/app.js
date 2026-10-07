@@ -14,7 +14,7 @@ import { AlphabeticalView } from './views/AlphabeticalView.js';
 import { MapView } from './views/MapView.js';
 import { KJDossierView } from './views/KJDossierView.js';
 import { KJIndexView } from './views/KJIndexView.js';
-import { initDebugMode, isDebugMode } from './utils/debug.js';
+import { initDebugMode, isDebugMode, loadDebugSources } from './utils/debug.js';
 import { initFreshLens } from './utils/freshness.js';
 import { initTagConfig } from './utils/tags.js';
 import { readLocation, writeLocation, onLocationChange, resolveView, DEFAULT_VIEW } from './core/router.js';
@@ -201,6 +201,12 @@ async function loadData() {
         initTagConfig(data.tagDefinitions);
 
         initVenues(data);
+
+        // Debug mode on a local host: the curator preview's private source
+        // links (#305). Awaited so the first render already carries them; a
+        // no-op returning 0 everywhere else.
+        const sourced = await loadDebugSources(new URL('sources.local.json', import.meta.url));
+        if (sourced) console.log(`[Debug] source links for ${sourced} shows (local only)`);
 
         // Update debug indicator with data source
         if (isDebugMode()) {

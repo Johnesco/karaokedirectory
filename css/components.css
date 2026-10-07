@@ -1316,6 +1316,16 @@ a.tag:focus-visible {
     color: var(--color-white);
 }
 
+/* Source link of the latest confirmation (#305) — debug mode, local only */
+.debug-source {
+    color: inherit;
+    margin-left: var(--spacing-2xs);
+}
+
+.debug-source:hover {
+    color: var(--color-white);
+}
+
 /* Debug tooltip on hover */
 .venue-card__debug-tooltip {
     display: none;
