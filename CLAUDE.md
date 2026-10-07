@@ -510,6 +510,8 @@ The curator runs on **:8765** via `node server.js` (its `start.cmd`), with its o
 
 **Catching up on Facebook is a list in the curator** (#298). The groups where shows get announced live in the master as a curator-private `_catchupGroups` list (`{ id, name, url, lastChecked? }`, never exported), shown at the top of the sidebar least-recently-checked first. **Start/Next** opens each in **one named companion window** (`kd-catchup`) on the right half of the screen and reuses it, marking each group checked as it moves on. Facebook refuses to be framed even by a local page, which is why it is a window and not an iframe.
 
+**The Posters screen is built for reading by hand, from the keyboard** (#300, #301, #302). There is no OCR and no vision API, by the owner's decision; the tool removes the clicking around the reading. A poster gets in by **Ctrl+V** anywhere in the curator (or a drop); a link on the clipboard, or pasted next, is kept as that poster's source and pre-fills the record's. The queue is **newest first** (toggle remembered per browser) and shows its count and oldest age; **"File older than N days"** files the stale ones into `filed/` behind one confirmation — moved, never deleted, never automatic. The search box always has focus: ↓ into the results, Space ticks, ←/→ steps a ticked show through **date chips** limited to nights it actually runs (the repo's `nextOccurrence`), Enter confirms; the other actions are Alt+key so no letter is ever stolen from the search.
+
 If you're a contributor (or a Claude session that needs to add a venue inside this repo):
 
 1. Edit `js/data.json` directly. Add the venue object to the `listings` array, following the schema in the "Venue Data Format" section below.
