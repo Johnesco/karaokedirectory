@@ -28,3 +28,7 @@ playwright/.cache/
 /company/
 /venue/
 sitemap.xml
+
+# Local-only debug data (#305). The curator preview serves it on request;
+# it must never be committed or deployed.
+js/sources.local.json

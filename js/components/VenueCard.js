@@ -109,7 +109,7 @@ export class VenueCard extends Component {
         const hostDisplay = formatHostDisplay(resolveHostFor(venue, schedule));
 
         // Debug info for schedule matching
-        const debugHtml = getDebugHtml(venue, date);
+        const debugHtml = getDebugHtml(venue, date, schedule);
 
         return `
             <div class="${cardClass}" data-venue-id="${escapeHtml(venue.id)}">

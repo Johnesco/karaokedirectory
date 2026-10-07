@@ -580,6 +580,7 @@ When enabled:
 - A "Debug Mode" indicator appears in the top-right corner
 - Venue cards show their schedule match reason (e.g., "Every Friday", "First Saturday")
 - Hover over cards for detailed match info
+- **On the owner's machine only**, a 🔗 to the post behind each show's latest confirmation (#305). Those links are curator-private and are **never in `js/data.json`**: the curator's preview (`:8766`) serves `js/sources.local.json`, generated per request from its records, and the site asks for it only in debug mode on a local host. Production debug mode shows no links
 
 **Freshness lens** (`?fresh=1`, #259) is the sibling lens for data age, worded from the confirmed night (ADR-015): "📣 Announced for Oct 1" before that night, "✓ Verified today" on it, "✓ Verified Aug 28 · 9d" after. An unconfirmed show gets nothing (#267). The detail schedule table grows a Verified column on all four surfaces when some show at the venue is confirmed, and the KJ dossier annotates each one. URL-only (no `localStorage`), off by default, and `renderFreshness()` returns `''` when off — so the public page emits no new markup, which `e2e/fresh-lens.spec.js` asserts. The curator's Preview button opens the site with it on.
 

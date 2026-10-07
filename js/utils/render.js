@@ -7,6 +7,7 @@ import { escapeHtml } from './string.js';
 import { formatScheduleEntry, formatActivePeriodText, formatDateMonthDay, scheduleMatchesDate, WEEKDAYS, getVenueExclusionForDate, getUpcomingExclusions, isPastOnceEvent, activeEntries, startOfToday } from './date.js';
 import { buildMapUrl, buildDirectionsUrl, createSocialLinks, formatAddress, sanitizeUrl } from './url.js';
 import { isFreshLens, renderFreshness } from './freshness.js';
+import { renderDebugSource } from './debug.js';
 
 /**
  * Resolve the effective host for a single show.
@@ -122,7 +123,7 @@ export function renderScheduleTable(venue) {
         // where the table collapses to label/value rows — see components.css.
         return `
             <tr>
-                <td data-label="Day">${dayLabel}${eventLink}</td>
+                <td data-label="Day">${dayLabel}${eventLink}${renderDebugSource(venue, entry)}</td>
                 <td data-label="Time">${formatted.time}</td>
                 ${hostCell}
                 ${verifiedCell}

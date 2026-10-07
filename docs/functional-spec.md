@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.53
+**Version:** 1.0.54
 **Last updated:** September 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -1289,6 +1289,13 @@ The `<body>` carries the `page--readable` class, which constrains `.main-content
 - **Debug indicator** — "Debug Mode" badge in the top-right corner
 - **Venue cards** — show schedule match reason (e.g., "Every Friday", "First Saturday", "Once: 2026-03-15")
 - **Hover info** — detailed match information on card hover
+- **Source links** (#305) — on the owner's machine only, a 🔗 after the match reason on a card, and after the day in the detail schedule table, opens the post behind that show's latest confirmation
+
+### Source links — local only
+
+The post links behind confirmations are curator-private (ADR-015) and the owner's call in #305 was that they stay out of the public file entirely — not merely unrendered. So they are never in `js/data.json`. The curator's site preview (`localhost:8766`) answers one extra path, `js/sources.local.json`, built from its own records on each request and never written to disk. In debug mode, and only when the page is served from `localhost` / `127.0.0.1` / `[::1]`, `loadData()` asks for it; anywhere else no request is made. A missing file means no links, silently.
+
+The file maps a show signature, `venueId|frequency|day-or-date|startTime` (`debugSourceKey()` — the curator's own show id does not survive export), to `{ url, for }`: the record with a source for the latest night. `renderDebugSource()` returns `''` outside debug mode or without a match, so the public page gains no markup. `.gitignore` lists the file in case one is ever written by hand.
 
 ### Freshness lens (`?fresh=1`)
 
@@ -1755,6 +1762,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-09 | 1.0.51 | #290: §11 "Storage and Data Flow" rewritten to match the code. It still described Supabase as wired but disabled through `js/config.js`, and a three-step fetch chain (a 30-minute `sessionStorage` cache, Supabase `fetchVenueData()`, then `js/data.json`) — all removed by ADR-009, and contradicted by the "Supabase — parked" subsection directly below. The load path is one `fetch` of `js/data.json` in `loadData()`, with no cache. The debug indicator's source label is a constant `local-json`, not a choice among three. Serving instructions point at `npm run dev` rather than `python -m http.server` / `npx serve`. | Claude Code |
 | 2026-09 | 1.0.52 | #288: Show lifespan (ADR-016). A recurring schedule entry may carry its own `activePeriod` — the known first and last night of that show, each optional and never backfilled; a change is an end plus a start, a correction an edit. `scheduleMatchesDate()` honours it, so every date-aware surface inherits it; surfaces with no date list only shows running today (`activeEntries()`), with no announcement of what is coming. `isActiveOn()` now answers for venues and shows alike. The validator fails a window that ends before it starts and warns on a show ended 30+ days, an exclusion outside its window, overlapping lives of one slot, and a venue with nothing running today. JSON-LD takes the tighter window; debug mode shows it. `data.json` is named as a stand-in database, the validator as its constraint layer. New §11 "Show Lifespan"; §2, §6, §10, §11, §13, §22 updated. | Claude Code |
 | 2026-09 | 1.0.53 | #288: the curator side, and pruning becomes flag-then-ask. The owner's call: removing ended shows is a section of the curator, never a side effect of Save or Export. The curator's "To prune" dashboard tab lists every show more than 30 days past its last night (ended recurring shows and spent one-time events) and the header counts them; each removal is a click behind a confirmation that names any venue left empty. Each schedule row gains a lifespan panel (first/last night, and **Split** for a change on a date). The curator's derived `lastVerified` ignores records for nights outside a show's lifespan; an ended show reads "ended" and leaves the overdue/never counts; and the curator's export check refuses the windows the repo would reject (ends before it starts, empty, on a one-time event, venue-level without a start), warning on overlaps. §11 "Show Lifespan" updated; ADR-016 decision 5 and its curator consequence reworded to match. | Claude Code |
+| 2026-10 | 1.0.54 | #305: debug mode shows each show's source link — the post behind its latest confirmation — on cards and in the detail schedule table, from `js/sources.local.json`, which only the curator's local preview serves (generated on request, never on disk). Requested only in debug mode on a local host; the public file and the deployed site carry no links. New §18 "Source links — local only". | Claude Code |
 
 ---
 
