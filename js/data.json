@@ -184,6 +184,18 @@
     "xpider-cantu": {
       "name": "Xpider Cantu",
       "website": "https://www.xpidermagic.com/karaoke"
+    },
+    "isaac-moreno": {
+      "name": "Isaac Moreno"
+    },
+    "deb-o-rah": {
+      "name": "DEB-O-RAH"
+    },
+    "gi-james": {
+      "name": "GI James"
+    },
+    "selma-bawdy": {
+      "name": "Selma Bawdy"
     }
   },
   "companies": {
@@ -410,7 +422,7 @@
           "day": "Friday",
           "startTime": "21:30",
           "endTime": "01:30",
-          "lastVerified": "2026-09-04"
+          "lastVerified": "2026-10-16"
         }
       ],
       "host": {
@@ -1162,7 +1174,8 @@
           "frequency": "every",
           "day": "Thursday",
           "startTime": "19:00",
-          "endTime": "22:00"
+          "endTime": "22:00",
+          "lastVerified": "2026-10-15"
         }
       ],
       "host": {
@@ -1578,7 +1591,8 @@
           "frequency": "every",
           "day": "Friday",
           "startTime": "19:00",
-          "endTime": "23:00"
+          "endTime": "23:00",
+          "lastVerified": "2026-10-16"
         }
       ],
       "host": {
@@ -2168,7 +2182,7 @@
           "activePeriod": {
             "start": "2026-10-01"
           },
-          "lastVerified": "2026-10-01"
+          "lastVerified": "2026-10-15"
         }
       ],
       "socials": {
@@ -2198,7 +2212,8 @@
           "frequency": "every",
           "day": "Thursday",
           "startTime": "21:00",
-          "endTime": "01:00"
+          "endTime": "01:00",
+          "lastVerified": "2026-10-15"
         }
       ],
       "host": {
@@ -3152,7 +3167,7 @@
           "day": "Wednesday",
           "startTime": "20:00",
           "endTime": "00:00",
-          "lastVerified": "2026-09-09"
+          "lastVerified": "2026-10-14"
         }
       ],
       "coordinates": {
@@ -3343,14 +3358,15 @@
           "startTime": "18:30",
           "endTime": "21:30",
           "eventUrl": "https://www.facebook.com/photo/?fbid=122235936422299398&set=a.122102434820299398",
-          "lastVerified": "2026-09-07"
+          "lastVerified": "2026-11-02"
         },
         {
           "frequency": "third",
           "day": "Monday",
           "startTime": "18:30",
           "endTime": "21:30",
-          "eventUrl": "https://www.facebook.com/photo/?fbid=122235936422299398&set=a.122102434820299398"
+          "eventUrl": "https://www.facebook.com/photo/?fbid=122235936422299398&set=a.122102434820299398",
+          "lastVerified": "2026-10-19"
         }
       ],
       "coordinates": {
@@ -3364,6 +3380,162 @@
         "website": "https://www.homespunkitchenandbar.com/",
         "facebook": "https://www.facebook.com/homespunkitchenandbar/"
       }
+    },
+    {
+      "id": "alcove-cantina",
+      "name": "Alcove Cantina",
+      "dedicated": false,
+      "address": {
+        "street": "119 E Main",
+        "city": "Round Rock",
+        "state": "TX",
+        "zip": "78664"
+      },
+      "schedule": [
+        {
+          "frequency": "every",
+          "day": "Tuesday",
+          "startTime": "19:30",
+          "endTime": "00:00",
+          "lastVerified": "2026-10-13",
+          "host": {
+            "companyId": "diamond-karaoke-austin"
+          }
+        },
+        {
+          "frequency": "every",
+          "day": "Wednesday",
+          "startTime": "19:30",
+          "endTime": "00:00",
+          "lastVerified": "2026-10-14",
+          "host": {
+            "companyId": "diamond-karaoke-austin"
+          }
+        }
+      ],
+      "coordinates": {
+        "lat": 30.508603,
+        "lng": -97.677934
+      },
+      "socials": {
+        "website": "https://www.alcoveroundrock.com/"
+      }
+    },
+    {
+      "id": "wicked-wings",
+      "name": "Wicked Wings",
+      "dedicated": false,
+      "tags": [
+        "restaurant"
+      ],
+      "address": {
+        "street": "615 W Slaughter Ln #108",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78748"
+      },
+      "schedule": [
+        {
+          "frequency": "every",
+          "day": "Sunday",
+          "startTime": "22:00",
+          "endTime": "02:00",
+          "host": {
+            "kjId": "isaac-moreno"
+          },
+          "lastVerified": "2026-10-11"
+        },
+        {
+          "frequency": "every",
+          "day": "Saturday",
+          "startTime": "21:00",
+          "endTime": "02:00",
+          "host": {
+            "kjId": "isaac-moreno"
+          },
+          "lastVerified": "2026-10-10"
+        },
+        {
+          "frequency": "every",
+          "day": "Tuesday",
+          "startTime": "21:00",
+          "endTime": "02:00",
+          "host": {
+            "kjId": "deb-o-rah"
+          },
+          "lastVerified": "2026-10-13"
+        }
+      ],
+      "coordinates": {
+        "lat": 30.172668,
+        "lng": -97.799954
+      }
+    },
+    {
+      "id": "american-legion-post-83",
+      "name": "American Legion Post 83",
+      "dedicated": false,
+      "address": {
+        "street": "4401 E St Elmo Rd",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78744"
+      },
+      "schedule": [
+        {
+          "frequency": "second",
+          "day": "Saturday",
+          "startTime": "18:00",
+          "endTime": "21:00",
+          "host": {
+            "kjId": "gi-james"
+          },
+          "lastVerified": "2026-10-10"
+        }
+      ],
+      "socials": {
+        "facebook": "https://www.facebook.com/americanlegion83"
+      },
+      "coordinates": {
+        "lat": 30.206267,
+        "lng": -97.740207
+      },
+      "tags": [
+        "neighborhood"
+      ]
+    },
+    {
+      "id": "oilcan-harry-s",
+      "name": "Oilcan Harry's",
+      "dedicated": false,
+      "address": {
+        "street": "211 W. 4th",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78701"
+      },
+      "schedule": [
+        {
+          "frequency": "every",
+          "day": "Tuesday",
+          "startTime": "23:00",
+          "endTime": "02:00",
+          "host": {
+            "kjId": "selma-bawdy"
+          }
+        }
+      ],
+      "socials": {
+        "website": "https://oilcanharrys.com/",
+        "facebook": "https://www.facebook.com/OilcanHarrys"
+      },
+      "coordinates": {
+        "lat": 30.266493,
+        "lng": -97.745355
+      },
+      "tags": [
+        "lgbtq"
+      ]
     }
   ]
 }
