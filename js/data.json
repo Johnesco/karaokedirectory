@@ -2297,38 +2297,6 @@
       }
     },
     {
-      "id": "pfluttos-tavern-2",
-      "name": "Pflutto's Tavern #2",
-      "tags": [
-        "neighborhood"
-      ],
-      "dedicated": false,
-      "address": {
-        "street": "101 Limmer Loop",
-        "city": "Round Rock",
-        "state": "TX",
-        "zip": "78665"
-      },
-      "schedule": [
-        {
-          "frequency": "every",
-          "day": "Wednesday",
-          "startTime": "19:00",
-          "endTime": "23:00"
-        }
-      ],
-      "host": {
-        "companyId": "diamond-karaoke-austin"
-      },
-      "socials": {
-        "facebook": "https://www.facebook.com/profile.php?id=61563834987547"
-      },
-      "coordinates": {
-        "lat": 30.562185952763,
-        "lng": -97.602474393776
-      }
-    },
-    {
       "id": "punch-bowl-social-domain",
       "name": "Punch Bowl Social (Domain)",
       "tags": [
