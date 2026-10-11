@@ -3483,12 +3483,12 @@
         {
           "frequency": "every",
           "day": "Tuesday",
-          "startTime": "23:00",
+          "startTime": "22:00",
           "endTime": "02:00",
+          "lastVerified": "2026-10-13",
           "host": {
             "kjId": "selma-bawdy"
-          },
-          "lastVerified": "2026-10-13"
+          }
         }
       ],
       "socials": {
