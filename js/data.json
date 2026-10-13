@@ -1592,7 +1592,8 @@
           "day": "Friday",
           "startTime": "19:00",
           "endTime": "23:00",
-          "lastVerified": "2026-10-16"
+          "lastVerified": "2026-10-16",
+          "created": "2026-09-26"
         }
       ],
       "host": {
@@ -2182,7 +2183,8 @@
           "activePeriod": {
             "start": "2026-10-01"
           },
-          "lastVerified": "2026-10-15"
+          "lastVerified": "2026-10-15",
+          "created": "2026-09-26"
         }
       ],
       "socials": {
@@ -3352,6 +3354,7 @@
     {
       "id": "alcove-cantina",
       "name": "Alcove Cantina",
+      "created": "2026-10-10",
       "dedicated": false,
       "address": {
         "street": "119 E Main",
@@ -3389,6 +3392,7 @@
     {
       "id": "wicked-wings",
       "name": "Wicked Wings",
+      "created": "2026-10-10",
       "dedicated": false,
       "tags": [
         "restaurant"
@@ -3439,6 +3443,7 @@
     {
       "id": "american-legion-post-83",
       "name": "American Legion Post 83",
+      "created": "2026-10-10",
       "dedicated": false,
       "address": {
         "street": "4401 E St Elmo Rd",
@@ -3472,6 +3477,7 @@
     {
       "id": "oilcan-harry-s",
       "name": "Oilcan Harry's",
+      "created": "2026-10-10",
       "dedicated": false,
       "address": {
         "street": "211 W. 4th",
@@ -3506,6 +3512,7 @@
     {
       "id": "lava-java-lounge",
       "name": "Lava Java Lounge",
+      "created": "2026-10-10",
       "dedicated": false,
       "address": {
         "street": "15418 Grand St",

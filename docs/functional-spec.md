@@ -3,8 +3,8 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.54
-**Last updated:** September 2026
+**Version:** 1.0.55
+**Last updated:** October 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
 
@@ -710,6 +710,8 @@ The shape `{ tagDefinitions, listings }` is the contract — both the local file
       activePeriod      object        OPTIONAL  The show's lifespan — { start?, end? }, at least one (see "Show Lifespan")
       socials           object|null   OPTIONAL  Event-level social links (same shape as venue `socials`)
       lastVerified      string        OPTIONAL  "YYYY-MM-DD" — the show date the latest evidence confirms; may be in the future (see "Show Verification")
+      created           string        OPTIONAL  "YYYY-MM-DD" — the day this show was added (see "Created and Featured")
+      featured          true|object   OPTIONAL  A featured placement — true, or { start?, end? }, at least one (see "Created and Featured")
 
     One-time entry (no activePeriod — its date is its whole life):
       frequency         string        "once"
@@ -720,6 +722,9 @@ The shape `{ tagDefinitions, listings }` is the contract — both the local file
       eventUrl          string        OPTIONAL  Link to event page
       socials           object|null   OPTIONAL  Event-level social links (same shape as venue `socials`)
       lastVerified      string        OPTIONAL  "YYYY-MM-DD" — the show date the latest evidence confirms; may be in the future (see "Show Verification")
+      created           string        OPTIONAL  "YYYY-MM-DD" — the day this event was added (no `featured`: specials are already pinned)
+
+  created               string        OPTIONAL  "YYYY-MM-DD" — the day this venue was added (see "Created and Featured")
 
   activePeriod          object        OPTIONAL  Limits when venue appears
     activePeriod.start  string        "YYYY-MM-DD"
@@ -874,6 +879,28 @@ A schedule entry may carry `lastVerified`: the `YYYY-MM-DD` **show date the late
   - `npm run curator:check` matches schedule entries on everything *except* this field and compares it by direction on its own, so a show confirmed in the curator but not yet exported is a pending line rather than a phantom loss.
 - **The evidence itself is curator-private** — the wording, the source link and the poster image never leave the curator, and the public file carries only the date.
 - **Display by surface:** the Announced marker on that night's calendar card (§6) is public. Otherwise none by default. With `?fresh=1` (§18 "Freshness lens", #259) the calendar cards, the detail schedule table on all four surfaces, and the KJ dossier show the night and its age.
+
+### Created and Featured
+
+Two fields that day-card sections read (#322, ADR-017, spike #320). Neither is displayed yet; the sections that use them are #324.
+
+```
+{ id: "lava-java-lounge", name: "Lava Java Lounge", created: "2026-10-10", ... }
+{ frequency: "every", day: "Thursday", startTime: "19:00",
+  created: "2026-09-26", featured: { start: "2026-10-15", end: "2026-10-31" } }
+```
+
+- **`created`** — the `YYYY-MM-DD` day a venue or a schedule entry was **added to the directory**. Not when the venue opened, and not the first night: that is `activePeriod.start`. A record is New for 30 days from the **later** of the two, so a show added three weeks before its first night gets its full 30 days from that night.
+  - **Both levels.** A new venue makes its shows New; a new show at an established venue is New on its own.
+  - **Written by the curator** (§16, #323) on the day it adds the record. A Split (ADR-016) carries the old show's `created` forward — a day or time change is not news — unless the owner marks the new half as a new show.
+  - **Reconstructed once, never backfilled.** When the field arrived, the seven records first published in the previous 30 days were stamped with the date of the merge that first published them (from `git log --first-parent main -- js/data.json`): five venues on 2026-10-10, and two new nights (Millie's on Main Thursday, Hudson Tavern Lynum Friday) on 2026-09-26. Everything older is undated, and undated means "not new" — an older date would sit outside the window anyway, so nothing is lost.
+- **`featured`** — a **placement** on a recurring show: the nights it sits in the Featured section. `{ start?, end? }`, inclusive, at least one bound, the same shape as a show's `activePeriod`; or `true` while placements are tests. It lives on the show, not the venue (ADR-013), and a dated window ends on its own. **Not allowed on one-time events**, which are already pinned to the top of the day.
+- **Validation** (`scripts/validate-data.js`):
+  - A malformed date, an empty `featured` object, `featured: false`, an unknown key, or `featured` on a one-time event **fails** (schema).
+  - A `featured` window that ends before it starts **fails** — the same CHECK as `activePeriod`.
+  - A placement whose `end` has passed is a **warning**: it no longer shows anywhere.
+  - A `created` after the record's own `activePeriod.end` is a **warning**: one of the two dates is wrong.
+- **`npm run curator:check`** reports a repo `created` the master lacks as content an export would destroy, until the curator carries the field (#323).
 
 ### Venue Count
 
@@ -1763,6 +1790,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-09 | 1.0.52 | #288: Show lifespan (ADR-016). A recurring schedule entry may carry its own `activePeriod` — the known first and last night of that show, each optional and never backfilled; a change is an end plus a start, a correction an edit. `scheduleMatchesDate()` honours it, so every date-aware surface inherits it; surfaces with no date list only shows running today (`activeEntries()`), with no announcement of what is coming. `isActiveOn()` now answers for venues and shows alike. The validator fails a window that ends before it starts and warns on a show ended 30+ days, an exclusion outside its window, overlapping lives of one slot, and a venue with nothing running today. JSON-LD takes the tighter window; debug mode shows it. `data.json` is named as a stand-in database, the validator as its constraint layer. New §11 "Show Lifespan"; §2, §6, §10, §11, §13, §22 updated. | Claude Code |
 | 2026-09 | 1.0.53 | #288: the curator side, and pruning becomes flag-then-ask. The owner's call: removing ended shows is a section of the curator, never a side effect of Save or Export. The curator's "To prune" dashboard tab lists every show more than 30 days past its last night (ended recurring shows and spent one-time events) and the header counts them; each removal is a click behind a confirmation that names any venue left empty. Each schedule row gains a lifespan panel (first/last night, and **Split** for a change on a date). The curator's derived `lastVerified` ignores records for nights outside a show's lifespan; an ended show reads "ended" and leaves the overdue/never counts; and the curator's export check refuses the windows the repo would reject (ends before it starts, empty, on a one-time event, venue-level without a start), warning on overlaps. §11 "Show Lifespan" updated; ADR-016 decision 5 and its curator consequence reworded to match. | Claude Code |
 | 2026-10 | 1.0.54 | #305: debug mode shows each show's source link — the post behind its latest confirmation — on cards and in the detail schedule table, from `js/sources.local.json`, which only the curator's local preview serves (generated on request, never on disk). Requested only in debug mode on a local host; the public file and the deployed site carry no links. New §18 "Source links — local only". | Claude Code |
+| 2026-10 | 1.0.55 | #322: Venues and schedule entries accept `created` (the day the record was added) and recurring entries accept `featured` (`true` or a `{start?, end?}` placement window; not on one-time events), the data behind day-card sections (ADR-017, spike #320). The validator fails a placement that ends before it starts and warns on a spent placement and on a `created` after its own `activePeriod.end`; new `test/validate-data.test.mjs` runs the CLI against mutated copies. `created` reconstructed once from git for the seven records first published in the previous 30 days. Not displayed yet (#324). New §11 "Created and Featured". | Claude Code |
 
 ---
 

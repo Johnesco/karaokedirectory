@@ -180,13 +180,14 @@ karaokedirectory/
 │   └── venue.schema.json  # Authoritative venue schema (ADR-005)
 │
 ├── e2e/                   # Playwright specs (15 files) — run by `npm test`, gated in CI
-├── test/                  # node --test unit specs (11 files) — run by `npm run test:unit`
+├── test/                  # node --test unit specs (12 files) — run by `npm run test:unit`
 │   ├── date.test.mjs      # Schedule matching, exclusions, lifespans, date ranges
 │   ├── venues.test.mjs    # venuePasses, search predicates, host hydration
 │   ├── render.test.mjs    # Host resolution, schedule table, "Also" line
 │   ├── build-pages.test.mjs       # Generated entity pages, JSON-LD
 │   ├── check-curator-drift.test.mjs  # Curator master vs data.json comparison
 │   ├── publish-data.test.mjs      # Publish gates and baseline handling
+│   ├── validate-data.test.mjs     # The validator CLI against mutated data copies (#322)
 │   └── freshness / router / string / tags / url .test.mjs  # one per module
 │
 ├── metrics/snapshots/     # Output of scripts/code-metrics.js (manual, occasional)
@@ -253,8 +254,14 @@ When adding or modifying venues in `js/data.json`, follow this structure:
         affiliation: "Some Karaoke Co",
         website: "https://..."
       },
-      lastVerified: "2026-10-02"  // Optional: the SHOW DATE the latest evidence confirms (ADR-015, #275) — not the day it was seen.
+      lastVerified: "2026-10-02", // Optional: the SHOW DATE the latest evidence confirms (ADR-015, #275) — not the day it was seen.
                                   // May be in the future; that night's card carries the Announced marker. Curator-derived; never backfilled
+      created: "2026-09-26",      // Optional: the day this show was ADDED to the directory (#322) — not its first night. Curator-stamped;
+                                  // a Split carries it forward. New for 30 days from the later of created and activePeriod.start
+      featured: {                 // Optional: a featured placement (#322, ADR-017) — true, or a window, inclusive, either bound open.
+        start: "2026-10-15",      // Same shape as activePeriod. Not allowed on "once" entries (already pinned). Validator warns once spent
+        end: "2026-10-31"
+      }
     },
     {
       frequency: "once",      // One-time special event
@@ -267,6 +274,7 @@ When adding or modifying venues in `js/data.json`, follow this structure:
       lastVerified: "2026-03-15"  // Optional: same meaning as above — the confirmed night, normally the event's own date
     }
   ],
+  created: "2026-10-10",      // Optional: the day this venue was ADDED (#322). Makes its shows New for 30 days. Undated = not new
   activePeriod: {             // Optional: limits when venue appears
     start: "2026-06-01",      // Venue only appears within this range
     end: "2026-08-31"
