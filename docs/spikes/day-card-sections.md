@@ -113,8 +113,7 @@ Every older venue and show stays undated, which costs nothing, because undated
 just means "not new". Without the reconstruction, New would launch empty and
 fill one show at a time.
 
-The two changed shows need the owner's eye before stamping:
-Hudson Tavern Lynum's Friday and Millie's Thursday could be time changes rather than new nights.
+Owner decision: the two new nights at existing venues (Hudson Tavern Lynum's Friday and Millie's Thursday) **count as new** and get `created`. A new night is usually confirmed in the same pass that adds it, so without `created` it would land in Verified instead of New.
 
 **Created vs. first night (decided).** The window starts at the later of the
 two, so a show added three weeks before its first night gets its full 30 days
