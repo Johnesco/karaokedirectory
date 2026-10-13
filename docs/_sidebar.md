@@ -8,3 +8,4 @@
   - [ADR Index](adr/README.md)
 - **Spikes**
   - [Surface data unification](spikes/surface-data-unification.md)
+  - [Day-card sections](spikes/day-card-sections.md)
