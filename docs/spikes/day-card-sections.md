@@ -1,6 +1,6 @@
 # Spike: Group a day's shows into sections
 
-> **Status:** Analysis complete. Prototype live behind `?sections=1`. Awaiting owner review.
+> **Status:** Analysis complete. Prototype live behind `?sections=1`. Follow-ups filed: #322–#325.
 > **Date:** 2026-10-12
 > **Type:** Spike (research and prototype)
 > **Ticket:** #320
@@ -155,9 +155,9 @@ directory doesn't have (`created`) plus the new `featured` flag. The
 grouping fits in one pure module and one render method, and every existing
 filter and count keeps working unchanged.
 
-**Proposed follow-up tickets** (to file once the owner accepts this write-up):
+**Follow-up tickets** (filed 2026-10-12):
 
-1. **Schema: `created` and `featured`** on the venue and schedule entry, plus validator rules and the one-time git reconstruction of the last 30 days.
-2. **Curator:** stamp `created` on add, carry it through Split with a "new show" checkbox, and add the Featured panel.
-3. **View:** promote the prototype from `?sections=1` to the default. Drop the `?featured=` stand-in. Add e2e coverage for section order, empty sections, search and the footer count. Update the functional spec §2 and CLAUDE.md's Display Philosophy (per ADR-017).
-4. **Later:** `?debug=1` shows each card's section reason.
+1. **#322 Schema: `created` and `featured`** on the venue and schedule entry, plus validator rules and the one-time git reconstruction of the last 30 days.
+2. **#323 Curator:** stamp `created` on add, carry it through Split with a "new show" checkbox, and add the Featured panel.
+3. **#324 View:** promote the prototype from `?sections=1` to the default. Drop the `?featured=` stand-in. Add e2e coverage for section order, empty sections, search and the footer count. Update the functional spec §2 and CLAUDE.md's Display Philosophy (per ADR-017).
+4. **#325 Later:** `?debug=1` shows each card's section reason.
