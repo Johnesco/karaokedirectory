@@ -43,25 +43,43 @@ test.describe('Alphabetical view', () => {
   // Data-agnostic on purpose: a schedule table only grows a Host column when
   // some entry carries its own host, so that column is the signal for "this
   // venue has per-show hosts" without naming a venue the data might drop.
-  test('a venue with per-show hosts still shows a Presented By block', async ({ page }) => {
+  //
+  // A host is a KJ, a company, or both (ADR-007). A company-only host renders
+  // its company line and no name line, so "names someone" means either. This
+  // test used to require a name line, and went red on Alcove Cantina — shows
+  // run by a company with no KJ named — although its page was right (#318).
+  // The per-show host shapes are pinned one by one in test/render.test.mjs.
+  test('a venue with per-show hosts presents every host in its Host column', async ({ page }) => {
     await expect(page.locator('.alphabetical-view .venue-card').first()).toBeVisible({ timeout: 10000 });
 
     const result = await page.evaluate(() => {
-      const cards = [...document.querySelectorAll('.venue-card--full')].filter((c) => {
-        const heads = [...c.querySelectorAll('.venue-detail__schedule-table th')];
-        return heads.some((h) => h.textContent.trim() === 'Host');
-      });
-      if (!cards.length) return { found: 0 };
-      return {
-        found: cards.length,
-        withoutHostBlock: cards
-          .filter((c) => !c.querySelector('.venue-detail__host-name'))
-          .map((c) => c.querySelector('.venue-card__link')?.textContent.trim()),
+      const text = (el) => (el ? el.textContent.trim() : '');
+      // The same "Name (Company)" / "Name" / "Company" form the Host cell uses
+      // (formatHostDisplay), so a cell can be matched to its block.
+      const label = (block) => {
+        const name = text(block.querySelector('.venue-detail__host-name'));
+        const company = text(block.querySelector('.venue-detail__host-affiliation'));
+        return name && company ? `${name} (${company})` : name || company;
       };
+      const cards = [...document.querySelectorAll('.venue-card--full')].filter((c) =>
+        [...c.querySelectorAll('.venue-detail__schedule-table th')].some((h) => h.textContent.trim() === 'Host'));
+      const problems = [];
+      for (const card of cards) {
+        const venue = text(card.querySelector('.venue-card__link'));
+        const blocks = [...card.querySelectorAll('.venue-detail__host')];
+        if (!blocks.length) { problems.push(`${venue}: no Presented By block`); continue; }
+        const presented = new Set(blocks.map(label));
+        if (presented.has('')) problems.push(`${venue}: a host block names nobody`);
+        for (const cell of card.querySelectorAll('.venue-detail__schedule-table td[data-label="Host"]')) {
+          const host = text(cell);
+          if (host && !presented.has(host)) problems.push(`${venue}: "${host}" hosts a show but is not under Presented By`);
+        }
+      }
+      return { found: cards.length, problems };
     });
 
     expect(result.found).toBeGreaterThan(0);
-    expect(result.withoutHostBlock).toEqual([]);
+    expect(result.problems).toEqual([]);
   });
 
 });
