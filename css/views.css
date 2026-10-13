@@ -233,13 +233,36 @@
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--text-secondary);
+    color: var(--section-accent, var(--text-secondary));
 }
 
-/* The unnamed remainder: a rule, not a heading, marks where it starts. */
-.day-card__section--divided {
-    padding-top: var(--spacing-md);
-    border-top: 1px solid var(--border-color);
+/* Headed sections are boxed in their own colour — an outline and a faint tint
+   — so their END is as visible as their start. The unnamed remainder stays on
+   the card's own background with no box: it is simply what follows.
+   The box's padding is added on both sides of the title and the cards alike,
+   so the title still lands on the card text's line. */
+.day-card__section--new      { --section-accent: var(--color-success); }
+.day-card__section--featured { --section-accent: var(--color-warning); }
+.day-card__section--verified { --section-accent: var(--color-primary-light); }
+
+.day-card__section--boxed {
+    padding: var(--spacing-sm);
+    border: 1px solid color-mix(in srgb, var(--section-accent) 60%, transparent);
+    border-radius: var(--border-radius);
+    background: color-mix(in srgb, var(--section-accent) 10%, transparent);
+}
+
+/* Phones: the day card is full-bleed and so are its venue cards (#224), and
+   the opaque cards cover nearly all of a tint — an outline there reads as two
+   hairlines. So the box becomes a solid stripe down the left edge, running the
+   section's full height: where the colour stops, the section ends. */
+@media (max-width: 768px) {
+    .page--edge-to-edge .day-card__section--boxed {
+        padding: var(--spacing-xs) 0;
+        border: 0;
+        border-left: 4px solid var(--section-accent);
+        border-radius: 0;
+    }
 }
 
 .day-card__footer {

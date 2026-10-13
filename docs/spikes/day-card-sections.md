@@ -38,7 +38,7 @@ the Featured section; nothing in the data carries the flag yet. For example:
 | `js/utils/sections.js` | Pure classifier: `newSince`, `isNewShow`, `isFeaturedShow`, `isVerifiedShow`, `sectionOf`, `groupShows`. |
 | `js/components/DayCard.js` | `renderEvents()` hands off to `renderSections()` when the lens is on. Each section reuses the existing card list. |
 | `js/core/router.js` | Reads `sections` and `featured` from the query string. URL-only, like `fresh`. |
-| `css/views.css` | Section title and the rule that starts the unnamed remainder. |
+| `css/views.css` | Section title, and the colour that marks where each headed section ends (see "Where a section ends"). |
 | `test/sections.test.mjs` | Unit tests for every rule above. |
 
 Without the flag the page is unchanged: no section markup, and the same 252
@@ -92,6 +92,15 @@ hold shows that have stayed confirmed after they stopped being new. The order
 in the table above already handles this. It's just worth knowing that Verified
 will look thin for a month after launch.
 
+## Where a section ends
+
+The first prototype gave the unnamed remainder a thin rule above it. The owner found that too faint: when New is followed by untitled shows, it's hard to see where New stops. Owner decision (2026-10-13): **colour marks the headed sections; the remainder keeps no title and the card's own background.**
+
+- **Each headed section has its own colour**: New green (`--color-success`), Featured amber (`--color-warning`), Verified indigo (`--color-primary-light`). The title takes the same colour.
+- **Desktop (769px+):** the section is boxed, with an outline at 60% of its colour and a 10% tint behind the cards. The box closes after its last card, so the end is as visible as the start.
+- **Phones (≤768px):** an outline didn't work. The day card and its venue cards run edge to edge, and the opaque cards hide almost all of the tint, so the box read as two hairlines. Instead, a **4px stripe in the section's colour runs down the left edge** for the section's full height. Where the stripe stops, the section ends.
+- **The remainder** has no title, no box and no stripe. Its shows start where the last coloured section stops.
+
 ## Answers to the open questions
 
 ### 1. The `created` field
@@ -142,7 +151,7 @@ disclosure" a precondition of the first paid placement, not a nice-to-have.
 | **Footer venue count** | Unchanged: a show sits in exactly one section. |
 | **Exclusions** | An excluded night keeps its row and its banner inside whichever section the show belongs to. Its *section* is a fact about the show, not that night. Acceptable. |
 | **Display Philosophy #5** (balance daily regulars against rarer shows) | The 30-day Verified window keeps monthly shows in Verified between posters. Homespun's third Monday (confirmed Oct 19) shows on Oct 19's card. Daily venues don't gain anything from sections. |
-| **Phones (≤768px)** | Each heading costs about 34px: a 16px title, 4px under it, and 14px between sections. With all three headings plus the remainder's rule, the first remaining card drops about 100px. On a 812px screen that's less than one card. |
+| **Phones (≤768px)** | Each heading costs about 34px: a 16px title, 4px under it, and 14px between sections. With all three headings showing, the first remaining show drops about 100px — less than one card on an 812px screen. |
 | **Desktop (769px+)** | Each section starts its own grid, so a one-card section leaves the rest of its row empty. That reads as intended separation. Merging partial rows would hide where a section ends. **Recommend keeping it.** |
 | **`?fresh=1`** | Untouched, and it composes: the lens annotates cards inside sections. |
 | **`?debug=1`** | Worth adding later: a line on each card saying *why* it's in its section ("New since Oct 1", "Verified for Oct 15"). Out of scope here; it fits the "fresh grows into debug info" direction. |

@@ -141,14 +141,14 @@ export class DayCard extends Component {
     }
 
     /**
-     * Spike #320 prototype: the same cards, grouped. Specials and the
-     * remainder carry no heading; the remainder is set off by a rule only when
-     * a headed section precedes it.
+     * Spike #320 prototype: the same cards, grouped. Headed sections are
+     * boxed in their own colour, so where one ends is visible; specials and
+     * the remainder carry no heading and sit on the card's own background.
      */
     renderSections(events, date) {
         const groups = groupShows(events, { date });
-        return groups.map(({ key, label, events: shows }, i) => `
-            <section class="day-card__section day-card__section--${key}${!label && i > 0 && key === 'rest' ? ' day-card__section--divided' : ''}"
+        return groups.map(({ key, label, events: shows }) => `
+            <section class="day-card__section day-card__section--${key}${label ? ' day-card__section--boxed' : ''}"
                      data-section="${key}"${label ? ` aria-label="${label}"` : ''}>
                 ${label ? `<h3 class="day-card__section-title">${label}</h3>` : ''}
                 ${this.renderList(shows, date)}
