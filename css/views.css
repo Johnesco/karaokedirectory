@@ -226,8 +226,13 @@
     margin-top: var(--spacing-md);
 }
 
+/* Centred between two rules in the section's colour: the title reads as a
+   divider across the card, so a section's start is a line, not just a word. */
 .day-card__section-title {
-    margin: 0 0 var(--spacing-xs);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin: 0 0 var(--spacing-sm);
     padding-inline: var(--spacing-md);
     font-size: var(--font-size-sm);
     font-weight: 600;
@@ -236,12 +241,25 @@
     color: var(--section-accent, var(--text-secondary));
 }
 
+.day-card__section-title::before,
+.day-card__section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.6;
+}
+
 /* Headed sections are boxed in their own colour — an outline and a faint tint
    — so their END is as visible as their start. The unnamed remainder stays on
    the card's own background with no box: it is simply what follows.
    The box's padding is added on both sides of the title and the cards alike,
    so the title still lands on the card text's line. */
-.day-card__section--new      { --section-accent: var(--color-success); }
+/* Title contrast, measured against the tinted box over the card (95% opaque),
+   worst case a white patch of the page image showing through: New 5.41:1,
+   Featured 4.97:1, Verified 4.60:1 — all past AA 4.5:1 for 14px text. New is
+   emerald-400, not --color-success (#10b981), which fell to 4.27:1 there. */
+.day-card__section--new      { --section-accent: #34d399; }
 .day-card__section--featured { --section-accent: var(--color-warning); }
 .day-card__section--verified { --section-accent: var(--color-primary-light); }
 

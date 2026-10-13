@@ -96,7 +96,8 @@ will look thin for a month after launch.
 
 The first prototype gave the unnamed remainder a thin rule above it. The owner found that too faint: when New is followed by untitled shows, it's hard to see where New stops. Owner decision (2026-10-13): **colour marks the headed sections; the remainder keeps no title and the card's own background.**
 
-- **Each headed section has its own colour**: New green (`--color-success`), Featured amber (`--color-warning`), Verified indigo (`--color-primary-light`). The title takes the same colour.
+- **Each headed section has its own colour**: New green (emerald-400, `#34d399`), Featured amber (`--color-warning`), Verified indigo (`--color-primary-light`). The title takes the same colour, **centred between two rules** in that colour, so a section's start reads as a line across the card rather than just a word.
+- **Contrast (AA, 4.5:1 for 14px text).** Measured against the tinted box over the card, which is 95% opaque. Worst case is a white patch of the page image showing through the other 5%: New 5.41:1, Featured 4.97:1, Verified 4.60:1. New started as `--color-success` (`#10b981`), which fell to 4.27:1 in that case, so it was lightened.
 - **Desktop (769px+):** the section is boxed, with an outline at 60% of its colour and a 10% tint behind the cards. The box closes after its last card, so the end is as visible as the start.
 - **Phones (≤768px):** an outline didn't work. The day card and its venue cards run edge to edge, and the opaque cards hide almost all of the tint, so the box read as two hairlines. Instead, a **4px stripe in the section's colour runs down the left edge** for the section's full height. Where the stripe stops, the section ends.
 - **The remainder** has no title, no box and no stripe. Its shows start where the last coloured section stops.
