@@ -15,6 +15,7 @@ import assert from 'node:assert/strict';
 
 import { resolveHostFor, getVenueHosts, renderHostSection, renderScheduleTable, getScheduleContext } from '../js/utils/render.js';
 import { initFreshLens } from '../js/utils/freshness.js';
+import { hydrateVenues } from '../js/utils/hosts.js';
 
 const KJ_A = { name: 'KJ Alpha', website: 'https://alpha.example' };
 const KJ_B = { name: 'KJ Beta' };
@@ -109,6 +110,90 @@ describe('renderHostSection', () => {
     const html = renderHostSection(v);
     assert.doesNotMatch(html, /<script>/);
     assert.match(html, /&lt;script&gt;/);
+  });
+});
+
+// Every host shape the data can hold, through the real registry path (#318).
+// The A–Z e2e test went red on Alcove Cantina, whose shows each named a company
+// and no KJ — valid data (ADR-007) that hydrates to `affiliation` with no
+// `name`. These pin what the page shows for each shape, so a test that expects
+// a KJ's name can't again mistake "a company presents it" for "nobody does".
+describe('host combinations, from registry refs (#318)', () => {
+  const registries = {
+    kjs: { 'kj-alpha': { name: 'KJ Alpha' }, 'kj-beta': { name: 'KJ Beta' } },
+    companies: { 'acme-karaoke': { name: 'Acme Karaoke' } },
+  };
+  const hydrate = (venue) => hydrateVenues({ ...registries, listings: [{ id: 'v', name: 'V', ...venue }] })[0];
+  const section = (venue) => renderHostSection(hydrate(venue));
+  const hasHostColumn = (venue) => /<th>Host<\/th>/.test(renderScheduleTable(hydrate(venue)));
+  const count = (html, cls) => (html.match(new RegExp(cls, 'g')) || []).length;
+  const KJ = { kjId: 'kj-alpha' };
+  const CO = { companyId: 'acme-karaoke' };
+  const BOTH = { kjId: 'kj-alpha', companyId: 'acme-karaoke' };
+
+  it('no host anywhere: no section, no Host column', () => {
+    const v = { schedule: [friday()] };
+    assert.equal(section(v), '');
+    assert.equal(hasHostColumn(v), false);
+  });
+
+  it('venue KJ + company: one block with both lines, no Host column', () => {
+    const v = { host: BOTH, schedule: [friday()] };
+    const html = section(v);
+    assert.equal(count(html, 'venue-detail__host-name'), 1);
+    assert.equal(count(html, 'venue-detail__host-affiliation'), 1);
+    assert.equal(hasHostColumn(v), false);
+  });
+
+  it('venue KJ only: a name line and no company line', () => {
+    const html = section({ host: KJ, schedule: [friday()] });
+    assert.equal(count(html, 'venue-detail__host-name'), 1);
+    assert.equal(count(html, 'venue-detail__host-affiliation'), 0);
+  });
+
+  it('venue company only: presented by the company, with no name line', () => {
+    const html = section({ host: CO, schedule: [friday()] });
+    assert.match(html, /Presented By/);
+    assert.match(html, /Acme Karaoke/);
+    assert.equal(count(html, 'venue-detail__host-name'), 0);
+    assert.equal(count(html, 'venue-detail__host-affiliation'), 1);
+  });
+
+  it('every show company-only (Alcove Cantina as added): Host column, and the company presents it', () => {
+    const v = { schedule: [friday({ day: 'Tuesday', host: CO }), friday({ day: 'Wednesday', host: CO })] };
+    const html = section(v);
+    assert.equal(hasHostColumn(v), true);
+    assert.match(html, /Acme Karaoke/);
+    assert.equal(count(html, 'venue-detail__host"'), 1, 'one host, deduplicated');
+    assert.equal(count(html, 'venue-detail__host-name'), 0, 'no KJ, so no name line — not a missing host');
+    assert.doesNotMatch(html, /venue-detail__host-shows/, 'a lone host needs no attribution');
+  });
+
+  it('every show the same KJ: Host column, one unattributed block', () => {
+    const v = { schedule: [friday({ host: KJ }), friday({ day: 'Saturday', host: KJ })] };
+    const html = section(v);
+    assert.equal(hasHostColumn(v), true);
+    assert.equal(count(html, 'venue-detail__host-name'), 1);
+    assert.doesNotMatch(html, /venue-detail__host-shows/);
+  });
+
+  it('shows with different hosts: one block each, each naming its shows', () => {
+    const v = { schedule: [friday({ host: KJ }), friday({ day: 'Saturday', host: CO })] };
+    const html = section(v);
+    assert.equal(count(html, 'venue-detail__host"'), 2);
+    assert.match(html, /KJ Alpha/);
+    assert.match(html, /Acme Karaoke/);
+    assert.equal(count(html, 'venue-detail__host-shows'), 2);
+  });
+
+  it('venue company with one show overridden by a KJ: the company covers all other nights', () => {
+    const v = { host: CO, schedule: [friday(), friday({ day: 'Saturday', host: KJ })] };
+    const html = section(v);
+    assert.equal(hasHostColumn(v), true);
+    assert.match(html, /Acme Karaoke/);
+    assert.match(html, /All other nights/);
+    assert.match(html, /KJ Alpha/);
+    assert.match(html, /Every Saturday/);
   });
 });
 
