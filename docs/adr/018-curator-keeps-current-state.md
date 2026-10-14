@@ -50,16 +50,15 @@ separate.
 4. **Announcement records are retired:** the `_announcements` list, the
    Announcements tab and the 📣 panel, along with the per-show source links in
    debug mode (#305). Poster images stay as files.
-5. **One writer.** Only the curator changes `js/data.json`. CI fails any PR
-   that touches the file unless it comes from a `data/` branch (the ones
-   Publish creates), and only one data PR is open at a time. `main` therefore
-   only moves when the owner publishes, so the curator's copy can't fall behind
-   and there is nothing to reconcile.
+5. **One writer.** Only the curator changes the venue data. Under
+   [ADR-019](019-data-deploys-from-its-own-branch.md) the data lives on its
+   own `data` branch, which only the curator pushes to, and code branches
+   don't contain the file at all. The curator's copy can't fall behind, so
+   there is nothing to reconcile.
    - A code change that needs a data change is split in two: the code PR makes
      the new data valid, then the change is made in the curator and published.
-   - Safety net: if `main`'s file ever differs from the last publish (only
-     possible if the rule was bypassed), the curator stops and offers one
-     action: take `main`'s file.
+   - Safety net: if the tip of `data` is ever not the curator's last push, the
+     curator stops and offers one action: take the `data` tip.
 
 ## Consequences
 

@@ -4,7 +4,7 @@
 > **Date:** 2026-10-14
 > **Type:** Spike (research and design)
 > **Ticket:** #327
-> **Related:** ADR-015 (one confirmation per show date), ADR-016 (lifespans), ADR-017 (day-card sections), ADR-018 (current state only), #276 (posters), #322 and #323 (`created`, `featured`), #324 (sections on by default)
+> **Related:** ADR-015 (one confirmation per show date), ADR-016 (lifespans), ADR-017 (day-card sections), ADR-018 (current state only), ADR-019 (data on its own branch), #276 (posters), #322 and #323 (`created`, `featured`), #324 (sections on by default)
 
 ## Revised direction (owner, 2026-10-14)
 
@@ -30,9 +30,12 @@ Proposal A below (the journal) is **withdrawn**. In its place:
   - `curator:check` and the three-way publish baseline (#336).
 - **Git is the only history.** The publish PR describes each change by
   comparing with `main`.
-- **One writer.** Only the curator changes `js/data.json`; CI rejects it from
-  any non-`data/` branch, and only one data PR is open at a time. `main` can't
-  move under the curator, so there's no state to reconcile (#336).
+- **One writer, on its own branch** ([ADR-019](../adr/019-data-deploys-from-its-own-branch.md), #337). The venue
+  data moves off `main` onto a `data` branch that only the curator pushes to.
+  Builds pull it. **Publishing is no longer a PR:** the curator runs the full
+  local gates (validate, build, the e2e suite, a render pass), then pushes
+  to `data`, and a GitHub Action deploys it (#334). This is also the seam for
+  a future database: "get the data" becomes one script.
 
 Proposals B to E (Today, one panel, one clock, one Publish) stand. Where they
 mention the journal, read "the current fields". The tickets below were
@@ -264,7 +267,8 @@ flowchart TD
 | #329 | `changed` field: schema, validator, spec | Repo | S |
 | #330 | One 30-day constant; validator, lens and sections share it | Repo | S |
 | #331 | *(revised)* Current state only: edit `data.json` directly; private venue notes in `notes.json`; retire `_announcements` | Curator | M |
-| #336 | Retire `curator:check`, the three-way publish baseline and the debug source links | Repo | S |
+| #336 | Retire `curator:check`, the publish-by-PR route and the debug source links | Repo | S |
+| #337 | Move the data to its own `data` branch; builds pull it; a push deploys (ADR-019) | Repo | M |
 | #332 | One action panel; the Form holds venue facts only | Curator | M |
 | #333 | Today screen and Due rule (no daily target) | Curator | L |
 | #334 | Autosave, and one Publish button with a journal PR body | Curator + `scripts/publish-data.js` | M |
