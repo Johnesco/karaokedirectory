@@ -1,6 +1,6 @@
 # Spike: One flow for keeping the directory current
 
-> **Status:** Proposal, awaiting owner review
+> **Status:** Accepted with changes (see "Decided"). Follow-up tickets filed
 > **Date:** 2026-10-14
 > **Type:** Spike (research and design)
 > **Ticket:** #327
@@ -155,7 +155,7 @@ The curator opens on **Today**, not on an empty form:
    and Thursday's shows come due on Thursday's schedule, not all at once. Each
    row carries the action panel (C). The list starts with **never-verified**
    shows and those about to leave the site's Verified section (day 25+ of 30).
-   A daily target ("5 checks today") turns "a few each day" into a finish line.
+   There is no daily target, by the owner's decision.
 3. **Watch.** Informational, not tasks:
    - New in the last 30 days, and changed in the last 30 days, so you can check what the site is saying
    - Featured windows starting or ending this week
@@ -178,10 +178,10 @@ panels, so every path writes the same records.
 - **Every action except Note also confirms the next night.** If you corrected a
   time, you just verified the show. Doing it as a separate step is how
   confirmations get missed.
-- **A plain Form edit to a show's day, time or host prompts once:** "Was this
-  wrong all along, or is it changing on a date?" Your answer writes a `correct`
-  or a `change` (a Split). Name, address, tags and socials stay plain edits:
-  they're facts about the venue, not the show, and they don't need a record.
+- **The Form holds venue facts only** (decided). Its schedule rows show each
+  show read-only, with one ✎ that opens the panel. Name, address, tags and
+  socials stay plain edits: they're facts about the venue, not the show, and
+  they don't need a record.
 
 ### D. One clock
 
@@ -230,8 +230,8 @@ flowchart TD
 | `changed` field: schema, validator, spec | Repo | S |
 | One 30-day constant; validator, lens and sections share it | Repo | S |
 | `_announcements` → `_log`: migration and derivation of `created` / `changed` | Curator | M |
-| Today screen, Due rule, daily target | Curator | L |
-| One action panel; the Form edit prompt | Curator | M |
+| Today screen and Due rule (no daily target) | Curator | L |
+| One action panel; the Form holds venue facts only | Curator | M |
 | Autosave, and one Publish button with a journal PR body | Curator + `scripts/publish-data.js` | M |
 | A "Changed" marker on the site (if wanted, Q2) | Repo | S |
 
@@ -239,7 +239,18 @@ Suggested order: the 30-day clock and `changed` in the repo first, then the
 journal, then Today, the panel and publishing in the curator. #324 (sections on
 by default) doesn't depend on any of this and can go first.
 
-## Open questions for the owner
+## Decided (owner, 2026-10-14)
+
+All six recommendations are accepted, except the daily target:
+
+1. **A correction counts as a confirmation.** It confirms the show's next night. It never sets `changed`.
+2. **`changed` shows on the site as a marker,** for 30 days on the card ("Now Thursdays · from Nov 6"). It doesn't get a section of its own.
+3. **What a show used to be stays private,** kept in the journal and not in the public file.
+4. **No daily target.** Today lists what's due and nothing more.
+5. **The Form holds venue facts only:** name, address, tags, active period, default host, socials and contact. Shows are changed only through the action panel. With no inline show editing left, the "wrong all along or changing on a date?" prompt isn't needed, because the panel asks the question by offering Correct and Changes from… as separate actions.
+6. **Contact details stay on the venue** (phone, who to ask). The per-venue "source" moves into journal records.
+
+## Open questions for the owner (answered above)
 
 1. **Should a correction count as a confirmation?** Recommendation: yes. You
    just looked.
