@@ -180,13 +180,14 @@ karaokedirectory/
 │   └── venue.schema.json  # Authoritative venue schema (ADR-005)
 │
 ├── e2e/                   # Playwright specs (15 files) — run by `npm test`, gated in CI
-├── test/                  # node --test unit specs (11 files) — run by `npm run test:unit`
+├── test/                  # node --test unit specs (12 files) — run by `npm run test:unit`
 │   ├── date.test.mjs      # Schedule matching, exclusions, lifespans, date ranges
 │   ├── venues.test.mjs    # venuePasses, search predicates, host hydration
 │   ├── render.test.mjs    # Host resolution, schedule table, "Also" line
 │   ├── build-pages.test.mjs       # Generated entity pages, JSON-LD
 │   ├── check-curator-drift.test.mjs  # Curator master vs data.json comparison
 │   ├── publish-data.test.mjs      # Publish gates and baseline handling
+│   ├── validate-data.test.mjs     # The validator CLI against mutated data copies (#322)
 │   └── freshness / router / string / tags / url .test.mjs  # one per module
 │
 ├── metrics/snapshots/     # Output of scripts/code-metrics.js (manual, occasional)
@@ -253,8 +254,14 @@ When adding or modifying venues in `js/data.json`, follow this structure:
         affiliation: "Some Karaoke Co",
         website: "https://..."
       },
-      lastVerified: "2026-10-02"  // Optional: the SHOW DATE the latest evidence confirms (ADR-015, #275) — not the day it was seen.
+      lastVerified: "2026-10-02", // Optional: the SHOW DATE the latest evidence confirms (ADR-015, #275) — not the day it was seen.
                                   // May be in the future; that night's card carries the Announced marker. Curator-derived; never backfilled
+      created: "2026-09-26",      // Optional: the day this show was ADDED to the directory (#322) — not its first night. Curator-stamped;
+                                  // a Split carries it forward. New for 30 days from the later of created and activePeriod.start
+      featured: {                 // Optional: a featured placement (#322, ADR-017) — true, or a window, inclusive, either bound open.
+        start: "2026-10-15",      // Same shape as activePeriod. Not allowed on "once" entries (already pinned). Validator warns once spent
+        end: "2026-10-31"
+      }
     },
     {
       frequency: "once",      // One-time special event
@@ -267,6 +274,7 @@ When adding or modifying venues in `js/data.json`, follow this structure:
       lastVerified: "2026-03-15"  // Optional: same meaning as above — the confirmed night, normally the event's own date
     }
   ],
+  created: "2026-10-10",      // Optional: the day this venue was ADDED (#322). Makes its shows New for 30 days. Undated = not new
   activePeriod: {             // Optional: limits when venue appears
     start: "2026-06-01",      // Venue only appears within this range
     end: "2026-08-31"
@@ -507,6 +515,8 @@ The curator runs on **:8765** via `node server.js` (its `start.cmd`), with its o
 **Announcements are their own list, not a field on a show** (#276 curator, #275 repo). A record is `{ seen, for?, show?, text?, source?, image? }` in a top-level `_announcements` array in the curator master, pointing at a schedule entry by a curator-private `_id`. It does not have to point at anything: a poster can be captured before the venue or the show exists, and linked later. The public `lastVerified` is **derived** — the latest `for` among the records pointing at a show — so it cannot move backwards and there is nothing to clear or demote. The records themselves never leave the curator: export copies five named top-level keys and strips every underscore key at any depth.
 
 **A show's lifespan is set in the curator, and pruning is flagged, never automatic** (#288, ADR-016). Each schedule row has a lifespan panel — first/last night, and **Split** for a change on a date (the old show ends the day before; a copy with a fresh `_id` and no confirmation starts that day). Only records for nights inside a show's lifespan count toward its derived `lastVerified`. A show past its last night reads "ended" and is exempt from the overdue/never counts. The curator's export check refuses the windows the repo would reject — including a venue-level window with no `start`, which the schema requires but the venue form allows. The dashboard's **"To prune"** tab lists every show more than 30 days past its last night (ended recurring shows and spent one-time events) and the header counts them; nothing is removed on Save or Export — each removal is the owner's click, and records about a removed show are kept, unlinked, marked as an ended show.
+
+**`created` is stamped by the curator; a placement is set there too** (#323, data #322, ADR-017). Adding a venue, a schedule entry, or a show or one-time event from the Posters screen writes today's date as `created`, so nobody types it. A Split keeps the old show's `created` (a day or time change is not news) unless its **new show** box is ticked. Each recurring row has a **☆ feature** panel beside the lifespan one: ticked with no dates is `featured: true`, dates make a window, unticking removes it; it is hidden on one-time events, and a Split gives each half only the placement nights it runs. Export refuses what the repo would reject (a window that ends before it starts, `featured` on a one-time event, a malformed date) and warns on a spent placement.
 
 **Catching up on Facebook is a list in the curator** (#298). The groups where shows get announced live in the master as a curator-private `_catchupGroups` list (`{ id, name, url, lastChecked? }`, never exported), shown at the top of the sidebar least-recently-checked first. **Start/Next** opens each in **one named companion window** (`kd-catchup`) on the right half of the screen and reuses it, marking each group checked as it moves on. Facebook refuses to be framed even by a local page, which is why it is a window and not an iframe.
 

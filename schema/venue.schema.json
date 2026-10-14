@@ -146,6 +146,9 @@
         "activePeriod": {
           "$ref": "#/$defs/activePeriod"
         },
+        "created": {
+          "$ref": "#/$defs/created"
+        },
         "host": {
           "$ref": "#/$defs/hostAssignment",
           "description": "Default host for shows that don't override it."
@@ -230,6 +233,34 @@
           "format": "date"
         }
       }
+    },
+    "created": {
+      "type": "string",
+      "format": "date",
+      "description": "The day this venue or show was added to the directory (#322, ADR-017). Drives the New section with activePeriod.start: a record is New for 30 days from the later of the two. Stamped by the curator on add; a Split carries it forward unless the owner marks the new half as a new show. Reconstructed once from git for records added in the 30 days before the field existed; older records stay undated, and undated means not new."
+    },
+    "featured": {
+      "description": "A featured placement on this show (#322, ADR-017): the nights it sits in the day card's Featured section. A window, inclusive, either bound open, the same shape as a show's activePeriod; or true while placements are tests. Not allowed on one-time events, which are already pinned. validate-data.js checks start <= end and warns once the window has ended.",
+      "oneOf": [
+        {
+          "const": true
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "minProperties": 1,
+          "properties": {
+            "start": {
+              "type": "string",
+              "format": "date"
+            },
+            "end": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        }
+      ]
     },
     "entryActivePeriod": {
       "type": "object",
@@ -349,6 +380,12 @@
           "type": "string",
           "format": "date",
           "description": "The show date the latest evidence confirms (ADR-015, #275) — a night this show ran or will run, not the day the evidence was seen. May be in the future: a flier for Oct 1 confirms Oct 1, and that night's calendar card carries the Announced marker. Absent means unrecorded, not wrong. Derived by the curator from its private announcement records; never backfilled."
+        },
+        "created": {
+          "$ref": "#/$defs/created"
+        },
+        "featured": {
+          "$ref": "#/$defs/featured"
         }
       },
       "allOf": [
@@ -368,7 +405,8 @@
               "date"
             ],
             "properties": {
-              "activePeriod": false
+              "activePeriod": false,
+              "featured": false
             }
           },
           "else": {

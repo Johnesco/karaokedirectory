@@ -240,6 +240,8 @@ for (const venue of data.listings) {
             const prefix = `schedule[${i}]`;
             checkHostRef(venue, entry.host, `${prefix}.host`);
             checkPeriodOrder(venue, entry.activePeriod, `${prefix}.activePeriod`);
+            // A placement window has the same shape and the same CHECK (#322).
+            checkPeriodOrder(venue, entry.featured, `${prefix}.featured`);
 
             // Minute-typo heuristic — start times should land on :00/:15/:30/:45.
             // Catches things like 17:03 that should have been 17:00.
@@ -418,9 +420,27 @@ for (const venue of data.listings) {
 // running that night, so the exclusion can never apply.
 const staleCutoffIso = isoOf(staleCutoff);
 
+// A record added after its own last night (#322): the created date or the
+// lifespan is wrong. A warning, because either could be the stale one.
+function checkCreatedAfterEnd(thing, where) {
+    const end = thing?.activePeriod?.end;
+    if (thing?.created && end && thing.created > end) {
+        warnings.push(`${where} was created ${thing.created}, after its activePeriod ends ${end} — one of them is wrong`);
+    }
+}
+
 for (const venue of data.listings) {
+    checkCreatedAfterEnd(venue, `${venue.name} (${venue.id})`);
     for (const entry of venue.schedule || []) {
         const label = `${entry.day || entry.date || '?'} ${entry.startTime || ''}`.trim();
+        checkCreatedAfterEnd(entry, `${venue.name} (${venue.id}) ${label}`);
+        // A spent placement (#322, ADR-017): it no longer shows anywhere, so
+        // it is clutter — the same shape as the ended-show warning below, but
+        // with no grace period, since nothing reads a past placement.
+        const featuredEnd = entry.featured?.end;
+        if (featuredEnd && featuredEnd < TODAY_ISO) {
+            warnings.push(`${venue.name} (${venue.id}) ${label} featured placement ended ${featuredEnd} — remove it`);
+        }
         const end = entry.activePeriod?.end;
         if (end && end < staleCutoffIso) {
             warnings.push(
