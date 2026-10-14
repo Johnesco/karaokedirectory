@@ -225,15 +225,15 @@ flowchart TD
 
 ## What changes where
 
-| Piece | Where | Size |
-|---|---|---|
-| `changed` field: schema, validator, spec | Repo | S |
-| One 30-day constant; validator, lens and sections share it | Repo | S |
-| `_announcements` → `_log`: migration and derivation of `created` / `changed` | Curator | M |
-| Today screen and Due rule (no daily target) | Curator | L |
-| One action panel; the Form holds venue facts only | Curator | M |
-| Autosave, and one Publish button with a journal PR body | Curator + `scripts/publish-data.js` | M |
-| A "Changed" marker on the site (if wanted, Q2) | Repo | S |
+| Ticket | Piece | Where | Size |
+|---|---|---|---|
+| #329 | `changed` field: schema, validator, spec | Repo | S |
+| #330 | One 30-day constant; validator, lens and sections share it | Repo | S |
+| #331 | `_announcements` → `_log`: migration and derivation of `created` / `changed` | Curator | M |
+| #332 | One action panel; the Form holds venue facts only | Curator | M |
+| #333 | Today screen and Due rule (no daily target) | Curator | L |
+| #334 | Autosave, and one Publish button with a journal PR body | Curator + `scripts/publish-data.js` | M |
+| #335 | A "Changed" marker on the site | Repo | S |
 
 Suggested order: the 30-day clock and `changed` in the repo first, then the
 journal, then Today, the panel and publishing in the curator. #324 (sections on
