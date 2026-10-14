@@ -1,10 +1,41 @@
 # Spike: One flow for keeping the directory current
 
-> **Status:** Accepted with changes (see "Decided"). Follow-up tickets filed
+> **Status:** Accepted, then **revised**: there is no journal (see "Revised direction" below and [ADR-018](../adr/018-curator-keeps-current-state.md)). Follow-up tickets filed
 > **Date:** 2026-10-14
 > **Type:** Spike (research and design)
 > **Ticket:** #327
-> **Related:** ADR-015 (one confirmation per show date), ADR-016 (lifespans), ADR-017 (day-card sections), #276 (posters), #322 and #323 (`created`, `featured`), #324 (sections on by default)
+> **Related:** ADR-015 (one confirmation per show date), ADR-016 (lifespans), ADR-017 (day-card sections), ADR-018 (current state only), #276 (posters), #322 and #323 (`created`, `featured`), #324 (sections on by default)
+
+## Revised direction (owner, 2026-10-14)
+
+**No historical log.** Having the latest information is what matters. A change
+only needs to be known well enough to mark a show new, changed or verified.
+Proposal A below (the journal) is **withdrawn**. In its place:
+
+- **One copy of the public data.** The curator edits a `data.json` in exactly
+  the public shape, and Publish sends it. Nothing is exported, nothing is
+  stripped, and nothing can drift.
+- **Private data is personal notes only.** A `notes.json` holds venue-level
+  contact details and notes (the owner's decision: venue-level for now), the
+  catch-up list, and draft venues.
+- **Each action sets the current public fields when you take it:**
+  - Confirm sets `lastVerified`, and never moves it backwards.
+  - Correct fixes the fields and confirms the next night.
+  - Changes from… splits the show and sets `changed`.
+  - Add sets `created`.
+  - Night off and Last night set the exclusion and the lifespan end.
+- **Retired:**
+  - the `_announcements` records, the Announcements tab and the 📣 panel;
+  - the debug-mode source links (#305), dropped by the owner's decision;
+  - `curator:check` and the three-way publish baseline (#336).
+- **Git is the only history.** The publish PR describes each change by
+  comparing with `main`.
+
+Proposals B to E (Today, one panel, one clock, one Publish) stand. Where they
+mention the journal, read "the current fields". The tickets below were
+rewritten to match.
+
+The rest of this document is the original analysis, kept as it was.
 
 ## The question
 
@@ -229,7 +260,8 @@ flowchart TD
 |---|---|---|---|
 | #329 | `changed` field: schema, validator, spec | Repo | S |
 | #330 | One 30-day constant; validator, lens and sections share it | Repo | S |
-| #331 | `_announcements` → `_log`: migration and derivation of `created` / `changed` | Curator | M |
+| #331 | *(revised)* Current state only: edit `data.json` directly; private venue notes in `notes.json`; retire `_announcements` | Curator | M |
+| #336 | Retire `curator:check`, the three-way publish baseline and the debug source links | Repo | S |
 | #332 | One action panel; the Form holds venue facts only | Curator | M |
 | #333 | Today screen and Due rule (no daily target) | Curator | L |
 | #334 | Autosave, and one Publish button with a journal PR body | Curator + `scripts/publish-data.js` | M |
