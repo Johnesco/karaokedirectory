@@ -50,10 +50,16 @@ separate.
 4. **Announcement records are retired:** the `_announcements` list, the
    Announcements tab and the 📣 panel, along with the per-show source links in
    debug mode (#305). Poster images stay as files.
-5. **Keeping up with `main`.** The curator remembers the commit it last
-   published from, not a copy of the file.
-   - When `main` has moved and nothing is pending, it takes `main`'s file.
-   - When both have moved, Publish stops and the owner chooses, venue by venue.
+5. **One writer.** Only the curator changes `js/data.json`. CI fails any PR
+   that touches the file unless it comes from a `data/` branch (the ones
+   Publish creates), and only one data PR is open at a time. `main` therefore
+   only moves when the owner publishes, so the curator's copy can't fall behind
+   and there is nothing to reconcile.
+   - A code change that needs a data change is split in two: the code PR makes
+     the new data valid, then the change is made in the curator and published.
+   - Safety net: if `main`'s file ever differs from the last publish (only
+     possible if the rule was bypassed), the curator stops and offers one
+     action: take `main`'s file.
 
 ## Consequences
 
@@ -68,9 +74,10 @@ separate.
   later date), not a property of a maximum over records.
 - **Cost.** There's no evidence trail. Why a show was marked verified isn't
   recorded beyond the poster files themselves.
-- **Cost.** When a code PR changes `js/data.json` while the owner has
-  unpublished edits, a venue-by-venue choice is needed. That's rare: #322 was
-  the only such PR in two months.
+- **Cost.** Contributors (and Claude sessions) can no longer edit
+  `js/data.json` in a code PR. A data change goes through the owner's curator.
+  A schema change that needs new data takes two steps: the code PR first, then
+  a publish. #322 would have been split this way.
 
 ## Alternatives considered
 
@@ -79,6 +86,9 @@ separate.
   brought growth, compaction and backup problems with it.
 - **Keep today's master and only retire the records.** Rejected: it keeps the
   second copy, and with it all the drift machinery.
+- **Let code PRs keep editing the data, and reconcile venue by venue when both
+  have moved.** Rejected by the owner: it builds a state that shouldn't exist,
+  and the drift machinery comes back.
 - **Edit the developer checkout's `js/data.json` directly.** Rejected: the
   checkout may be mid-feature, on another branch, or dirty, which is the same
   reason `publish-data.js` already works through the GitHub API.

@@ -30,6 +30,9 @@ Proposal A below (the journal) is **withdrawn**. In its place:
   - `curator:check` and the three-way publish baseline (#336).
 - **Git is the only history.** The publish PR describes each change by
   comparing with `main`.
+- **One writer.** Only the curator changes `js/data.json`; CI rejects it from
+  any non-`data/` branch, and only one data PR is open at a time. `main` can't
+  move under the curator, so there's no state to reconcile (#336).
 
 Proposals B to E (Today, one panel, one clock, one Publish) stand. Where they
 mention the journal, read "the current fields". The tickets below were
