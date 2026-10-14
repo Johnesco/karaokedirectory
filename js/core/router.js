@@ -102,7 +102,8 @@ function parseHash(rawHash) {
  * `debug` it has no localStorage twin.
  *
  * @returns {{view: string|null, venueId: string|null, hostFilter: string,
- *            debug: boolean, fresh: boolean, isLegacyHashView: boolean}}
+ *            debug: boolean, fresh: boolean, sections: boolean,
+ *            featured: string[], isLegacyHashView: boolean}}
  */
 export function readLocation() {
     const query = new URLSearchParams(window.location.search);
@@ -123,6 +124,10 @@ export function readLocation() {
         hostFilter: query.get('kj') || '',
         debug: query.get('debug') === '1',
         fresh: query.get('fresh') === '1',
+        // Spike #320 prototype — day-card sections, plus a venue-id list that
+        // stands in for the proposed `featured` field. URL-only, like `fresh`.
+        sections: query.get('sections') === '1',
+        featured: (query.get('featured') || '').split(',').map(s => s.trim()).filter(Boolean),
         isLegacyHashView: !!legacyView,
     };
 }

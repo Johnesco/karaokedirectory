@@ -217,6 +217,72 @@
     background: var(--color-gray-700);
 }
 
+/* Day-card sections — ?sections=1, spike #320 prototype. The title's inline
+   padding is the venue card's own (--spacing-md), so the heading lands on the
+   card text's line at every width: at <=768px the body has no gutter and the
+   card's padding is the single inset; at 769px+ the body gutter applies to
+   both alike (#224). */
+.day-card__section + .day-card__section {
+    margin-top: var(--spacing-md);
+}
+
+/* Centred between two rules in the section's colour: the title reads as a
+   divider across the card, so a section's start is a line, not just a word. */
+.day-card__section-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin: 0 0 var(--spacing-sm);
+    padding-inline: var(--spacing-md);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--section-accent, var(--text-secondary));
+}
+
+.day-card__section-title::before,
+.day-card__section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.6;
+}
+
+/* Headed sections are boxed in their own colour — an outline and a faint tint
+   — so their END is as visible as their start. The unnamed remainder stays on
+   the card's own background with no box: it is simply what follows.
+   The box's padding is added on both sides of the title and the cards alike,
+   so the title still lands on the card text's line. */
+/* Title contrast, measured against the tinted box over the card (95% opaque),
+   worst case a white patch of the page image showing through: New 5.41:1,
+   Featured 4.97:1, Verified 4.60:1 — all past AA 4.5:1 for 14px text. New is
+   emerald-400, not --color-success (#10b981), which fell to 4.27:1 there. */
+.day-card__section--new      { --section-accent: #34d399; }
+.day-card__section--featured { --section-accent: var(--color-warning); }
+.day-card__section--verified { --section-accent: var(--color-primary-light); }
+
+.day-card__section--boxed {
+    padding: var(--spacing-sm);
+    border: 1px solid color-mix(in srgb, var(--section-accent) 60%, transparent);
+    border-radius: var(--border-radius);
+    background: color-mix(in srgb, var(--section-accent) 10%, transparent);
+}
+
+/* Phones: the day card is full-bleed and so are its venue cards (#224), and
+   the opaque cards cover nearly all of a tint — an outline there reads as two
+   hairlines. So the box becomes a solid stripe down the left edge, running the
+   section's full height: where the colour stops, the section ends. */
+@media (max-width: 768px) {
+    .page--edge-to-edge .day-card__section--boxed {
+        padding: var(--spacing-xs) 0;
+        border: 0;
+        border-left: 4px solid var(--section-accent);
+        border-radius: 0;
+    }
+}
+
 .day-card__footer {
     padding: var(--spacing-sm) var(--spacing-md);
     background: var(--color-gray-800);
