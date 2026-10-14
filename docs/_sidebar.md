@@ -9,3 +9,4 @@
 - **Spikes**
   - [Surface data unification](spikes/surface-data-unification.md)
   - [Day-card sections](spikes/day-card-sections.md)
+  - [Curator update flow](spikes/curator-update-flow.md)
