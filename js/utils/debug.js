@@ -4,6 +4,7 @@
  */
 
 import { scheduleMatchesDate } from './date.js';
+import { sectionReason } from './sections.js';
 import { escapeHtml } from './string.js';
 import { sanitizeUrl } from './url.js';
 
@@ -197,8 +198,16 @@ export function getDebugHtml(venue, date, entry) {
 
     const info = getVenueDebugInfo(venue, date);
 
+    // Why this show is in its day-card section (#325). Only on a dated card
+    // with a show, which is every calendar card; never outside debug mode.
+    const reason = date && entry ? sectionReason(venue, entry, { date }) : null;
+    const sectionLine = reason
+        ? `<span class="venue-card__debug-section" data-section-reason="${reason.key}">${escapeHtml(reason.text)}</span>`
+        : '';
+
     return `
         <span class="venue-card__debug">${info.matchReason}${renderDebugSource(venue, entry)}</span>
+        ${sectionLine}
         <div class="venue-card__debug-tooltip">
             <strong>${venue.name}</strong><br>
             Match: ${info.matchReason}<br>

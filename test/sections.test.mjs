@@ -6,7 +6,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
-    newSince, isNewShow, isUpdatedShow, isVerifiedShow, isFeaturedShow, sectionOf, groupShows,
+    newSince, isNewShow, isUpdatedShow, isVerifiedShow, isFeaturedShow, sectionOf, sectionReason, groupShows,
     SECTION_WINDOW_DAYS,
 } from '../js/utils/sections.js';
 
@@ -129,5 +129,26 @@ describe('groupShows', () => {
         assert.deepEqual(groups.map(g => g.key), ['special', 'verified', 'rest']);
         assert.deepEqual(groups.find(g => g.key === 'rest').events.map(e => e.venue.name), ['A', 'C']);
         assert.deepEqual(groups.map(g => g.label), [null, 'Verified', null]);
+    });
+});
+
+describe('sectionReason (#325)', () => {
+    const opts = { date: TODAY, asOf: TODAY };
+    it('names the record and the date that decided New', () => {
+        assert.deepEqual(sectionReason(venue(), show({ created: '2026-10-01' }), opts), { key: 'new', text: 'New since Oct 1 (show added)' });
+        assert.deepEqual(sectionReason(venue(), show({ created: '2026-09-20', activePeriod: { start: '2026-10-05' } }), opts), { key: 'new', text: "New since Oct 5 (show's first night)" });
+        assert.deepEqual(sectionReason(venue({ created: '2026-10-09' }), show(), opts), { key: 'new', text: 'New since Oct 9 (venue added)' });
+    });
+    it('says when a show was updated, featured or verified', () => {
+        assert.equal(sectionReason(venue(), show({ changed: '2026-10-10' }), opts).text, 'Updated Oct 10 (show details changed)');
+        assert.equal(sectionReason(venue(), show({ featured: true }), opts).text, 'Featured (every night it runs)');
+        assert.equal(sectionReason(venue(), show({ featured: { start: '2026-10-01', end: '2026-10-31' } }), opts).text, 'Featured Oct 1 – Oct 31');
+        assert.equal(sectionReason(venue(), show({ featured: { end: '2026-10-31' } }), opts).text, 'Featured until Oct 31');
+        assert.equal(sectionReason(venue(), show({ lastVerified: '2026-10-15' }), opts).text, 'Verified for Oct 15');
+    });
+    it('explains the rest, and specials', () => {
+        assert.equal(sectionReason(venue(), show(), opts).text, 'Never verified');
+        assert.equal(sectionReason(venue(), show({ lastVerified: '2026-08-01' }), opts).text, 'Not verified in 30 days (last for Aug 1)');
+        assert.equal(sectionReason(venue(), show({ frequency: 'once', date: '2026-10-12' }), opts).key, 'special');
     });
 });
