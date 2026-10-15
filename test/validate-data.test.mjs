@@ -55,6 +55,29 @@ describe('validate-data: created', () => {
     });
 });
 
+describe('validate-data: changed', () => {
+    it('accepts a change on the first night (a Split) and a later correction', () => {
+        const split = validate((_, { entry }) => { entry.changed = '2026-11-06'; entry.activePeriod = { start: '2026-11-06' }; });
+        assert.equal(split.code, 0, split.out);
+        assert.doesNotMatch(split.out, /cannot change before it starts/);
+        const corrected = validate((_, { entry }) => { entry.changed = '2026-12-01'; entry.activePeriod = { start: '2026-11-06' }; });
+        assert.doesNotMatch(corrected.out, /cannot change before it starts/);
+        const noStart = validate((_, { entry }) => { entry.changed = '2026-10-15'; delete entry.activePeriod; });
+        assert.equal(noStart.code, 0, noStart.out);
+        assert.doesNotMatch(noStart.out, /cannot change before it starts/);
+    });
+    it('warns when a show changed before its first night', () => {
+        const r = validate((_, { entry }) => { entry.changed = '2026-11-01'; entry.activePeriod = { start: '2026-11-06' }; });
+        assert.equal(r.code, 0, r.out);
+        assert.match(r.out, /changed 2026-11-01, before its first night 2026-11-06/);
+    });
+    it('fails a malformed date, and changed on a one-time event', () => {
+        assert.equal(validate((_, { entry }) => { entry.changed = 'Nov 6'; }).code, 1);
+        const once = { frequency: 'once', date: '2026-12-31', startTime: '21:00', changed: '2026-12-31' };
+        assert.equal(validate((_, { venue }) => { venue.schedule.push(once); }).code, 1);
+    });
+});
+
 describe('validate-data: featured', () => {
     it('accepts true and an open-ended window', () => {
         assert.equal(validate((_, { entry }) => { entry.featured = true; }).code, 0);

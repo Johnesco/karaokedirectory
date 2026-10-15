@@ -434,6 +434,15 @@ for (const venue of data.listings) {
     for (const entry of venue.schedule || []) {
         const label = `${entry.day || entry.date || '?'} ${entry.startTime || ''}`.trim();
         checkCreatedAfterEnd(entry, `${venue.name} (${venue.id}) ${label}`);
+        // A show cannot have changed before it existed (#329). A Split's
+        // `changed` equals the new entry's first night; a later correction moves
+        // it forward. A warning: either date could be the wrong one.
+        if (entry.changed && entry.activePeriod?.start && entry.changed < entry.activePeriod.start) {
+            warnings.push(
+                `${venue.name} (${venue.id}) ${label} changed ${entry.changed}, before its first night ` +
+                `${entry.activePeriod.start} — a show cannot change before it starts`
+            );
+        }
         // A spent placement (#322, ADR-017): it no longer shows anywhere, so
         // it is clutter — the same shape as the ended-show warning below, but
         // with no grace period, since nothing reads a past placement.

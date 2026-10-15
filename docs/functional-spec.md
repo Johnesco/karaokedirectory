@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.58
+**Version:** 1.0.59
 **Last updated:** October 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -736,6 +736,7 @@ The shape `{ tagDefinitions, listings }` is the contract — both the local file
       lastVerified      string        OPTIONAL  "YYYY-MM-DD" — the show date the latest evidence confirms; may be in the future (see "Show Verification")
       created           string        OPTIONAL  "YYYY-MM-DD" — the day this show was added (see "Created and Featured")
       featured          true|object   OPTIONAL  A featured placement — true, or { start?, end? }, at least one (see "Created and Featured")
+      changed           string        OPTIONAL  "YYYY-MM-DD" — when the show's details last changed (a Split or a correction); see "Created, Changed and Featured"
 
     One-time entry (no activePeriod — its date is its whole life):
       frequency         string        "once"
@@ -904,7 +905,7 @@ A schedule entry may carry `lastVerified`: the `YYYY-MM-DD` **show date the late
 - **The evidence itself is curator-private** — the wording, the source link and the poster image never leave the curator, and the public file carries only the date.
 - **Display by surface:** the Announced marker on that night's calendar card (§6) is public. Otherwise none by default. With `?fresh=1` (§18 "Freshness lens", #259) the calendar cards, the detail schedule table on all four surfaces, and the KJ dossier show the night and its age.
 
-### Created and Featured
+### Created, Changed and Featured
 
 Two fields that day-card sections read (#322, ADR-017, spike #320). Neither is displayed yet; the sections that use them are #324.
 
@@ -919,11 +920,13 @@ Two fields that day-card sections read (#322, ADR-017, spike #320). Neither is d
   - **Written by the curator** (§16, #323) on the day it adds the record. A Split (ADR-016) carries the old show's `created` forward — a day or time change is not news — unless the owner marks the new half as a new show.
   - **Reconstructed once, never backfilled.** When the field arrived, the seven records first published in the previous 30 days were stamped with the date of the merge that first published them (from `git log --first-parent main -- js/data.json`): five venues on 2026-10-10, and two new nights (Millie's on Main Thursday, Hudson Tavern Lynum Friday) on 2026-09-26. Everything older is undated, and undated means "not new" — an older date would sit outside the window anyway, so nothing is lost.
 - **`featured`** — a **placement** on a recurring show: the nights it sits in the Featured section. `{ start?, end? }`, inclusive, at least one bound, the same shape as a show's `activePeriod`; or `true` while placements are tests. It lives on the show, not the venue (ADR-013), and a dated window ends on its own. **Not allowed on one-time events**, which are already pinned to the top of the day.
+- **`changed`** (#329): the `YYYY-MM-DD` date an existing show's **details last changed**. Owner decision (2026-10-15): **any** detail change to a show that isn't new counts: day, time, KJ or other details, whether it's a change on a date or a correction. A change on a date (an ADR-016 Split) sets it to the night the new version takes effect, which is the new entry's `activePeriod.start`. A correction sets it to the day it was corrected. A newly added show carries `created` instead. The curator sets it when the change is made (#331, #332). The site lists the show under **Updated** for 30 days from this date (#335). Not allowed on one-time events. What the show used to be is not in the public file.
 - **Validation** (`scripts/validate-data.js`):
   - A malformed date, an empty `featured` object, `featured: false`, an unknown key, or `featured` on a one-time event **fails** (schema).
   - A `featured` window that ends before it starts **fails** — the same CHECK as `activePeriod`.
   - A placement whose `end` has passed is a **warning**: it no longer shows anywhere.
   - A `created` after the record's own `activePeriod.end` is a **warning**: one of the two dates is wrong.
+  - A `changed` before the entry's own `activePeriod.start` is a **warning**: a show cannot change before it starts. A malformed `changed`, or `changed` on a one-time event, **fails**.
 - **`npm run curator:check`** reports a repo `created` the master lacks as content an export would destroy, until the curator carries the field (#323).
 
 ### Venue Count
@@ -1818,7 +1821,8 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-10 | 1.0.55 | #322: Venues and schedule entries accept `created` (the day the record was added) and recurring entries accept `featured` (`true` or a `{start?, end?}` placement window; not on one-time events), the data behind day-card sections (ADR-017, spike #320). The validator fails a placement that ends before it starts and warns on a spent placement and on a `created` after its own `activePeriod.end`; new `test/validate-data.test.mjs` runs the CLI against mutated copies. `created` reconstructed once from git for the seven records first published in the previous 30 days. Not displayed yet (#324). New §11 "Created and Featured". | Claude Code |
 | 2026-10 | 1.0.56 | #338: data PRs merge themselves. `publish-data.js` turns on auto-merge for each data PR it opens, so a publish goes live once both required checks pass, with no trip to GitHub; branch protection is unchanged. Best effort, with `--no-auto-merge` to opt out. Replaces, for now, the data-branch plan (ADR-019 deferred, #337). | Claude Code |
 | 2026-10 | 1.0.57 | #324: day-card sections on by default. Every day card groups its shows into Specials → New → Featured → Verified → the rest, each show in exactly one, alphabetical within each, empty sections not rendered; both 30-day windows count from today, Featured from the card date. The `?sections=1` flag and the `?featured=` stand-in are gone; Featured reads only `schedule[].featured`. ADR-017 accepted and Display Philosophy #1 amended. New `e2e/day-card-sections.spec.js`. New §2 "Sections". | Claude Code |
-| 2026-10 | 1.0.58 | #330: one verification clock. `VERIFIED_WINDOW_DAYS = 30` in `js/utils/date.js` replaces the 60-day `FRESHNESS_HORIZON_DAYS`; the day-card sections, the `?fresh=1` lens and the validator (which mirrors the number, guarded by a unit test) now agree that a show confirmed fewer than 30 days ago is fresh and day 30 is out. Previously a show left the public Verified section a month before anything called it overdue. The curator's own 30/60/90 setting goes with #333. | Claude Code |
+| 2026-10 | 1.0.58 | #329: recurring schedule entries accept `changed`, the date an existing show's details last changed. A change on a date (an ADR-016 Split) sets the night it takes effect; a correction sets the day it was corrected (owner decision: any detail change to a show that isn't new). The validator warns when it falls before the entry's `activePeriod.start`, and fails it on one-time events. Nothing writes or displays it yet (#331/#332 write it, #335 shows it). §11 "Created and Featured" becomes "Created, Changed and Featured". | Claude Code |
+| 2026-10 | 1.0.59 | #330: one verification clock. `VERIFIED_WINDOW_DAYS = 30` in `js/utils/date.js` replaces the 60-day `FRESHNESS_HORIZON_DAYS`; the day-card sections, the `?fresh=1` lens and the validator (which mirrors the number, guarded by a unit test) now agree that a show confirmed fewer than 30 days ago is fresh and day 30 is out. Previously a show left the public Verified section a month before anything called it overdue. The curator's own 30/60/90 setting goes with #333. | Claude Code |
 
 ---
 

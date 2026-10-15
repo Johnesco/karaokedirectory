@@ -386,6 +386,11 @@
         },
         "featured": {
           "$ref": "#/$defs/featured"
+        },
+        "changed": {
+          "type": "string",
+          "format": "date",
+          "description": "When this show's details last changed (#329; owner decision 2026-10-15: any detail change to an existing show). A change on a date (an ADR-016 Split) sets it to the night the new version takes effect, which is the entry's activePeriod.start; a correction sets it to the day it was corrected. Never before the entry's activePeriod.start. Set by the curator when the change is made, never typed; a newly added show carries created instead. The site lists the show under Updated for 30 days from it (#335). Not allowed on one-time events."
         }
       },
       "allOf": [
@@ -406,7 +411,8 @@
             ],
             "properties": {
               "activePeriod": false,
-              "featured": false
+              "featured": false,
+              "changed": false
             }
           },
           "else": {
