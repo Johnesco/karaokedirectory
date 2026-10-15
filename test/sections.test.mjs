@@ -2,19 +2,18 @@
  * Unit tests for day-card sections (spike #320 prototype, js/utils/sections.js).
  */
 
-import { describe, it, beforeEach } from 'node:test';
+import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
     newSince, isNewShow, isVerifiedShow, isFeaturedShow, sectionOf, groupShows,
-    initSectionsLens, SECTION_WINDOW_DAYS,
+    SECTION_WINDOW_DAYS,
 } from '../js/utils/sections.js';
 
 const TODAY = new Date(2026, 9, 12); // Mon Oct 12, 2026
 const show = (over = {}) => ({ frequency: 'every', day: 'Monday', startTime: '21:00', ...over });
 const venue = (over = {}) => ({ id: 'v', name: 'V', schedule: [], ...over });
 
-beforeEach(() => initSectionsLens(true, []));
 
 describe('newSince', () => {
     it('is null when neither date is recorded', () => {
@@ -70,9 +69,9 @@ describe('isFeaturedShow', () => {
         assert.equal(isFeaturedShow(venue(), show({ featured: { start: '2026-10-20' } }), night), false);
         assert.equal(isFeaturedShow(venue(), show({ featured: { end: '2026-10-18' } }), night), false);
     });
-    it('honours the prototype venue-id list', () => {
-        initSectionsLens(true, ['v']);
-        assert.equal(isFeaturedShow(venue(), show(), night), true);
+    it('honours featured: true, and nothing without the field', () => {
+        assert.equal(isFeaturedShow(venue(), show({ featured: true }), night), true);
+        assert.equal(isFeaturedShow(venue(), show(), night), false);
     });
 });
 

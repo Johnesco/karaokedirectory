@@ -52,8 +52,8 @@
 
 These principles govern **what** the directory shows and **how** it presents venues — the editorial stance, not the technical architecture.
 
-### 1. Neutral Directory, Not a Review Platform
-No ratings, reviews, rankings, or "best of" lists. Every active venue is presented equally. Alphabetical sort everywhere. No algorithmic or editorial favoritism.
+### 1. Every Show Listed, Alphabetical Within Each Group
+No ratings, reviews, rankings, or "best of" lists. Every active show is listed, and **position within a group is always alphabetical**. Groups reflect facts about a show (new, recently confirmed), plus one owner-controlled placement group: **Featured** ([ADR-017](docs/adr/017-day-card-sections-and-featured-placement.md), amending the old "every venue presented equally, no editorial favoritism"). Featured holds test placements only; its label and disclosure are revisited before the first paid placement.
 
 ### 2. Facts, Not Opinions
 Show what a venue **is** (dive bar, 21+, LGBTQ+), not what experience you'll have. Tags are descriptive, not prescriptive. No "vibe" or quality descriptors.
@@ -179,7 +179,7 @@ karaokedirectory/
 ├── schema/
 │   └── venue.schema.json  # Authoritative venue schema (ADR-005)
 │
-├── e2e/                   # Playwright specs (15 files) — run by `npm test`, gated in CI
+├── e2e/                   # Playwright specs (16 files) — run by `npm test`, gated in CI
 ├── test/                  # node --test unit specs (12 files) — run by `npm run test:unit`
 │   ├── date.test.mjs      # Schedule matching, exclusions, lifespans, date ranges
 │   ├── venues.test.mjs    # venuePasses, search predicates, host hydration
@@ -442,6 +442,12 @@ Tags are rendered as color-coded badges in VenueCard, VenueModal, VenueDetailPan
 - Date helpers in `js/utils/date.js`; deduplication skips already-shown venues in later sections
 - Collapse state persists in `localStorage` (`extendedSection_{title}_collapsed`)
 
+### Day Card Sections (ADR-017, #324)
+Every day card groups its shows: **Specials** (one-time events, no heading) → **New** → **Featured** → **Verified** → **the rest** (no heading). Each show sits in exactly one section, the first it qualifies for, and each section is alphabetical. Empty sections aren't rendered.
+- New: `created` or `activePeriod.start` (the later), at show or venue level, within 30 days of today. Verified: `lastVerified` within 30 days of today. Featured: `featured` is `true` or a window covering the card's date
+- The rules are pure functions in `js/utils/sections.js` (`groupShows()`), unit-tested. `DayCard.renderEvents()` renders them. Extended sections get them too
+- Headed sections are coloured (New emerald `#34d399`, Featured amber, Verified indigo) with a centred title between rules: a box at 769px+, a left stripe at ≤768px. See functional spec §2 "Sections"
+
 ### Day Card States
 | Class | Behavior |
 |-------|----------|
@@ -573,7 +579,7 @@ read as fatal.
 |---|---|---|
 | `validate:all` | `js/data.json` against `schema/venue.schema.json`, plus cross-row checks and data-quality warnings; CSS load order on all 4 pages | Non-zero exit fails CI. Warnings are informational and do not fail |
 | `test:unit` | `js/utils/date.js`, `js/utils/hosts.js`, and the pure predicates in `js/services/venues.js` | **Pure modules only.** View classes belong to e2e — do not unit test them |
-| `npm test` | Behaviour across all 4 pages, 15 spec files | Starts its own server on **:3456**, so it will not collide with `npm run dev` |
+| `npm test` | Behaviour across all 4 pages, 16 spec files | Starts its own server on **:3456**, so it will not collide with `npm run dev` |
 
 Notes that will bite you otherwise:
 
@@ -699,6 +705,7 @@ Current ADRs:
 - [ADR-014](docs/adr/014-tag-colors-authored-css.md) — Tag colours are authored CSS; `data.json` is purely factual
 - [ADR-015](docs/adr/015-one-confirmation-per-show-date.md) — **One confirmation, anchored to the show date**: a show carries one public date, the night the latest evidence confirms (supersedes the ADR-013 evidence-level addendum)
 - [ADR-016](docs/adr/016-show-lifespan.md) — **A show's lifespan, recorded as it becomes known**: an optional `activePeriod` on the schedule entry, never backfilled; a change is an end plus a start; no announcement; shows 30+ days past their last night are flagged in the curator's "To prune" tab and removed only when the owner asks
+- [ADR-017](docs/adr/017-day-card-sections-and-featured-placement.md) — **Day-card sections, and featured placement**: shows grouped into Specials / New / Featured / Verified / the rest, alphabetical within each; amends Display Philosophy #1; a gate on the first paid placement
 
 ## Security Considerations
 - Always use `escapeHtml()` when rendering user-provided content

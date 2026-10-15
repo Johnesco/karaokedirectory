@@ -16,7 +16,6 @@ import { KJDossierView } from './views/KJDossierView.js';
 import { KJIndexView } from './views/KJIndexView.js';
 import { initDebugMode, isDebugMode, loadDebugSources } from './utils/debug.js';
 import { initFreshLens } from './utils/freshness.js';
-import { initSectionsLens } from './utils/sections.js';
 import { initTagConfig } from './utils/tags.js';
 import { readLocation, writeLocation, onLocationChange, resolveView, DEFAULT_VIEW } from './core/router.js';
 import { initFabs } from './components/fabs.js';
@@ -68,8 +67,6 @@ async function init() {
     // Freshness lens (?fresh=1, #259). The router reads the URL; this only
     // takes the answer.
     initFreshLens(readLocation().fresh);
-    // Day-card sections (?sections=1, spike #320 prototype).
-    initSectionsLens(readLocation().sections, readLocation().featured);
 
     // Load venue data
     await loadData();
