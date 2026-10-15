@@ -1,10 +1,18 @@
 # ADR-019: Venue data deploys from its own branch
 
-**Status:** Proposed
+**Status:** Deferred (2026-10-15). Not adopted for the MVP. Revisit when the venue data moves to a real database.
 **Date:** 2026-10-14
-**Amends:** [ADR-010](010-static-on-netlify-only-constraint.md) (the deploy model; the static-on-Netlify constraint stands), [ADR-012](012-generated-entity-pages.md) (the build's input), and the data-by-pull-request route of #277
-**Tickets:** #337 (the move), #331, #334, #336
+**Would amend:** [ADR-010](010-static-on-netlify-only-constraint.md) (the deploy model), [ADR-012](012-generated-entity-pages.md) (the build's input), and the data-by-pull-request route of #277
+**Tickets:** #337 (closed, not planned). Replaced for now by #338 (auto-merged data PRs).
 **Related:** [ADR-018](018-curator-keeps-current-state.md) (the curator keeps current state only; one writer)
+
+> **Why deferred.** The owner judged this too much for the MVP: a data branch, a
+> build hook, a pull step in every build and checkout, and Netlify credit
+> exposure, all to remove one manual merge per publish. #338 removes that merge
+> more simply, with **data PRs that merge themselves once CI is green**. `main`
+> keeps its protection and the deploy model doesn't change. The design below is
+> kept because its central idea, "get the data from its source" as one build
+> step, is the seam a future database will need.
 
 ## Context
 

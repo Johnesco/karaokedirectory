@@ -26,4 +26,4 @@ Format and threshold rule: see [sdlc-baseline `docs/adrs.md`](https://github.com
 | [016](016-show-lifespan.md) | A show's lifespan, recorded as it becomes known | Accepted |
 | [017](017-day-card-sections-and-featured-placement.md) | Day-card sections, and featured placement | Proposed |
 | [018](018-curator-keeps-current-state.md) | The curator keeps current state only | Proposed |
-| [019](019-data-deploys-from-its-own-branch.md) | Venue data deploys from its own branch | Proposed |
+| [019](019-data-deploys-from-its-own-branch.md) | Venue data deploys from its own branch | Deferred |
