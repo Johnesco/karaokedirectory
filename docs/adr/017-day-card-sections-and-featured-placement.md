@@ -1,6 +1,6 @@
 # ADR-017: Day-card sections, and featured placement
 
-**Status:** Proposed
+**Status:** Accepted (2026-10-15, shipped in #324)
 **Date:** 2026-10-12
 **Tickets:** #320 (spike)
 **Related:** [ADR-013](013-show-centric-presentation.md) (the show is the unit of presentation) · [ADR-015](015-one-confirmation-per-show-date.md) (`lastVerified` is the night confirmed) · [ADR-016](016-show-lifespan.md) (`activePeriod` on the show) · [spike write-up](../spikes/day-card-sections.md)

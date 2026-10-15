@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.56
+**Version:** 1.0.57
 **Last updated:** October 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -83,11 +83,35 @@ When expanded, shows:
 - **Full-bleed on mobile:** on `page--edge-to-edge` at ≤768px the day card's body carries no inline padding, so venue cards run to both screen edges and the venue card's own padding is the page's single text inset (§19 "Density and alignment"). Day cards are direct children of `.weekly-view__grid` — the `.weekly-view__day` wrapper that used to hold each one had no styling and was removed (#224).
 - **Closures:** a card whose date is excluded (§11 Schedule Exclusions) keeps its place but is dimmed with a strikethrough name and a bright "Closed" banner (`.venue-card--excluded`), so the venue is still findable rather than silently dropped.
 
+### Sections (ADR-017, #324)
+
+Every day card groups its shows into sections, in this order. A show sits in **exactly one**: the first it qualifies for.
+
+| Section | Heading | A show is here when… |
+|---|---|---|
+| Specials | none | it's a one-time event (`frequency: "once"`). Pinned on top, as before |
+| **New** | "New" | the show **or its venue** is new: the later of `created` and `activePeriod.start` (§11 "Created and Featured") is within a rolling 30 days, counted back from **today**. A new show at an established venue qualifies on its own; a first night still ahead counts |
+| **Featured** | "Featured" | its `featured` is `true`, or a placement window covering **the card's own date**. Test placements only for now (ADR-017) |
+| **Verified** | "Verified" | its `lastVerified` (§11 "Show Verification") is within a rolling 30 days of today. A confirmation for a night still ahead counts |
+| The rest | none | everything else. Always last |
+
+- **Both 30-day windows count from today, not from the card's date**, so every card shows the same split. That includes the extended sections (Next Week, Later in Month, Next Month), which render through the same component.
+- **Inside a section, order is alphabetical** (below). Recency, frequency and placement never decide position within a section.
+- **Empty sections are not rendered.** Search and the dedicated filter run before grouping, so a section empties out and disappears with its results.
+- **The footer count is unchanged:** each show is in one section, so it's still the unique open venues on that day.
+- **How it looks.** Headed sections carry their own colour: New emerald (`#34d399`), Featured amber (`--color-warning`), Verified indigo (`--color-primary-light`).
+  - Each title is centred between two rules in that colour.
+  - At 769px+ the section is an outlined, faintly tinted box that closes after its last card.
+  - At ≤768px, where cards are full-bleed, a 4px stripe of the colour runs down the left edge for the section's full height, because an outline there reads as two hairlines.
+  - Title contrast is at least 4.6:1 against the tinted box in the worst case (white page image behind the card's 5% transparency).
+  - The rest has no title, box or stripe.
+- **Logic:** `js/utils/sections.js` (`groupShows()`, `sectionOf()` and the predicates), pure and unit-tested. `DayCard.renderEvents()` renders the groups.
+
 ### Sorting
 
-- **Special events first** — schedule entries with `frequency: "once"` matching that date sort to the top
-- **Then alphabetical** — remaining entries sorted by `getSortableName()` (ignores articles like "The", "A", etc.)
-- **Ties** broken by `startTime` so multiple events at the same venue read chronologically
+- **Special events first.** Schedule entries with `frequency: "once"` matching that date sort to the top, and form the Specials section.
+- **Then alphabetical.** Remaining entries are sorted by `getSortableName()` (which ignores articles like "The" and "A"). Grouping preserves this order, so each section is alphabetical.
+- **Ties** are broken by `startTime`, so multiple events at the same venue read chronologically.
 
 ### "Also …" Indicator (Other Nights)
 
@@ -1793,6 +1817,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-10 | 1.0.54 | #305: debug mode shows each show's source link — the post behind its latest confirmation — on cards and in the detail schedule table, from `js/sources.local.json`, which only the curator's local preview serves (generated on request, never on disk). Requested only in debug mode on a local host; the public file and the deployed site carry no links. New §18 "Source links — local only". | Claude Code |
 | 2026-10 | 1.0.55 | #322: Venues and schedule entries accept `created` (the day the record was added) and recurring entries accept `featured` (`true` or a `{start?, end?}` placement window; not on one-time events), the data behind day-card sections (ADR-017, spike #320). The validator fails a placement that ends before it starts and warns on a spent placement and on a `created` after its own `activePeriod.end`; new `test/validate-data.test.mjs` runs the CLI against mutated copies. `created` reconstructed once from git for the seven records first published in the previous 30 days. Not displayed yet (#324). New §11 "Created and Featured". | Claude Code |
 | 2026-10 | 1.0.56 | #338: data PRs merge themselves. `publish-data.js` turns on auto-merge for each data PR it opens, so a publish goes live once both required checks pass, with no trip to GitHub; branch protection is unchanged. Best effort, with `--no-auto-merge` to opt out. Replaces, for now, the data-branch plan (ADR-019 deferred, #337). | Claude Code |
+| 2026-10 | 1.0.57 | #324: day-card sections on by default. Every day card groups its shows into Specials → New → Featured → Verified → the rest, each show in exactly one, alphabetical within each, empty sections not rendered; both 30-day windows count from today, Featured from the card date. The `?sections=1` flag and the `?featured=` stand-in are gone; Featured reads only `schedule[].featured`. ADR-017 accepted and Display Philosophy #1 amended. New `e2e/day-card-sections.spec.js`. New §2 "Sections". | Claude Code |
 
 ---
 

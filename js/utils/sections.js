@@ -1,7 +1,7 @@
 /**
- * Day-card sections — `?sections=1` (spike #320).
+ * Day-card sections (ADR-017, #324; prototyped in spike #320).
  *
- * PROTOTYPE. Groups one day's shows into sections instead of one flat list:
+ * Every day card groups its shows into sections instead of one flat list:
  *
  *   (specials)  `frequency: "once"` — pinned on top, as today; no heading
  *   New         the show or its venue is new within the last 30 days
@@ -19,8 +19,8 @@
  * the same split. The Featured window is different in kind: it is a placement
  * on particular nights, so it is tested against the card's own date.
  *
- * Same shape as the freshness lens: a flag set once at boot from the router,
- * and pure helpers that take their reference date as an argument.
+ * Pure: every helper takes its reference dates as arguments, so the rules are
+ * unit-tested without a DOM (test/sections.test.mjs).
  */
 
 import { daysSince, parseLocalDate, startOfToday } from './date.js';
@@ -36,33 +36,6 @@ export const SECTIONS = [
     { key: 'verified', label: 'Verified' },
     { key: 'rest', label: null },
 ];
-
-let lensOn = false;
-let featuredIds = new Set();
-
-/**
- * Turn sections on or off. Takes plain values rather than reading the URL —
- * the router owns the URL (`readLocation().sections` / `.featured`).
- *
- * `featured` is a prototype-only stand-in for the schema field the spike
- * proposes (`featured: {start, end}` on a schedule entry): a list of venue ids
- * whose shows are treated as featured, so the section can be seen before any
- * data carries the flag.
- *
- * @param {boolean} enabled
- * @param {string[]} [featured] - Venue ids to feature (prototype only)
- * @returns {boolean} the resulting state
- */
-export function initSectionsLens(enabled, featured = []) {
-    lensOn = !!enabled;
-    featuredIds = new Set(featured);
-    return lensOn;
-}
-
-/** @returns {boolean} */
-export function isSectionsLens() {
-    return lensOn;
-}
 
 /**
  * The date a record's "new" window starts: the later of when it was created
@@ -112,16 +85,16 @@ export function isVerifiedShow(entry, asOf = startOfToday()) {
 }
 
 /**
- * Featured on this night. The proposed field is `featured: {start?, end?}` on
- * the schedule entry — a placement window, inclusive, either bound open — or
- * `true`. The prototype also honours the `?featured=` venue-id list.
- * @param {Object} venue
+ * Featured on this night: the schedule entry's `featured` (#322) is `true`,
+ * or a placement window `{start?, end?}` — inclusive, either bound open —
+ * that covers the card's date.
+ * @param {Object} venue - Unused today; kept so every predicate has the
+ *   same (venue, entry, …) shape
  * @param {Object} entry
  * @param {Date} date - The card's own date
  * @returns {boolean}
  */
 export function isFeaturedShow(venue, entry, date) {
-    if (featuredIds.has(venue?.id)) return true;
     const f = entry?.featured;
     if (f === true) return true;
     if (!f || typeof f !== 'object') return false;

@@ -217,7 +217,7 @@
     background: var(--color-gray-700);
 }
 
-/* Day-card sections — ?sections=1, spike #320 prototype. The title's inline
+/* Day-card sections (ADR-017, #324). The title's inline
    padding is the venue card's own (--spacing-md), so the heading lands on the
    card text's line at every width: at <=768px the body has no gutter and the
    card's padding is the single inset; at 769px+ the body gutter applies to

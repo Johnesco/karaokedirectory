@@ -24,4 +24,4 @@ Format and threshold rule: see [sdlc-baseline `docs/adrs.md`](https://github.com
 | [014](014-tag-colors-authored-css.md) | Tag colours are authored CSS — `data.json` is purely factual | Accepted |
 | [015](015-one-confirmation-per-show-date.md) | One confirmation, anchored to the show date | Accepted |
 | [016](016-show-lifespan.md) | A show's lifespan, recorded as it becomes known | Accepted |
-| [017](017-day-card-sections-and-featured-placement.md) | Day-card sections, and featured placement | Proposed |
+| [017](017-day-card-sections-and-featured-placement.md) | Day-card sections, and featured placement | Accepted |

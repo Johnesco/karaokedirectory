@@ -1,6 +1,6 @@
 # Spike: Group a day's shows into sections
 
-> **Status:** Analysis complete. Prototype live behind `?sections=1`. Follow-ups filed: #322–#325.
+> **Status:** Shipped. Sections are on by default since #324 (ADR-017 accepted); the `?sections=1` prototype flag is gone. Follow-ups: #322–#325.
 > **Date:** 2026-10-12
 > **Type:** Spike (research and prototype)
 > **Ticket:** #320
