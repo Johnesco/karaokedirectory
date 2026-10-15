@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.57
+**Version:** 1.0.58
 **Last updated:** October 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -897,7 +897,7 @@ A schedule entry may carry `lastVerified`: the `YYYY-MM-DD` **show date the late
 - **Written by the curator** (§16), which *derives* it rather than storing it by hand: the latest confirmed night among its own private records for that show. Being a maximum it cannot move backwards, so "older evidence must not move the clock" is a property rather than a rule anyone applies. Nothing in this repo writes it.
 - **Validation** (`scripts/validate-data.js`):
   - A date that is **not a night the show runs** is a **warning** — the Announced marker can never render on it, so the confirmation is invisible. The check mirrors `scheduleMatchesDate`, so it asks exactly the question the marker will ask at render time.
-  - A date more than **60 days past** — the "week is the heartbeat" horizon — is a **warning**, not a failure: only the curator can re-confirm a show, and a stale date is still a true statement about the last night anyone confirmed. An upcoming night is never stale, and spent one-time events are skipped.
+  - A date **30 or more days past** — the one verification clock (#330), the day a show leaves the site's Verified section — is a **warning**, not a failure: only the curator can re-confirm a show, and a stale date is still a true statement about the last night anyone confirmed. An upcoming night is never stale, and spent one-time events are skipped.
   - A date more than **366 days ahead** **fails**: that is a typo, not lookahead.
   - Entries without the field are not reported (on day one that would be 142 warnings saying nothing); coverage is printed instead (`Verified schedule entries: N of M`).
   - `npm run curator:check` matches schedule entries on everything *except* this field and compares it by direction on its own, so a show confirmed in the curator but not yet exported is a pending line rather than a phantom loss.
@@ -1357,7 +1357,7 @@ A second opt-in lens, the same shape as debug mode but **URL-only** — no `loca
 - **Calendar cards** (§6) — a last line after the host, worded from the confirmed night (ADR-015): "📣 Announced for Oct 1" before it, "✓ Verified today" on it, "✓ Verified Aug 28 · 9d" after. An unconfirmed show gets **nothing** (#267): the lens is an internal testing aid, and a card with nothing to say says nothing
 - **Detail schedule table** (§7, §8) — a Verified column on all four surfaces, added by `renderScheduleTable()` on the same conditional pattern as the Host column, and only when some show at the venue is verified. Unverified rows leave the cell empty, which the ≤480px stacked layout hides
 - **KJ dossier** (§10) — the same line on every show row; "verify your listings" is that page's job
-- **States** — upcoming (the confirmed night has not arrived, `--upcoming`), fresh (≤60 days past, `--fresh`) and overdue (>60, `--overdue`), as BEM modifiers on `.venue-card__verified`, `.venue-detail__verified` and `.kj-dossier__verified`; "never" renders nothing. Sixty days is `FRESHNESS_HORIZON_DAYS` in `js/utils/date.js`, the validator's horizon
+- **States** — upcoming (the confirmed night has not arrived, `--upcoming`), fresh (fewer than 30 days past, `--fresh`) and overdue (30 or more, `--overdue`), as BEM modifiers on `.venue-card__verified`, `.venue-detail__verified` and `.kj-dossier__verified`; "never" renders nothing. Thirty days is `VERIFIED_WINDOW_DAYS` in `js/utils/date.js` (#330), the same clock as the day card's Verified section and the validator's horizon
 - **Dates are absolute** ("Aug 28", with the year when it differs from the current one, via `formatDateMonthDay()`) — a relative "3 weeks ago" reads as a judgment
 - The flag is read by `readLocation()` in `js/core/router.js` and survives in-session navigation, because `writeLocation()` leaves query keys it does not own alone. Hard `?kj=` links rebuild the query and drop it — acceptable for a lens
 - **Generated `/venue/` pages** (§22) are static and script-free; the lens does not apply there
@@ -1818,6 +1818,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-10 | 1.0.55 | #322: Venues and schedule entries accept `created` (the day the record was added) and recurring entries accept `featured` (`true` or a `{start?, end?}` placement window; not on one-time events), the data behind day-card sections (ADR-017, spike #320). The validator fails a placement that ends before it starts and warns on a spent placement and on a `created` after its own `activePeriod.end`; new `test/validate-data.test.mjs` runs the CLI against mutated copies. `created` reconstructed once from git for the seven records first published in the previous 30 days. Not displayed yet (#324). New §11 "Created and Featured". | Claude Code |
 | 2026-10 | 1.0.56 | #338: data PRs merge themselves. `publish-data.js` turns on auto-merge for each data PR it opens, so a publish goes live once both required checks pass, with no trip to GitHub; branch protection is unchanged. Best effort, with `--no-auto-merge` to opt out. Replaces, for now, the data-branch plan (ADR-019 deferred, #337). | Claude Code |
 | 2026-10 | 1.0.57 | #324: day-card sections on by default. Every day card groups its shows into Specials → New → Featured → Verified → the rest, each show in exactly one, alphabetical within each, empty sections not rendered; both 30-day windows count from today, Featured from the card date. The `?sections=1` flag and the `?featured=` stand-in are gone; Featured reads only `schedule[].featured`. ADR-017 accepted and Display Philosophy #1 amended. New `e2e/day-card-sections.spec.js`. New §2 "Sections". | Claude Code |
+| 2026-10 | 1.0.58 | #330: one verification clock. `VERIFIED_WINDOW_DAYS = 30` in `js/utils/date.js` replaces the 60-day `FRESHNESS_HORIZON_DAYS`; the day-card sections, the `?fresh=1` lens and the validator (which mirrors the number, guarded by a unit test) now agree that a show confirmed fewer than 30 days ago is fresh and day 30 is out. Previously a show left the public Verified section a month before anything called it overdue. The curator's own 30/60/90 setting goes with #333. | Claude Code |
 
 ---
 

@@ -445,6 +445,7 @@ Tags are rendered as color-coded badges in VenueCard, VenueModal, VenueDetailPan
 ### Day Card Sections (ADR-017, #324)
 Every day card groups its shows: **Specials** (one-time events, no heading) → **New** → **Featured** → **Verified** → **the rest** (no heading). Each show sits in exactly one section, the first it qualifies for, and each section is alphabetical. Empty sections aren't rendered.
 - New: `created` or `activePeriod.start` (the later), at show or venue level, within 30 days of today. Verified: `lastVerified` within 30 days of today. Featured: `featured` is `true` or a window covering the card's date
+- **One clock (#330):** the 30 days is `VERIFIED_WINDOW_DAYS` in `js/utils/date.js`. The Verified section, the `?fresh=1` lens and the validator's stale warning all use it, and all treat day 30 as outside. The validator mirrors the number (it's CommonJS), and `test/validate-data.test.mjs` fails if the two differ
 - The rules are pure functions in `js/utils/sections.js` (`groupShows()`), unit-tested. `DayCard.renderEvents()` renders them. Extended sections get them too
 - Headed sections are coloured (New emerald `#34d399`, Featured amber, Verified indigo) with a centred title between rules: a box at 769px+, a left stripe at ≤768px. See functional spec §2 "Sections"
 

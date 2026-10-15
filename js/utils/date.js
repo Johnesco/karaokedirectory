@@ -544,11 +544,16 @@ export function daysSince(iso, asOf = startOfToday()) {
 }
 
 /**
- * Days after which a show's verification counts as overdue. Sixty is the
- * "week is the heartbeat" window (Display Philosophy #3), the same horizon
- * `scripts/validate-data.js` warns past.
+ * The one verification clock (#330). A show whose confirmed night was FEWER
+ * than this many days ago is fresh: it sits in the site's Verified section
+ * (ADR-017), the `?fresh=1` lens calls it fresh, and the validator leaves it
+ * alone. Day 30 is outside on all three. The day-card sections read it, the
+ * curator imports this module, and `scripts/validate-data.js` (CommonJS, so
+ * it cannot import this file) mirrors the number — a unit test keeps the two
+ * equal. It replaced a 60-day horizon that let a show leave the public
+ * Verified section a month before anything called it overdue.
  */
-export const FRESHNESS_HORIZON_DAYS = 60;
+export const VERIFIED_WINDOW_DAYS = 30;
 
 /**
  * How fresh a show's `lastVerified` is (ADR-015, #275). The date is a SHOW
@@ -565,7 +570,7 @@ export function freshnessOf(entry, asOf = startOfToday()) {
     if (!iso) return { state: 'never', days: null, iso: '' };
     const days = daysSince(iso, asOf);
     if (days < 0) return { state: 'upcoming', days, iso };
-    return { state: days > FRESHNESS_HORIZON_DAYS ? 'overdue' : 'fresh', days, iso };
+    return { state: days >= VERIFIED_WINDOW_DAYS ? 'overdue' : 'fresh', days, iso };
 }
 
 /**
