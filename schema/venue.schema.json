@@ -386,6 +386,11 @@
         },
         "featured": {
           "$ref": "#/$defs/featured"
+        },
+        "changed": {
+          "type": "string",
+          "format": "date",
+          "description": "The night the current version of this show took effect (#329, spike #327): written only by a change on a date — an ADR-016 Split — and equal to this entry's activePeriod.start. A correction never writes it. Set by the curator when the change is recorded; the site marks a show changed for 30 days from it (#335). Not allowed on one-time events."
         }
       },
       "allOf": [
@@ -406,7 +411,8 @@
             ],
             "properties": {
               "activePeriod": false,
-              "featured": false
+              "featured": false,
+              "changed": false
             }
           },
           "else": {

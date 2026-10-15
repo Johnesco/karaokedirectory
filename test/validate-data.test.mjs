@@ -55,6 +55,26 @@ describe('validate-data: created', () => {
     });
 });
 
+describe('validate-data: changed', () => {
+    it('accepts changed equal to the first night', () => {
+        const r = validate((_, { entry }) => { entry.changed = '2026-11-06'; entry.activePeriod = { start: '2026-11-06' }; });
+        assert.equal(r.code, 0, r.out);
+        assert.doesNotMatch(r.out, /a change takes effect/);
+    });
+    it('warns when changed and the first night disagree, or there is no first night', () => {
+        const a = validate((_, { entry }) => { entry.changed = '2026-11-06'; entry.activePeriod = { start: '2026-11-13' }; });
+        assert.equal(a.code, 0, a.out);
+        assert.match(a.out, /changed 2026-11-06, but its first night is 2026-11-13/);
+        const b = validate((_, { entry }) => { entry.changed = '2026-11-06'; delete entry.activePeriod; });
+        assert.match(b.out, /changed 2026-11-06, but its first night is not set/);
+    });
+    it('fails a malformed date, and changed on a one-time event', () => {
+        assert.equal(validate((_, { entry }) => { entry.changed = 'Nov 6'; }).code, 1);
+        const once = { frequency: 'once', date: '2026-12-31', startTime: '21:00', changed: '2026-12-31' };
+        assert.equal(validate((_, { venue }) => { venue.schedule.push(once); }).code, 1);
+    });
+});
+
 describe('validate-data: featured', () => {
     it('accepts true and an open-ended window', () => {
         assert.equal(validate((_, { entry }) => { entry.featured = true; }).code, 0);
