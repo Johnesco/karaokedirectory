@@ -154,5 +154,7 @@ describe('parseArgs', () => {
     assert.equal(parseArgs(['--repo', 'a/b']).repo, 'a/b');
     assert.equal(parseArgs(['--adopt-baseline']).adoptBaseline, true);
     assert.equal(parseArgs([]).adoptBaseline, undefined);
+    assert.equal(parseArgs(['--no-auto-merge']).noAutoMerge, true);
+    assert.equal(parseArgs([]).noAutoMerge, undefined);
   });
 });
