@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.64
+**Version:** 1.0.65
 **Last updated:** October 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -1825,6 +1825,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-10 | 1.0.62 | #336: the machinery for keeping two copies of the data in step is retired, now that the curator keeps one (#331): `check-curator-drift.js`, `npm run curator:check`, the three-way publish baseline and `--adopt-baseline`. `publish-data.js` instead refuses when `main` isn't what the curator last published, unless a data PR is merging (`mainGuard()`). A CI step fails any non-`data/` PR that touches `js/data.json`. Debug-mode source links (#305) are removed. | Claude Code |
 | 2026-10 | 1.0.63 | #332: the curator's show actions are one panel. The Form holds venue facts only; its schedule rows are read-only with a ✎ that opens the same panel as the Posters screen's: Confirm, Correct it, Changes from…, Night off, Last night, ☆ Feature, + show, + one-time. Lifespan and placement move into it from the Form row; the row's ✓ next, 📣, inline inputs and "Verify all shows today" are retired. No change to the site or the data shape. |
 | 2026-10 | 1.0.64 | #333: the curator opens on **Today**: Due this week (next night within 7 days and not confirmed for it, by the repo's `nextOccurrence`; never-verified first; contact, ✓ and the show panel on each row), Inbox, Publish (changes since the last publish) and Watch (New/Updated via `sections.js`, placements this week, To prune). The Dashboard's tabs become one searchable Shows table, and the per-browser overdue setting gives way to `VERIFIED_WINDOW_DAYS`. No change to the site or the data shape. |
+| 2026-10 | 1.0.65 | #349: the curator's Posters screen ends every poster one of four ways — Confirm, Park (`posters/_parked/`, returnable), Skip, Delete (`posters/_deleted/`, never removed from disk) — chosen before Submit, with a live "What will change" preview diffing the data since the poster came up. Park/Note only (which kept nothing since #331), Discard and Not a poster are retired. No change to the site or the data shape. |
 
 ---
 
