@@ -513,7 +513,7 @@ Use these semantic elements consistently:
 
 `js/data.json` is **maintained externally** by the project owner, in a local-only curator tool that lives outside this repo (at the owner's `~/karaoke-curator/`). **Only the curator changes it** (one writer, ADR-018): never edit venue data in a code PR. A code change that needs new data makes it *valid* in its own PR; the owner then makes the change in the curator and publishes it (#322 broke this rule once).
 
-**The curator keeps current state only** (#331, ADR-018). Its `data.json` is **exactly** the site's `js/data.json`: Save writes it, Publish sends it, and there is no Export step and no second copy to drift. Personal notes (venue contact and notes, the Facebook catch-up list, unfinished draft venues) live in a separate `notes.json` that never leaves the owner's machine. No history is kept: each action sets the public fields when it is taken, and git holds every published version. When the curator opens it checks that `main`'s `js/data.json` is what was last published (skipped while a data PR is merging); if not, its one offer is "take main's data". The old `curator:check` drift script and three-way publish baseline are gone (#336); a CI step fails any non-`data/` PR that touches `js/data.json`.
+**The curator keeps current state only** (#331, ADR-018). Its `data.json` is **exactly** the site's `js/data.json`: the curator saves it a moment after every change (#334; Ctrl+S saves at once), **Publish N changes** sends it, and there is no Save button, no Export step and no second copy to drift. Personal notes (venue contact and notes, the Facebook catch-up list, unfinished draft venues) live in a separate `notes.json` that never leaves the owner's machine. No history is kept: each action sets the public fields when it is taken, and git holds every published version. When the curator opens it checks that `main`'s `js/data.json` is what was last published (skipped while a data PR is merging); if not, its one offer is "take main's data". The old `curator:check` drift script and three-way publish baseline are gone (#336); a CI step fails any non-`data/` PR that touches `js/data.json`.
 
 The curator runs on **:8765** via `node server.js` (its `start.cmd`), with its own site preview on **:8766**, which serves the curator's own `data.json` so a change can be checked before publishing. Serving it from a static file server instead makes browsing work while Save and Publish both fail with `501 Unsupported method ('POST')`.
 
@@ -561,8 +561,10 @@ npm run test:unit    # node --test — pure modules only, ~150ms
 npm test             # Playwright end-to-end, ~1.5 min
 
 npm run data:publish:dry  # what a publish would send live, without sending it
-npm run data:publish      # gates, then open the data PR with auto-merge on (no ticket by design, #338)
+npm run data:publish      # gates, then open the data PR with auto-merge on (no ticket by design, #338) — or add to the open one (#334)
 ```
+
+**A publish is summarised in the owner's terms, and there is one data PR at a time** (#334). The PR lists what changed against `main` as Confirmed, Changed, Added, Ended, Removed and Edited (`summarizeDiff()`, which lines shows up by identity so a Split, a prune or a correction reads as what it is). Publishing again before the last data PR merges commits to that PR's branch and rewrites its description, rather than opening a second one.
 
 **Publishing checks one writer** (ADR-018, #336). `publish-data.js` refuses when `main`'s `js/data.json` is not what the curator last published (`last-published.json`, next to the curator's `data.json`), unless a data PR is still merging. That means someone changed the data outside the curator, and the curator's one offer is "take main's data". The `curator:check` drift script, its three-way baseline and the first-publish `--adopt-baseline` step existed while the curator kept a second full copy; #331 removed the copy and #336 removed them.
 
