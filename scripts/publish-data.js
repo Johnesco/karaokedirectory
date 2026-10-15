@@ -17,12 +17,14 @@
  *      ordinary edit is informational and only someone else's work is fatal
  *   3. validate-data.js on the file we are about to publish
  *   4. nothing to do? say so and stop
- *   5. branch, commit the one file, open the PR
+ *   5. branch, commit the one file, open the PR, and turn on auto-merge so it
+ *      merges itself once CI is green (#338) — branch protection still holds
  *   6. remember what we published, as the base for next time
  *
  * Usage:
  *   node scripts/publish-data.js [--dry-run] [--adopt-baseline] [--export <file>]
  *                                [--master <file>] [--branch <name>] [--repo owner/name]
+ *                                [--no-auto-merge]
  *
  * `gh` must be installed and authenticated. It is found on PATH, via GH_PATH,
  * or at the usual Windows location.
@@ -43,6 +45,7 @@ function parseArgs(argv) {
     for (let i = 0; i < argv.length; i += 1) {
         const a = argv[i];
         if (a === '--dry-run') out.dryRun = true;
+        else if (a === '--no-auto-merge') out.noAutoMerge = true;
         else if (a === '--export') out.exportFile = argv[++i];
         else if (a === '--master') out.master = argv[++i];
         else if (a === '--branch') out.branch = argv[++i];
@@ -223,7 +226,7 @@ function firstPublishNotice(items) {
 function main() {
     const args = parseArgs(process.argv.slice(2));
     if (args.help) {
-        console.log('Usage: node scripts/publish-data.js [--dry-run] [--adopt-baseline] [--export <file>] [--master <file>] [--branch <name>] [--repo owner/name]');
+        console.log('Usage: node scripts/publish-data.js [--dry-run] [--adopt-baseline] [--export <file>] [--master <file>] [--branch <name>] [--repo owner/name] [--no-auto-merge]');
         return 0;
     }
 
@@ -404,10 +407,23 @@ function main() {
         const url = gh(bin, ['pr', 'create', '--repo', repo, '--base', 'main', '--head', branch,
             '--title', title, '--body-file', bodyFile]).trim().split('\n').pop();
 
+        // Auto-merge (#338): the PR merges itself the moment both required
+        // checks pass, so a publish needs no trip to GitHub. Protection is
+        // unchanged — a red check means it never merges. Best effort: if the
+        // repo setting is off or gh refuses, the publish has still succeeded,
+        // and the owner merges by hand as before.
+        let autoMerge = false;
+        if (!args.noAutoMerge) {
+            try { gh(bin, ['pr', 'merge', url, '--repo', repo, '--auto', '--merge']); autoMerge = true; }
+            catch (err) { console.warn(`\nCould not turn on auto-merge (${err.message.split('\n')[0]}).`); }
+        }
+
         // ---- 6. remember what we published ---------------------------------
         fs.writeFileSync(basePath, content);
 
-        console.log('\nOpened a pull request. CI runs for a few minutes, then merge it:');
+        console.log(autoMerge
+            ? '\nOpened a pull request with auto-merge on. It goes live by itself once CI passes (a few minutes):'
+            : '\nOpened a pull request. CI runs for a few minutes, then merge it:');
         console.log(`PR: ${url}`);
         return 0;
     } catch (err) {

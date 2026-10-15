@@ -217,7 +217,7 @@
     background: var(--color-gray-700);
 }
 
-/* Day-card sections — ?sections=1, spike #320 prototype. The title's inline
+/* Day-card sections (ADR-017, #324). The title's inline
    padding is the venue card's own (--spacing-md), so the heading lands on the
    card text's line at every width: at <=768px the body has no gutter and the
    card's padding is the single inset; at 769px+ the body gutter applies to
@@ -260,6 +260,8 @@
    Featured 4.97:1, Verified 4.60:1 — all past AA 4.5:1 for 14px text. New is
    emerald-400, not --color-success (#10b981), which fell to 4.27:1 there. */
 .day-card__section--new      { --section-accent: #34d399; }
+/* Sky-400 (#335): 4.91:1 in the same worst case, 5.74:1 over the dark page. */
+.day-card__section--updated  { --section-accent: #38bdf8; }
 .day-card__section--featured { --section-accent: var(--color-warning); }
 .day-card__section--verified { --section-accent: var(--color-primary-light); }
 

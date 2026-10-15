@@ -2,19 +2,18 @@
  * Unit tests for day-card sections (spike #320 prototype, js/utils/sections.js).
  */
 
-import { describe, it, beforeEach } from 'node:test';
+import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
-    newSince, isNewShow, isVerifiedShow, isFeaturedShow, sectionOf, groupShows,
-    initSectionsLens, SECTION_WINDOW_DAYS,
+    newSince, isNewShow, isUpdatedShow, isVerifiedShow, isFeaturedShow, sectionOf, sectionReason, groupShows,
+    SECTION_WINDOW_DAYS,
 } from '../js/utils/sections.js';
 
 const TODAY = new Date(2026, 9, 12); // Mon Oct 12, 2026
 const show = (over = {}) => ({ frequency: 'every', day: 'Monday', startTime: '21:00', ...over });
 const venue = (over = {}) => ({ id: 'v', name: 'V', schedule: [], ...over });
 
-beforeEach(() => initSectionsLens(true, []));
 
 describe('newSince', () => {
     it('is null when neither date is recorded', () => {
@@ -70,9 +69,37 @@ describe('isFeaturedShow', () => {
         assert.equal(isFeaturedShow(venue(), show({ featured: { start: '2026-10-20' } }), night), false);
         assert.equal(isFeaturedShow(venue(), show({ featured: { end: '2026-10-18' } }), night), false);
     });
-    it('honours the prototype venue-id list', () => {
-        initSectionsLens(true, ['v']);
-        assert.equal(isFeaturedShow(venue(), show(), night), true);
+    it('honours featured: true, and nothing without the field', () => {
+        assert.equal(isFeaturedShow(venue(), show({ featured: true }), night), true);
+        assert.equal(isFeaturedShow(venue(), show(), night), false);
+    });
+});
+
+describe('Updated (#335)', () => {
+    it('a recent change is Updated; one 30 or more days old is not', () => {
+        assert.equal(isUpdatedShow(show({ changed: '2026-09-13' }), TODAY), true);   // 29 days
+        assert.equal(isUpdatedShow(show({ changed: '2026-09-12' }), TODAY), false);  // 30 days
+        assert.equal(isUpdatedShow(show(), TODAY), false);
+    });
+    it("a Split's new entry is Updated, not New: its start is the change, not a first night", () => {
+        const split = show({ created: '2025-01-01', changed: '2026-10-08', activePeriod: { start: '2026-10-08' } });
+        assert.equal(newSince(split), '2025-01-01');
+        assert.equal(isNewShow(venue(), split, TODAY), false);
+        assert.equal(sectionOf(venue(), split, { date: TODAY, asOf: TODAY }), 'updated');
+    });
+    it('a correction (no new start) on an old show is Updated', () => {
+        const fixed = show({ created: '2025-01-01', changed: '2026-10-12' });
+        assert.equal(sectionOf(venue(), fixed, { date: TODAY, asOf: TODAY }), 'updated');
+    });
+    it('something added recently stays New even if it also changed', () => {
+        const both = show({ created: '2026-10-01', changed: '2026-10-10' });
+        assert.equal(sectionOf(venue(), both, { date: TODAY, asOf: TODAY }), 'new');
+        // …and so does a show at a venue added recently.
+        assert.equal(sectionOf(venue({ created: '2026-10-05' }), show({ changed: '2026-10-10' }), { date: TODAY, asOf: TODAY }), 'new');
+    });
+    it('Updated outranks Featured and Verified', () => {
+        const s = show({ changed: '2026-10-10', featured: true, lastVerified: '2026-10-12' });
+        assert.equal(sectionOf(venue(), s, { date: TODAY, asOf: TODAY }), 'updated');
     });
 });
 
@@ -102,5 +129,26 @@ describe('groupShows', () => {
         assert.deepEqual(groups.map(g => g.key), ['special', 'verified', 'rest']);
         assert.deepEqual(groups.find(g => g.key === 'rest').events.map(e => e.venue.name), ['A', 'C']);
         assert.deepEqual(groups.map(g => g.label), [null, 'Verified', null]);
+    });
+});
+
+describe('sectionReason (#325)', () => {
+    const opts = { date: TODAY, asOf: TODAY };
+    it('names the record and the date that decided New', () => {
+        assert.deepEqual(sectionReason(venue(), show({ created: '2026-10-01' }), opts), { key: 'new', text: 'New since Oct 1 (show added)' });
+        assert.deepEqual(sectionReason(venue(), show({ created: '2026-09-20', activePeriod: { start: '2026-10-05' } }), opts), { key: 'new', text: "New since Oct 5 (show's first night)" });
+        assert.deepEqual(sectionReason(venue({ created: '2026-10-09' }), show(), opts), { key: 'new', text: 'New since Oct 9 (venue added)' });
+    });
+    it('says when a show was updated, featured or verified', () => {
+        assert.equal(sectionReason(venue(), show({ changed: '2026-10-10' }), opts).text, 'Updated Oct 10 (show details changed)');
+        assert.equal(sectionReason(venue(), show({ featured: true }), opts).text, 'Featured (every night it runs)');
+        assert.equal(sectionReason(venue(), show({ featured: { start: '2026-10-01', end: '2026-10-31' } }), opts).text, 'Featured Oct 1 – Oct 31');
+        assert.equal(sectionReason(venue(), show({ featured: { end: '2026-10-31' } }), opts).text, 'Featured until Oct 31');
+        assert.equal(sectionReason(venue(), show({ lastVerified: '2026-10-15' }), opts).text, 'Verified for Oct 15');
+    });
+    it('explains the rest, and specials', () => {
+        assert.equal(sectionReason(venue(), show(), opts).text, 'Never verified');
+        assert.equal(sectionReason(venue(), show({ lastVerified: '2026-08-01' }), opts).text, 'Not verified in 30 days (last for Aug 1)');
+        assert.equal(sectionReason(venue(), show({ frequency: 'once', date: '2026-10-12' }), opts).key, 'special');
     });
 });

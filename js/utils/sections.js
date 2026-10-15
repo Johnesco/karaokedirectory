@@ -1,10 +1,11 @@
 /**
- * Day-card sections — `?sections=1` (spike #320).
+ * Day-card sections (ADR-017, #324; prototyped in spike #320).
  *
- * PROTOTYPE. Groups one day's shows into sections instead of one flat list:
+ * Every day card groups its shows into sections instead of one flat list:
  *
  *   (specials)  `frequency: "once"` — pinned on top, as today; no heading
- *   New         the show or its venue is new within the last 30 days
+ *   New         the show or its venue was added within the last 30 days
+ *   Updated     an existing show's details changed within the last 30 days (#335)
  *   Featured    an owner-set flag on the show (test placements only for now)
  *   Verified    the show's `lastVerified` is within the last 30 days
  *   (the rest)  everything else; no heading, always last
@@ -19,60 +20,43 @@
  * the same split. The Featured window is different in kind: it is a placement
  * on particular nights, so it is tested against the card's own date.
  *
- * Same shape as the freshness lens: a flag set once at boot from the router,
- * and pure helpers that take their reference date as an argument.
+ * Pure: every helper takes its reference dates as arguments, so the rules are
+ * unit-tested without a DOM (test/sections.test.mjs).
  */
 
-import { daysSince, parseLocalDate, startOfToday } from './date.js';
+import { daysSince, parseLocalDate, startOfToday, VERIFIED_WINDOW_DAYS, formatDateMonthDay } from './date.js';
 
-/** Both windows — New and Verified — are a rolling 30 days. */
-export const SECTION_WINDOW_DAYS = 30;
+/**
+ * Both windows — New and Verified — are the one 30-day clock (#330). New uses
+ * the same length by the owner's decision, not because it must.
+ */
+export const SECTION_WINDOW_DAYS = VERIFIED_WINDOW_DAYS;
 
 /** Render order. `special` and `rest` carry no heading. */
 export const SECTIONS = [
     { key: 'special', label: null },
     { key: 'new', label: 'New' },
+    { key: 'updated', label: 'Updated' },
     { key: 'featured', label: 'Featured' },
     { key: 'verified', label: 'Verified' },
     { key: 'rest', label: null },
 ];
 
-let lensOn = false;
-let featuredIds = new Set();
-
-/**
- * Turn sections on or off. Takes plain values rather than reading the URL —
- * the router owns the URL (`readLocation().sections` / `.featured`).
- *
- * `featured` is a prototype-only stand-in for the schema field the spike
- * proposes (`featured: {start, end}` on a schedule entry): a list of venue ids
- * whose shows are treated as featured, so the section can be seen before any
- * data carries the flag.
- *
- * @param {boolean} enabled
- * @param {string[]} [featured] - Venue ids to feature (prototype only)
- * @returns {boolean} the resulting state
- */
-export function initSectionsLens(enabled, featured = []) {
-    lensOn = !!enabled;
-    featuredIds = new Set(featured);
-    return lensOn;
-}
-
-/** @returns {boolean} */
-export function isSectionsLens() {
-    return lensOn;
-}
-
 /**
  * The date a record's "new" window starts: the later of when it was created
  * and its first night (`activePeriod.start`). Either alone is enough; neither
  * means the record can never read as new — no backfill (ADR-015, ADR-016).
+ *
+ * An entry carrying `changed` (#329) is a changed show, not a new one: a
+ * Split's new entry starts on the change date, and that start is the change,
+ * not a first night. So its `activePeriod.start` is ignored here and only its
+ * own `created` can make it New (#335) — otherwise it goes to Updated.
  * @param {Object} record - A venue or a schedule entry
  * @returns {string|null} YYYY-MM-DD
  */
 export function newSince(record) {
-    const dates = [record?.created, record?.activePeriod?.start].filter(Boolean);
+    const start = record?.changed ? null : record?.activePeriod?.start;
+    const dates = [record?.created, start].filter(Boolean);
     if (dates.length === 0) return null;
     return dates.sort().at(-1);
 }
@@ -101,6 +85,18 @@ export function isNewShow(venue, entry, asOf = startOfToday()) {
 }
 
 /**
+ * Updated (#335): an existing show's details changed inside the window — any
+ * detail change to a show that isn't new, a Split or a correction (owner
+ * decision, 2026-10-15). `changed` (#329) records when.
+ * @param {Object} entry
+ * @param {Date} [asOf]
+ * @returns {boolean}
+ */
+export function isUpdatedShow(entry, asOf = startOfToday()) {
+    return withinWindow(entry?.changed, asOf);
+}
+
+/**
  * Verified: the night the latest evidence confirms (ADR-015) is inside the
  * window. An announcement for a night still ahead always counts.
  * @param {Object} entry
@@ -112,16 +108,16 @@ export function isVerifiedShow(entry, asOf = startOfToday()) {
 }
 
 /**
- * Featured on this night. The proposed field is `featured: {start?, end?}` on
- * the schedule entry — a placement window, inclusive, either bound open — or
- * `true`. The prototype also honours the `?featured=` venue-id list.
- * @param {Object} venue
+ * Featured on this night: the schedule entry's `featured` (#322) is `true`,
+ * or a placement window `{start?, end?}` — inclusive, either bound open —
+ * that covers the card's date.
+ * @param {Object} venue - Unused today; kept so every predicate has the
+ *   same (venue, entry, …) shape
  * @param {Object} entry
  * @param {Date} date - The card's own date
  * @returns {boolean}
  */
 export function isFeaturedShow(venue, entry, date) {
-    if (featuredIds.has(venue?.id)) return true;
     const f = entry?.featured;
     if (f === true) return true;
     if (!f || typeof f !== 'object') return false;
@@ -139,14 +135,63 @@ export function isFeaturedShow(venue, entry, date) {
  * @param {Object} options
  * @param {Date} options.date - The card's date (for Featured)
  * @param {Date} [options.asOf] - Today (for New and Verified)
- * @returns {'special'|'new'|'featured'|'verified'|'rest'}
+ * @returns {'special'|'new'|'updated'|'featured'|'verified'|'rest'}
  */
 export function sectionOf(venue, entry, { date, asOf = startOfToday() }) {
     if (entry?.frequency === 'once') return 'special';
     if (isNewShow(venue, entry, asOf)) return 'new';
+    if (isUpdatedShow(entry, asOf)) return 'updated';
     if (isFeaturedShow(venue, entry, date)) return 'featured';
     if (isVerifiedShow(entry, asOf)) return 'verified';
     return 'rest';
+}
+
+/**
+ * Why a show is in its section, in words (#325, debug mode only): the date
+ * that decided it, and which record it came from. Pure, so it is unit-tested;
+ * `getDebugHtml()` renders it and nothing calls it outside debug mode.
+ *
+ * Which record decided New mirrors `isNewShow()`: the show is checked first,
+ * then its venue; within a record, the later of `created` and first night.
+ *
+ * @param {Object} venue
+ * @param {Object} entry
+ * @param {Object} options - As for sectionOf
+ * @returns {{key: string, text: string}}
+ */
+export function sectionReason(venue, entry, { date, asOf = startOfToday() }) {
+    const key = sectionOf(venue, entry, { date, asOf });
+    const md = (iso) => formatDateMonthDay(iso, { now: asOf });
+
+    if (key === 'special') return { key, text: 'Special: one-time event' };
+
+    if (key === 'new') {
+        const fromShow = withinWindow(newSince(entry), asOf);
+        const record = fromShow ? entry : venue;
+        const since = newSince(record);
+        // created wins when it is the later date; otherwise the first night decided.
+        const who = fromShow ? 'show' : 'venue';
+        const how = since === record.created ? `${who} added` : `${who}'s first night`;
+        return { key, text: `New since ${md(since)} (${how})` };
+    }
+
+    if (key === 'updated') return { key, text: `Updated ${md(entry.changed)} (show details changed)` };
+
+    if (key === 'featured') {
+        const f = entry.featured;
+        if (f === true) return { key, text: 'Featured (every night it runs)' };
+        if (f.start && f.end) return { key, text: `Featured ${md(f.start)} – ${md(f.end)}` };
+        return { key, text: f.start ? `Featured from ${md(f.start)}` : `Featured until ${md(f.end)}` };
+    }
+
+    if (key === 'verified') return { key, text: `Verified for ${md(entry.lastVerified)}` };
+
+    return {
+        key,
+        text: entry?.lastVerified
+            ? `Not verified in ${SECTION_WINDOW_DAYS} days (last for ${md(entry.lastVerified)})`
+            : 'Never verified',
+    };
 }
 
 /**

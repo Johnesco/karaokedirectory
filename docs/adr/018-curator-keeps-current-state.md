@@ -1,6 +1,6 @@
 # ADR-018: The curator keeps current state only
 
-**Status:** Proposed
+**Status:** Accepted (2026-10-15, implemented by #331 — the curator now keeps data.json + notes.json, no records)
 **Date:** 2026-10-14
 **Supersedes:** the curator half of [ADR-015](015-one-confirmation-per-show-date.md), where `lastVerified` is derived from private announcement records. ADR-015's *meaning* of `lastVerified` (the night the latest evidence confirms) stands.
 **Tickets:** #327 (spike), #331 (curator), #336 (repo retirements), #332–#334

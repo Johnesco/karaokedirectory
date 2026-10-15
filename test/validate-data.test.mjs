@@ -55,6 +55,29 @@ describe('validate-data: created', () => {
     });
 });
 
+describe('validate-data: changed', () => {
+    it('accepts a change on the first night (a Split) and a later correction', () => {
+        const split = validate((_, { entry }) => { entry.changed = '2026-11-06'; entry.activePeriod = { start: '2026-11-06' }; });
+        assert.equal(split.code, 0, split.out);
+        assert.doesNotMatch(split.out, /cannot change before it starts/);
+        const corrected = validate((_, { entry }) => { entry.changed = '2026-12-01'; entry.activePeriod = { start: '2026-11-06' }; });
+        assert.doesNotMatch(corrected.out, /cannot change before it starts/);
+        const noStart = validate((_, { entry }) => { entry.changed = '2026-10-15'; delete entry.activePeriod; });
+        assert.equal(noStart.code, 0, noStart.out);
+        assert.doesNotMatch(noStart.out, /cannot change before it starts/);
+    });
+    it('warns when a show changed before its first night', () => {
+        const r = validate((_, { entry }) => { entry.changed = '2026-11-01'; entry.activePeriod = { start: '2026-11-06' }; });
+        assert.equal(r.code, 0, r.out);
+        assert.match(r.out, /changed 2026-11-01, before its first night 2026-11-06/);
+    });
+    it('fails a malformed date, and changed on a one-time event', () => {
+        assert.equal(validate((_, { entry }) => { entry.changed = 'Nov 6'; }).code, 1);
+        const once = { frequency: 'once', date: '2026-12-31', startTime: '21:00', changed: '2026-12-31' };
+        assert.equal(validate((_, { venue }) => { venue.schedule.push(once); }).code, 1);
+    });
+});
+
 describe('validate-data: featured', () => {
     it('accepts true and an open-ended window', () => {
         assert.equal(validate((_, { entry }) => { entry.featured = true; }).code, 0);
@@ -80,5 +103,43 @@ describe('validate-data: featured', () => {
         const r = validate((_, { entry }) => { entry.featured = { end: PAST }; });
         assert.equal(r.code, 0, r.out);
         assert.match(r.out, /featured placement ended 2020-01-01/);
+    });
+});
+
+describe('validate-data: one verification clock (#330)', () => {
+    const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    /** The most recent date `daysBack` or more days ago that falls on `day`. */
+    const nightAtLeast = (day, daysBack) => {
+        const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - daysBack);
+        while (WEEKDAYS[d.getDay()] !== day) d.setDate(d.getDate() - 1);
+        return d;
+    };
+    const ago = (d) => { const t = new Date(); t.setHours(0, 0, 0, 0); return Math.round((t - d) / 86400000); };
+
+    it('mirrors VERIFIED_WINDOW_DAYS from js/utils/date.js', async () => {
+        const { VERIFIED_WINDOW_DAYS } = await import('../js/utils/date.js');
+        const src = readFileSync(SCRIPT, 'utf8');
+        const m = src.match(/const STALE_VERIFIED_DAYS = (\d+);/);
+        assert.ok(m, 'STALE_VERIFIED_DAYS not found in validate-data.js');
+        assert.equal(Number(m[1]), VERIFIED_WINDOW_DAYS);
+    });
+
+    it('warns at 30 days or more, not before', () => {
+        const STALE = /no longer in the site's Verified section/;
+        // A night of this show's weekday inside the window (23–29 days back)…
+        const day = WEEKDAYS[0];
+        const inside = (() => { for (let b = 23; b <= 29; b++) { const d = nightAtLeast(day, b); if (ago(d) <= 29) return d; } })();
+        // …and one at 30 or more days back.
+        const outside = nightAtLeast(day, 30);
+        const r1 = validate((_, { entry }) => {
+            entry.day = day; delete entry.activePeriod; delete entry.exclusions; entry.lastVerified = iso(inside);
+        });
+        const r2 = validate((_, { entry }) => {
+            entry.day = day; delete entry.activePeriod; delete entry.exclusions; entry.lastVerified = iso(outside);
+        });
+        assert.ok(ago(inside) < 30 && ago(outside) >= 30);
+        assert.doesNotMatch(r1.out.split('\n').filter(l => l.includes(iso(inside))).join('\n'), STALE);
+        assert.match(r2.out, STALE);
     });
 });

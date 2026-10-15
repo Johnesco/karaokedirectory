@@ -210,7 +210,10 @@ describe('renderScheduleTable under the freshness lens (#259)', () => {
     initFreshLens(true);
     const html = renderScheduleTable({ schedule: [friday({ lastVerified: '2026-08-28' }), friday({ day: 'Saturday' })] });
     assert.match(html, /<th>Verified<\/th>/);
-    assert.match(html, /venue-detail__verified--fresh/);
+    // Any state: this asserts the column, not the date's age. The fixed date
+    // ages against the real clock, so pinning "fresh" broke once it passed the
+    // window (#330). Freshness states are covered in freshness.test.mjs.
+    assert.match(html, /venue-detail__verified venue-detail__verified--\w+/);
     assert.doesNotMatch(html, /Not verified/);
     // The unverified row's cell is empty, so the <480px stacked layout hides it.
     assert.match(html, /<td data-label="Verified"><\/td>/);

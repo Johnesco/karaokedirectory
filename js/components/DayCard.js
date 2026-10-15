@@ -18,7 +18,7 @@ import { formatDateShort, isToday, getDayDisplayName, getDayName, getScheduleExc
 import { getVenueEventsForDate } from '../services/venues.js';
 import { renderDisclosureButton } from '../utils/disclosure.js';
 import { getState } from '../core/state.js';
-import { isSectionsLens, groupShows } from '../utils/sections.js';
+import { groupShows } from '../utils/sections.js';
 
 /**
  * Check if a date is in the past (before today)
@@ -123,9 +123,21 @@ export class DayCard extends Component {
         `;
     }
 
+    /**
+     * A day's shows, grouped into sections (ADR-017, #324). Headed sections
+     * (New, Featured, Verified) are boxed in their own colour so where one
+     * ends is visible; specials and the remainder carry no heading and sit on
+     * the card's own background. Empty sections are never rendered.
+     */
     renderEvents(events, date) {
-        if (isSectionsLens()) return this.renderSections(events, date);
-        return this.renderList(events, date);
+        const groups = groupShows(events, { date });
+        return groups.map(({ key, label, events: shows }) => `
+            <section class="day-card__section day-card__section--${key}${label ? ' day-card__section--boxed' : ''}"
+                     data-section="${key}"${label ? ` aria-label="${label}"` : ''}>
+                ${label ? `<h3 class="day-card__section-title">${label}</h3>` : ''}
+                ${this.renderList(shows, date)}
+            </section>
+        `).join('');
     }
 
     renderList(events, date) {
@@ -140,21 +152,6 @@ export class DayCard extends Component {
         `;
     }
 
-    /**
-     * Spike #320 prototype: the same cards, grouped. Headed sections are
-     * boxed in their own colour, so where one ends is visible; specials and
-     * the remainder carry no heading and sit on the card's own background.
-     */
-    renderSections(events, date) {
-        const groups = groupShows(events, { date });
-        return groups.map(({ key, label, events: shows }) => `
-            <section class="day-card__section day-card__section--${key}${label ? ' day-card__section--boxed' : ''}"
-                     data-section="${key}"${label ? ` aria-label="${label}"` : ''}>
-                ${label ? `<h3 class="day-card__section-title">${label}</h3>` : ''}
-                ${this.renderList(shows, date)}
-            </section>
-        `).join('');
-    }
 }
 
 /**
