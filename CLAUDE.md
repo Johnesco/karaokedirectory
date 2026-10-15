@@ -172,21 +172,19 @@ karaokedirectory/
 │   ├── geocode-venues.js  # Add coordinates to venues (patches data.json)
 │   ├── validate-data.js   # THE data validator (Ajv + supplementary checks) — CI gate
 │   ├── check-css-load-order.js  # CSS load order across HTML pages — CI gate
-│   ├── check-curator-drift.js   # Curator master vs js/data.json — run BEFORE exporting
-│   ├── publish-data.js          # Take an export live: gates, then a PR (#277)
+│   ├── publish-data.js          # Take the curator's data.json live: one-writer check, validate, an auto-merging PR
 │   └── code-metrics.js    # Line/size snapshot by bucket (manual, writes metrics/snapshots/)
 │
 ├── schema/
 │   └── venue.schema.json  # Authoritative venue schema (ADR-005)
 │
 ├── e2e/                   # Playwright specs (16 files) — run by `npm test`, gated in CI
-├── test/                  # node --test unit specs (12 files) — run by `npm run test:unit`
+├── test/                  # node --test unit specs (12 files: 11 listed by name, plus sections.test.mjs) — run by `npm run test:unit`
 │   ├── date.test.mjs      # Schedule matching, exclusions, lifespans, date ranges
 │   ├── venues.test.mjs    # venuePasses, search predicates, host hydration
 │   ├── render.test.mjs    # Host resolution, schedule table, "Also" line
 │   ├── build-pages.test.mjs       # Generated entity pages, JSON-LD
-│   ├── check-curator-drift.test.mjs  # Curator master vs data.json comparison
-│   ├── publish-data.test.mjs      # Publish gates and baseline handling
+│   ├── publish-data.test.mjs      # Publish summary and the one-writer guard (mainGuard)
 │   ├── validate-data.test.mjs     # The validator CLI against mutated data copies (#322)
 │   └── freshness / router / string / tags / url .test.mjs  # one per module
 │
@@ -515,7 +513,7 @@ Use these semantic elements consistently:
 
 `js/data.json` is **maintained externally** by the project owner, in a local-only curator tool that lives outside this repo (at the owner's `~/karaoke-curator/`). **Only the curator changes it** (one writer, ADR-018): never edit venue data in a code PR. A code change that needs new data makes it *valid* in its own PR; the owner then makes the change in the curator and publishes it (#322 broke this rule once).
 
-**The curator keeps current state only** (#331, ADR-018). Its `data.json` is **exactly** the site's `js/data.json`: Save writes it, Publish sends it, and there is no Export step and no second copy to drift. Personal notes (venue contact and notes, the Facebook catch-up list, unfinished draft venues) live in a separate `notes.json` that never leaves the owner's machine. No history is kept: each action sets the public fields when it is taken, and git holds every published version. When the curator opens it checks that `main`'s `js/data.json` is what was last published (skipped while a data PR is merging); if not, its one offer is "take main's data". `npm run curator:check` and the three-way publish baseline predate this and now skip, because there is no master to compare; #336 retires them.
+**The curator keeps current state only** (#331, ADR-018). Its `data.json` is **exactly** the site's `js/data.json`: Save writes it, Publish sends it, and there is no Export step and no second copy to drift. Personal notes (venue contact and notes, the Facebook catch-up list, unfinished draft venues) live in a separate `notes.json` that never leaves the owner's machine. No history is kept: each action sets the public fields when it is taken, and git holds every published version. When the curator opens it checks that `main`'s `js/data.json` is what was last published (skipped while a data PR is merging); if not, its one offer is "take main's data". The old `curator:check` drift script and three-way publish baseline are gone (#336); a CI step fails any non-`data/` PR that touches `js/data.json`.
 
 The curator runs on **:8765** via `node server.js` (its `start.cmd`), with its own site preview on **:8766**, which serves the curator's own `data.json` so a change can be checked before publishing. Serving it from a static file server instead makes browsing work while Save and Publish both fail with `501 Unsupported method ('POST')`.
 
@@ -558,20 +556,11 @@ npm run validate:all # venue data (Ajv + supplementary checks) and CSS load orde
 npm run test:unit    # node --test — pure modules only, ~150ms
 npm test             # Playwright end-to-end, ~1.5 min
 
-npm run curator:check # curator master vs js/data.json — owner only, before exporting
 npm run data:publish:dry  # what a publish would send live, without sending it
 npm run data:publish      # gates, then open the data PR with auto-merge on (no ticket by design, #338)
 ```
 
-`curator:check` is deliberately **not** part of `validate:all` and not a CI gate: it compares against a file outside the repo that only the owner has, so it would skip on every CI run and for every other contributor. It is a pre-export guard, not a build gate.
-
-It runs in one of two modes (#277). With a record of the last publish
-(`~/karaoke-curator/last-published.json`, written by `scripts/publish-data.js`) it is
-**three-way**: a repo value is at risk only where it differs from what was last
-published, because that means someone else changed it. Without that record it is
-**strict**, and every repo/master difference counts as content at risk — which is why
-an ordinary edit (a rename, a corrected address, a show moved half an hour) used to
-read as fatal.
+**Publishing checks one writer** (ADR-018, #336). `publish-data.js` refuses when `main`'s `js/data.json` is not what the curator last published (`last-published.json`, next to the curator's `data.json`), unless a data PR is still merging. That means someone changed the data outside the curator, and the curator's one offer is "take main's data". The `curator:check` drift script, its three-way baseline and the first-publish `--adopt-baseline` step existed while the curator kept a second full copy; #331 removed the copy and #336 removed them.
 
 | Gate | Covers | Notes |
 |---|---|---|
@@ -595,7 +584,6 @@ When enabled:
 - Venue cards show their schedule match reason (e.g., "Every Friday", "First Saturday")
 - Hover over cards for detailed match info
 - Calendar cards say **why the show is in its section** (#325): "New since Oct 1 (show's first night)", "Updated Oct 10 (show details changed)", "Verified for Oct 15", "Never verified"…, built by `sectionReason()` in `js/utils/sections.js`
-- **On the owner's machine only**, a 🔗 to the post behind each show's latest confirmation (#305). Those links are curator-private and are **never in `js/data.json`**: the curator's preview (`:8766`) serves `js/sources.local.json`, generated per request from its records, and the site asks for it only in debug mode on a local host. Production debug mode shows no links
 
 **Freshness lens** (`?fresh=1`, #259) is the sibling lens for data age, worded from the confirmed night (ADR-015): "📣 Announced for Oct 1" before that night, "✓ Verified today" on it, "✓ Verified Aug 28 · 9d" after. An unconfirmed show gets nothing (#267). The detail schedule table grows a Verified column on all four surfaces when some show at the venue is confirmed, and the KJ dossier annotates each one. URL-only (no `localStorage`), off by default, and `renderFreshness()` returns `''` when off — so the public page emits no new markup, which `e2e/fresh-lens.spec.js` asserts. The curator's Preview button opens the site with it on.
 
@@ -634,11 +622,11 @@ When sdlc-baseline updates, glance at its [CHANGELOG](https://github.com/Johnesc
 This project intentionally diverges from canonical sdlc-baseline guidance in these places:
 
 - **Publishing venue data carries no ticket.** `npm run data:publish` (the curator's
-  Publish button) opens a PR straight from an export, with no GitHub Issue behind it,
+  Publish button) opens a PR straight from the curator's data.json, with no GitHub Issue behind it,
   and turns on auto-merge so it merges itself once CI is green (#338).
   Rationale: updating venue data is daily operation, not development — it happens
-  several times a week, changes no code, and is gated by `validate-data.js` and
-  `check-curator-drift.js` rather than by review. Building the tooling still follows
+  several times a week, changes no code, and is gated by `validate-data.js` and the
+  one-writer check (#336) rather than by review. Building the tooling still follows
   the normal process (#275, #276, #277). Everything that touches code keeps its ticket.
 
 ### Project IDs
