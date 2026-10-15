@@ -61,7 +61,7 @@ describe('renderFreshness', () => {
     assert.doesNotMatch(html, /Sep 6/);
   });
 
-  it('marks a night past the 60-day horizon overdue', () => {
+  it('marks a night 30 or more days past overdue (#330)', () => {
     initFreshLens(true);
     assert.match(renderFreshness(friday({ lastVerified: '2026-06-01' }), { now: NOW }), /--overdue/);
   });

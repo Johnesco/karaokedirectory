@@ -23,10 +23,13 @@
  * unit-tested without a DOM (test/sections.test.mjs).
  */
 
-import { daysSince, parseLocalDate, startOfToday } from './date.js';
+import { daysSince, parseLocalDate, startOfToday, VERIFIED_WINDOW_DAYS } from './date.js';
 
-/** Both windows — New and Verified — are a rolling 30 days. */
-export const SECTION_WINDOW_DAYS = 30;
+/**
+ * Both windows — New and Verified — are the one 30-day clock (#330). New uses
+ * the same length by the owner's decision, not because it must.
+ */
+export const SECTION_WINDOW_DAYS = VERIFIED_WINDOW_DAYS;
 
 /** Render order. `special` and `rest` carry no heading. */
 export const SECTIONS = [

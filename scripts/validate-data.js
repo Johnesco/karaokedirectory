@@ -7,7 +7,7 @@
  *
  * Registry hygiene (unreferenced or same-named kjs/companies entries), stale
  * venues (active, but every event is in the past) and shows whose confirmed
- * night is more than 60 days past, or is not a night the show runs at all
+ * night is 30 or more days past (#330), or is not a night the show runs at all
  * (ADR-015, #275), are reported as warnings — worth a look, but not a build
  * failure. So are the lifespan checks (ADR-016): a show that ended more than
  * 30 days ago, an exclusion outside its show's lifespan, a venue with nothing
@@ -538,13 +538,16 @@ function entryRunsOn(entry, date, iso) {
 //     Oct 1. Only an absurd one fails, which keeps the fat-finger guard
 //     (typing 2126 for 2026) without rejecting ordinary lookahead.
 //
-// Past 60 days — the "week is the heartbeat" horizon — is still a warning
+// 30 days or more — the one verification clock (#330), the day a show leaves
+// the site's Verified section — is still a warning
 // rather than a failure: only the curator can re-confirm a show, and a stale
 // date is still a true statement about the last night anyone confirmed.
 // Entries WITHOUT the field are not reported: it is opt-in and never
 // backfilled, so on day one that would be 142 warnings saying nothing.
 // Coverage is printed in the Data Quality block instead.
-const STALE_VERIFIED_DAYS = 60;
+// Mirrors VERIFIED_WINDOW_DAYS in js/utils/date.js — this script is CommonJS and
+// cannot import it. test/validate-data.test.mjs fails if the two ever differ.
+const STALE_VERIFIED_DAYS = 30;
 const FUTURE_VERIFIED_LIMIT_DAYS = 366;
 const verifiedCutoff = new Date(TODAY);
 verifiedCutoff.setDate(verifiedCutoff.getDate() - STALE_VERIFIED_DAYS);
@@ -582,10 +585,10 @@ for (const venue of data.listings) {
         if (verified >= TODAY) continue;                  // an upcoming night cannot be stale
         if (entry.frequency === 'once') continue;         // a spent one-time event is not re-confirmable
         if (hasEnded(entry, TODAY_ISO)) continue;         // nor is a show that has ended (ADR-016)
-        if (verified >= verifiedCutoff) continue;
+        if (verified > verifiedCutoff) continue;          // inside the window: fewer than 30 days
         warnings.push(
             `${venue.name} (${venue.id}) ${label} was last confirmed for ${entry.lastVerified}` +
-            ` — more than ${STALE_VERIFIED_DAYS} days ago`
+            ` — ${STALE_VERIFIED_DAYS} or more days ago, so it is no longer in the site's Verified section`
         );
     }
 }

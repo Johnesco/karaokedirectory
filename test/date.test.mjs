@@ -33,7 +33,7 @@ import {
   formatDateMonthDay,
   daysSince,
   freshnessOf,
-  FRESHNESS_HORIZON_DAYS,
+  VERIFIED_WINDOW_DAYS,
   toLocalISO,
   isAnnouncedOn,
   nextOccurrence,
@@ -390,12 +390,12 @@ describe('freshness helpers', () => {
   });
 
   it('freshnessOf: absent is "never", inside the horizon is fresh, past it is overdue', () => {
-    assert.equal(FRESHNESS_HORIZON_DAYS, 60);
+    assert.equal(VERIFIED_WINDOW_DAYS, 30);
     assert.deepEqual(freshnessOf({}, SEP(6)), { state: 'never', days: null, iso: '' });
     assert.deepEqual(freshnessOf({ lastVerified: '2026-08-28' }, SEP(6)), { state: 'fresh', days: 9, iso: '2026-08-28' });
-    // Sep 6 minus 60 days is Jul 8: on the horizon is still fresh, one day past it is not.
-    assert.equal(freshnessOf({ lastVerified: '2026-07-08' }, SEP(6)).state, 'fresh');
-    assert.equal(freshnessOf({ lastVerified: '2026-07-07' }, SEP(6)).state, 'overdue');
+    // One clock (#330): 29 days ago is fresh, 30 days ago is out. Sep 6 minus 30 is Aug 7.
+    assert.equal(freshnessOf({ lastVerified: '2026-08-08' }, SEP(6)).state, 'fresh');
+    assert.equal(freshnessOf({ lastVerified: '2026-08-07' }, SEP(6)).state, 'overdue');
   });
 
   it('freshnessOf: a night that has not arrived is "upcoming", not fresh (ADR-015)', () => {
