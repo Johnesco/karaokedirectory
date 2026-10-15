@@ -6,18 +6,8 @@
 import { scheduleMatchesDate } from './date.js';
 import { sectionReason } from './sections.js';
 import { escapeHtml } from './string.js';
-import { sanitizeUrl } from './url.js';
 
 let debugMode = false;
-
-// Post links behind each show's latest confirmation (#305). They are private:
-// never in js/data.json, never deployed. The curator's local preview serves
-// them as js/sources.local.json, generated on request from its own records, so
-// debug mode shows them on the owner's machine and nowhere else.
-let debugSources = {};
-
-/** Hosts where the local-only file can exist. Production is never one. */
-const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
 
 /**
  * Initialize debug mode from URL or localStorage
@@ -45,55 +35,6 @@ export function initDebugMode() {
  */
 export function isDebugMode() {
     return debugMode;
-}
-
-/**
- * Load the local-only source links, in debug mode on a local host only. Any
- * failure leaves the map empty: the file is optional by design.
- * @param {URL|string} url - Where js/sources.local.json would be
- * @returns {Promise<number>} How many shows have a link
- */
-export async function loadDebugSources(url) {
-    debugSources = {};
-    if (!debugMode || !LOCAL_HOSTS.has(window.location.hostname)) return 0;
-    try {
-        const response = await fetch(url, { cache: 'no-store' });
-        if (!response.ok) return 0;
-        const map = await response.json();
-        if (map && typeof map === 'object') debugSources = map;
-    } catch {
-        // No curator preview behind this server — nothing to show.
-    }
-    return Object.keys(debugSources).length;
-}
-
-/**
- * A show's identity across the export: the curator's own id is stripped, so
- * the venue plus what makes the show itself. Must match buildDebugSources()
- * in the curator's server.js.
- * @param {string} venueId
- * @param {Object} entry - Schedule entry
- * @returns {string}
- */
-export function debugSourceKey(venueId, entry) {
-    const when = entry.frequency === 'once' ? entry.date : entry.day;
-    return [venueId, entry.frequency, when, entry.startTime].join('|');
-}
-
-/**
- * A link to the post behind a show's latest confirmation, in debug mode when
- * the local file supplied one. '' otherwise, so normal pages gain no markup.
- * @param {Object} venue
- * @param {Object} entry - Schedule entry
- * @returns {string} HTML
- */
-export function renderDebugSource(venue, entry) {
-    if (!debugMode || !venue || !entry) return '';
-    const found = debugSources[debugSourceKey(venue.id, entry)];
-    const href = found && sanitizeUrl(found.url);
-    if (!href) return '';
-    const title = 'Source of the latest confirmation' + (found.for ? ` (night of ${found.for})` : '');
-    return ` <a class="debug-source" href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(title)}"><i class="fa-solid fa-link"></i></a>`;
 }
 
 /**
@@ -206,7 +147,7 @@ export function getDebugHtml(venue, date, entry) {
         : '';
 
     return `
-        <span class="venue-card__debug">${info.matchReason}${renderDebugSource(venue, entry)}</span>
+        <span class="venue-card__debug">${info.matchReason}</span>
         ${sectionLine}
         <div class="venue-card__debug-tooltip">
             <strong>${venue.name}</strong><br>
