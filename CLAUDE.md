@@ -556,7 +556,7 @@ npm test             # Playwright end-to-end, ~1.5 min
 
 npm run curator:check # curator master vs js/data.json — owner only, before exporting
 npm run data:publish:dry  # what a publish would send live, without sending it
-npm run data:publish      # gates, then open the data PR (no ticket by design)
+npm run data:publish      # gates, then open the data PR with auto-merge on (no ticket by design, #338)
 ```
 
 `curator:check` is deliberately **not** part of `validate:all` and not a CI gate: it compares against a file outside the repo that only the owner has, so it would skip on every CI run and for every other contributor. It is a pre-export guard, not a build gate.
@@ -629,7 +629,8 @@ When sdlc-baseline updates, glance at its [CHANGELOG](https://github.com/Johnesc
 This project intentionally diverges from canonical sdlc-baseline guidance in these places:
 
 - **Publishing venue data carries no ticket.** `npm run data:publish` (the curator's
-  Publish button) opens a PR straight from an export, with no GitHub Issue behind it.
+  Publish button) opens a PR straight from an export, with no GitHub Issue behind it,
+  and turns on auto-merge so it merges itself once CI is green (#338).
   Rationale: updating venue data is daily operation, not development — it happens
   several times a week, changes no code, and is gated by `validate-data.js` and
   `check-curator-drift.js` rather than by review. Building the tooling still follows

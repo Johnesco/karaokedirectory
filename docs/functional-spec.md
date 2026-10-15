@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.55
+**Version:** 1.0.56
 **Last updated:** October 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -1264,6 +1264,7 @@ This spec section previously described the in-repo editor's UI in detail; that c
 
 Venue data reaches the live site by pull request, because `main` is protected. `scripts/publish-data.js` (the curator's Publish button, or `npm run data:publish`) does the mechanical part: it reads what `main` currently holds, runs `check-curator-drift.js` against that and `validate-data.js` against the export, summarises the difference, then creates a branch, commits `js/data.json` and opens the PR. The owner merges it; Netlify deploys from `main`.
 
+- **It merges itself** (#338). The PR is opened with auto-merge on, so it merges the moment both required checks pass — no trip to GitHub. Branch protection is unchanged: a red check means it never merges. If auto-merge cannot be turned on (the repo setting is off), the publish still succeeds and the log says to merge by hand; `--no-auto-merge` opts out for one publish.
 - **No ticket.** Publishing venue data is daily operation, not development. Recorded as an explicit deviation in CLAUDE.md rather than left as a rule being quietly broken.
 - **It works against GitHub, not the checkout.** A routine data publish has no business touching a working tree that may be mid-feature, on another branch, or dirty. The branch, the commit and the file all go through the API.
 - **Two steps in the UI.** The button runs a dry run first, showing what would go out and what the live site would lose; only then does the real one appear. A publish sends other people's data out, so it should not be one click away from a stale master.
@@ -1791,6 +1792,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-09 | 1.0.53 | #288: the curator side, and pruning becomes flag-then-ask. The owner's call: removing ended shows is a section of the curator, never a side effect of Save or Export. The curator's "To prune" dashboard tab lists every show more than 30 days past its last night (ended recurring shows and spent one-time events) and the header counts them; each removal is a click behind a confirmation that names any venue left empty. Each schedule row gains a lifespan panel (first/last night, and **Split** for a change on a date). The curator's derived `lastVerified` ignores records for nights outside a show's lifespan; an ended show reads "ended" and leaves the overdue/never counts; and the curator's export check refuses the windows the repo would reject (ends before it starts, empty, on a one-time event, venue-level without a start), warning on overlaps. §11 "Show Lifespan" updated; ADR-016 decision 5 and its curator consequence reworded to match. | Claude Code |
 | 2026-10 | 1.0.54 | #305: debug mode shows each show's source link — the post behind its latest confirmation — on cards and in the detail schedule table, from `js/sources.local.json`, which only the curator's local preview serves (generated on request, never on disk). Requested only in debug mode on a local host; the public file and the deployed site carry no links. New §18 "Source links — local only". | Claude Code |
 | 2026-10 | 1.0.55 | #322: Venues and schedule entries accept `created` (the day the record was added) and recurring entries accept `featured` (`true` or a `{start?, end?}` placement window; not on one-time events), the data behind day-card sections (ADR-017, spike #320). The validator fails a placement that ends before it starts and warns on a spent placement and on a `created` after its own `activePeriod.end`; new `test/validate-data.test.mjs` runs the CLI against mutated copies. `created` reconstructed once from git for the seven records first published in the previous 30 days. Not displayed yet (#324). New §11 "Created and Featured". | Claude Code |
+| 2026-10 | 1.0.56 | #338: data PRs merge themselves. `publish-data.js` turns on auto-merge for each data PR it opens, so a publish goes live once both required checks pass, with no trip to GitHub; branch protection is unchanged. Best effort, with `--no-auto-merge` to opt out. Replaces, for now, the data-branch plan (ADR-019 deferred, #337). | Claude Code |
 
 ---
 
