@@ -17,9 +17,14 @@
  *      data PR is still merging — otherwise someone changed it outside the curator
  *   3. validate-data.js on the file we are about to publish
  *   4. nothing to do? say so and stop
- *   5. branch, commit the one file, open the PR, and turn on auto-merge so it
- *      merges itself once CI is green (#338) — branch protection still holds
+ *   5. a data PR still open? commit to its branch and rewrite its description
+ *      (#334: one PR, another commit). Otherwise branch, commit the one file,
+ *      open the PR, and turn on auto-merge so it merges itself once CI is green
+ *      (#338) — branch protection still holds
  *   6. remember what we published, so the next run (and the curator) can tell
+ *
+ * The description groups what changed against main the way the owner reads it
+ * (#334): confirmed, changed, added, ended, removed, edited.
  *
  * Usage:
  *   node scripts/publish-data.js [--dry-run] [--export <file>] [--branch <name>]
@@ -87,72 +92,221 @@ function gh(bin, args, opts = {}) {
 
 const canon = (v) => JSON.stringify(v === undefined ? null : v);
 
+// ---- describing a show, the way the owner reads one -------------------------
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+/** "Nov 6" from "2026-11-06". */
+function shortDate(iso) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || '');
+    return m ? `${MONTHS[parseInt(m[2], 10) - 1]} ${parseInt(m[3], 10)}` : String(iso || '');
+}
+/** "9 PM", "8:30 PM" from "21:00", "20:30". */
+function time12(t) {
+    const m = /^(\d{2}):(\d{2})$/.exec(t || '');
+    if (!m) return '';
+    const h = parseInt(m[1], 10);
+    return `${(h % 12) || 12}${m[2] === '00' ? '' : ':' + m[2]} ${h < 12 ? 'AM' : 'PM'}`;
+}
+/** "Every Friday", "Second Saturday", "One-time Oct 31 (Halloween Bash)". */
+function whenOf(s) {
+    if (s.frequency === 'once') return `One-time ${shortDate(s.date)}${s.eventName ? ` (${s.eventName})` : ''}`;
+    const f = String(s.frequency || '');
+    return `${f.charAt(0).toUpperCase()}${f.slice(1)} ${s.day || '?'}`;
+}
+function showName(s) {
+    const t = time12(s.startTime);
+    return t ? `${whenOf(s)} ${t}` : whenOf(s);
+}
+/** A host ref by its registry names: "Xpider Cantu \u00b7 Starling Karaoke". */
+function hostName(h, data) {
+    if (!h) return 'the venue\'s host';
+    const bits = [];
+    if (h.kjId) bits.push(((data.kjs || {})[h.kjId] || {}).name || h.kjId);
+    if (h.companyId) bits.push(((data.companies || {})[h.companyId] || {}).name || h.companyId);
+    if (h.name) bits.push(h.name);
+    return bits.join(' \u00b7 ') || 'no host';
+}
+
+/** What changed about a show, as "Every Friday \u2192 Every Thursday; 9 PM \u2192 8 PM". */
+function describeShowChange(b, a, data, { withStart = true } = {}) {
+    const parts = [];
+    if (whenOf(b) !== whenOf(a)) parts.push(`${whenOf(b)} \u2192 ${whenOf(a)}`);
+    if ((b.startTime || '') !== (a.startTime || '') || (b.endTime || '') !== (a.endTime || '')) {
+        const span = (s) => [time12(s.startTime), time12(s.endTime)].filter(Boolean).join('\u2013');
+        parts.push(`${span(b)} \u2192 ${span(a)}`);
+    }
+    if (canon(b.host) !== canon(a.host)) parts.push(`host ${hostName(b.host, data)} \u2192 ${hostName(a.host, data)}`);
+    if ((b.eventUrl || '') !== (a.eventUrl || '')) parts.push(a.eventUrl ? 'event link updated' : 'event link removed');
+    if (withStart && (b.activePeriod || {}).start !== (a.activePeriod || {}).start && (a.activePeriod || {}).start) parts.push(`first night ${shortDate(a.activePeriod.start)}`);
+    return parts.join('; ');
+}
+
+// ---- lining up a venue's shows before and after ------------------------------
+
+// What a show IS, as opposed to what has been said about it lately. Two
+// entries with the same identity are the same show; a correction changes its
+// identity, a confirmation, an ending, a night off or a placement do not.
+const VOLATILE = new Set(['lastVerified', 'changed', 'activePeriod', 'exclusions', 'featured', 'eventUrl', 'socials']);
+function identity(s) {
+    const c = {};
+    for (const k of Object.keys(s || {}).sort()) if (!VOLATILE.has(k)) c[k] = s[k];
+    return canon(c);
+}
+
 /**
- * What this publish changes, in the terms the owner thinks in: venues added,
- * removed or edited, and shows newly confirmed. Pure, so it is unit-testable.
+ * Pair a venue's schedule entries across a publish. Entries whose identity is
+ * unchanged line up first (longest common subsequence, so order is kept);
+ * what is left between two anchors is paired in order, as an edit in place \u2014
+ * except an entry that is plainly new (a fresh `created`, or a Split's copy:
+ * `changed` with a first night), which never stands in for an old one.
+ * Returns { pairs: [[b, a]], added: [a], removed: [b] }.
+ */
+function matchShows(before, after) {
+    const B = before || [], A = after || [];
+    const kb = B.map(identity), ka = A.map(identity);
+    const L = Array.from({ length: B.length + 1 }, () => new Array(A.length + 1).fill(0));
+    for (let i = B.length - 1; i >= 0; i -= 1) {
+        for (let j = A.length - 1; j >= 0; j -= 1) {
+            L[i][j] = kb[i] === ka[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+        }
+    }
+    const anchors = [];
+    for (let i = 0, j = 0; i < B.length && j < A.length;) {
+        if (kb[i] === ka[j]) { anchors.push([i, j]); i += 1; j += 1; }
+        else if (L[i + 1][j] >= L[i][j + 1]) i += 1;
+        else j += 1;
+    }
+    const pairs = [], added = [], removed = [];
+    const plainlyNew = (a, b) => (a.created && a.created !== b.created)
+        || (a.changed && (a.activePeriod || {}).start && (a.activePeriod || {}).start !== (b.activePeriod || {}).start);
+    let pi = 0, pj = 0;
+    for (const [ai, aj] of [...anchors, [B.length, A.length]]) {
+        const gapB = B.slice(pi, ai), gapA = A.slice(pj, aj);
+        let k = 0;
+        for (const a of gapA) {
+            if (k < gapB.length && !plainlyNew(a, gapB[k])) { pairs.push([gapB[k], a]); k += 1; }
+            else added.push(a);
+        }
+        for (; k < gapB.length; k += 1) removed.push(gapB[k]);
+        if (ai < B.length) pairs.push([B[ai], A[aj]]);
+        pi = ai + 1; pj = aj + 1;
+    }
+    return { pairs, added, removed };
+}
+
+function addDays(iso, n) {
+    const d = new Date(`${iso}T00:00:00Z`);
+    d.setUTCDate(d.getUTCDate() + n);
+    return d.toISOString().slice(0, 10);
+}
+
+/**
+ * What this publish changes, in the terms the owner thinks in (#334):
+ *   confirmed  a show's lastVerified moved later
+ *   changed    a correction (`changed` moved) or a change on a date (a new
+ *              entry carrying `changed`, usually a Split)
+ *   added      a new venue, or a new show
+ *   ended      a show given a last night (activePeriod.end)
+ *   removed    a venue or show taken out (pruned)
+ *   edited     anything else: venue facts, nights off, placements, links
+ * One show can appear in two groups (confirmed AND ended, say). Pure, so it is
+ * unit-tested; `after` also supplies the registry names for hosts.
  */
 function summarizeDiff(before, after) {
     const b = new Map((before.listings || []).map((v) => [v.id, v]));
     const a = new Map((after.listings || []).map((v) => [v.id, v]));
-    const added = [];
-    const removed = [];
-    const edited = [];
-    const confirmed = [];
+    const sum = { confirmed: [], changed: [], added: [], ended: [], removed: [], edited: [] };
 
     for (const [id, av] of a) {
+        const name = av.name || id;
         const bv = b.get(id);
-        if (!bv) { added.push(av.name || id); continue; }
+        if (!bv) {
+            const n = (av.schedule || []).length;
+            sum.added.push(`${name} (new venue${n ? `, ${n} show${n === 1 ? '' : 's'}: ${(av.schedule || []).map(showName).join(', ')}` : ''})`);
+            continue;
+        }
 
-        // Confirmations first: they are the common case and deserve their own line.
-        const bNights = new Map((bv.schedule || []).map((s, i) => [i, s.lastVerified || '']));
-        (av.schedule || []).forEach((s, i) => {
-            const was = bNights.get(i) || '';
-            if ((s.lastVerified || '') !== was && s.lastVerified) {
-                confirmed.push(`${av.name || id} \u2014 ${s.frequency === 'once' ? s.date : (s.frequency + ' ' + s.day)} \u2192 ${s.lastVerified}`);
+        const { pairs, added, removed } = matchShows(bv.schedule, av.schedule);
+        for (const [bs, as] of pairs) {
+            // Named as main knows it: the changed line says what it became.
+            const label = `${name}, ${showName(bs)}`;
+            if ((as.lastVerified || '') > (bs.lastVerified || '')) sum.confirmed.push(`${label} \u2192 ${shortDate(as.lastVerified)}`);
+            const endA = (as.activePeriod || {}).end, endB = (bs.activePeriod || {}).end;
+            if (endA && endA !== endB) sum.ended.push(`${name}, ${showName(bs)} \u2014 last night ${shortDate(endA)}`);
+            if (as.changed && as.changed !== bs.changed) {
+                const what = describeShowChange(bs, as, after);
+                sum.changed.push(`${name}, ${showName(bs)}${what ? ` \u2014 ${what}` : ' \u2014 corrected'}`);
             }
-        });
+            // Whatever else moved, by field name. The groups above own their fields.
+            const rest = [];
+            const keys = new Set([...Object.keys(bs), ...Object.keys(as)]);
+            for (const k of keys) {
+                if (['lastVerified', 'changed'].includes(k)) continue;
+                if (k === 'activePeriod' && canon({ ...bs.activePeriod, end: undefined }) === canon({ ...as.activePeriod, end: undefined })) continue;
+                if (as.changed && as.changed !== bs.changed && !['exclusions', 'featured'].includes(k)) continue;   // the change line says it
+                if (canon(bs[k]) !== canon(as[k])) rest.push(k === 'exclusions' ? 'nights off' : k === 'featured' ? 'placement' : k);
+            }
+            if (rest.length) sum.edited.push(`${label} \u2014 ${rest.join(', ')}`);
+        }
+        for (const as of added) {
+            // A change on a date (a Split): a new entry carrying `changed`, whose
+            // predecessor ends the night before it starts. Anything else that is
+            // new here — `created`, or nothing at all — is an addition, even if
+            // it was corrected before it was ever published.
+            const start = (as.activePeriod || {}).start;
+            const prev = as.changed && start && (av.schedule || []).find((s) => s !== as && (s.activePeriod || {}).end === addDays(start, -1));
+            if (prev) {
+                const what = describeShowChange(prev, as, after, { withStart: false });   // "from …" says the start
+                sum.changed.push(`${name}, ${showName(prev)} \u2014 ${what || showName(as)} from ${shortDate(start)}`);
+            } else if (as.changed && !as.created) {
+                sum.changed.push(`${name}, ${showName(as)}${start ? ` from ${shortDate(start)}` : ''}`);
+            } else {
+                sum.added.push(`${name}, ${showName(as)}`);
+            }
+        }
+        for (const bs of removed) sum.removed.push(`${name}, ${showName(bs)}`);
 
-        // Anything else about the venue that moved.
+        // Venue facts.
+        const facts = [];
         const keys = new Set([...Object.keys(bv), ...Object.keys(av)]);
-        for (const k of keys) {
-            if (k === 'schedule') continue;
-            if (canon(bv[k]) !== canon(av[k])) { edited.push(av.name || id); break; }
-        }
-        // A schedule change that is not just a confirmation.
-        const strip = (arr) => (arr || []).map((s) => { const c = { ...s }; delete c.lastVerified; return canon(c); });
-        if (canon(strip(bv.schedule)) !== canon(strip(av.schedule)) && !edited.includes(av.name || id)) {
-            edited.push(av.name || id);
-        }
+        for (const k of keys) if (k !== 'schedule' && canon(bv[k]) !== canon(av[k])) facts.push(k);
+        if (facts.length) sum.edited.push(`${name} \u2014 ${facts.join(', ')}`);
     }
-    for (const [id, bv] of b) if (!a.has(id)) removed.push(bv.name || id);
+    for (const [id, bv] of b) if (!a.has(id)) sum.removed.push(`${bv.name || id} (venue)`);
 
-    return { added, removed, edited, confirmed };
+    // The shared records shows point at.
+    for (const k of ['kjs', 'companies', 'cities', 'tagDefinitions']) {
+        if (canon(before[k] || {}) !== canon(after[k] || {})) sum.edited.push(`${k} registry`);
+    }
+    return sum;
 }
+
+const GROUPS = [
+    ['confirmed', 'Confirmed', 'confirmed'],
+    ['changed', 'Changed', 'changed'],
+    ['added', 'Added', 'added'],
+    ['ended', 'Ended', 'ended'],
+    ['removed', 'Removed', 'removed'],
+    ['edited', 'Edited', 'edited'],
+];
 
 function prTitle(sum, now = new Date()) {
     const p = (n) => String(n).padStart(2, '0');
     const stamp = `${now.getFullYear()}-${p(now.getMonth() + 1)}-${p(now.getDate())}`;
-    const bits = [];
-    if (sum.confirmed.length) bits.push(`${sum.confirmed.length} show${sum.confirmed.length === 1 ? '' : 's'} confirmed`);
-    if (sum.added.length) bits.push(`${sum.added.length} venue${sum.added.length === 1 ? '' : 's'} added`);
-    if (sum.removed.length) bits.push(`${sum.removed.length} removed`);
-    if (sum.edited.length) bits.push(`${sum.edited.length} edited`);
+    const bits = GROUPS.filter(([k]) => (sum[k] || []).length).map(([k, , word]) => `${sum[k].length} ${word}`);
     return `Curator publish ${stamp}${bits.length ? ' \u2014 ' + bits.join(', ') : ''}`;
 }
 
 function prBody(sum) {
     const lines = ['Routine data publish from the curator.', ''];
     const section = (title, items) => {
-        if (!items.length) return;
-        lines.push(`**${title}**`, '');
+        if (!items || !items.length) return;
+        lines.push(`**${title} (${items.length})**`, '');
         items.slice(0, 40).forEach((i) => lines.push(`- ${i}`));
         if (items.length > 40) lines.push(`- \u2026and ${items.length - 40} more`);
         lines.push('');
     };
-    section('Shows confirmed', sum.confirmed);
-    section('Venues added', sum.added);
-    section('Venues edited', sum.edited);
-    section('Venues removed', sum.removed);
+    for (const [k, title] of GROUPS) section(title, sum[k]);
     lines.push(
         '---',
         '',
@@ -246,11 +400,16 @@ function main() {
     let base = null;
     try { if (fs.existsSync(basePath)) base = JSON.parse(fs.readFileSync(basePath, 'utf8')); }
     catch (err) { console.error(`Cannot read ${basePath}: ${err.message}`); return 1; }
-    let inFlight = false;
+    // An open data PR (#334): a publish before it merges adds to it instead of
+    // opening a second one. Newest first, should there ever be two.
+    let openPr = null;
     try {
-        inFlight = JSON.parse(gh(bin, ['pr', 'list', '--repo', repo, '--state', 'open', '--json', 'headRefName']))
-            .some((p) => /^data\//.test(p.headRefName));
+        const open = JSON.parse(gh(bin, ['pr', 'list', '--repo', repo, '--state', 'open', '--json', 'number,url,headRefName,createdAt']))
+            .filter((p) => /^data\//.test(p.headRefName))
+            .sort((x, y) => String(y.createdAt).localeCompare(String(x.createdAt)));
+        openPr = open[0] || null;
     } catch { /* unknown: treat as not in flight, which is the stricter answer */ }
+    const inFlight = !!openPr;
     const guard = mainGuard({ base, main: mainJson, inFlight });
     if (guard === 'refuse') {
         console.error('\nPublish stopped: js/data.json on main is not what the curator last published.');
@@ -280,28 +439,79 @@ function main() {
         return 0;
     }
 
+    // The PR's diff is against main, so its summary is too — even when this
+    // publish only adds to an open PR.
     const sum = summarizeDiff(mainJson, exported);
     const title = prTitle(sum);
     const body = prBody(sum);
 
+    // What the open data PR already holds: the same file means nothing new.
+    let openSha = null;
+    if (openPr && !args.branch) {
+        try {
+            const meta = JSON.parse(gh(bin, ['api', `repos/${repo}/contents/js/data.json?ref=${encodeURIComponent(openPr.headRefName)}`]));
+            if (canon(JSON.parse(Buffer.from(meta.content, 'base64').toString('utf8'))) === canon(exported)) {
+                console.log(`\nNothing new — the open data PR already has this: ${openPr.url}`);
+                fs.writeFileSync(basePath, content);
+                return 0;
+            }
+            openSha = meta.sha;
+        } catch { openSha = null; /* gone or unreadable: open a new PR below */ }
+    }
+
     console.log('');
-    if (sum.confirmed.length) console.log(`shows confirmed: ${sum.confirmed.length}`);
-    if (sum.added.length) console.log(`venues added:    ${sum.added.join(', ')}`);
-    if (sum.edited.length) console.log(`venues edited:   ${sum.edited.join(', ')}`);
-    if (sum.removed.length) console.log(`venues removed:  ${sum.removed.join(', ')}`);
+    for (const [k, label] of GROUPS) {
+        if (!sum[k].length) continue;
+        console.log(`${label} (${sum[k].length}):`);
+        sum[k].slice(0, 15).forEach((line) => console.log(`  - ${line}`));
+        if (sum[k].length > 15) console.log(`  - …and ${sum[k].length - 15} more`);
+    }
 
     let branch = args.branch || branchName();
 
     if (args.dryRun) {
         console.log('\n--- dry run, nothing created ---');
-        console.log(`branch: ${branch}`);
+        console.log(openSha ? `adds to the open data PR #${openPr.number} (${openPr.headRefName})` : `branch: ${branch}`);
         console.log(`title:  ${title}`);
         console.log('body:');
         console.log(body);
         return 0;
     }
 
-    // ---- 5. branch, commit, PR ---------------------------------------------
+    // ---- 5a. add to the open data PR (#334) ----------------------------------
+    // One PR, another commit: the title and description are rewritten to cover
+    // everything it now sends. If the PR merged in the meantime, the write fails
+    // and a fresh PR is opened below instead.
+    if (openSha) {
+        try {
+            const putBody = path.join(tmp, 'put.json');
+            fs.writeFileSync(putBody, JSON.stringify({
+                message: `${title}\n\nRoutine data publish from the curator. No ticket by design.`,
+                content: Buffer.from(content, 'utf8').toString('base64'),
+                branch: openPr.headRefName,
+                sha: openSha,
+            }));
+            gh(bin, ['api', '-X', 'PUT', `repos/${repo}/contents/js/data.json`, '--input', putBody]);
+            const bodyFile = path.join(tmp, 'body.md');
+            fs.writeFileSync(bodyFile, body);
+            gh(bin, ['pr', 'edit', openPr.url, '--repo', repo, '--title', title, '--body-file', bodyFile]);
+            let autoMerge = false;
+            if (!args.noAutoMerge) {
+                try { gh(bin, ['pr', 'merge', openPr.url, '--repo', repo, '--auto', '--merge']); autoMerge = true; }
+                catch (err) { console.warn(`\nCould not confirm auto-merge (${err.message.split('\n')[0]}).`); }
+            }
+            fs.writeFileSync(basePath, content);
+            console.log(`\nAdded to the open data PR #${openPr.number} — one PR, another commit.`);
+            console.log(autoMerge ? 'Auto-merge is on: it goes live by itself once CI passes.' : 'Merge it once CI passes.');
+            console.log(`PR: ${openPr.url}`);
+            fs.rmSync(tmp, { recursive: true, force: true });
+            return 0;
+        } catch (err) {
+            console.warn(`\nCould not add to the open data PR (${err.message.split('\n')[0]}); opening a new one.`);
+        }
+    }
+
+    // ---- 5b. branch, commit, PR ----------------------------------------------
     try {
         const mainSha = JSON.parse(gh(bin, ['api', `repos/${repo}/git/ref/heads/main`])).object.sha;
         for (let i = 0; i < 20; i += 1) {
@@ -360,6 +570,6 @@ function main() {
     }
 }
 
-module.exports = { summarizeDiff, prTitle, prBody, branchName, parseArgs, mainGuard };
+module.exports = { summarizeDiff, matchShows, prTitle, prBody, branchName, parseArgs, mainGuard };
 
 if (require.main === module) process.exit(main());
