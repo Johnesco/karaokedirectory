@@ -4,7 +4,8 @@
  * Every day card groups its shows into sections instead of one flat list:
  *
  *   (specials)  `frequency: "once"` — pinned on top, as today; no heading
- *   New         the show or its venue is new within the last 30 days
+ *   New         the show or its venue was added within the last 30 days
+ *   Updated     an existing show's details changed within the last 30 days (#335)
  *   Featured    an owner-set flag on the show (test placements only for now)
  *   Verified    the show's `lastVerified` is within the last 30 days
  *   (the rest)  everything else; no heading, always last
@@ -35,6 +36,7 @@ export const SECTION_WINDOW_DAYS = VERIFIED_WINDOW_DAYS;
 export const SECTIONS = [
     { key: 'special', label: null },
     { key: 'new', label: 'New' },
+    { key: 'updated', label: 'Updated' },
     { key: 'featured', label: 'Featured' },
     { key: 'verified', label: 'Verified' },
     { key: 'rest', label: null },
@@ -44,11 +46,17 @@ export const SECTIONS = [
  * The date a record's "new" window starts: the later of when it was created
  * and its first night (`activePeriod.start`). Either alone is enough; neither
  * means the record can never read as new — no backfill (ADR-015, ADR-016).
+ *
+ * An entry carrying `changed` (#329) is a changed show, not a new one: a
+ * Split's new entry starts on the change date, and that start is the change,
+ * not a first night. So its `activePeriod.start` is ignored here and only its
+ * own `created` can make it New (#335) — otherwise it goes to Updated.
  * @param {Object} record - A venue or a schedule entry
  * @returns {string|null} YYYY-MM-DD
  */
 export function newSince(record) {
-    const dates = [record?.created, record?.activePeriod?.start].filter(Boolean);
+    const start = record?.changed ? null : record?.activePeriod?.start;
+    const dates = [record?.created, start].filter(Boolean);
     if (dates.length === 0) return null;
     return dates.sort().at(-1);
 }
@@ -74,6 +82,18 @@ function withinWindow(iso, asOf) {
  */
 export function isNewShow(venue, entry, asOf = startOfToday()) {
     return withinWindow(newSince(entry), asOf) || withinWindow(newSince(venue), asOf);
+}
+
+/**
+ * Updated (#335): an existing show's details changed inside the window — any
+ * detail change to a show that isn't new, a Split or a correction (owner
+ * decision, 2026-10-15). `changed` (#329) records when.
+ * @param {Object} entry
+ * @param {Date} [asOf]
+ * @returns {boolean}
+ */
+export function isUpdatedShow(entry, asOf = startOfToday()) {
+    return withinWindow(entry?.changed, asOf);
 }
 
 /**
@@ -115,11 +135,12 @@ export function isFeaturedShow(venue, entry, date) {
  * @param {Object} options
  * @param {Date} options.date - The card's date (for Featured)
  * @param {Date} [options.asOf] - Today (for New and Verified)
- * @returns {'special'|'new'|'featured'|'verified'|'rest'}
+ * @returns {'special'|'new'|'updated'|'featured'|'verified'|'rest'}
  */
 export function sectionOf(venue, entry, { date, asOf = startOfToday() }) {
     if (entry?.frequency === 'once') return 'special';
     if (isNewShow(venue, entry, asOf)) return 'new';
+    if (isUpdatedShow(entry, asOf)) return 'updated';
     if (isFeaturedShow(venue, entry, date)) return 'featured';
     if (isVerifiedShow(entry, asOf)) return 'verified';
     return 'rest';

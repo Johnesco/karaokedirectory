@@ -6,7 +6,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
-    newSince, isNewShow, isVerifiedShow, isFeaturedShow, sectionOf, groupShows,
+    newSince, isNewShow, isUpdatedShow, isVerifiedShow, isFeaturedShow, sectionOf, groupShows,
     SECTION_WINDOW_DAYS,
 } from '../js/utils/sections.js';
 
@@ -72,6 +72,34 @@ describe('isFeaturedShow', () => {
     it('honours featured: true, and nothing without the field', () => {
         assert.equal(isFeaturedShow(venue(), show({ featured: true }), night), true);
         assert.equal(isFeaturedShow(venue(), show(), night), false);
+    });
+});
+
+describe('Updated (#335)', () => {
+    it('a recent change is Updated; one 30 or more days old is not', () => {
+        assert.equal(isUpdatedShow(show({ changed: '2026-09-13' }), TODAY), true);   // 29 days
+        assert.equal(isUpdatedShow(show({ changed: '2026-09-12' }), TODAY), false);  // 30 days
+        assert.equal(isUpdatedShow(show(), TODAY), false);
+    });
+    it("a Split's new entry is Updated, not New: its start is the change, not a first night", () => {
+        const split = show({ created: '2025-01-01', changed: '2026-10-08', activePeriod: { start: '2026-10-08' } });
+        assert.equal(newSince(split), '2025-01-01');
+        assert.equal(isNewShow(venue(), split, TODAY), false);
+        assert.equal(sectionOf(venue(), split, { date: TODAY, asOf: TODAY }), 'updated');
+    });
+    it('a correction (no new start) on an old show is Updated', () => {
+        const fixed = show({ created: '2025-01-01', changed: '2026-10-12' });
+        assert.equal(sectionOf(venue(), fixed, { date: TODAY, asOf: TODAY }), 'updated');
+    });
+    it('something added recently stays New even if it also changed', () => {
+        const both = show({ created: '2026-10-01', changed: '2026-10-10' });
+        assert.equal(sectionOf(venue(), both, { date: TODAY, asOf: TODAY }), 'new');
+        // …and so does a show at a venue added recently.
+        assert.equal(sectionOf(venue({ created: '2026-10-05' }), show({ changed: '2026-10-10' }), { date: TODAY, asOf: TODAY }), 'new');
+    });
+    it('Updated outranks Featured and Verified', () => {
+        const s = show({ changed: '2026-10-10', featured: true, lastVerified: '2026-10-12' });
+        assert.equal(sectionOf(venue(), s, { date: TODAY, asOf: TODAY }), 'updated');
     });
 });
 
