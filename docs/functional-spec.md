@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.60
+**Version:** 1.0.61
 **Last updated:** October 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -1344,6 +1344,7 @@ The `<body>` carries the `page--readable` class, which constrains `.main-content
 
 - **Debug indicator** — "Debug Mode" badge in the top-right corner
 - **Venue cards** — show schedule match reason (e.g., "Every Friday", "First Saturday", "Once: 2026-03-15")
+- **Section reason** (#325) — on calendar cards, a line under the match-reason badge says why the show is in its day-card section (§2 "Sections"). It names the date that decided it and the record it came from: "New since Oct 1 (show's first night)", "New since Oct 9 (venue added)", "Updated Oct 10 (show details changed)", "Featured Oct 15 – Oct 31", "Verified for Oct 15", "Not verified in 30 days (last for Aug 1)", "Never verified". `sectionReason()` in `js/utils/sections.js` (pure, unit-tested) builds the text. Nothing is emitted outside debug mode.
 - **Hover info** — detailed match information on card hover
 - **Source links** (#305) — on the owner's machine only, a 🔗 after the match reason on a card, and after the day in the detail schedule table, opens the post behind that show's latest confirmation
 
@@ -1825,6 +1826,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-10 | 1.0.58 | #329: recurring schedule entries accept `changed`, the date an existing show's details last changed. A change on a date (an ADR-016 Split) sets the night it takes effect; a correction sets the day it was corrected (owner decision: any detail change to a show that isn't new). The validator warns when it falls before the entry's `activePeriod.start`, and fails it on one-time events. Nothing writes or displays it yet (#331/#332 write it, #335 shows it). §11 "Created and Featured" becomes "Created, Changed and Featured". | Claude Code |
 | 2026-10 | 1.0.59 | #330: one verification clock. `VERIFIED_WINDOW_DAYS = 30` in `js/utils/date.js` replaces the 60-day `FRESHNESS_HORIZON_DAYS`; the day-card sections, the `?fresh=1` lens and the validator (which mirrors the number, guarded by a unit test) now agree that a show confirmed fewer than 30 days ago is fresh and day 30 is out. Previously a show left the public Verified section a month before anything called it overdue. The curator's own 30/60/90 setting goes with #333. | Claude Code |
 | 2026-10 | 1.0.60 | #335: an **Updated** section under New. An existing show whose `changed` is within 30 days of today goes there: any detail change to a show that isn't new, a Split or a correction. New now ignores `activePeriod.start` on an entry carrying `changed`, so a Split's new entry reads as Updated, not New. Updated is sky (`#38bdf8`, 4.91:1 worst case). Order: Specials → New → Updated → Featured → Verified → the rest. | Claude Code |
+| 2026-10 | 1.0.61 | #325: in debug mode each calendar card says why it is in its day-card section, naming the deciding date and the record (show or venue): `sectionReason()` in `js/utils/sections.js`, rendered by `getDebugHtml()` as `.venue-card__debug-section`. No markup outside debug mode. §18 updated. | Claude Code |
 
 ---
 

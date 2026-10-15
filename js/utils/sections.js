@@ -24,7 +24,7 @@
  * unit-tested without a DOM (test/sections.test.mjs).
  */
 
-import { daysSince, parseLocalDate, startOfToday, VERIFIED_WINDOW_DAYS } from './date.js';
+import { daysSince, parseLocalDate, startOfToday, VERIFIED_WINDOW_DAYS, formatDateMonthDay } from './date.js';
 
 /**
  * Both windows — New and Verified — are the one 30-day clock (#330). New uses
@@ -144,6 +144,54 @@ export function sectionOf(venue, entry, { date, asOf = startOfToday() }) {
     if (isFeaturedShow(venue, entry, date)) return 'featured';
     if (isVerifiedShow(entry, asOf)) return 'verified';
     return 'rest';
+}
+
+/**
+ * Why a show is in its section, in words (#325, debug mode only): the date
+ * that decided it, and which record it came from. Pure, so it is unit-tested;
+ * `getDebugHtml()` renders it and nothing calls it outside debug mode.
+ *
+ * Which record decided New mirrors `isNewShow()`: the show is checked first,
+ * then its venue; within a record, the later of `created` and first night.
+ *
+ * @param {Object} venue
+ * @param {Object} entry
+ * @param {Object} options - As for sectionOf
+ * @returns {{key: string, text: string}}
+ */
+export function sectionReason(venue, entry, { date, asOf = startOfToday() }) {
+    const key = sectionOf(venue, entry, { date, asOf });
+    const md = (iso) => formatDateMonthDay(iso, { now: asOf });
+
+    if (key === 'special') return { key, text: 'Special: one-time event' };
+
+    if (key === 'new') {
+        const fromShow = withinWindow(newSince(entry), asOf);
+        const record = fromShow ? entry : venue;
+        const since = newSince(record);
+        // created wins when it is the later date; otherwise the first night decided.
+        const who = fromShow ? 'show' : 'venue';
+        const how = since === record.created ? `${who} added` : `${who}'s first night`;
+        return { key, text: `New since ${md(since)} (${how})` };
+    }
+
+    if (key === 'updated') return { key, text: `Updated ${md(entry.changed)} (show details changed)` };
+
+    if (key === 'featured') {
+        const f = entry.featured;
+        if (f === true) return { key, text: 'Featured (every night it runs)' };
+        if (f.start && f.end) return { key, text: `Featured ${md(f.start)} – ${md(f.end)}` };
+        return { key, text: f.start ? `Featured from ${md(f.start)}` : `Featured until ${md(f.end)}` };
+    }
+
+    if (key === 'verified') return { key, text: `Verified for ${md(entry.lastVerified)}` };
+
+    return {
+        key,
+        text: entry?.lastVerified
+            ? `Not verified in ${SECTION_WINDOW_DAYS} days (last for ${md(entry.lastVerified)})`
+            : 'Never verified',
+    };
 }
 
 /**
