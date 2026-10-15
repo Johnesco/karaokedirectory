@@ -13,18 +13,20 @@
  *
  * The sequence:
  *   1. fetch js/data.json from main
- *   2. curator:check against it, three-way against our last publish, so an
- *      ordinary edit is informational and only someone else's work is fatal
+ *   2. one writer (ADR-018, #336): main must be what we last published, unless a
+ *      data PR is still merging — otherwise someone changed it outside the curator
  *   3. validate-data.js on the file we are about to publish
  *   4. nothing to do? say so and stop
  *   5. branch, commit the one file, open the PR, and turn on auto-merge so it
  *      merges itself once CI is green (#338) — branch protection still holds
- *   6. remember what we published, as the base for next time
+ *   6. remember what we published, so the next run (and the curator) can tell
  *
  * Usage:
- *   node scripts/publish-data.js [--dry-run] [--adopt-baseline] [--export <file>]
- *                                [--master <file>] [--branch <name>] [--repo owner/name]
- *                                [--no-auto-merge]
+ *   node scripts/publish-data.js [--dry-run] [--export <file>] [--branch <name>]
+ *                                [--repo owner/name] [--no-auto-merge]
+ *
+ * --export defaults to the curator's data.json (#331). --master and
+ * --adopt-baseline are accepted and ignored, for curators older than #336.
  *
  * `gh` must be installed and authenticated. It is found on PATH, via GH_PATH,
  * or at the usual Windows location.
@@ -138,16 +140,8 @@ function prTitle(sum, now = new Date()) {
     return `Curator publish ${stamp}${bits.length ? ' \u2014 ' + bits.join(', ') : ''}`;
 }
 
-function prBody(sum, pending, adoptedBaseline) {
+function prBody(sum) {
     const lines = ['Routine data publish from the curator.', ''];
-    if (adoptedBaseline) {
-        lines.push(
-            '> **First publish.** There was no record of a previous one, so every difference',
-            '> below was reviewed by hand and the live file was adopted as the baseline',
-            '> (`--adopt-baseline`, #285). Later publishes compare against it automatically.',
-            '',
-        );
-    }
     const section = (title, items) => {
         if (!items.length) return;
         lines.push(`**${title}**`, '');
@@ -159,66 +153,33 @@ function prBody(sum, pending, adoptedBaseline) {
     section('Venues added', sum.added);
     section('Venues edited', sum.edited);
     section('Venues removed', sum.removed);
-    if (pending && pending.length) {
-        lines.push('<details><summary>curator:check detail</summary>', '');
-        pending.slice(0, 60).forEach((l) => lines.push(`- ${l}`));
-        lines.push('', '</details>', '');
-    }
     lines.push(
         '---',
         '',
         'No ticket by design: publishing venue data is daily operation, not development',
-        '(see CLAUDE.md, "Project-specific deviations"). `validate-data.js` and',
-        '`check-curator-drift.js` both passed before this was opened. Netlify deploys on merge.',
+        '(see CLAUDE.md, "Project-specific deviations"). `validate-data.js` passed, and',
+        'main held what the curator last published, before this was opened. It merges',
+        'itself once CI is green; Netlify deploys on merge.',
     );
     return lines.join('\n');
 }
 
 /**
- * What to do about the baseline before publishing (#285).
+ * One writer (ADR-018, #336): may we publish over what main holds?
  *
- * The three-way base is written BY a successful publish, so the FIRST publish has
- * none, runs strict, and is refused by exactly the ordinary edits the base exists
- * to allow. Seeding it automatically would be worse than the bug: with base equal
- * to the repo, nothing can ever differ from it, and the check that exists to catch
- * a stale master silently passes forever.
- *
- * So the first publish is a reviewed step. Three outcomes:
- *   'proceed'    - business as usual (a base exists, or there is nothing to review)
- *   'need-adopt' - first publish with real differences: show them, ask for the flag
- *   'adopt-now'  - the flag was given: record the baseline and go
- *
- * @param {{baseExists: boolean, driftOk: boolean, adopt: boolean}} state
- * @returns {'proceed'|'need-adopt'|'adopt-now'}
+ * Only the curator changes the venue data, so main should hold exactly what it
+ * last published. Two exceptions are normal: no record yet (nothing to compare),
+ * and a data PR still merging (main has not caught up). Anything else means
+ * someone changed js/data.json outside the curator — publishing would silently
+ * overwrite it, so refuse; the curator's one offer is "take main's data".
+ * Pure, so it is unit-tested.
+ * @param {{ base: object|null, main: object, inFlight: boolean }} p
+ * @returns {'ok'|'no-base'|'in-flight'|'refuse'}
  */
-function baselineDecision({ baseExists, driftOk, adopt }) {
-    if (baseExists) return 'proceed';
-    if (driftOk) return 'proceed';      // nothing to review; the publish writes the base anyway
-    return adopt ? 'adopt-now' : 'need-adopt';
-}
-
-/** What to tell someone facing their first publish. */
-function firstPublishNotice(items) {
-    return [
-        '',
-        '=== This is the first publish, and there is no baseline yet ===',
-        '',
-        'Every later publish compares three ways: the live file, your master, and a',
-        'record of what you last published. That record is written BY a publish, so',
-        'this one has nothing to compare against and had to assume the worst about',
-        'each difference below.',
-        '',
-        'Read them. Each should be a change YOU made in the curator:',
-        '',
-        ...items.map((i) => '  - ' + i),
-        '',
-        'If any line is something you did NOT do, stop: your master is behind the live',
-        'site, and publishing would revert someone else\'s work. Reconcile first.',
-        '',
-        'If they are all yours, run it again with --adopt-baseline. That records the',
-        'live file as your starting point and publishes. You only ever do this once.',
-        '',
-    ].join('\n');
+function mainGuard({ base, main, inFlight }) {
+    if (!base) return 'no-base';
+    if (canon(base) === canon(main)) return 'ok';
+    return inFlight ? 'in-flight' : 'refuse';
 }
 
 // ---------------------------------------------------------------- main
@@ -226,18 +187,19 @@ function firstPublishNotice(items) {
 function main() {
     const args = parseArgs(process.argv.slice(2));
     if (args.help) {
-        console.log('Usage: node scripts/publish-data.js [--dry-run] [--adopt-baseline] [--export <file>] [--master <file>] [--branch <name>] [--repo owner/name] [--no-auto-merge]');
+        console.log('Usage: node scripts/publish-data.js [--dry-run] [--export <file>] [--branch <name>] [--repo owner/name] [--no-auto-merge]');
         return 0;
     }
 
-    const exportFile = args.exportFile || path.join(CURATOR_DIR, 'last-export.json');
-    const master = args.master || path.join(CURATOR_DIR, 'data-curated.js');
-    const basePath = path.join(path.dirname(master), 'last-published.json');
+    // The curator's data.json is the public file (#331); the record of the last
+    // publish sits beside it, where the curator's own main-check reads it.
+    const exportFile = args.exportFile || path.join(CURATOR_DIR, 'data.json');
+    const basePath = path.join(path.dirname(exportFile), 'last-published.json');
 
     console.log('=== Publish venue data ===');
     if (!fs.existsSync(exportFile)) {
         console.error(`Nothing to publish: ${exportFile} does not exist.`);
-        console.error('Press Export in the curator first \u2014 that writes the file this publishes.');
+        console.error('Save in the curator first \u2014 that writes the file this publishes.');
         return 1;
     }
 
@@ -280,60 +242,25 @@ function main() {
         return 1;
     }
 
-    // ---- 2. drift, against main and our last publish -----------------------
-    // Which baseline the check reads. Normally the real one; a dry run that adopts
-    // points this at a scratch copy so that nothing is recorded.
-    let adoptBase = basePath;
-    const runDrift = () => spawnSync(process.execPath, [path.join(__dirname, 'check-curator-drift.js'), master], {
-        encoding: 'utf8',
-        env: { ...process.env, REPO_DATA: mainFile, CURATOR_BASE: adoptBase },
-    });
-    let drift = runDrift();
-    process.stdout.write(drift.stdout || '');
-
-    const baseExisted = fs.existsSync(basePath);
-    let adoptedBaseline = false;
-    const decision = baselineDecision({
-        baseExists: baseExisted,
-        driftOk: drift.status === 0,
-        adopt: !!args.adoptBaseline,
-    });
-
-    if (decision === 'need-adopt') {
-        const items = (drift.stdout || '').split('\n')
-            .filter((l) => l.startsWith('- ')).map((l) => l.slice(2));
-        console.error(firstPublishNotice(items));
+    // ---- 2. one writer: main is what we last published (ADR-018, #336) ------
+    let base = null;
+    try { if (fs.existsSync(basePath)) base = JSON.parse(fs.readFileSync(basePath, 'utf8')); }
+    catch (err) { console.error(`Cannot read ${basePath}: ${err.message}`); return 1; }
+    let inFlight = false;
+    try {
+        inFlight = JSON.parse(gh(bin, ['pr', 'list', '--repo', repo, '--state', 'open', '--json', 'headRefName']))
+            .some((p) => /^data\//.test(p.headRefName));
+    } catch { /* unknown: treat as not in flight, which is the stricter answer */ }
+    const guard = mainGuard({ base, main: mainJson, inFlight });
+    if (guard === 'refuse') {
+        console.error('\nPublish stopped: js/data.json on main is not what the curator last published.');
+        console.error('Someone changed it outside the curator. In the curator, press "Take main\'s data",');
+        console.error('redo any edits you still want, and publish again.');
         return 1;
     }
-
-    if (decision === 'adopt-now') {
-        // Adopt the live file as the starting point, then ask again - the second
-        // run is three-way, so an edit reads as pending and only someone else's
-        // work would still be fatal.
-        //
-        // A DRY RUN adopts into a scratch file and leaves the real one alone. A
-        // dry run that wrote the baseline would let someone agree to the one-time
-        // review, wander off without publishing, and leave every later publish
-        // silently permissive - which is the safety this whole flag exists for.
-        adoptBase = args.dryRun ? path.join(tmp, 'baseline-preview.json') : basePath;
-        console.log(args.dryRun
-            ? '\n--adopt-baseline (dry run): previewing against the live file. Nothing is recorded.'
-            : '\n--adopt-baseline: recording the live js/data.json as the baseline for future publishes.');
-        fs.copyFileSync(mainFile, adoptBase);
-        adoptedBaseline = true;
-        drift = runDrift();
-        process.stdout.write('\n=== re-checked against the adopted baseline ===\n');
-        process.stdout.write(drift.stdout || '');
-    }
-
-    if (drift.status !== 0) {
-        console.error('\nPublish stopped: the live site holds content this export would destroy (above).');
-        console.error(baseExisted || adoptedBaseline
-            ? 'Someone changed js/data.json since your last publish. Reconcile, then try again.'
-            : 'Even with a fresh baseline this does not reconcile. Look at the master.');
-        return 1;
-    }
-    const pending = (drift.stdout || '').split('\n').filter((l) => l.startsWith('- ')).map((l) => l.slice(2));
+    console.log(guard === 'ok' ? '\nmain holds the last publish: ok'
+        : guard === 'in-flight' ? '\nmain has not caught up with an open data PR yet: ok'
+        : '\nno record of a previous publish: nothing to compare');
 
     // ---- 3. the repo's own validator on what we are publishing -------------
     const val = spawnSync(process.execPath, [path.join(__dirname, 'validate-data.js'), exportFile], { encoding: 'utf8' });
@@ -355,7 +282,7 @@ function main() {
 
     const sum = summarizeDiff(mainJson, exported);
     const title = prTitle(sum);
-    const body = prBody(sum, pending, adoptedBaseline);
+    const body = prBody(sum);
 
     console.log('');
     if (sum.confirmed.length) console.log(`shows confirmed: ${sum.confirmed.length}`);
@@ -367,7 +294,6 @@ function main() {
 
     if (args.dryRun) {
         console.log('\n--- dry run, nothing created ---');
-        if (adoptedBaseline) console.log('(the baseline was previewed, not recorded - run without --dry-run to adopt it for real)');
         console.log(`branch: ${branch}`);
         console.log(`title:  ${title}`);
         console.log('body:');
@@ -434,6 +360,6 @@ function main() {
     }
 }
 
-module.exports = { summarizeDiff, prTitle, prBody, branchName, parseArgs, baselineDecision, firstPublishNotice };
+module.exports = { summarizeDiff, prTitle, prBody, branchName, parseArgs, mainGuard };
 
 if (require.main === module) process.exit(main());

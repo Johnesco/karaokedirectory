@@ -14,7 +14,7 @@ import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
-const { summarizeDiff, prTitle, prBody, branchName, parseArgs, baselineDecision, firstPublishNotice } = require('../scripts/publish-data.js');
+const { summarizeDiff, prTitle, prBody, branchName, parseArgs, mainGuard } = require('../scripts/publish-data.js');
 
 const show = (over = {}) => ({ frequency: 'every', day: 'Friday', startTime: '21:00', endTime: '01:00', ...over });
 const venue = (id, over = {}) => ({ id, name: over.name || id, schedule: [show()], ...over });
@@ -101,52 +101,6 @@ describe('branchName', () => {
   });
 });
 
-describe('baselineDecision (#285)', () => {
-  // The first publish has no baseline, so it runs strict and is refused by the
-  // ordinary edits the baseline exists to allow. Seeding it automatically would
-  // disable the stale-master check forever, so it takes a deliberate opt-in.
-  it('proceeds normally once a baseline exists, whatever the flag says', () => {
-    assert.equal(baselineDecision({ baseExists: true, driftOk: true, adopt: false }), 'proceed');
-    assert.equal(baselineDecision({ baseExists: true, driftOk: true, adopt: true }), 'proceed');
-  });
-
-  it('proceeds on a first publish that has nothing to review', () => {
-    assert.equal(baselineDecision({ baseExists: false, driftOk: true, adopt: false }), 'proceed');
-  });
-
-  it('asks for the opt-in when a first publish has real differences', () => {
-    assert.equal(baselineDecision({ baseExists: false, driftOk: false, adopt: false }), 'need-adopt');
-  });
-
-  it('adopts only when asked, and only on a first publish', () => {
-    assert.equal(baselineDecision({ baseExists: false, driftOk: false, adopt: true }), 'adopt-now');
-    // A later publish that fails the check is a real problem; the flag must not
-    // let someone paper over it.
-    assert.equal(baselineDecision({ baseExists: true, driftOk: false, adopt: true }), 'proceed');
-  });
-});
-
-describe('firstPublishNotice', () => {
-  it('lists each difference and says what to do either way', () => {
-    const n = firstPublishNotice(['bar-one.name changed', 'bar-two schedule entry missing']);
-    assert.match(n, /first publish/i);
-    assert.match(n, /bar-one\.name changed/);
-    assert.match(n, /bar-two schedule entry missing/);
-    assert.match(n, /did NOT do/);          // the stop case
-    assert.match(n, /--adopt-baseline/);    // the go case
-    assert.match(n, /once/);                // and that it is one-time
-  });
-});
-
-describe('prBody first-publish note', () => {
-  it('records an adopted baseline in the pull request', () => {
-    const sum = { confirmed: [], added: [], removed: [], edited: ['Bar One'] };
-    assert.match(prBody(sum, [], true), /First publish/);
-    assert.match(prBody(sum, [], true), /--adopt-baseline/);
-    assert.doesNotMatch(prBody(sum, [], false), /First publish/);
-  });
-});
-
 describe('parseArgs', () => {
   it('reads the flags the curator passes', () => {
     assert.deepEqual(parseArgs(['--dry-run']), { dryRun: true });
@@ -156,5 +110,29 @@ describe('parseArgs', () => {
     assert.equal(parseArgs([]).adoptBaseline, undefined);
     assert.equal(parseArgs(['--no-auto-merge']).noAutoMerge, true);
     assert.equal(parseArgs([]).noAutoMerge, undefined);
+  });
+});
+
+describe('mainGuard (one writer, #336)', () => {
+  const data = { listings: [{ id: 'a', name: 'A' }] };
+  it('passes when main is what we last published', () => {
+    assert.equal(mainGuard({ base: data, main: JSON.parse(JSON.stringify(data)), inFlight: false }), 'ok');
+  });
+  it('has nothing to compare without a record', () => {
+    assert.equal(mainGuard({ base: null, main: data, inFlight: false }), 'no-base');
+  });
+  it('allows a mismatch while a data PR is still merging', () => {
+    assert.equal(mainGuard({ base: { listings: [] }, main: data, inFlight: true }), 'in-flight');
+  });
+  it('refuses when main changed outside the curator', () => {
+    assert.equal(mainGuard({ base: { listings: [] }, main: data, inFlight: false }), 'refuse');
+  });
+});
+
+describe('prBody', () => {
+  it('no longer mentions the retired drift check', () => {
+    const body = prBody({ confirmed: [], added: ['Gamma'], removed: [], edited: [] });
+    assert.doesNotMatch(body, /check-curator-drift|curator:check|First publish/);
+    assert.match(body, /merges\s+itself/);
   });
 });

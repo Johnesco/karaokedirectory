@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.61
+**Version:** 1.0.62
 **Last updated:** October 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -902,7 +902,6 @@ A schedule entry may carry `lastVerified`: the `YYYY-MM-DD` **show date the late
   - A date **30 or more days past** — the one verification clock (#330), the day a show leaves the site's Verified section — is a **warning**, not a failure: only the curator can re-confirm a show, and a stale date is still a true statement about the last night anyone confirmed. An upcoming night is never stale, and spent one-time events are skipped.
   - A date more than **366 days ahead** **fails**: that is a typo, not lookahead.
   - Entries without the field are not reported (on day one that would be 142 warnings saying nothing); coverage is printed instead (`Verified schedule entries: N of M`).
-  - `npm run curator:check` matches schedule entries on everything *except* this field and compares it by direction on its own, so a show confirmed in the curator but not yet exported is a pending line rather than a phantom loss.
 - **The evidence itself is curator-private** — the wording, the source link and the poster image never leave the curator, and the public file carries only the date.
 - **Display by surface:** the Announced marker on that night's calendar card (§6) is public. Otherwise none by default. With `?fresh=1` (§18 "Freshness lens", #259) the calendar cards, the detail schedule table on all four surfaces, and the KJ dossier show the night and its age.
 
@@ -928,7 +927,6 @@ Two fields that day-card sections read (#322, ADR-017, spike #320). Neither is d
   - A placement whose `end` has passed is a **warning**: it no longer shows anywhere.
   - A `created` after the record's own `activePeriod.end` is a **warning**: one of the two dates is wrong.
   - A `changed` before the entry's own `activePeriod.start` is a **warning**: a show cannot change before it starts. A malformed `changed`, or `changed` on a one-time event, **fails**.
-- **`npm run curator:check`** reports a repo `created` the master lacks as content an export would destroy, until the curator carries the field (#323).
 
 ### Venue Count
 
@@ -1290,15 +1288,14 @@ This spec section previously described the in-repo editor's UI in detail; that c
 
 ### Publishing Venue Data
 
-Venue data reaches the live site by pull request, because `main` is protected. `scripts/publish-data.js` (the curator's Publish button, or `npm run data:publish`) does the mechanical part: it reads what `main` currently holds, runs `check-curator-drift.js` against that and `validate-data.js` against the export, summarises the difference, then creates a branch, commits `js/data.json` and opens the PR. The owner merges it; Netlify deploys from `main`.
+Venue data reaches the live site by pull request, because `main` is protected. `scripts/publish-data.js` (the curator's Publish button, or `npm run data:publish`) does the mechanical part. It reads what `main` currently holds, checks **one writer** (below), runs `validate-data.js` against the curator's `data.json` (#331), summarises the difference, then creates a branch, commits `js/data.json`, opens the PR and turns on auto-merge (#338). The PR merges itself once CI is green, and Netlify deploys from `main`.
 
 - **It merges itself** (#338). The PR is opened with auto-merge on, so it merges the moment both required checks pass — no trip to GitHub. Branch protection is unchanged: a red check means it never merges. If auto-merge cannot be turned on (the repo setting is off), the publish still succeeds and the log says to merge by hand; `--no-auto-merge` opts out for one publish.
 - **No ticket.** Publishing venue data is daily operation, not development. Recorded as an explicit deviation in CLAUDE.md rather than left as a rule being quietly broken.
 - **It works against GitHub, not the checkout.** A routine data publish has no business touching a working tree that may be mid-feature, on another branch, or dirty. The branch, the commit and the file all go through the API.
 - **Two steps in the UI.** The button runs a dry run first, showing what would go out and what the live site would lose; only then does the real one appear. A publish sends other people's data out, so it should not be one click away from a stale master.
-- **It stops on drift.** If `main` holds anything the export would destroy, nothing is created and the log says what. That is the gate that catches a stale master.
-- **The first publish is a reviewed step** (#285). The baseline is written *by* a publish, so publish number one has none, runs strict, and would be refused by the very edits the baseline exists to allow. It does not fail silently: it names every difference and asks for `--adopt-baseline` (a button in the curator) confirming each one is the curator's own work. Seeding the baseline automatically was rejected — a baseline equal to the live file can never differ from it, which would disable the stale-master check permanently. A dry run previews the adoption without recording it.
-- **`last-published.json`** records what was published, next to the curator master. It is what makes `curator:check` three-way on the next run (§"Show Verification", #277): without it, every ordinary edit reads as content at risk.
+- **It stops if `main` changed outside the curator** (one writer, ADR-018, #336). `main` should hold exactly what the curator last published (`last-published.json`, beside the curator's `data.json`). A mismatch is allowed only while a data PR is still merging. Otherwise nothing is created, and the curator's one offer is "take main's data". A CI step backs this up: any PR that changes `js/data.json` from a branch not named `data/…` fails.
+- **`last-published.json`** records what was published, beside the curator's `data.json`. The one-writer check and the curator's own check when it opens both compare `main` against it. The drift script (`curator:check`), its three-way baseline and the first-publish `--adopt-baseline` step existed while the curator kept a second full copy of the data. #331 removed the copy, and #336 removed them.
 
 ## 17 About Page
 
@@ -1346,13 +1343,11 @@ The `<body>` carries the `page--readable` class, which constrains `.main-content
 - **Venue cards** — show schedule match reason (e.g., "Every Friday", "First Saturday", "Once: 2026-03-15")
 - **Section reason** (#325) — on calendar cards, a line under the match-reason badge says why the show is in its day-card section (§2 "Sections"). It names the date that decided it and the record it came from: "New since Oct 1 (show's first night)", "New since Oct 9 (venue added)", "Updated Oct 10 (show details changed)", "Featured Oct 15 – Oct 31", "Verified for Oct 15", "Not verified in 30 days (last for Aug 1)", "Never verified". `sectionReason()` in `js/utils/sections.js` (pure, unit-tested) builds the text. Nothing is emitted outside debug mode.
 - **Hover info** — detailed match information on card hover
-- **Source links** (#305) — on the owner's machine only, a 🔗 after the match reason on a card, and after the day in the detail schedule table, opens the post behind that show's latest confirmation
+- **Source links** (#305) were retired by #336. The curator keeps no confirmation records any more (#331), so there is nothing to link to, and debug mode no longer asks for `js/sources.local.json`.
 
-### Source links — local only
+### Source links — retired (#336)
 
-The post links behind confirmations are curator-private (ADR-015) and the owner's call in #305 was that they stay out of the public file entirely — not merely unrendered. So they are never in `js/data.json`. The curator's site preview (`localhost:8766`) answers one extra path, `js/sources.local.json`, built from its own records on each request and never written to disk. In debug mode, and only when the page is served from `localhost` / `127.0.0.1` / `[::1]`, `loadData()` asks for it; anywhere else no request is made. A missing file means no links, silently.
-
-The file maps a show signature, `venueId|frequency|day-or-date|startTime` (`debugSourceKey()` — the curator's own show id does not survive export), to `{ url, for }`: the record with a source for the latest night. `renderDebugSource()` returns `''` outside debug mode or without a match, so the public page gains no markup. `.gitignore` lists the file in case one is ever written by hand.
+Until #336, debug mode on a local host fetched `js/sources.local.json` from the curator's preview, a map of each show's latest confirmation link, and showed a 🔗 on cards and in the schedule table. The curator now keeps current state only (#331, ADR-018) with no confirmation records, so the file, the fetch and the links are gone. `e2e/debug-mode.spec.js` asserts that the file is never requested and that no link renders.
 
 ### Freshness lens (`?fresh=1`)
 
@@ -1827,6 +1822,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-10 | 1.0.59 | #330: one verification clock. `VERIFIED_WINDOW_DAYS = 30` in `js/utils/date.js` replaces the 60-day `FRESHNESS_HORIZON_DAYS`; the day-card sections, the `?fresh=1` lens and the validator (which mirrors the number, guarded by a unit test) now agree that a show confirmed fewer than 30 days ago is fresh and day 30 is out. Previously a show left the public Verified section a month before anything called it overdue. The curator's own 30/60/90 setting goes with #333. | Claude Code |
 | 2026-10 | 1.0.60 | #335: an **Updated** section under New. An existing show whose `changed` is within 30 days of today goes there: any detail change to a show that isn't new, a Split or a correction. New now ignores `activePeriod.start` on an entry carrying `changed`, so a Split's new entry reads as Updated, not New. Updated is sky (`#38bdf8`, 4.91:1 worst case). Order: Specials → New → Updated → Featured → Verified → the rest. | Claude Code |
 | 2026-10 | 1.0.61 | #325: in debug mode each calendar card says why it is in its day-card section, naming the deciding date and the record (show or venue): `sectionReason()` in `js/utils/sections.js`, rendered by `getDebugHtml()` as `.venue-card__debug-section`. No markup outside debug mode. §18 updated. | Claude Code |
+| 2026-10 | 1.0.62 | #336: the machinery for keeping two copies of the data in step is retired, now that the curator keeps one (#331): `check-curator-drift.js`, `npm run curator:check`, the three-way publish baseline and `--adopt-baseline`. `publish-data.js` instead refuses when `main` isn't what the curator last published, unless a data PR is merging (`mainGuard()`). A CI step fails any non-`data/` PR that touches `js/data.json`. Debug-mode source links (#305) are removed. | Claude Code |
 
 ---
 

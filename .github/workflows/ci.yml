@@ -20,6 +20,28 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # One writer (ADR-018, #336): only the curator changes the venue data,
+      # through its publish PRs on data/<date> branches. A code PR that touches
+      # js/data.json fails here — make the new data valid in the code PR, then
+      # make the change in the curator and publish it. The checkout is the PR's
+      # merge commit, so a diff against the base is exactly the PR's changes.
+      - name: One writer for js/data.json
+        if: github.event_name == 'pull_request'
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          git fetch --no-tags --depth=1 origin "$BASE_SHA"
+          if git diff --name-only "$BASE_SHA" HEAD | grep -qx 'js/data.json'; then
+            case "$HEAD_REF" in
+              data/*) echo "js/data.json changed on $HEAD_REF: a curator publish, allowed." ;;
+              *) echo "::error file=js/data.json::Only the curator changes js/data.json (one writer, ADR-018). Make the new data valid in this PR, then make the change in the curator and publish it."
+                 exit 1 ;;
+            esac
+          else
+            echo "js/data.json untouched."
+          fi
+
       - name: Validate venue data (js/data.json)
         run: node scripts/validate-data.js
 
