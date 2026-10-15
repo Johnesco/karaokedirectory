@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.59
+**Version:** 1.0.60
 **Last updated:** October 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -90,7 +90,8 @@ Every day card groups its shows into sections, in this order. A show sits in **e
 | Section | Heading | A show is here when… |
 |---|---|---|
 | Specials | none | it's a one-time event (`frequency: "once"`). Pinned on top, as before |
-| **New** | "New" | the show **or its venue** is new: the later of `created` and `activePeriod.start` (§11 "Created and Featured") is within a rolling 30 days, counted back from **today**. A new show at an established venue qualifies on its own; a first night still ahead counts |
+| **New** | "New" | the show **or its venue** was **added**: the later of `created` and `activePeriod.start` (§11 "Created, Changed and Featured") is within a rolling 30 days, counted back from **today**. A new show at an established venue qualifies on its own; a first night still ahead counts. A show carrying `changed` ignores its own `activePeriod.start` here, because that start is the change, not a first night |
+| **Updated** | "Updated" | an existing show's details **changed**: its `changed` (§11) is within a rolling 30 days of today. Covers **any** detail change to a show that isn't new, whether a change on a date (a Split) or a correction (owner decision, #335) |
 | **Featured** | "Featured" | its `featured` is `true`, or a placement window covering **the card's own date**. Test placements only for now (ADR-017) |
 | **Verified** | "Verified" | its `lastVerified` (§11 "Show Verification") is within a rolling 30 days of today. A confirmation for a night still ahead counts |
 | The rest | none | everything else. Always last |
@@ -99,7 +100,7 @@ Every day card groups its shows into sections, in this order. A show sits in **e
 - **Inside a section, order is alphabetical** (below). Recency, frequency and placement never decide position within a section.
 - **Empty sections are not rendered.** Search and the dedicated filter run before grouping, so a section empties out and disappears with its results.
 - **The footer count is unchanged:** each show is in one section, so it's still the unique open venues on that day.
-- **How it looks.** Headed sections carry their own colour: New emerald (`#34d399`), Featured amber (`--color-warning`), Verified indigo (`--color-primary-light`).
+- **How it looks.** Headed sections carry their own colour: New emerald (`#34d399`), Updated sky (`#38bdf8`), Featured amber (`--color-warning`), Verified indigo (`--color-primary-light`).
   - Each title is centred between two rules in that colour.
   - At 769px+ the section is an outlined, faintly tinted box that closes after its last card.
   - At ≤768px, where cards are full-bleed, a 4px stripe of the colour runs down the left edge for the section's full height, because an outline there reads as two hairlines.
@@ -1823,6 +1824,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-10 | 1.0.57 | #324: day-card sections on by default. Every day card groups its shows into Specials → New → Featured → Verified → the rest, each show in exactly one, alphabetical within each, empty sections not rendered; both 30-day windows count from today, Featured from the card date. The `?sections=1` flag and the `?featured=` stand-in are gone; Featured reads only `schedule[].featured`. ADR-017 accepted and Display Philosophy #1 amended. New `e2e/day-card-sections.spec.js`. New §2 "Sections". | Claude Code |
 | 2026-10 | 1.0.58 | #329: recurring schedule entries accept `changed`, the date an existing show's details last changed. A change on a date (an ADR-016 Split) sets the night it takes effect; a correction sets the day it was corrected (owner decision: any detail change to a show that isn't new). The validator warns when it falls before the entry's `activePeriod.start`, and fails it on one-time events. Nothing writes or displays it yet (#331/#332 write it, #335 shows it). §11 "Created and Featured" becomes "Created, Changed and Featured". | Claude Code |
 | 2026-10 | 1.0.59 | #330: one verification clock. `VERIFIED_WINDOW_DAYS = 30` in `js/utils/date.js` replaces the 60-day `FRESHNESS_HORIZON_DAYS`; the day-card sections, the `?fresh=1` lens and the validator (which mirrors the number, guarded by a unit test) now agree that a show confirmed fewer than 30 days ago is fresh and day 30 is out. Previously a show left the public Verified section a month before anything called it overdue. The curator's own 30/60/90 setting goes with #333. | Claude Code |
+| 2026-10 | 1.0.60 | #335: an **Updated** section under New. An existing show whose `changed` is within 30 days of today goes there: any detail change to a show that isn't new, a Split or a correction. New now ignores `activePeriod.start` on an entry carrying `changed`, so a Split's new entry reads as Updated, not New. Updated is sky (`#38bdf8`, 4.91:1 worst case). Order: Specials → New → Updated → Featured → Verified → the rest. | Claude Code |
 
 ---
 

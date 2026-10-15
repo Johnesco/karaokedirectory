@@ -47,6 +47,18 @@ decision is recorded as an amendment here or in a superseding ADR.
 - `created: "YYYY-MM-DD"` on the venue and on the schedule entry. Stamped by the curator when the record is added. A Split (ADR-016) carries it forward unless the owner marks the new half as a genuinely new show. For launch, it is reconstructed once from git for records added in the last 30 days. Every older record stays undated, and undated means "not new".
 - `featured: { start?, end? }` on the schedule entry: inclusive, either bound open, the same shape as `activePeriod`. Not allowed on `once` entries.
 
+### Amendment (2026-10-15, #335): an Updated section
+
+The owner added an **Updated** section directly under New:
+Specials → New → **Updated** → Featured → Verified → the rest. New is for
+something *added* (a venue, or a new show at one). Updated is for **any detail
+change to a show that isn't new** within 30 days of today, whether a change on
+a date (an ADR-016 Split) or a correction. It's recorded in the show's
+`changed` date (#329). A Split's new entry starts on the change date, so New
+ignores `activePeriod.start` on an entry carrying `changed`; otherwise every
+change would read as New. Ordering and the one-section-per-show rule are
+unchanged, and each section stays alphabetical.
+
 ## Consequences
 
 - **Good.** Signal (new, featured, recently confirmed) is visible without a click, and the regular schedule stays complete underneath. The grouping is a pure function over the rows `getVenueEventsForDate()` already emits. Filters, search, deduplication and the footer count are untouched.
