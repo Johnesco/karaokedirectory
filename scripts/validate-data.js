@@ -434,13 +434,13 @@ for (const venue of data.listings) {
     for (const entry of venue.schedule || []) {
         const label = `${entry.day || entry.date || '?'} ${entry.startTime || ''}`.trim();
         checkCreatedAfterEnd(entry, `${venue.name} (${venue.id}) ${label}`);
-        // A change takes effect on the new show's first night (#329, ADR-016
-        // Split), so the two dates should agree. A warning: either could be the
-        // one that is wrong, and only the curator can tell.
-        if (entry.changed && entry.changed !== entry.activePeriod?.start) {
+        // A show cannot have changed before it existed (#329). A Split's
+        // `changed` equals the new entry's first night; a later correction moves
+        // it forward. A warning: either date could be the wrong one.
+        if (entry.changed && entry.activePeriod?.start && entry.changed < entry.activePeriod.start) {
             warnings.push(
-                `${venue.name} (${venue.id}) ${label} changed ${entry.changed}, but its first night is ` +
-                `${entry.activePeriod?.start || 'not set'} — a change takes effect on the new show's first night`
+                `${venue.name} (${venue.id}) ${label} changed ${entry.changed}, before its first night ` +
+                `${entry.activePeriod.start} — a show cannot change before it starts`
             );
         }
         // A spent placement (#322, ADR-017): it no longer shows anywhere, so

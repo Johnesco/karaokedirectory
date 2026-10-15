@@ -262,8 +262,8 @@ When adding or modifying venues in `js/data.json`, follow this structure:
         start: "2026-10-15",      // Same shape as activePeriod. Not allowed on "once" entries (already pinned). Validator warns once spent
         end: "2026-10-31"
       },
-      changed: "2026-11-06"       // Optional: the night this version took effect (#329) — only a change on a date (a Split) writes it,
-                                  // never a correction; equals activePeriod.start. Not on "once" entries. The site marks it for 30 days (#335)
+      changed: "2026-11-06"       // Optional: when this show's details last changed (#329) — a Split sets the night it takes effect,
+                                  // a correction the day it was corrected. Not on "once" entries. Listed under Updated for 30 days (#335)
     },
     {
       frequency: "once",      // One-time special event

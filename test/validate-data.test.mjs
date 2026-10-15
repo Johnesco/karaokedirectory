@@ -56,17 +56,20 @@ describe('validate-data: created', () => {
 });
 
 describe('validate-data: changed', () => {
-    it('accepts changed equal to the first night', () => {
-        const r = validate((_, { entry }) => { entry.changed = '2026-11-06'; entry.activePeriod = { start: '2026-11-06' }; });
-        assert.equal(r.code, 0, r.out);
-        assert.doesNotMatch(r.out, /a change takes effect/);
+    it('accepts a change on the first night (a Split) and a later correction', () => {
+        const split = validate((_, { entry }) => { entry.changed = '2026-11-06'; entry.activePeriod = { start: '2026-11-06' }; });
+        assert.equal(split.code, 0, split.out);
+        assert.doesNotMatch(split.out, /cannot change before it starts/);
+        const corrected = validate((_, { entry }) => { entry.changed = '2026-12-01'; entry.activePeriod = { start: '2026-11-06' }; });
+        assert.doesNotMatch(corrected.out, /cannot change before it starts/);
+        const noStart = validate((_, { entry }) => { entry.changed = '2026-10-15'; delete entry.activePeriod; });
+        assert.equal(noStart.code, 0, noStart.out);
+        assert.doesNotMatch(noStart.out, /cannot change before it starts/);
     });
-    it('warns when changed and the first night disagree, or there is no first night', () => {
-        const a = validate((_, { entry }) => { entry.changed = '2026-11-06'; entry.activePeriod = { start: '2026-11-13' }; });
-        assert.equal(a.code, 0, a.out);
-        assert.match(a.out, /changed 2026-11-06, but its first night is 2026-11-13/);
-        const b = validate((_, { entry }) => { entry.changed = '2026-11-06'; delete entry.activePeriod; });
-        assert.match(b.out, /changed 2026-11-06, but its first night is not set/);
+    it('warns when a show changed before its first night', () => {
+        const r = validate((_, { entry }) => { entry.changed = '2026-11-01'; entry.activePeriod = { start: '2026-11-06' }; });
+        assert.equal(r.code, 0, r.out);
+        assert.match(r.out, /changed 2026-11-01, before its first night 2026-11-06/);
     });
     it('fails a malformed date, and changed on a one-time event', () => {
         assert.equal(validate((_, { entry }) => { entry.changed = 'Nov 6'; }).code, 1);
