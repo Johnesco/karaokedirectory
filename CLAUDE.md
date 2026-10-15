@@ -261,7 +261,9 @@ When adding or modifying venues in `js/data.json`, follow this structure:
       featured: {                 // Optional: a featured placement (#322, ADR-017) — true, or a window, inclusive, either bound open.
         start: "2026-10-15",      // Same shape as activePeriod. Not allowed on "once" entries (already pinned). Validator warns once spent
         end: "2026-10-31"
-      }
+      },
+      changed: "2026-11-06"       // Optional: when this show's details last changed (#329) — a Split sets the night it takes effect,
+                                  // a correction the day it was corrected. Not on "once" entries. Listed under Updated for 30 days (#335)
     },
     {
       frequency: "once",      // One-time special event
