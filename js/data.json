@@ -3540,6 +3540,44 @@
       "host": {
         "kjId": "xpider-cantu"
       }
+    },
+    {
+      "id": "roadhouse-bar",
+      "name": "Roadhouse Bar",
+      "created": "2026-10-15",
+      "dedicated": false,
+      "address": {
+        "street": "1103 Wonder Dr.",
+        "city": "Round Rock",
+        "state": "TX",
+        "zip": "78681"
+      },
+      "schedule": [
+        {
+          "frequency": "every",
+          "day": "Wednesday",
+          "startTime": "22:00",
+          "endTime": "02:00",
+          "created": "2026-10-15"
+        },
+        {
+          "frequency": "every",
+          "day": "Saturday",
+          "startTime": "22:00",
+          "endTime": "02:00",
+          "created": "2026-10-15"
+        }
+      ],
+      "socials": {
+        "facebook": "https://www.facebook.com/RoadhouseRR/"
+      },
+      "coordinates": {
+        "lat": 30.517225,
+        "lng": -97.692528
+      },
+      "tags": [
+        "neighborhood"
+      ]
     }
   ]
 }
