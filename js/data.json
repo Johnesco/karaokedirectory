@@ -3531,7 +3531,8 @@
           },
           "host": {
             "kjId": "xpider-cantu"
-          }
+          },
+          "lastVerified": "2026-10-19"
         }
       ],
       "socials": {
@@ -3556,13 +3557,6 @@
         {
           "frequency": "every",
           "day": "Wednesday",
-          "startTime": "22:00",
-          "endTime": "02:00",
-          "created": "2026-10-15"
-        },
-        {
-          "frequency": "every",
-          "day": "Saturday",
           "startTime": "22:00",
           "endTime": "02:00",
           "created": "2026-10-15"
