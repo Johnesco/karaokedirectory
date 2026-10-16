@@ -196,6 +196,9 @@
     },
     "selma-bawdy": {
       "name": "Selma Bawdy"
+    },
+    "dj-rob": {
+      "name": "DJ Rob"
     }
   },
   "companies": {
@@ -257,6 +260,9 @@
     "texas-live-band-karaoke": {
       "name": "Texas Live Band Karaoke",
       "website": "https://www.facebook.com/texaslbk"
+    },
+    "vibehouse-entertainment": {
+      "name": "Vibehouse Entertainment"
     }
   },
   "listings": [
@@ -426,7 +432,8 @@
         }
       ],
       "host": {
-        "kjId": "erin-hierholzer"
+        "kjId": "dj-rob",
+        "companyId": "vibehouse-entertainment"
       },
       "coordinates": {
         "lat": 30.4790993,
@@ -860,7 +867,11 @@
           "frequency": "every",
           "day": "Friday",
           "startTime": "21:00",
-          "endTime": "01:00"
+          "endTime": "01:00",
+          "featured": {
+            "start": "2026-10-16",
+            "end": "2026-10-31"
+          }
         },
         {
           "frequency": "every",
@@ -1763,8 +1774,8 @@
       }
     },
     {
-      "id": "last-call",
-      "name": "Last Call",
+      "id": "last-call-pf-neighborhood-bar",
+      "name": "Last Call PF Neighborhood Bar",
       "tags": [
         "neighborhood"
       ],
@@ -1783,11 +1794,13 @@
           "endTime": "01:00"
         }
       ],
-      "host": null,
-      "socials": null,
       "coordinates": {
         "lat": 30.4565806,
         "lng": -97.6584215
+      },
+      "host": {
+        "kjId": "dj-rob",
+        "companyId": "vibehouse-entertainment"
       }
     },
     {
@@ -3166,7 +3179,8 @@
           "frequency": "every",
           "day": "Thursday",
           "startTime": "19:00",
-          "endTime": "23:00"
+          "endTime": "23:00",
+          "lastVerified": "2026-10-22"
         }
       ],
       "host": {
@@ -3580,6 +3594,78 @@
       "tags": [
         "neighborhood"
       ]
+    },
+    {
+      "id": "halftime-sports-bar-and-grill",
+      "name": "Halftime Sports Bar & Grill",
+      "created": "2026-10-16",
+      "dedicated": false,
+      "address": {
+        "street": "11200 Lakeline Mall Dr., Unit F-18",
+        "city": "Cedar Park",
+        "state": "TX",
+        "zip": "78613"
+      },
+      "schedule": [
+        {
+          "frequency": "every",
+          "day": "Tuesday",
+          "startTime": "20:00",
+          "endTime": "00:00",
+          "host": {
+            "kjId": "dj-rob",
+            "companyId": "vibehouse-entertainment"
+          },
+          "activePeriod": {
+            "start": "2026-10-13"
+          },
+          "created": "2026-10-16"
+        }
+      ],
+      "coordinates": {
+        "lat": 30.470519,
+        "lng": -97.806965
+      },
+      "tags": [
+        "sports-bar"
+      ],
+      "host": {
+        "kjId": "dj-rob",
+        "companyId": "vibehouse-entertainment"
+      }
+    },
+    {
+      "id": "long-branch-saloon",
+      "name": "Long Branch Saloon",
+      "created": "2026-10-16",
+      "dedicated": false,
+      "address": {
+        "street": "107 W. Main St.",
+        "city": "Round Rock",
+        "state": "TX",
+        "zip": "78664"
+      },
+      "schedule": [
+        {
+          "frequency": "every",
+          "day": "Wednesday",
+          "startTime": "20:00",
+          "endTime": "00:00",
+          "host": {
+            "kjId": "dj-rob",
+            "companyId": "vibehouse-entertainment"
+          },
+          "created": "2026-10-16"
+        }
+      ],
+      "coordinates": {
+        "lat": 30.508288,
+        "lng": -97.679054
+      },
+      "host": {
+        "kjId": "dj-rob",
+        "companyId": "vibehouse-entertainment"
+      }
     }
   ]
 }
