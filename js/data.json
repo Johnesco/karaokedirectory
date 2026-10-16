@@ -1633,8 +1633,10 @@
         {
           "frequency": "every",
           "day": "Friday",
-          "startTime": "20:00",
-          "endTime": "23:00"
+          "startTime": "21:00",
+          "endTime": "02:00",
+          "changed": "2026-10-16",
+          "lastVerified": "2026-10-16"
         }
       ],
       "host": {
