@@ -3560,6 +3560,14 @@
           "startTime": "22:00",
           "endTime": "02:00",
           "created": "2026-10-15"
+        },
+        {
+          "frequency": "every",
+          "day": "Saturday",
+          "startTime": "22:00",
+          "endTime": "02:00",
+          "created": "2026-10-16",
+          "lastVerified": "2026-10-17"
         }
       ],
       "socials": {
