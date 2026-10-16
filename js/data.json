@@ -1789,9 +1789,15 @@
       "schedule": [
         {
           "frequency": "every",
-          "day": "Saturday",
+          "day": "Friday",
           "startTime": "21:00",
-          "endTime": "01:00"
+          "endTime": "01:00",
+          "host": {
+            "kjId": "dj-rob",
+            "companyId": "vibehouse-entertainment"
+          },
+          "changed": "2026-10-16",
+          "lastVerified": "2026-10-16"
         }
       ],
       "coordinates": {
