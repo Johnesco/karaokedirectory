@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.67
+**Version:** 1.0.68
 **Last updated:** October 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -1830,6 +1830,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-10 | 1.0.65 | #349: the curator's Posters screen ends every poster one of four ways — Confirm, Park (`posters/_parked/`, returnable), Skip, Delete (`posters/_deleted/`, never removed from disk) — chosen before Submit, with a live "What will change" preview diffing the data since the poster came up. Park/Note only (which kept nothing since #331), Discard and Not a poster are retired. No change to the site or the data shape. |
 | 2026-10 | 1.0.66 | #334: one Publish button. The curator autosaves (Save and Export leave its header; Ctrl+S remains). `publish-data.js` summarises a publish in six groups — Confirmed, Changed, Added, Ended, Removed, Edited — with shows lined up by identity, and a publish while a data PR is open commits to that PR instead of opening another. |
 | 2026-10 | 1.0.67 | Curator, from the first real-world run: #353 adding a show confirms it (`lastVerified` = its first night); #355 one page at a time — saves carry a revision, an older one is refused and other open pages are told to reload, after two open pages erased a published show (PR #354); #357 three screens, Today · Work · Shows, with Work merging Posters and the Form (venue details open in place) and the counts line moved to Today. No change to the site or the data shape. |
+| 2026-10 | 1.0.68 | #359: the curator's **Changes** tab — every unpublished change against `last-published.json`, editable in place (show ✎, Edit venue, Undo changes, Bring it back), with blocking issues (red) and missing-but-optional info (amber) under each venue, and a Publish button that waits for the blockers. The curator's mirror of the repo's rules now also requires a 5-digit ZIP, as the schema does. No change to the site or the data shape. |
 
 ---
 
