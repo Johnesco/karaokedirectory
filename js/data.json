@@ -953,31 +953,41 @@
           "frequency": "every",
           "day": "Monday",
           "startTime": "20:00",
-          "endTime": "01:00"
+          "endTime": "02:00",
+          "changed": "2026-10-17",
+          "lastVerified": "2026-10-19"
         },
         {
           "frequency": "every",
           "day": "Tuesday",
           "startTime": "20:00",
-          "endTime": "01:00"
+          "endTime": "02:00",
+          "changed": "2026-10-17",
+          "lastVerified": "2026-10-20"
         },
         {
           "frequency": "every",
           "day": "Wednesday",
           "startTime": "20:00",
-          "endTime": "01:00"
+          "endTime": "02:00",
+          "changed": "2026-10-17",
+          "lastVerified": "2026-10-21"
         },
         {
           "frequency": "every",
           "day": "Thursday",
           "startTime": "20:00",
-          "endTime": "01:00"
+          "endTime": "02:00",
+          "changed": "2026-10-17",
+          "lastVerified": "2026-10-22"
         },
         {
           "frequency": "every",
           "day": "Friday",
           "startTime": "19:00",
-          "endTime": "01:00"
+          "endTime": "02:00",
+          "changed": "2026-10-17",
+          "lastVerified": "2026-10-23"
         },
         {
           "frequency": "every",
