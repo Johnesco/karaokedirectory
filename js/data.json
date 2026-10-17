@@ -2058,13 +2058,17 @@
           "frequency": "every",
           "day": "Friday",
           "startTime": "20:00",
-          "endTime": "00:00"
+          "endTime": "00:00",
+          "changed": "2026-10-16"
         },
         {
           "frequency": "every",
           "day": "Saturday",
           "startTime": "20:00",
-          "endTime": "00:00"
+          "endTime": "00:00",
+          "activePeriod": {
+            "end": "2026-10-03"
+          }
         }
       ],
       "host": null,
