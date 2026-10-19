@@ -3138,6 +3138,17 @@
           "day": "Tuesday",
           "startTime": "20:00",
           "endTime": "23:00"
+        },
+        {
+          "frequency": "every",
+          "day": "Saturday",
+          "startTime": "20:00",
+          "endTime": "23:00",
+          "host": {
+            "companyId": "party-pipes-karaoke"
+          },
+          "created": "2026-10-18",
+          "lastVerified": "2026-10-24"
         }
       ],
       "host": {
