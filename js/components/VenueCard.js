@@ -148,11 +148,11 @@ export class VenueCard extends Component {
 
     fullTemplate(venue) {
         // Inline-expanded card for the Alphabetical view. Delegates to the same
-        // shared section renderer the modal/pane/map detail use, so the A–Z card
+        // shared section renderer the modal and map detail use, so the A–Z card
         // shows the same facts (per-show hosts, exclusions, upcoming closures,
         // active period). `actions: false` drops the View Map / Directions / Share
         // button row to keep the long A–Z list light — full actions live in the
-        // detail pane/modal opened on click.
+        // modal opened on click.
         // `.venue-card__header` survives here and only here: this is the one
         // template where it holds two children, so its flex row and gap are
         // real. The compact card put a single <h3> inside it, making the flex

@@ -24,8 +24,8 @@
 
 ### 2. Mobile-First Responsive Design
 - Base styles target mobile devices
-- Media queries enhance for larger screens. The scale is **480 / 560 / 768 / 1400**, plus one `min-width: 1024px` rule for the map's docked venue card: 480px stacks schedule tables, 560px splits phone vs phablet nav, 769px+ enables multi-column venue grids, 1400px+ shows the desktop detail pane (see spec §19). `bingo.html` keeps its own game-specific scale.
-- Modal for venue details on mobile, side pane on desktop (1400px+)
+- Media queries enhance for larger screens. The scale is **480 / 560 / 768**, plus one `min-width: 1024px` rule for the map's docked venue card: 480px stacks schedule tables, 560px splits phone vs phablet nav, 769px+ enables multi-column venue grids (see spec §19). Wider screens keep that layout — the 1400px desktop detail pane was removed in #368. `bingo.html` keeps its own game-specific scale.
+- Modal for venue details at every width (the map view uses its own floating card)
 - **Mobile drives the layout; the wider breakpoints inherit** (#224). On `page--edge-to-edge` at ≤768px, `.main-content`'s inline padding is zero and the day-card body's is too, so venue cards run to both screen edges and the venue card's own padding is the page's **single text inset** — day name, venue name and day-card footer count all land on one line. At 769px+ there are two lines, because the day-card body keeps its gutter to carry the multi-column grid. See spec §19 "Density and alignment"
 
 ### 3. Separation of Concerns
@@ -138,8 +138,7 @@ karaokedirectory/
 │   │   ├── DayCard.js     # Daily schedule display (supports search filtering)
 │   │   ├── ExtendedSection.js  # Extended sections (Next Week, Later in Month, Next Month)
 │   │   ├── VenueCard.js   # Venue listing item
-│   │   ├── VenueModal.js  # Mobile venue detail popup
-│   │   ├── VenueDetailPane.js  # Desktop venue detail sidebar
+│   │   ├── VenueModal.js  # Venue detail popup (every width)
 │   │   ├── venue-selection.js  # Shared venue-card click binding
 │   │   └── fabs.js        # Back-to-top + jump-to-today (was an inline script in index.html)
 │   │
@@ -387,7 +386,7 @@ Available tags:
 | `neighborhood` | Neighborhood Bar | Casual neighborhood bar |
 | `special-event` | Special Event | One-time special karaoke events (auto-added on cards for `frequency: "once"` entries) |
 
-Tags are rendered as color-coded badges in VenueCard, VenueModal, VenueDetailPane and MapView using the `renderTags()` function from `js/utils/tags.js`.
+Tags are rendered as color-coded badges in VenueCard, VenueModal and MapView using the `renderTags()` function from `js/utils/tags.js`.
 
 **`dedicated` and `special-event` are derived, not stored.** `renderTags()` prepends the first when `venue.dedicated` is true; `VenueCard` prepends the second when the entry it is rendering is `frequency: "once"`. `renderTags()` deduplicates the result, so listing either in a venue's `tags` no longer renders the badge twice (#208) — but it is still redundant, and `validate-data.js` warns about it. Since ADR-014, `validate-data.js` also warns if a tag definition still carries `color`/`textColor` — those fields are ignored; the palette lives in CSS.
 

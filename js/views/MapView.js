@@ -467,7 +467,7 @@ export class MapView extends Component {
             marker.on('click', (e) => {
                 L.DomEvent.stopPropagation(e);
                 // Emit VENUE_SELECTED so app-level subscribers (URL hash sync,
-                // venue-card highlight) fire. VenueModal/VenueDetailPane skip
+                // venue-card highlight) fire. VenueModal skips
                 // opening when the current view is 'map' — the floating
                 // .map-venue-card is the contextual UI here.
                 emit(Events.VENUE_SELECTED, venue);

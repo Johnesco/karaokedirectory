@@ -82,7 +82,7 @@ function scheduleEntryLabel(entry, { short = false } = {}) {
  *
  * Under the freshness lens (?fresh=1, #259) a Verified column is added too,
  * on the same conditional pattern — so the four surfaces that share this
- * table (modal, desktop pane, map expanded card, A–Z full card) all get it
+ * table (modal, map expanded card, A–Z full card) all get it
  * from one place, and the default page's markup is untouched. It appears only
  * when some show here is verified (#267): an unverified show says nothing,
  * so a venue with nothing verified gets no column at all.
@@ -405,8 +405,7 @@ export function getScheduleContext(venue, schedule, currentDate = null) {
 
 /**
  * Render the full venue-detail sections (location, schedule, host, socials, contact)
- * shared by VenueModal, VenueDetailPane, MapView's expanded card, and the A–Z
- * full card.
+ * shared by VenueModal, MapView's expanded card, and the A–Z full card.
  *
  * Emits ONE block: `.venue-detail__*`. It used to take a `classPrefix` and the
  * four callers passed four different ones, so the same markup came out under
@@ -417,12 +416,12 @@ export function getScheduleContext(venue, schedule, currentDate = null) {
  * Callers put a surface modifier on their OWN wrapper and style the differences
  * through it:
  *
- *   (none)                    modal and desktop pane — the reference treatment
+ *   (none)                    the modal — the reference treatment
  *   .venue-detail--compact    MapView's floating card: tighter, smaller type
  *   .venue-detail--inline     A–Z full card: sits inside a list item
  *
  * Their own wrappers, headers, titles and close buttons stay per-surface — those
- * genuinely differ (modal backdrop vs sticky pane vs floating card) and are not
+ * genuinely differ (modal backdrop vs floating card) and are not
  * this function's markup.
  *
  * @param {Object} venue - Venue data object

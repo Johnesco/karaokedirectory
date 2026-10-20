@@ -105,10 +105,6 @@ export class VenueModal extends Component {
     }
 
     open(venue) {
-        // Don't open modal on wide screens where detail pane is visible
-        if (window.innerWidth >= 1400) {
-            return;
-        }
         // On map view the floating .map-venue-card is the contextual UI;
         // opening the modal would obscure the map.
         if (getState('view') === 'map') {
