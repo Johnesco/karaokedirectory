@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.69
+**Version:** 1.0.70
 **Last updated:** October 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -299,7 +299,7 @@ A card that appears over the map when a marker is selected. Has two states:
 - "Details" button expands the card and shows a back arrow
 - "Back to Summary" returns to compact view
 - Clicking the map background (not a marker or card) dismisses the card
-- **Past one-time events are hidden** — `frequency: "once"` entries dated before today are filtered out of both the summary and detail schedule. Recurring entries always show; the modal/pane surfaces opened from the calendar view still display the full schedule unfiltered.
+- **Past one-time events are hidden** — `frequency: "once"` entries dated before today are filtered out of both the summary and detail schedule. Recurring entries always show; the modal opened from the calendar view still display the full schedule unfiltered.
 - **Sizing:** full-width bottom sheet on mobile; on desktop (≥1024px) a fixed 350px-wide card anchored right (explicit width so it doesn't shrink to its content). The floating "Hide Dedicated" map control and the analytics consent-banner buttons are ≥44px tall (touch targets).
 
 ### Exclusion Dates on the Map
@@ -505,16 +505,15 @@ When debug mode is enabled (`?debug=1`), compact cards show the schedule match r
 
 **File:** `js/components/VenueModal.js`
 
-Full-screen modal overlay for viewing venue details on smaller screens.
+Modal overlay for viewing venue details, at every screen width. Wide screens had a side pane (§8) until #368.
 
 ### When It Opens
 
 The modal opens only when ALL of these conditions are met:
 - A `VENUE_SELECTED` event fires
-- Window width is **less than 1400px**
 - The current view is **not** the map view (map uses its own floating card)
 
-> **Implementation note:** The open guard in VenueModal checks `window.innerWidth < 1400` AND `getState('view') !== 'map'`. Schedule tables, host sections, and active period notices are rendered using shared utilities from `js/utils/render.js` (`renderScheduleTable()`, `renderHostSection()`, `renderActivePeriod()`) — the same functions used by VenueDetailPane and MapView's expanded card.
+> **Implementation note:** The open guard in VenueModal checks `getState('view') !== 'map'`; its `window.innerWidth < 1400` check went with the side pane (#368). Schedule tables, host sections, and active period notices are rendered using shared utilities from `js/utils/render.js` (`renderScheduleTable()`, `renderHostSection()`, `renderActivePeriod()`) — the same functions used by MapView's expanded card.
 
 ### Content Sections
 
@@ -550,34 +549,19 @@ A `MODAL_OPEN` emit on open was removed in #157 - nothing listened for it.
 
 ---
 
-## 8 Venue Detail (Desktop Pane)
+## 8 Venue Detail (Desktop Pane) — removed
 
-**File:** `js/components/VenueDetailPane.js`
+**Removed in #368**, with the 1400px breakpoint. `VenueDetailPane` was a sticky right sidebar shown at 1400px+, with the modal suppressed there. Wide screens now fall back to the 769px+/1024px layout and open the modal (§7) like tablets do. The section number is kept so references to §8 still resolve.
 
-Sticky sidebar on the right side of the screen for wide viewports.
-
-### Display Breakpoint
-
-Visible when window width is **1400px or wider**. Hidden on smaller screens via CSS.
-
-### Content
-
-Same sections as the mobile modal (closure banner, Location, Schedule, Host, Social Media, Contact) — both are built by the shared `renderVenueDetailSections()`, so the "Closed Today" banner and "Upcoming closures" list (§7, §11) appear identically here.
-
-> **Implementation note (#161):** `renderVenueDetailSections()` emits one block, `.venue-detail__*`, on all four surfaces that use it — the mobile modal, this pane, the map's expanded card, and the A–Z full card. Each caller adds `.venue-detail` plus an optional surface modifier to its own wrapper:
+> **Implementation note (#161):** `renderVenueDetailSections()` emits one block, `.venue-detail__*`, on the three surfaces that use it — the modal, the map's expanded card, and the A–Z full card (the desktop pane was a fourth until #368). Each caller adds `.venue-detail` plus an optional surface modifier to its own wrapper:
 >
 > | Surface | Wrapper classes |
 > |---|---|
 > | Mobile modal | `.venue-modal__content venue-detail` |
-> | Desktop pane | `.detail-pane venue-detail venue-detail--pane` |
 > | Map expanded card | `.map-venue-card__detail-content venue-detail venue-detail--compact` |
 > | A–Z full card | `.venue-card--full venue-detail venue-detail--inline` |
 >
 > The renderer previously took a `classPrefix` and the four callers passed four different ones, so the same markup came out under four names and the stylesheet carried a 4×17 matrix to dress them alike. Wrappers, headers, titles and close buttons stay per-surface — those genuinely differ and are not the renderer's markup.
-
-### Empty State
-
-When no venue is selected, shows a microphone icon and the text: "Select a venue to see details, schedule, and host information."
 
 ### State
 
@@ -853,7 +837,7 @@ exclusions: [
 - **Display by surface:**
   - **Weekly calendar** (§2) — dimmed card with a "Closed" banner on the excluded date
   - **Map** (§4) — dimmed marker; "Closed Today: [reason]" banner in the floating card
-  - **Detail modal / desktop pane / map expanded card** (§7, §8) — "Closed Today: [reason]" banner plus an "Upcoming closures" list (next 60 days, e.g. "Jun 20 (Holiday), Jun 27")
+  - **Detail modal / map expanded card** (§7) — "Closed Today: [reason]" banner plus an "Upcoming closures" list (next 60 days, e.g. "Jun 20 (Holiday), Jun 27")
 - Exclusions are **interruptions inside a show's life** — a holiday, a temporary closing. A show's start and end belong in its `activePeriod` ("Show Lifespan" below), not in a run of exclusions. An exclusion outside that window can never apply: it is left out of "Upcoming closures" and the validator warns about it.
 
 ### Show Lifespan
@@ -1421,8 +1405,9 @@ with.
 
 ### Breakpoints
 
-The scale is **480 / 560 / 768 / 1400**, plus one `min-width: 1024px` rule for
-the map's docked venue card.
+The scale is **480 / 560 / 768**, plus one `min-width: 1024px` rule for
+the map's docked venue card. A fourth step, 1400px (the desktop detail pane),
+was removed in #368: wider screens simply keep the 769px+/1024px layout.
 
 | Width | Behavior |
 |-------|----------|
@@ -1431,7 +1416,6 @@ the map's docked venue card.
 | Phablet (561–768px) | Desktop-style labeled navigation with inline search (~115–130px); single column content; tighter main-content gutter below 768px |
 | 769px+ | Venue cards flow into a multi-column grid (`auto-fill, minmax(320px, 1fr)`) inside day/letter cards; labeled nav buttons |
 | 1024px+ | The map's expanded venue card docks right at a fixed 350px instead of a bottom sheet |
-| 1400px+ | Desktop venue detail pane visible alongside main content; mobile modal suppressed |
 
 > **Corrected in #166.** This table used to list a `1200px+` row ("side-by-side
 > layouts where applicable") and describe `1024px+` as "more grid columns as
@@ -1448,12 +1432,11 @@ the map's docked venue card.
 - Haptic feedback in bingo game
 - Touch-friendly tap targets
 
-### Desktop-Specific Behaviors (1400px+)
+### Desktop-Specific Behaviors (769px+)
 
-- Venue detail pane as sticky right sidebar
-- Modal suppressed (pane used instead)
+- Venue details open in the same modal as on mobile
 - Wider cards and multi-column layouts
-- The two-pane `.app-layout` is a fixed-height grid (`calc(100vh - 140px)`) whose list and detail columns each scroll internally. The footer lives **inside the scrolling list column** (not as a body-level sibling) so there is a single scroll context — a body-level footer would overflow the fixed-height layout and produce a second outer scrollbar. Below 1400px the list is plain block flow, so the footer sits at the page bottom as normal.
+- `.main-content` caps at a 1400px max-width, centered. That is a content width, not a breakpoint
 
 ### Map View
 
@@ -1546,8 +1529,8 @@ instead (see State above).
 
 | Event | Constant | Trigger | Emitters | Listeners |
 |-------|----------|---------|----------|-----------|
-| `venue:selected` | `VENUE_SELECTED` | User clicks/selects a venue | `app.js`, `VenueCard`, `MapView`, `venue-selection` | `app.js`, `VenueModal`, `VenueDetailPane` |
-| `venue:closed` | `VENUE_CLOSED` | Venue detail dismissed | `VenueModal` | `app.js`, `VenueDetailPane` |
+| `venue:selected` | `VENUE_SELECTED` | User clicks/selects a venue | `app.js`, `VenueCard`, `MapView`, `venue-selection` | `app.js`, `VenueModal` |
+| `venue:closed` | `VENUE_CLOSED` | Venue detail dismissed | `VenueModal` | `app.js` |
 
 That is the whole bus. Both events have a real emitter *and* a real listener,
 and neither duplicates a state key.
@@ -1594,12 +1577,11 @@ Venue selections are reflected in the URL hash, enabling shareable direct links 
 
 #### Share Button
 
-All three venue detail surfaces include a "Share" button alongside "View Map" and "Directions":
+Both venue detail surfaces include a "Share" button alongside "View Map" and "Directions":
 
 | Surface | Button Class | Location |
 |---------|-------------|----------|
-| Mobile modal (`VenueModal`) | `.venue-modal__share` | Location section map-links |
-| Desktop pane (`VenueDetailPane`) | `.detail-pane__share` | Location section map-links |
+| Modal (`VenueModal`) | `.venue-modal__share` | Location section map-links |
 | Map card (`MapView`) | `.map-venue-card__share` | Expanded details map-links |
 
 **Behavior:**
@@ -1832,6 +1814,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-10 | 1.0.67 | Curator, from the first real-world run: #353 adding a show confirms it (`lastVerified` = its first night); #355 one page at a time — saves carry a revision, an older one is refused and other open pages are told to reload, after two open pages erased a published show (PR #354); #357 three screens, Today · Work · Shows, with Work merging Posters and the Form (venue details open in place) and the counts line moved to Today. No change to the site or the data shape. |
 | 2026-10 | 1.0.68 | #359: the curator's **Changes** tab — every unpublished change against `last-published.json`, editable in place (show ✎, Edit venue, Undo changes, Bring it back), with blocking issues (red) and missing-but-optional info (amber) under each venue, and a Publish button that waits for the blockers. The curator's mirror of the repo's rules now also requires a 5-digit ZIP, as the schema does. No change to the site or the data shape. |
 | 2026-10 | 1.0.69 | #360: the curator's tabs become Today · Venues · Input · Changes · Shows, with one editor drawer for a venue and its shows on every tab (no inline editing anywhere); Venues is the A–Z list and the sidebar goes; Input starts from the source (poster, post or link, call, email, tip) and each Submit writes a private input-log entry to `notes.json`, never published. No change to the site or the data shape. |
+| 2026-10 | 1.0.70 | #368: the 1400px breakpoint is gone, and with it the desktop detail pane (`VenueDetailPane`, the two-pane `.app-layout` grid, `.detail-pane*` styles). Wide screens fall back to the 769px+/1024px layout and open the venue modal at every width; the modal's `innerWidth < 1400` guard is removed. The footer is a plain body-level sibling again. §7, §8 (kept as a removal note), §19, §21 and the share-button table updated. | Claude Code |
 
 ---
 

@@ -473,7 +473,7 @@ init() {
 | `weekStart` | Date | WeeklyView, Navigation | Navigation |
 | `showDedicated` | boolean | All views, Navigation | Navigation, MapView |
 | `searchQuery` | string | All views (via service functions) | Navigation |
-| `selectedVenue` | object/null | — | VenueModal, VenueDetailPane |
+| `selectedVenue` | object/null | — | VenueModal |
 
 ### Gotchas
 
@@ -699,7 +699,7 @@ socials.threads = document.getElementById('social-threads').value.trim() || unde
 
 - Always use CSS variables from `base.css` for colors, spacing, and typography. Don't hardcode values.
 - Mobile-first: write base styles for mobile, then add `@media (min-width: ...)` for larger screens.
-- The project uses four breakpoints: 768px, 1024px, 1200px (editor only), 1400px. Most components only need 768px and 1400px.
+- The scale is 480 / 560 / 768, plus one 1024px rule for the map's docked card (spec §19). Most components only need 768px. There is no wide-desktop step since #368.
 - Check existing components in `components.css` for patterns. Most follow the same structure: block → elements → modifiers → responsive.
 
 ---

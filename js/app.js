@@ -8,7 +8,6 @@ import { on, emit, Events } from './core/events.js';
 import { initVenues, getVenueById } from './services/venues.js';
 import { Navigation } from './components/Navigation.js';
 import { VenueModal } from './components/VenueModal.js';
-import { VenueDetailPane } from './components/VenueDetailPane.js';
 import { WeeklyView } from './views/WeeklyView.js';
 import { AlphabeticalView } from './views/AlphabeticalView.js';
 import { MapView } from './views/MapView.js';
@@ -23,7 +22,6 @@ import { initFabs } from './components/fabs.js';
 // View instances
 let navigation = null;
 let venueModal = null;
-let venueDetailPane = null;
 let currentView = null;
 
 /**
@@ -86,13 +84,9 @@ async function init() {
         new ResizeObserver(updateNavHeight).observe(navContainer);
     }
 
-    // Initialize modal (for mobile/tablet, hidden by default)
+    // Initialize the venue detail modal (every width since #368; hidden by default)
     venueModal = new VenueModal('#venue-modal');
     venueModal.render();
-
-    // Initialize detail pane (for wide screens, shown via CSS)
-    venueDetailPane = new VenueDetailPane('#venue-detail-pane');
-    venueDetailPane.render();
 
     // Handle venue selection highlighting + URL hash sync
     on(Events.VENUE_SELECTED, (venue) => {

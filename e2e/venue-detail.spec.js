@@ -3,7 +3,7 @@ const { test, expect } = require('@playwright/test');
 
 /**
  * Helper: click the venue name button (not the whole card) to reliably trigger
- * the modal/detail-pane. Clicking the whole .venue-card can land on the address
+ * the modal. Clicking the whole .venue-card can land on the address
  * <a> tag, which the WeeklyView click handler intentionally ignores.
  */
 async function openFirstVenue(page) {
@@ -12,7 +12,7 @@ async function openFirstVenue(page) {
   await venueLink.click();
 }
 
-test.describe('Venue detail — modal & detail pane', () => {
+test.describe('Venue detail — modal', () => {
 
   test.describe('Mobile modal (375x812)', () => {
     test.use({ viewport: { width: 375, height: 812 } });
@@ -51,8 +51,7 @@ test.describe('Venue detail — modal & detail pane', () => {
       await expect(page.locator(modalContent)).toBeVisible({ timeout: 5000 });
 
       // Scope to the modal. Since #161 every detail surface emits the same
-      // .venue-detail__ block, so an unscoped locator also matches the
-      // (display:none at this width) desktop pane and trips strict mode.
+      // .venue-detail__ block, so an unscoped locator can match another one.
       const modal = page.locator(modalContent);
       await expect(modal.locator('.venue-detail__address')).toBeVisible();
       // At least 2 sections: Location and Schedule
@@ -96,21 +95,19 @@ test.describe('Venue detail — modal & detail pane', () => {
     });
   });
 
-  test.describe('Desktop detail pane (1400x900)', () => {
-    test.use({ viewport: { width: 1400, height: 900 } });
+  // There is no desktop side pane since #368: wide screens fall back to the
+  // modal, exactly as tablets do.
+  test.describe('Wide desktop (1600x900)', () => {
+    test.use({ viewport: { width: 1600, height: 900 } });
 
-    test('clicking venue populates detail pane', async ({ page }) => {
+    test('clicking venue opens the modal, and no side pane exists', async ({ page }) => {
       await page.goto('/');
       await expect(page.locator('.day-card').first()).toBeVisible({ timeout: 15000 });
 
-      const detailPane = page.locator('#venue-detail-pane');
-
       await openFirstVenue(page);
 
-      // Detail pane should have content
-      await expect(detailPane).not.toBeEmpty();
-      const paneText = await detailPane.textContent();
-      expect(paneText.length).toBeGreaterThan(0);
+      await expect(page.locator('.venue-modal__content')).toBeVisible({ timeout: 5000 });
+      await expect(page.locator('#venue-detail-pane')).toHaveCount(0);
     });
 
     test('venue card gets selected class when clicked', async ({ page }) => {

@@ -25,7 +25,6 @@ graph TD
         DC[DayCard.js]
         VC[VenueCard.js]
         VM[VenueModal.js]
-        VDP[VenueDetailPane.js]
         ES[ExtendedSection.js]
         COMP[Component.js]
     end
@@ -54,7 +53,6 @@ graph TD
     APP --> MV
     APP --> NAV
     APP --> VM
-    APP --> VDP
     APP --> VS
     APP --> STATE
     APP --> EVENTS
@@ -114,12 +112,6 @@ graph TD
     VM --> TAGS
     VM --> RENDER
 
-    VDP --> COMP
-    VDP --> STR
-    VDP --> URL
-    VDP --> EVENTS
-    VDP --> TAGS
-    VDP --> RENDER
 
     ES --> DC
     ES --> DATE
@@ -175,7 +167,6 @@ graph TD
     subgraph Singletons ["Singleton Components (created once)"]
         NAV["Navigation"]
         VM["VenueModal"]
-        VDP["VenueDetailPane"]
     end
 
     subgraph Views ["Views (destroyed/recreated on switch)"]
@@ -201,7 +192,6 @@ graph TD
 
     APP --> NAV
     APP --> VM
-    APP --> VDP
     APP --> WV
     APP --> AV
     APP --> MV
@@ -217,10 +207,6 @@ graph TD
     VM --> RDR
     VM --> RT
 
-    VDP --> RST
-    VDP --> RHS
-    VDP --> RDR
-    VDP --> RT
 
     MV --> RST
     MV --> RHS
@@ -234,14 +220,13 @@ graph TD
     style APP fill:#6366f1,color:#fff
     style NAV fill:#818cf8,color:#fff
     style VM fill:#818cf8,color:#fff
-    style VDP fill:#818cf8,color:#fff
 ```
 
 ### Component Types
 
 | Type | Lifecycle | Examples |
 |------|-----------|---------|
-| **Singleton** | Created once in `app.js init()`, persists for entire session | Navigation, VenueModal, VenueDetailPane |
+| **Singleton** | Created once in `app.js init()`, persists for entire session | Navigation, VenueModal |
 | **View** | Created on view switch, destroyed when switching away | WeeklyView, AlphabeticalView, MapView |
 | **Template helper** | Function that creates a temporary Component instance, calls `template()`, returns HTML string — no persistent state | `renderDayCard()`, `renderVenueCard()`, `renderExtendedSection()` |
 | **Pure function** | Stateless function that returns an HTML string from data | `renderScheduleTable()`, `renderTags()`, `createSocialLinks()` |
@@ -316,8 +301,8 @@ sequenceDiagram
 
 | Event Constant | String | Emitted By | Listened By | Payload |
 |---------------|--------|------------|-------------|---------|
-| `VENUE_SELECTED` | `venue:selected` | app.js, VenueCard, MapView, venue-selection | app.js, VenueModal, VenueDetailPane | venue object |
-| `VENUE_CLOSED` | `venue:closed` | VenueModal | app.js, VenueDetailPane | — |
+| `VENUE_SELECTED` | `venue:selected` | app.js, VenueCard, MapView, venue-selection | app.js, VenueModal | venue object |
+| `VENUE_CLOSED` | `venue:closed` | VenueModal | app.js | — |
 
 Two events, both with a real emitter and a real listener. That is deliberate:
 **state changes belong in `state.js`, not on the bus.** A component that needs
@@ -340,7 +325,6 @@ sequenceDiagram
     participant EventBus as Event Bus
     participant app.js
     participant VenueModal
-    participant VenueDetailPane
 
     User->>VenueCard: Click venue name
     VenueCard->>EventBus: emit(VENUE_SELECTED, venue)
@@ -348,14 +332,9 @@ sequenceDiagram
     EventBus->>app.js: VENUE_SELECTED handler
     app.js->>app.js: Highlight selected card (.venue-card--selected)
 
-    alt Window width < 1400px AND view !== 'map'
+    alt view !== 'map' (any width, #368)
         EventBus->>VenueModal: VENUE_SELECTED handler
         VenueModal->>VenueModal: Show modal with venue data
-    end
-
-    alt Window width >= 1400px
-        EventBus->>VenueDetailPane: VENUE_SELECTED handler
-        VenueDetailPane->>VenueDetailPane: Show venue in sidebar
     end
 
     Note over User: User closes detail view
@@ -363,7 +342,6 @@ sequenceDiagram
     alt Modal was open
         VenueModal->>EventBus: emit(VENUE_CLOSED)
         EventBus->>app.js: Remove .venue-card--selected
-        EventBus->>VenueDetailPane: Clear to empty state
     end
 ```
 
@@ -409,7 +387,7 @@ sequenceDiagram
 | `showDedicated` | boolean | `true` | Navigation, MapView | All views, Navigation | WeeklyView, AlphabeticalView, MapView, Navigation |
 | `searchQuery` | string | `''` | Navigation | All views (via getVenuesForDate/getVenuesSorted) | WeeklyView, AlphabeticalView, MapView |
 | `hostFilter` | string | `''` | Navigation, app.js | Navigation, KJDossierView, router.resolveView | app.js → writeLocation() + renderView() |
-| `selectedVenue` | object/null | `null` | VenueModal, VenueDetailPane | — | — |
+| `selectedVenue` | object/null | `null` | VenueModal | — | — |
 | `isLoading` | boolean | `false` | — | — | — |
 
 `venues`, `filteredVenues`, and `filters` used to head this table with empty
@@ -519,23 +497,20 @@ All variables defined in `base.css`:
 graph LR
     MOBILE["Mobile Base<br/>(default styles)"]
     TABLET["768px<br/>Enhanced spacing"]
-    DESKTOP["1024px<br/>Wider cards"]
-    WIDE["1400px<br/>Dual-pane layout"]
+    DESKTOP["1024px<br/>Docked map card"]
 
-    MOBILE --> TABLET --> DESKTOP --> WIDE
+    MOBILE --> TABLET --> DESKTOP
 
     style MOBILE fill:#ef4444,color:#fff
     style TABLET fill:#f59e0b,color:#fff
     style DESKTOP fill:#10b981,color:#fff
-    style WIDE fill:#6366f1,color:#fff
 ```
 
 | Breakpoint | Key Changes |
 |------------|-------------|
 | **Base** (mobile) | Single column, modal for details, stacked nav |
 | **768px** | Enhanced spacing, horizontal nav layout |
-| **1024px** | Wider cards, more horizontal space |
-| **1400px** | **Major shift** — dual-pane layout. VenueDetailPane sidebar appears. VenueModal suppressed. CSS grid: `1fr 400px` |
+| **1024px** | The map's expanded venue card docks right at 350px. The largest step: wider screens keep this layout and open the modal (the 1400px dual-pane layout was removed in #368) |
 
 ### BEM Naming Convention
 

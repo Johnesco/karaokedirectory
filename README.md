@@ -8,7 +8,7 @@ A mobile-friendly web application for discovering karaoke venues in and around A
 - **Alphabetical Listing** — Browse all 70+ venues sorted A-Z with letter index for quick jumps
 - **Interactive Map** — Full-screen immersive map with floating controls and venue cards (Leaflet.js)
 - **Global Search** — Filter venues by name, city, neighborhood, host, affiliation, or tags across all views
-- **Venue Details** — View addresses, schedules, host/KJ info, and social media links (mobile modal / desktop side pane)
+- **Venue Details** — View addresses, schedules, host/KJ info, and social media links (in a modal)
 - **Venue Tags** — 19 color-coded badges showing venue characteristics (LGBTQ+, 21+, Dive Bar, Live Band, etc.)
 - **Special Events** — One-time karaoke events with specific dates, event names, and event page links
 - **Closure Dates** — Recurring shows can be marked closed on specific dates (holidays, private events), shown with a "Closed" indicator in the Calendar and on the Map

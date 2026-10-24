@@ -67,7 +67,7 @@ export function emit(event, data) {
  *
  * Both of these have a real emitter and a real listener, and neither duplicates
  * a state key. A venue being selected is a one-shot announcement that several
- * unrelated components (modal, detail pane, card highlighting) each act on
+ * unrelated components (modal, card highlighting) each act on
  * differently — that is what a bus is for.
  *
  * Deleted in #157, with the reason each was dead:

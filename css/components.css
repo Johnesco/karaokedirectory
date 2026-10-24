@@ -320,8 +320,8 @@
 
    Two blocks, because two different things end up last. `.venue-card` covers the
    compact calendar card, which is not a `.venue-detail`. `.venue-detail` covers
-   the four surfaces that share the detail markup — scoping this to `.venue-card`
-   alone reached the A-Z inline card and missed the modal, the pane and the map
+   the surfaces that share the detail markup — scoping this to `.venue-card`
+   alone reached the A-Z inline card and missed the modal and the map
    card, which hang `.venue-detail` on a wrapper that is not a card (#226). */
 .venue-card > :last-child,
 .venue-detail > :last-child {
@@ -616,9 +616,7 @@ a.tag:focus-visible {
     margin-bottom: var(--spacing-xs);
 }
 
-/* Shared venue detail styles (modal and side pane) */
-.venue-modal__event-name,
-.detail-pane__event-name {
+.venue-modal__event-name {
     color: var(--color-primary-light);
     font-style: italic;
     margin: 0;
@@ -693,12 +691,11 @@ a.tag:focus-visible {
 /* ===================================================================
    Venue detail block — .venue-detail
    ===================================================================
-   ONE block for the sections renderVenueDetailSections() emits. Four
+   ONE block for the sections renderVenueDetailSections() emits. Three
    surfaces show it, and each puts .venue-detail (plus an optional
    modifier) on its own wrapper:
 
      VenueModal        .venue-modal__content venue-detail
-     VenueDetailPane   .detail-pane venue-detail
      MapView card      .map-venue-card__detail-content venue-detail venue-detail--compact
      A-Z full card     .venue-card--full venue-detail venue-detail--inline
 
@@ -707,7 +704,7 @@ a.tag:focus-visible {
    over — a hand-maintained matrix that had already drifted
    (.venue-card__phone was emitted and styled nowhere).
 
-   The base below IS the modal/pane treatment. Their wrappers, headers,
+   The base below IS the modal treatment. Their wrappers, headers,
    titles and close buttons stay per-surface: those genuinely differ and
    are not this renderer's markup.
    =================================================================== */
@@ -955,15 +952,6 @@ a.tag:focus-visible {
     font-size: var(--font-size-sm);
 }
 
-/* --- .venue-detail--pane : the desktop sidebar ----------------------
-   One difference only: the sidebar is narrow, so the action buttons
-   stack instead of sitting in a row. */
-
-.venue-detail--pane .venue-detail__map-links {
-    flex-direction: column;
-    flex-wrap: nowrap;
-}
-
 /* --- .venue-detail--inline : the A-Z full card ----------------------
    Sits inside a list item rather than its own panel, so the exclusion
    banner bleeds to the card edge and the socials row gets a rule above
@@ -1157,7 +1145,7 @@ a.tag:focus-visible {
     opacity: 0.7;
 }
 
-/* Event URL link in schedule table (modal + detail pane) */
+/* Event URL link in schedule table (modal) */
 .schedule-event-link {
     color: var(--color-primary-light);
     margin-left: var(--spacing-xs);
@@ -1177,50 +1165,6 @@ a.tag:focus-visible {
 .venue-card--selected .venue-card__link {
     color: var(--color-primary-light);
 }
-
-/* Venue Detail Pane (Wide Screen) */
-.detail-pane {
-    padding: var(--spacing-lg);
-    height: 100%;
-}
-
-.detail-pane--empty {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.detail-pane__empty-content {
-    text-align: center;
-    color: var(--text-muted);
-    padding: var(--spacing-xl);
-}
-
-.detail-pane__empty-icon {
-    font-size: var(--font-size-4xl);
-    color: var(--color-gray-500);
-    margin-bottom: var(--spacing-lg);
-}
-
-.detail-pane__empty-text {
-    font-size: var(--font-size-base);
-    line-height: 1.6;
-    max-width: 250px;
-    margin: 0 auto;
-}
-
-.detail-pane__header {
-    margin-bottom: var(--spacing-lg);
-    padding-bottom: var(--spacing-md);
-    border-bottom: 1px solid var(--border-color);
-}
-
-.detail-pane__title {
-    font-size: var(--font-size-xl);
-    margin-bottom: var(--spacing-xs);
-    color: var(--text-primary);
-}
-
 
 /* Mobile overflow prevention */
 @media (max-width: 768px) {
