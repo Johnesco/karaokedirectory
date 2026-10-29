@@ -267,47 +267,6 @@
   },
   "listings": [
     {
-      "id": "sociedad",
-      "name": "Sociedad",
-      "tags": [
-        "restaurant"
-      ],
-      "dedicated": false,
-      "address": {
-        "street": "119 E Main Street",
-        "city": "Round Rock",
-        "state": "TX",
-        "zip": "78664"
-      },
-      "schedule": [
-        {
-          "frequency": "every",
-          "day": "Tuesday",
-          "startTime": "19:30",
-          "endTime": "00:00"
-        },
-        {
-          "frequency": "every",
-          "day": "Wednesday",
-          "startTime": "19:30",
-          "endTime": "00:00"
-        }
-      ],
-      "host": {
-        "companyId": "diamond-karaoke-austin"
-      },
-      "socials": {
-        "facebook": "https://www.facebook.com/AlcoveCantina",
-        "instagram": "https://www.instagram.com/alcovecantinarr/",
-        "twitter": "https://twitter.com/AlcoveCantina",
-        "website": "https://www.alcovecantina.com/"
-      },
-      "coordinates": {
-        "lat": 30.5086031,
-        "lng": -97.6779341
-      }
-    },
-    {
       "id": "the-austin-eagle",
       "name": "The Austin Eagle",
       "tags": [
