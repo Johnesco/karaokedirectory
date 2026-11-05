@@ -152,3 +152,24 @@ describe('sectionReason (#325)', () => {
         assert.equal(sectionReason(venue(), show({ frequency: 'once', date: '2026-10-12' }), opts).key, 'special');
     });
 });
+
+describe('ended shows sort last (#373)', () => {
+    const NOV5 = new Date(2026, 10, 5);
+    const ended = show({ day: 'Thursday', activePeriod: { end: '2026-10-29' }, lastVerified: '2026-10-22', featured: true });
+    const live = show({ day: 'Thursday' });
+
+    it('an ended show is in the ended section, whatever else it qualifies for', () => {
+        assert.equal(sectionOf(venue({ schedule: [ended] }), ended, { date: NOV5, asOf: NOV5 }), 'ended');
+    });
+    it('the ended group comes after the rest, with no heading', () => {
+        const groups = groupShows([
+            { venue: venue({ name: 'A', schedule: [ended] }), schedule: ended },
+            { venue: venue({ name: 'B', schedule: [live] }), schedule: live },
+        ], { date: NOV5, asOf: NOV5 });
+        assert.deepEqual(groups.map(g => g.key), ['rest', 'ended']);
+        assert.equal(groups[1].label, null);
+    });
+    it('debug mode names the last night', () => {
+        assert.match(sectionReason(venue({ schedule: [ended] }), ended, { date: NOV5, asOf: NOV5 }).text, /^Ended: last night Oct 29/);
+    });
+});

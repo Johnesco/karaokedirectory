@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.70
+**Version:** 1.0.71
 **Last updated:** October 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -94,7 +94,8 @@ Every day card groups its shows into sections, in this order. A show sits in **e
 | **Updated** | "Updated" | an existing show's details **changed**: its `changed` (§11) is within a rolling 30 days of today. Covers **any** detail change to a show that isn't new, whether a change on a date (a Split) or a correction (owner decision, #335) |
 | **Featured** | "Featured" | its `featured` is `true`, or a placement window covering **the card's own date**. Test placements only for now (ADR-017) |
 | **Verified** | "Verified" | its `lastVerified` (§11 "Show Verification") is within a rolling 30 days of today. A confirmation for a night still ahead counts |
-| The rest | none | everything else. Always last |
+| The rest | none | everything else |
+| Ended | none | the show has ended (§11 "Show Lifespan", ADR-020). Always last. Each card carries a diagonal **"Ended"** banner across the whole card, over dimmed content, and is not counted in the footer |
 
 - **Both 30-day windows count from today, not from the card's date**, so every card shows the same split. That includes the extended sections (Next Week, Later in Month, Next Month), which render through the same component.
 - **Inside a section, order is alphabetical** (below). Recency, frequency and placement never decide position within a section.
@@ -852,7 +853,8 @@ A recurring schedule entry may carry its own `activePeriod`: the **known first a
 - **Either bound alone, never backfilled.** At least one of `start` / `end`; a missing bound is open. No `start` means "running since before we knew" — the honest reading of every entry that predates the field. The date an entry was added is not the date the show started, so it is never written as one.
 - **A change is an end plus a start; a correction is an edit.** When a show moves nights, changes host or changes time **on a date**, the old entry gets `end` (the day before) and a new entry opens with `start`. When a fact was simply wrong, it is edited in place with no dates. The new entry is a new show: confirmations (`lastVerified`) do not carry across.
 - **Not allowed on `once` entries** — the schema rejects it. A one-time event's date is already its whole life.
-- **No announcement.** Nothing public says "moving to Thursdays" or "starting Oct 15"; the switch simply happens on its date.
+- **Ended shows are labelled** (ADR-020, #373, amending the next point). A recurring show **has ended** when its `end` is before today and no entry at the same venue starts the day after (that is a Split, a change rather than an ending). On the calendar (week and extended sections) every card for it carries a diagonal **"Ended"** banner, including its past nights, and for **14 days after the last night** (`ENDED_GRACE_DAYS`) it keeps appearing, bannered, on the nights it would have run. Then it is gone. Nothing is shown before the end date. `hasEnded()` and `isEndedNight()` in `js/utils/date.js`; `getVenueEventsForDate()` lists the grace nights. Surfaces with no date are unchanged.
+- **No announcement.** Nothing public says "moving to Thursdays", "starting Oct 15" or "ending soon"; a switch simply happens on its date.
   - **Surfaces that ask about a date answer for that date** — the weekly calendar, the extended sections, the map's date filter, `nextOccurrence()` and `lastOccurrenceOnOrBefore()`. The check lives in `scheduleMatchesDate()`, so all of them inherit it. The "Also" line on a calendar card reads other shows as of the card's date (§2).
   - **Surfaces with no date of their own answer for today** — the detail schedule table on all four surfaces, the map card, the "Presented By" section, search's per-show host match, the KJ index and dossier, and the generated `/venue/`, `/kj/` and `/company/` pages. They list shows running today via `activeEntries()`: an ended show is gone, and one that has not started waits for its first night rather than being labelled. This mirrors venue-level `activePeriod`, which the calendar checks for its date and the A–Z and map check for today.
   - **Accepted cost:** during the lookahead the calendar can show the new show while its detail table still lists the old one, because the table knows only today. The card itself names the right night, and the disagreement ends on the switch date.
@@ -1815,6 +1817,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-10 | 1.0.68 | #359: the curator's **Changes** tab — every unpublished change against `last-published.json`, editable in place (show ✎, Edit venue, Undo changes, Bring it back), with blocking issues (red) and missing-but-optional info (amber) under each venue, and a Publish button that waits for the blockers. The curator's mirror of the repo's rules now also requires a 5-digit ZIP, as the schema does. No change to the site or the data shape. |
 | 2026-10 | 1.0.69 | #360: the curator's tabs become Today · Venues · Input · Changes · Shows, with one editor drawer for a venue and its shows on every tab (no inline editing anywhere); Venues is the A–Z list and the sidebar goes; Input starts from the source (poster, post or link, call, email, tip) and each Submit writes a private input-log entry to `notes.json`, never published. No change to the site or the data shape. |
 | 2026-10 | 1.0.70 | #368: the 1400px breakpoint is gone, and with it the desktop detail pane (`VenueDetailPane`, the two-pane `.app-layout` grid, `.detail-pane*` styles). Wide screens fall back to the 769px+/1024px layout and open the venue modal at every width; the modal's `innerWidth < 1400` guard is removed. The footer is a plain body-level sibling again. §7, §8 (kept as a removal note), §19, §21 and the share-button table updated. | Claude Code |
+| 2026-11 | 1.0.71 | #373: an ended show is labelled (ADR-020, amending ADR-016 §4 and Display Philosophy #7). A recurring show past its `activePeriod.end`, with no entry starting the day after, carries a diagonal "Ended" banner on every calendar card, past nights included, and is listed on the nights it would have run for 14 days after its last night. New `ended` day-card section, last and unheaded; not counted in the footer. New `e2e/ended-show.spec.js`. | Claude Code |
 
 ---
 

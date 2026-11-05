@@ -8,7 +8,9 @@
  *   Updated     an existing show's details changed within the last 30 days (#335)
  *   Featured    an owner-set flag on the show (test placements only for now)
  *   Verified    the show's `lastVerified` is within the last 30 days
- *   (the rest)  everything else; no heading, always last
+ *   (the rest)  everything else; no heading
+ *   (ended)     a show past its last night (#373); no heading, always last —
+ *               each card carries its own "Ended" banner
  *
  * A show sits in exactly one section — the first it qualifies for, in the
  * order above — so the footer's venue count needs no change. Inside a section
@@ -24,7 +26,7 @@
  * unit-tested without a DOM (test/sections.test.mjs).
  */
 
-import { daysSince, parseLocalDate, startOfToday, VERIFIED_WINDOW_DAYS, formatDateMonthDay } from './date.js';
+import { hasEnded, daysSince, parseLocalDate, startOfToday, VERIFIED_WINDOW_DAYS, formatDateMonthDay } from './date.js';
 
 /**
  * Both windows — New and Verified — are the one 30-day clock (#330). New uses
@@ -40,6 +42,7 @@ export const SECTIONS = [
     { key: 'featured', label: 'Featured' },
     { key: 'verified', label: 'Verified' },
     { key: 'rest', label: null },
+    { key: 'ended', label: null },
 ];
 
 /**
@@ -135,9 +138,12 @@ export function isFeaturedShow(venue, entry, date) {
  * @param {Object} options
  * @param {Date} options.date - The card's date (for Featured)
  * @param {Date} [options.asOf] - Today (for New and Verified)
- * @returns {'special'|'new'|'updated'|'featured'|'verified'|'rest'}
+ * @returns {'special'|'new'|'updated'|'featured'|'verified'|'rest'|'ended'}
  */
 export function sectionOf(venue, entry, { date, asOf = startOfToday() }) {
+    // Ended first (#373): a show that no longer runs is not New, Verified or
+    // anything else, whatever its dates say.
+    if (hasEnded(entry, venue?.schedule, asOf)) return 'ended';
     if (entry?.frequency === 'once') return 'special';
     if (isNewShow(venue, entry, asOf)) return 'new';
     if (isUpdatedShow(entry, asOf)) return 'updated';
@@ -164,6 +170,8 @@ export function sectionReason(venue, entry, { date, asOf = startOfToday() }) {
     const md = (iso) => formatDateMonthDay(iso, { now: asOf });
 
     if (key === 'special') return { key, text: 'Special: one-time event' };
+
+    if (key === 'ended') return { key, text: `Ended: last night ${md(entry.activePeriod.end)}` };
 
     if (key === 'new') {
         const fromShow = withinWindow(newSince(entry), asOf);

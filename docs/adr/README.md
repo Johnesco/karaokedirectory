@@ -27,3 +27,4 @@ Format and threshold rule: see [sdlc-baseline `docs/adrs.md`](https://github.com
 | [017](017-day-card-sections-and-featured-placement.md) | Day-card sections, and featured placement | Accepted |
 | [018](018-curator-keeps-current-state.md) | The curator keeps current state only | Accepted |
 | [019](019-data-deploys-from-its-own-branch.md) | Venue data deploys from its own branch | Deferred |
+| [020](020-ended-shows-are-labelled.md) | An ended show is labelled "Ended" on the calendar | Accepted |

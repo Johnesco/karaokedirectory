@@ -71,7 +71,7 @@ Daily venues can dominate the calendar and overshadow weekly, bi-weekly, or mont
 The app is designed for someone on their phone asking "where's karaoke tonight?" Quick search, minimal clicks, fast load, no account required.
 
 ### 7. Community-Sourced, Editorially Controlled
-Anyone can submit a venue, but inclusion is curated. The `active` flag allows quiet removal without deleting data. No public archive or "closed" label.
+Anyone can submit a venue, but inclusion is curated. The `active` flag allows quiet removal without deleting data. No public archive. One label, by the owner's decision ([ADR-020](docs/adr/020-ended-shows-are-labelled.md)): a show past its last night is bannered **"Ended"** on the calendar, on its past nights and for 14 days after, then gone.
 
 ### 8. Intentionally Minimal
 No accounts, favorites, history, social features, or personalization. Every visit starts fresh and equal. Features are only added if they serve the core "find karaoke" use case.
@@ -177,7 +177,7 @@ karaokedirectory/
 ├── schema/
 │   └── venue.schema.json  # Authoritative venue schema (ADR-005)
 │
-├── e2e/                   # Playwright specs (16 files) — run by `npm test`, gated in CI
+├── e2e/                   # Playwright specs (17 files) — run by `npm test`, gated in CI
 ├── test/                  # node --test unit specs (12 files: 11 listed by name, plus sections.test.mjs) — run by `npm run test:unit`
 │   ├── date.test.mjs      # Schedule matching, exclusions, lifespans, date ranges
 │   ├── venues.test.mjs    # venuePasses, search predicates, host hydration
@@ -442,7 +442,7 @@ Tags are rendered as color-coded badges in VenueCard, VenueModal and MapView usi
 - Collapse state persists in `localStorage` (`extendedSection_{title}_collapsed`)
 
 ### Day Card Sections (ADR-017, #324)
-Every day card groups its shows: **Specials** (one-time events, no heading) → **New** → **Updated** → **Featured** → **Verified** → **the rest** (no heading). Each show sits in exactly one section, the first it qualifies for, and each section is alphabetical. Empty sections aren't rendered.
+Every day card groups its shows: **Specials** (one-time events, no heading) → **New** → **Updated** → **Featured** → **Verified** → **the rest** (no heading) → **Ended** (no heading; each card carries a diagonal "Ended" banner, ADR-020). Each show sits in exactly one section, the first it qualifies for, and each section is alphabetical. Empty sections aren't rendered.
 - New: something **added**. `created` or `activePeriod.start` (the later), at show or venue level, within 30 days of today; an entry with `changed` ignores its own start. Updated (#335): **any** detail change to a show that isn't new (a Split or a correction), via `changed` within 30 days. Verified: `lastVerified` within 30 days of today. Featured: `featured` is `true` or a window covering the card's date
 - **One clock (#330):** the 30 days is `VERIFIED_WINDOW_DAYS` in `js/utils/date.js`. The Verified section, the `?fresh=1` lens and the validator's stale warning all use it, and all treat day 30 as outside. The validator mirrors the number (it's CommonJS), and `test/validate-data.test.mjs` fails if the two differ
 - The rules are pure functions in `js/utils/sections.js` (`groupShows()`), unit-tested. `DayCard.renderEvents()` renders them. Extended sections get them too
@@ -573,7 +573,7 @@ npm run data:publish      # gates, then open the data PR with auto-merge on (no 
 |---|---|---|
 | `validate:all` | `js/data.json` against `schema/venue.schema.json`, plus cross-row checks and data-quality warnings; CSS load order on all 4 pages | Non-zero exit fails CI. Warnings are informational and do not fail |
 | `test:unit` | `js/utils/date.js`, `js/utils/hosts.js`, and the pure predicates in `js/services/venues.js` | **Pure modules only.** View classes belong to e2e — do not unit test them |
-| `npm test` | Behaviour across all 4 pages, 16 spec files | Starts its own server on **:3456**, so it will not collide with `npm run dev` |
+| `npm test` | Behaviour across all 4 pages, 17 spec files | Starts its own server on **:3456**, so it will not collide with `npm run dev` |
 
 Notes that will bite you otherwise:
 
@@ -700,6 +700,7 @@ Current ADRs:
 - [ADR-015](docs/adr/015-one-confirmation-per-show-date.md) — **One confirmation, anchored to the show date**: a show carries one public date, the night the latest evidence confirms (supersedes the ADR-013 evidence-level addendum)
 - [ADR-016](docs/adr/016-show-lifespan.md) — **A show's lifespan, recorded as it becomes known**: an optional `activePeriod` on the schedule entry, never backfilled; a change is an end plus a start; no announcement; shows 30+ days past their last night are flagged in the curator's "To prune" tab and removed only when the owner asks
 - [ADR-017](docs/adr/017-day-card-sections-and-featured-placement.md) — **Day-card sections, and featured placement**: shows grouped into Specials / New / Featured / Verified / the rest, alphabetical within each; amends Display Philosophy #1; a gate on the first paid placement
+- [ADR-020](docs/adr/020-ended-shows-are-labelled.md) — **An ended show is labelled "Ended" on the calendar**: derived from `activePeriod.end` (a Split's old half excluded), every card bannered including past nights, listed for 14 days after the last night; amends ADR-016 §4 and Display Philosophy #7
 
 ## Security Considerations
 - Always use `escapeHtml()` when rendering user-provided content
