@@ -1,6 +1,6 @@
 # ADR-016: A show's lifespan, recorded as it becomes known
 
-**Status:** Accepted
+**Status:** Accepted. §4 amended by [ADR-020](020-ended-shows-are-labelled.md): an ended show is labelled "Ended" on the calendar
 **Date:** 2026-09-26
 **Tickets:** #288
 **Related:** [ADR-013](013-show-centric-presentation.md) (the show is the unit of presentation) · [ADR-015](015-one-confirmation-per-show-date.md) (a date means the night it is about) · #169 (the 30-day grace for spent one-time events)

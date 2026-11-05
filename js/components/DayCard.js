@@ -14,7 +14,7 @@
 
 import { Component } from './Component.js';
 import { renderVenueCard } from './VenueCard.js';
-import { formatDateShort, isToday, getDayDisplayName, getDayName, getScheduleExclusion } from '../utils/date.js';
+import { formatDateShort, isToday, getDayDisplayName, getDayName, getScheduleExclusion, hasEnded } from '../utils/date.js';
 import { getVenueEventsForDate } from '../services/venues.js';
 import { renderDisclosureButton } from '../utils/disclosure.js';
 import { getState } from '../core/state.js';
@@ -57,10 +57,12 @@ export class DayCard extends Component {
         const allEvents = getVenueEventsForDate(date, { includeDedicated: showDedicated, searchQuery });
         const events = venueIds ? allEvents.filter(e => venueIds.has(e.venue.id)) : allEvents;
         // Footer count is unique venues that are actually open — exclude
-        // venues whose only event today is suppressed by an exclusion.
+        // venues whose only event today is suppressed by an exclusion, or
+        // whose show has ended (#373).
         const openVenueIds = new Set(
             events
                 .filter(e => !getScheduleExclusion(e.schedule, date))
+                .filter(e => !hasEnded(e.schedule, e.venue.schedule))
                 .map(e => e.venue.id)
         );
         const uniqueVenueCount = openVenueIds.size;

@@ -31,7 +31,7 @@
  * second implementation waiting to disagree with the first.
  */
 
-import { scheduleMatchesDate, isActiveOn, activeEntries, getDateRange, parseLocalDate } from '../utils/date.js';
+import { scheduleMatchesDate, isEndedNight, isActiveOn, activeEntries, getDateRange, parseLocalDate } from '../utils/date.js';
 import { getSortableName, containsIgnoreCase } from '../utils/string.js';
 import { getTagConfig } from '../utils/tags.js';
 import { getVenueHosts } from '../utils/render.js';
@@ -348,7 +348,9 @@ export function getVenueEventsForDate(date, options = {}) {
         if (!venuePasses(venue, { date, includeDedicated, searchQuery })) continue;
 
         for (const schedule of venue.schedule) {
-            if (scheduleMatchesDate(schedule, date)) {
+            // An ended show also appears on the nights it would have run for
+            // ENDED_GRACE_DAYS after its last one, bannered "Ended" (#373).
+            if (scheduleMatchesDate(schedule, date) || isEndedNight(schedule, venue.schedule, date)) {
                 events.push({ venue, schedule });
             }
         }

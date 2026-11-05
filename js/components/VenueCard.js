@@ -12,7 +12,7 @@
 
 import { Component } from './Component.js';
 import { escapeHtml } from '../utils/string.js';
-import { formatTimeRange, getScheduleExclusion, isAnnouncedOn } from '../utils/date.js';
+import { formatTimeRange, getScheduleExclusion, isAnnouncedOn, hasEnded } from '../utils/date.js';
 import { buildMapUrl, formatAddress, sanitizeUrl } from '../utils/url.js';
 import { isDebugMode, getDebugHtml } from '../utils/debug.js';
 import { renderFreshness } from '../utils/freshness.js';
@@ -80,6 +80,11 @@ export class VenueCard extends Component {
         const classes = ['venue-card'];
         if (isSpecialEvent) classes.push('venue-card--special-event');
         if (exclusion) classes.push('venue-card--excluded');
+        // Ended (#373): the show is past its last night. Every card for it —
+        // its past nights and the grace nights after — carries one diagonal
+        // banner across the whole card, so nobody mistakes it for a live show.
+        const ended = schedule ? hasEnded(schedule, venue.schedule) : false;
+        if (ended) classes.push('venue-card--ended');
         const cardClass = classes.join(' ');
         const eventName = isSpecialEvent ? (schedule.eventName || 'Special Event') : null;
         const exclusionBanner = exclusion
@@ -113,6 +118,7 @@ export class VenueCard extends Component {
 
         return `
             <div class="${cardClass}" data-venue-id="${escapeHtml(venue.id)}">
+                ${ended ? '<div class="venue-card__ended-banner" role="note"><span>Ended</span></div>' : ''}
                 ${exclusionBanner}
                 ${debugHtml}
                 <h3 class="venue-card__name">

@@ -191,13 +191,72 @@ export function activeEntries(schedule, asOf = startOfToday()) {
  * @returns {boolean} True if schedule applies to date
  */
 export function scheduleMatchesDate(schedule, date) {
-    const { frequency, day } = schedule;
-
     // A show's lifespan (ADR-016): outside its own activePeriod it does not
     // run, whatever its pattern says. Checked here, the single matcher, so the
     // calendar, the extended sections, the map filter, the closure banner and
     // next/lastOccurrence all inherit it.
     if (!isActiveOn(schedule, date)) return false;
+    return patternMatchesDate(schedule, date);
+}
+
+/**
+ * How long an ended show keeps appearing, bannered "Ended", on the nights it
+ * would have run (#373). Counted from the day after its last night.
+ */
+export const ENDED_GRACE_DAYS = 14;
+
+/**
+ * Whether a recurring show has ended (#373): its `activePeriod.end` is before
+ * today, and no entry at the same venue starts the day after. That second
+ * entry is the signature of a Split (ADR-016 §3) — a change on a date, not an
+ * ending — so the old half of a Split is never labelled.
+ * @param {Object} entry - Schedule entry
+ * @param {Object[]} [schedule] - The venue's whole schedule (for the Split check)
+ * @param {Date} [asOf] - Today
+ * @returns {boolean}
+ */
+export function hasEnded(entry, schedule = [], asOf = startOfToday()) {
+    const end = entry?.activePeriod?.end;
+    if (!end || entry.frequency === 'once') return false;
+    const today = new Date(asOf);
+    today.setHours(0, 0, 0, 0);
+    if (parseLocalDate(end) >= today) return false;
+    const dayAfter = parseLocalDate(end);
+    dayAfter.setDate(dayAfter.getDate() + 1);
+    const successorStart = toLocalISO(dayAfter);
+    return !(schedule || []).some(other =>
+        other !== entry && other?.activePeriod?.start === successorStart
+    );
+}
+
+/**
+ * A night an ended show would have run, inside the grace after its last night
+ * (#373). The calendar lists the show on these nights, bannered "Ended", so a
+ * regular looking for it learns it ended rather than finding nothing.
+ * `scheduleMatchesDate` stays false for them: the show does not run.
+ * @param {Object} entry - Schedule entry
+ * @param {Object[]} schedule - The venue's whole schedule
+ * @param {Date} date - The card's date
+ * @param {Date} [asOf] - Today
+ * @returns {boolean}
+ */
+export function isEndedNight(entry, schedule, date, asOf = startOfToday()) {
+    if (!hasEnded(entry, schedule, asOf)) return false;
+    const day = new Date(date);
+    day.setHours(0, 0, 0, 0);
+    const daysAfter = Math.round((day - parseLocalDate(entry.activePeriod.end)) / 86400000);
+    if (daysAfter < 1 || daysAfter > ENDED_GRACE_DAYS) return false;
+    return patternMatchesDate(entry, day);
+}
+
+/**
+ * The recurrence pattern alone, ignoring the lifespan.
+ * @param {Object} schedule - Schedule entry
+ * @param {Date} date
+ * @returns {boolean}
+ */
+function patternMatchesDate(schedule, date) {
+    const { frequency, day } = schedule;
 
     // One-time special event: compare exact date string.
     //

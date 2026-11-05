@@ -1064,6 +1064,41 @@ a.tag:focus-visible {
    (holiday, private event, etc.). Body content is dimmed; the banner stays
    bright to communicate the closure. Card stays in alphabetical position so
    users hunting for the venue still find it. */
+/* Ended card (#373) — a show past its last night. One diagonal band runs
+   corner to corner across the whole card, over dimmed content, so the card
+   cannot be read as a live show at a glance. The band is centred on the card
+   and wider than it (overflow clips the ends), so it spans any card size.
+   pointer-events: none keeps the card itself clickable underneath. */
+.venue-card--ended {
+    position: relative;
+    overflow: hidden;
+}
+
+.venue-card--ended > *:not(.venue-card__ended-banner) {
+    opacity: 0.4;
+}
+
+.venue-card__ended-banner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 150%;
+    transform: translate(-50%, -50%) rotate(-14deg);
+    padding: var(--spacing-xs) 0;
+    /* #b91c1c, not --color-error: white on #ef4444 is 3.8:1, under AA at
+       this size on phones (14px root); this is 6.5:1. */
+    background: #b91c1c;
+    color: var(--color-white);
+    text-align: center;
+    font-size: var(--font-size-xl);
+    font-weight: 800;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    pointer-events: none;
+    z-index: 1;
+}
+
 .venue-card--excluded {
     border-left: 4px solid var(--color-warning);
     background: linear-gradient(135deg, rgba(245, 158, 11, 0.06), transparent);
