@@ -3172,7 +3172,10 @@
           "day": "Thursday",
           "startTime": "19:00",
           "endTime": "23:00",
-          "lastVerified": "2026-10-22"
+          "lastVerified": "2026-10-22",
+          "activePeriod": {
+            "end": "2026-10-29"
+          }
         }
       ],
       "host": {
