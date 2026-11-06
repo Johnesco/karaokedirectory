@@ -28,6 +28,9 @@ function shape(data) {
   const old = isoOf(new Date(today.getFullYear() - 1, today.getMonth(), 1));
 
   for (const v of data.listings) {
+    // Shows whose last night has come (#373, #378) would add an Ended section;
+    // ended-show.spec.js covers those, so this fixture drops them.
+    v.schedule = (v.schedule || []).filter(e => !(e.activePeriod?.end && e.activePeriod.end <= iso));
     delete v.created;
     // A venue opened in the last 30 days would make all its shows New.
     if (v.activePeriod?.start) v.activePeriod.start = v.activePeriod.start < old ? v.activePeriod.start : old;
@@ -125,9 +128,9 @@ test.describe('Day-card sections (ADR-017, #324)', () => {
     test.skip(!picked, 'fewer than five venues have a weekly show today');
     const card = page.locator('.day-card--today');
     const stated = parseInt(await card.locator('.day-card__count').textContent() || '0', 10);
-    const ids = await card.locator('.day-card__section .venue-card').evaluateAll(els => els.map(e => e.dataset.venueId));
-    const closed = await card.locator('.venue-card--excluded').count();
-    if (closed === 0) expect(stated).toBe(new Set(ids).size);
-    else expect(stated).toBeLessThanOrEqual(new Set(ids).size);
+    // Closed and ended cards are listed but not counted (#373, #376).
+    const ids = await card.locator('.day-card__section .venue-card:not(.venue-card--excluded):not(.venue-card--ended)')
+      .evaluateAll(els => els.map(e => e.dataset.venueId));
+    expect(stated).toBe(new Set(ids).size);
   });
 });

@@ -71,7 +71,7 @@ Daily venues can dominate the calendar and overshadow weekly, bi-weekly, or mont
 The app is designed for someone on their phone asking "where's karaoke tonight?" Quick search, minimal clicks, fast load, no account required.
 
 ### 7. Community-Sourced, Editorially Controlled
-Anyone can submit a venue, but inclusion is curated. The `active` flag allows quiet removal without deleting data. No public archive. One label, by the owner's decision ([ADR-020](docs/adr/020-ended-shows-are-labelled.md)): a show past its last night is bannered **"Ended"** on the calendar, on its past nights and for 14 days after, then gone.
+Anyone can submit a venue, but inclusion is curated. The `active` flag allows quiet removal without deleting data. No public archive. One label, by the owner's decision ([ADR-020](docs/adr/020-ended-shows-are-labelled.md)): a show whose last night has arrived is bannered **"Ended"** on the calendar, on its past nights and for 14 days after, then gone. Each card answers for its own night (#378): the nights after a last night entered ahead of time read "Ended" at once, while its own nights read normally until it arrives.
 
 ### 8. Intentionally Minimal
 No accounts, favorites, history, social features, or personalization. Every visit starts fresh and equal. Features are only added if they serve the core "find karaoke" use case.
@@ -700,7 +700,7 @@ Current ADRs:
 - [ADR-015](docs/adr/015-one-confirmation-per-show-date.md) — **One confirmation, anchored to the show date**: a show carries one public date, the night the latest evidence confirms (supersedes the ADR-013 evidence-level addendum)
 - [ADR-016](docs/adr/016-show-lifespan.md) — **A show's lifespan, recorded as it becomes known**: an optional `activePeriod` on the schedule entry, never backfilled; a change is an end plus a start; no announcement; shows 30+ days past their last night are flagged in the curator's "To prune" tab and removed only when the owner asks
 - [ADR-017](docs/adr/017-day-card-sections-and-featured-placement.md) — **Day-card sections, and featured placement**: shows grouped into Specials / New / Featured / Verified / the rest, alphabetical within each; amends Display Philosophy #1; a gate on the first paid placement
-- [ADR-020](docs/adr/020-ended-shows-are-labelled.md) — **An ended show is labelled "Ended" on the calendar**: derived from `activePeriod.end` (a Split's old half excluded), every card bannered including past nights, listed for 14 days after the last night; amends ADR-016 §4 and Display Philosophy #7
+- [ADR-020](docs/adr/020-ended-shows-are-labelled.md) — **An ended show is labelled "Ended" on the calendar**: derived from `activePeriod.end` (a Split's old half excluded), every card bannered including past nights, listed for 14 days after the last night; amends ADR-016 §4 and Display Philosophy #7. Amended by #378: each card answers for its own night, so a last night entered ahead of time banners the nights after it at once
 
 ## Security Considerations
 - Always use `escapeHtml()` when rendering user-provided content

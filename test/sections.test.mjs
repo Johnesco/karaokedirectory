@@ -172,4 +172,10 @@ describe('ended shows sort last (#373)', () => {
     it('debug mode names the last night', () => {
         assert.match(sectionReason(venue({ schedule: [ended] }), ended, { date: NOV5, asOf: NOV5 }).text, /^Ended: last night Oct 29/);
     });
+    it('a last night still ahead (#378): its own nights are not ended, the nights after it are', () => {
+        const ending = show({ day: 'Thursday', activePeriod: { end: '2026-11-12' } });
+        const v = venue({ schedule: [ending] });
+        assert.equal(sectionOf(v, ending, { date: NOV5, asOf: NOV5 }), 'rest');
+        assert.equal(sectionOf(v, ending, { date: new Date(2026, 10, 19), asOf: NOV5 }), 'ended');
+    });
 });

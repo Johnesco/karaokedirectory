@@ -206,21 +206,17 @@ export function scheduleMatchesDate(schedule, date) {
 export const ENDED_GRACE_DAYS = 14;
 
 /**
- * Whether a recurring show has ended (#373): its `activePeriod.end` is before
- * today, and no entry at the same venue starts the day after. That second
- * entry is the signature of a Split (ADR-016 §3) — a change on a date, not an
- * ending — so the old half of a Split is never labelled.
+ * Whether a show has a last night that is an ending (#373): a recurring entry
+ * with `activePeriod.end`, and no entry at the same venue starting the day
+ * after. That second entry is the signature of a Split (ADR-016 §3) — a change
+ * on a date, not an ending — so the old half of a Split is never labelled.
  * @param {Object} entry - Schedule entry
- * @param {Object[]} [schedule] - The venue's whole schedule (for the Split check)
- * @param {Date} [asOf] - Today
+ * @param {Object[]} [schedule] - The venue's whole schedule
  * @returns {boolean}
  */
-export function hasEnded(entry, schedule = [], asOf = startOfToday()) {
+function endsForGood(entry, schedule = []) {
     const end = entry?.activePeriod?.end;
     if (!end || entry.frequency === 'once') return false;
-    const today = new Date(asOf);
-    today.setHours(0, 0, 0, 0);
-    if (parseLocalDate(end) >= today) return false;
     const dayAfter = parseLocalDate(end);
     dayAfter.setDate(dayAfter.getDate() + 1);
     const successorStart = toLocalISO(dayAfter);
@@ -230,23 +226,59 @@ export function hasEnded(entry, schedule = [], asOf = startOfToday()) {
 }
 
 /**
- * A night an ended show would have run, inside the grace after its last night
+ * Whether a show's last night has arrived (#373, #378): it ends for good and
+ * its `activePeriod.end` is today or earlier. From that day every card for it
+ * is bannered "Ended", its past nights included.
+ * @param {Object} entry - Schedule entry
+ * @param {Object[]} [schedule] - The venue's whole schedule (for the Split check)
+ * @param {Date} [asOf] - Today
+ * @returns {boolean}
+ */
+export function hasEnded(entry, schedule = [], asOf = startOfToday()) {
+    if (!endsForGood(entry, schedule)) return false;
+    const today = new Date(asOf);
+    today.setHours(0, 0, 0, 0);
+    return parseLocalDate(entry.activePeriod.end) <= today;
+}
+
+/**
+ * A night a show would have run, inside the grace after its last night
  * (#373). The calendar lists the show on these nights, bannered "Ended", so a
  * regular looking for it learns it ended rather than finding nothing.
+ * Decided by the night alone, not by today (#378): a last night entered ahead
+ * of time bans the nights after it at once.
  * `scheduleMatchesDate` stays false for them: the show does not run.
+ * @param {Object} entry - Schedule entry
+ * @param {Object[]} schedule - The venue's whole schedule
+ * @param {Date} date - The card's date
+ * @returns {boolean}
+ */
+export function isEndedNight(entry, schedule, date) {
+    if (!endsForGood(entry, schedule)) return false;
+    const day = new Date(date);
+    day.setHours(0, 0, 0, 0);
+    const daysAfter = Math.round((day - parseLocalDate(entry.activePeriod.end)) / 86400000);
+    if (daysAfter < 1 || daysAfter > ENDED_GRACE_DAYS) return false;
+    return patternMatchesDate(entry, day);
+}
+
+/**
+ * Whether one card — a show on one night — reads "Ended" (#378). A night after
+ * the last night always does (see isEndedNight); a night up to and including
+ * the last night does once the last night has arrived (see hasEnded). So a
+ * future ending reads normally on the show's own nights and "Ended" after them.
  * @param {Object} entry - Schedule entry
  * @param {Object[]} schedule - The venue's whole schedule
  * @param {Date} date - The card's date
  * @param {Date} [asOf] - Today
  * @returns {boolean}
  */
-export function isEndedNight(entry, schedule, date, asOf = startOfToday()) {
-    if (!hasEnded(entry, schedule, asOf)) return false;
+export function isEndedOn(entry, schedule, date, asOf = startOfToday()) {
+    if (!endsForGood(entry, schedule)) return false;
     const day = new Date(date);
     day.setHours(0, 0, 0, 0);
-    const daysAfter = Math.round((day - parseLocalDate(entry.activePeriod.end)) / 86400000);
-    if (daysAfter < 1 || daysAfter > ENDED_GRACE_DAYS) return false;
-    return patternMatchesDate(entry, day);
+    if (day > parseLocalDate(entry.activePeriod.end)) return isEndedNight(entry, schedule, day);
+    return hasEnded(entry, schedule, asOf);
 }
 
 /**

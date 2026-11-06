@@ -2,8 +2,9 @@
 const { test, expect } = require('@playwright/test');
 
 /**
- * Ended shows (#373): a recurring show past its last night (activePeriod.end
- * before today, and no entry starting the day after) is labelled. Every
+ * Ended shows (#373, #378): a recurring show whose last night has arrived
+ * (activePeriod.end today or earlier, and no entry starting the day after) is
+ * labelled, and the nights after a last night always are. Every
  * calendar card for it carries one diagonal "Ended" banner — its past nights
  * too — and for 14 days after the last night it keeps appearing, bannered, on
  * the nights it would have run.
@@ -13,11 +14,16 @@ const { test, expect } = require('@playwright/test');
  *   - SPLIT: the old half of a Split ended a week ago and the new half started
  *     the next day — a change, not an ending, so no banner anywhere
  *   - LONG: last night three weeks ago, past the grace, so not listed tonight
+ *   - FUTURE (#378): last night a week ahead — reads normally on its own
+ *     nights, and "Ended" on the nights after it already
+ *   - TODAY_END (#378): last night is tonight — it has arrived, so bannered
  */
 
 const ENDED = 'zz-ended-e2e';
 const SPLIT = 'zz-split-e2e';
 const LONG = 'zz-long-ended-e2e';
+const FUTURE = 'zz-future-end-e2e';
+const TODAY_END = 'zz-ends-today-e2e';
 const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 function dayOffset(days) {
@@ -50,6 +56,10 @@ async function serveWithEndedVenues(page) {
         ] },
       { id: LONG, name: 'Aaa Long Ended Test Bar', address,
         schedule: [weekly({ activePeriod: { end: localISO(dayOffset(-21)) } })] },
+      { id: FUTURE, name: 'Aaa Future End Test Bar', address,
+        schedule: [weekly({ activePeriod: { end: localISO(dayOffset(7)) } })] },
+      { id: TODAY_END, name: 'Aaa Ends Today Test Bar', address,
+        schedule: [weekly({ activePeriod: { end: localISO(dayOffset(0)) } })] },
     );
     await route.fulfill({ response, json: data });
   });
@@ -58,7 +68,7 @@ async function serveWithEndedVenues(page) {
 // The week itself, not the extended sections below it (see show-lifespan.spec.js).
 const card = (scope, id) => `.weekly-view > .weekly-view__grid ${scope} .venue-card[data-venue-id="${id}"]`;
 
-test.describe('Ended shows (#373)', () => {
+test.describe('Ended shows (#373, #378)', () => {
 
   test.beforeEach(async ({ page }) => {
     await serveWithEndedVenues(page);
@@ -107,6 +117,23 @@ test.describe('Ended shows (#373)', () => {
     await expect(page.locator(card(`.day-card--${todayName.toLowerCase()}`, ENDED))).toHaveCount(1);
     await page.locator('[data-week="1"]').click(); // +14: end + 21
     await expect(page.locator(card(`.day-card--${todayName.toLowerCase()}`, ENDED))).toHaveCount(0);
+  });
+
+  test('a last night still ahead: its own nights read normally, the nights after read Ended (#378)', async ({ page }) => {
+    const weekday = `.day-card--${todayName.toLowerCase()}`;
+    await expect(page.locator(card('.day-card--today', FUTURE))).toHaveCount(1);
+    await expect(page.locator(`${card('.day-card--today', FUTURE)} .venue-card__ended-banner`)).toHaveCount(0);
+
+    await page.locator('[data-week="1"]').click(); // +7: the last night itself
+    await expect(page.locator(card(weekday, FUTURE))).toHaveCount(1);
+    await expect(page.locator(`${card(weekday, FUTURE)} .venue-card__ended-banner`)).toHaveCount(0);
+
+    await page.locator('[data-week="1"]').click(); // +14: a night after it
+    await expect(page.locator(`${card(weekday, FUTURE)} .venue-card__ended-banner`)).toHaveText('Ended');
+  });
+
+  test('on its last night the show reads Ended: the day has arrived (#378)', async ({ page }) => {
+    await expect(page.locator(`${card('.day-card--today', TODAY_END)} .venue-card__ended-banner`)).toHaveText('Ended');
   });
 
 });

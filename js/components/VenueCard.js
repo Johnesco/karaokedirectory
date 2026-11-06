@@ -12,7 +12,7 @@
 
 import { Component } from './Component.js';
 import { escapeHtml } from '../utils/string.js';
-import { formatTimeRange, getScheduleExclusion, isAnnouncedOn, hasEnded } from '../utils/date.js';
+import { formatTimeRange, getScheduleExclusion, isAnnouncedOn, hasEnded, isEndedOn } from '../utils/date.js';
 import { buildMapUrl, formatAddress, sanitizeUrl } from '../utils/url.js';
 import { isDebugMode, getDebugHtml } from '../utils/debug.js';
 import { renderFreshness } from '../utils/freshness.js';
@@ -80,10 +80,13 @@ export class VenueCard extends Component {
         const classes = ['venue-card'];
         if (isSpecialEvent) classes.push('venue-card--special-event');
         if (exclusion) classes.push('venue-card--excluded');
-        // Ended (#373): the show is past its last night. Every card for it —
-        // its past nights and the grace nights after — carries one diagonal
-        // banner across the whole card, so nobody mistakes it for a live show.
-        const ended = schedule ? hasEnded(schedule, venue.schedule) : false;
+        // Ended (#373, #378): decided per card. A night after the show's last
+        // night always reads "Ended"; its own nights do once the last night
+        // has arrived. One diagonal banner across the whole card, so nobody
+        // mistakes it for a live show. Without a date, whether it has arrived.
+        const ended = !schedule ? false
+            : date ? isEndedOn(schedule, venue.schedule, date)
+            : hasEnded(schedule, venue.schedule);
         if (ended) classes.push('venue-card--ended');
         const cardClass = classes.join(' ');
         const eventName = isSpecialEvent ? (schedule.eventName || 'Special Event') : null;

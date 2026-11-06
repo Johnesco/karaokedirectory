@@ -22,6 +22,7 @@ import {
   scheduleMatchesDate,
   hasEnded,
   isEndedNight,
+  isEndedOn,
   ENDED_GRACE_DAYS,
   getScheduleExclusion,
   getVenueExclusionForDate,
@@ -594,7 +595,7 @@ describe('show lifespan — activePeriod on a schedule entry (ADR-016)', () => {
   });
 });
 
-describe('ended shows — hasEnded / isEndedNight (#373)', () => {
+describe('ended shows — hasEnded / isEndedNight / isEndedOn (#373, #378)', () => {
     // Wildflower's shape: every Thursday, last night Thu Oct 29 2026.
     const TODAY = new Date(2026, 10, 5); // Thu Nov 5
     const thu = { frequency: 'every', day: 'Thursday', startTime: '19:00', activePeriod: { end: '2026-10-29' } };
@@ -602,8 +603,9 @@ describe('ended shows — hasEnded / isEndedNight (#373)', () => {
     it('a show past its last night has ended', () => {
         assert.equal(hasEnded(thu, [thu], TODAY), true);
     });
-    it('on its last night, and before it, it has not', () => {
-        assert.equal(hasEnded(thu, [thu], new Date(2026, 9, 29)), false);
+    it('it has ended on its last night itself (#378), not before', () => {
+        assert.equal(hasEnded(thu, [thu], new Date(2026, 9, 29)), true);
+        assert.equal(hasEnded(thu, [thu], new Date(2026, 9, 28)), false);
         assert.equal(hasEnded(thu, [thu], new Date(2026, 9, 1)), false);
     });
     it('no end, or a one-time event, never ends this way', () => {
@@ -613,22 +615,44 @@ describe('ended shows — hasEnded / isEndedNight (#373)', () => {
     it('the old half of a Split has not ended: a successor starts the day after', () => {
         const next = { frequency: 'every', day: 'Friday', activePeriod: { start: '2026-10-30' } };
         assert.equal(hasEnded(thu, [thu, next], TODAY), false);
+        assert.equal(isEndedNight(thu, [thu, next], new Date(2026, 10, 5)), false);
+        assert.equal(isEndedOn(thu, [thu, next], new Date(2026, 9, 22), TODAY), false);
         const later = { frequency: 'every', day: 'Friday', activePeriod: { start: '2026-11-15' } };
         assert.equal(hasEnded(thu, [thu, later], TODAY), true);
     });
     it('appears on its nights for ENDED_GRACE_DAYS after the last one, and not after', () => {
         assert.equal(ENDED_GRACE_DAYS, 14);
-        assert.equal(isEndedNight(thu, [thu], new Date(2026, 10, 5), TODAY), true);  // +7
-        assert.equal(isEndedNight(thu, [thu], new Date(2026, 10, 12), TODAY), true); // +14
-        assert.equal(isEndedNight(thu, [thu], new Date(2026, 10, 19), TODAY), false); // +21
-        assert.equal(isEndedNight(thu, [thu], new Date(2026, 10, 6), TODAY), false); // a Friday
+        assert.equal(isEndedNight(thu, [thu], new Date(2026, 10, 5)), true);  // +7
+        assert.equal(isEndedNight(thu, [thu], new Date(2026, 10, 12)), true); // +14
+        assert.equal(isEndedNight(thu, [thu], new Date(2026, 10, 19)), false); // +21
+        assert.equal(isEndedNight(thu, [thu], new Date(2026, 10, 6)), false); // a Friday
     });
     it('its own nights are not ended nights — the matcher covers those', () => {
-        assert.equal(isEndedNight(thu, [thu], new Date(2026, 9, 29), TODAY), false);
+        assert.equal(isEndedNight(thu, [thu], new Date(2026, 9, 29)), false);
         assert.equal(scheduleMatchesDate(thu, new Date(2026, 9, 29)), true);
         assert.equal(scheduleMatchesDate(thu, new Date(2026, 10, 5)), false);
     });
-    it('no grace nights before the show has ended', () => {
-        assert.equal(isEndedNight(thu, [thu], new Date(2026, 10, 5), new Date(2026, 9, 28)), false);
+
+    // Alcove's shape (#378): Tue/Wed shows, last night entered as Thu Nov 5.
+    const tue = { frequency: 'every', day: 'Tuesday', activePeriod: { end: '2026-11-05' } };
+    it('a last night still ahead: the nights after it read Ended at once', () => {
+        const before = new Date(2026, 10, 2); // Mon Nov 2
+        assert.equal(isEndedOn(tue, [tue], new Date(2026, 10, 10), before), true);  // +5
+        assert.equal(isEndedOn(tue, [tue], new Date(2026, 10, 17), before), true);  // +12
+        assert.equal(isEndedOn(tue, [tue], new Date(2026, 10, 24), before), false); // +19, past the grace
+    });
+    it('a last night still ahead: its own nights read normally', () => {
+        const before = new Date(2026, 10, 2);
+        assert.equal(isEndedOn(tue, [tue], new Date(2026, 9, 27), before), false);
+        assert.equal(isEndedOn(tue, [tue], new Date(2026, 10, 3), before), false);
+    });
+    it('once the last night arrives, every card reads Ended, the past included', () => {
+        assert.equal(isEndedOn(tue, [tue], new Date(2026, 9, 27), TODAY), true);
+        assert.equal(isEndedOn(tue, [tue], new Date(2026, 10, 3), TODAY), true);
+        assert.equal(isEndedOn(tue, [tue], new Date(2026, 10, 10), TODAY), true);
+    });
+    it('a show with no end never reads Ended', () => {
+        const open = { frequency: 'every', day: 'Tuesday' };
+        assert.equal(isEndedOn(open, [open], new Date(2026, 10, 10), TODAY), false);
     });
 });
