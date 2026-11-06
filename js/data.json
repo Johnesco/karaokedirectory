@@ -3374,14 +3374,20 @@
           "day": "Tuesday",
           "startTime": "19:30",
           "endTime": "00:00",
-          "lastVerified": "2026-10-13"
+          "lastVerified": "2026-10-13",
+          "activePeriod": {
+            "end": "2026-11-05"
+          }
         },
         {
           "frequency": "every",
           "day": "Wednesday",
           "startTime": "19:30",
           "endTime": "00:00",
-          "lastVerified": "2026-10-14"
+          "lastVerified": "2026-10-14",
+          "activePeriod": {
+            "end": "2026-11-05"
+          }
         }
       ],
       "coordinates": {
