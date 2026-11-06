@@ -26,7 +26,7 @@
  * unit-tested without a DOM (test/sections.test.mjs).
  */
 
-import { hasEnded, daysSince, parseLocalDate, startOfToday, VERIFIED_WINDOW_DAYS, formatDateMonthDay } from './date.js';
+import { hasEnded, isEndedOn, daysSince, parseLocalDate, startOfToday, VERIFIED_WINDOW_DAYS, formatDateMonthDay } from './date.js';
 
 /**
  * Both windows — New and Verified — are the one 30-day clock (#330). New uses
@@ -142,8 +142,10 @@ export function isFeaturedShow(venue, entry, date) {
  */
 export function sectionOf(venue, entry, { date, asOf = startOfToday() }) {
     // Ended first (#373): a show that no longer runs is not New, Verified or
-    // anything else, whatever its dates say.
-    if (hasEnded(entry, venue?.schedule, asOf)) return 'ended';
+    // anything else, whatever its dates say. Decided for this card's night
+    // (#378), so a future last night reads normally until it arrives.
+    const ended = date ? isEndedOn(entry, venue?.schedule, date, asOf) : hasEnded(entry, venue?.schedule, asOf);
+    if (ended) return 'ended';
     if (entry?.frequency === 'once') return 'special';
     if (isNewShow(venue, entry, asOf)) return 'new';
     if (isUpdatedShow(entry, asOf)) return 'updated';
