@@ -177,7 +177,7 @@ karaokedirectory/
 ├── schema/
 │   └── venue.schema.json  # Authoritative venue schema (ADR-005)
 │
-├── e2e/                   # Playwright specs (17 files) — run by `npm test`, gated in CI
+├── e2e/                   # Playwright specs (18 files) — run by `npm test`, gated in CI
 ├── test/                  # node --test unit specs (12 files: 11 listed by name, plus sections.test.mjs) — run by `npm run test:unit`
 │   ├── date.test.mjs      # Schedule matching, exclusions, lifespans, date ranges
 │   ├── venues.test.mjs    # venuePasses, search predicates, host hydration
@@ -573,7 +573,7 @@ npm run data:publish      # gates, then open the data PR with auto-merge on (no 
 |---|---|---|
 | `validate:all` | `js/data.json` against `schema/venue.schema.json`, plus cross-row checks and data-quality warnings; CSS load order on all 4 pages | Non-zero exit fails CI. Warnings are informational and do not fail |
 | `test:unit` | `js/utils/date.js`, `js/utils/hosts.js`, and the pure predicates in `js/services/venues.js` | **Pure modules only.** View classes belong to e2e — do not unit test them |
-| `npm test` | Behaviour across all 4 pages, 17 spec files | Starts its own server on **:3456**, so it will not collide with `npm run dev` |
+| `npm test` | Behaviour across all 4 pages, 18 spec files | Starts its own server on **:3456**, so it will not collide with `npm run dev` |
 
 Notes that will bite you otherwise:
 

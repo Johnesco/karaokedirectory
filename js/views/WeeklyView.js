@@ -27,21 +27,23 @@ export class WeeklyView extends Component {
     template() {
         const weekStart = getState('weekStart');
         const searchQuery = getState('searchQuery');
-        const currentWeekStart = getWeekStart(weekStart);
-        const dates = getWeekDates(currentWeekStart);
+        // The week on screen, which is not necessarily the one containing the
+        // current date: the user may have navigated (#380).
+        const viewedWeekStart = getWeekStart(weekStart);
+        const dates = getWeekDates(viewedWeekStart);
 
-        // Render current week. Day cards are direct children of the grid — the
+        // Render the viewed week. Day cards are direct children of the grid — the
         // .weekly-view__day wrapper they used to sit in had no CSS rule anywhere
         // in css/, so it was a DOM level that did nothing (#224).
-        const currentWeekHtml = dates.map(date => renderDayCard(date)).join('');
+        const viewedWeekHtml = dates.map(date => renderDayCard(date)).join('');
 
         // Extended sections (Next Week, This Month, Next Month)
-        const extendedSectionsHtml = this.renderExtendedSections(currentWeekStart, dates);
+        const extendedSectionsHtml = this.renderExtendedSections(viewedWeekStart, dates);
 
         return `
             <div class="weekly-view">
                 <div class="weekly-view__grid">
-                    ${currentWeekHtml}
+                    ${viewedWeekHtml}
                 </div>
                 ${extendedSectionsHtml}
             </div>
@@ -50,18 +52,19 @@ export class WeeklyView extends Component {
 
     /**
      * Render extended sections (Next Week, This Month, Next Month)
-     * @param {Date} currentWeekStart - Start of current week
-     * @param {Date[]} currentWeekDates - Dates in current week
+     * Each section follows the one before it, all anchored on the VIEWED week;
+     * only the third section's 60-day cap counts from the current date (#380).
+     * @param {Date} viewedWeekStart - Sunday of the week on screen
+     * @param {Date[]} viewedWeekDates - Dates of the week on screen
      * @returns {string} HTML for extended sections
      */
-    renderExtendedSections(currentWeekStart, currentWeekDates) {
-        const today = new Date();
+    renderExtendedSections(viewedWeekStart, viewedWeekDates) {
         const showDedicated = getState('showDedicated');
         const searchQuery = getState('searchQuery');
         const seenVenues = new Set();
 
-        // Collect venue IDs from current week (no deduplication for current week)
-        currentWeekDates.forEach(date => {
+        // Collect venue IDs from the viewed week (no deduplication for it)
+        viewedWeekDates.forEach(date => {
             const venues = getVenuesForDate(date, { includeDedicated: showDedicated, searchQuery });
             venues.forEach(v => seenVenues.add(v.id));
         });
@@ -69,7 +72,7 @@ export class WeeklyView extends Component {
         const sections = [];
 
         // Next Week section
-        const nextWeekRange = getNextWeekRange(currentWeekStart);
+        const nextWeekRange = getNextWeekRange(viewedWeekStart);
         sections.push(renderExtendedSection({
             title: 'Next Week',
             startDate: nextWeekRange.start,
@@ -91,8 +94,11 @@ export class WeeklyView extends Component {
             }));
         }
 
-        // Next Month section
-        const nextMonthRange = getNextMonthRange(today, 60);
+        // Next Month section: the month after "Later in [Month]", so the sections
+        // never repeat or reorder a month (#380). Its 60-day cap counts from the
+        // current date, inside getNextMonthRange.
+        const laterInMonthStart = thisMonthRange ? thisMonthRange.start : nextWeekRange.end;
+        const nextMonthRange = getNextMonthRange(laterInMonthStart);
         if (nextMonthRange) {
             const monthName = getMonthName(nextMonthRange.start);
             sections.push(renderExtendedSection({
