@@ -151,20 +151,18 @@ test.describe('Weekly view — calendar behavior', () => {
   });
 
   test('the day-card footer count matches the cards the day actually shows', async ({ page }) => {
-    // The footer counts unique OPEN venues, so a card whose only event is
-    // excluded that day is deliberately not counted. Assert footer <= unique
-    // rendered, and equal whenever nothing is closed.
+    // The footer counts unique OPEN venues: a card whose event is excluded
+    // that day, or whose show has ended (#373), is deliberately not counted.
+    // So the count must equal the unique venues among the other cards.
     const cards = page.locator('.extended-section .day-card');
     for (let i = 0; i < await cards.count(); i++) {
       const card = cards.nth(i);
       const footer = await card.locator('.day-card__count').textContent();
       if (!footer) continue;
       const stated = parseInt(footer, 10);
-      const names = (await card.locator('.venue-card__link').allTextContents()).map((s) => s.trim());
-      const closed = await card.locator('.venue-card--excluded').count();
-      const unique = new Set(names).size;
-      expect(stated).toBeLessThanOrEqual(unique);
-      if (closed === 0) expect(stated).toBe(unique);
+      const open = card.locator('.venue-card:not(.venue-card--excluded):not(.venue-card--ended) .venue-card__link');
+      const names = (await open.allTextContents()).map((s) => s.trim());
+      expect(stated).toBe(new Set(names).size);
     }
   });
 
