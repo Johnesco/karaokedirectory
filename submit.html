@@ -138,9 +138,14 @@
                                     <label>Date <span class="required">*</span></label>
                                     <input type="date" name="date-0">
                                 </div>
-                                <div class="form-group schedule-event-name-group" style="display: none;">
-                                    <label>Event Name</label>
-                                    <input type="text" name="eventName-0" placeholder="e.g., Birthday Bash">
+                                <div class="form-group schedule-next-date-group" style="display: none;">
+                                    <label>Next Date</label>
+                                    <input type="date" name="nextDate-0">
+                                    <small>The next night it runs, so we can confirm the pattern.</small>
+                                </div>
+                                <div class="form-group schedule-event-name-group">
+                                    <label><span class="schedule-event-name-label">Show Name</span></label>
+                                    <input type="text" name="eventName-0" placeholder="Optional">
                                 </div>
                                 <div class="form-group">
                                     <label>Start Time</label>
@@ -153,12 +158,32 @@
                                 <div class="form-group schedule-event-url-group">
                                     <label>Event URL</label>
                                     <input type="url" name="eventUrl-0" inputmode="url" placeholder="https://...">
+                                    <small class="schedule-event-url-hint">A link that stays current (the show's page or the venue's calendar), not one night's event page.</small>
                                 </div>
                             </div>
                         </div>
                         <button type="button" class="btn btn--secondary add-schedule-btn">
                             <i class="fa-solid fa-plus"></i> Add Another Night
                         </button>
+                        <div class="form-row karaoke-scope-row">
+                            <div class="form-group form-group--full">
+                                <label>Is karaoke the whole night?</label>
+                                <div class="radio-group">
+                                    <label class="radio-option">
+                                        <input type="radio" name="karaoke-scope" value="" checked>
+                                        <span>Not sure</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="karaoke-scope" value="whole">
+                                        <span>Yes, karaoke all night</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="karaoke-scope" value="part">
+                                        <span>No, it's part of a bigger show</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </fieldset>
 
                     <fieldset class="form-section">
@@ -244,6 +269,23 @@
                                         <datalist id="known-companies"></datalist>
                                     </div>
                                 </div>
+                                <!-- Shown only when the submitter says they are the KJ / Host (#388).
+                                     Email-only: it tells the curator whose word the submission is. -->
+                                <div class="form-row" id="host-self-row" style="display: none;">
+                                    <div class="form-group form-group--full">
+                                        <label>Are you the KJ named above?</label>
+                                        <div class="radio-group">
+                                            <label class="radio-option">
+                                                <input type="radio" name="host-self" value="yes">
+                                                <span>Yes, that's me</span>
+                                            </label>
+                                            <label class="radio-option">
+                                                <input type="radio" name="host-self" value="no">
+                                                <span>No, someone else hosts</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="form-row">
                                     <div class="form-group form-group--full">
                                         <label for="host-website">KJ / company website</label>
@@ -263,11 +305,11 @@
                                 <div class="form-row">
                                     <div class="form-group">
                                         <label for="venue-facebook"><i class="fa-brands fa-facebook"></i> Facebook</label>
-                                        <input type="url" id="venue-facebook" name="venue-facebook" inputmode="url" placeholder="https://facebook.com/...">
+                                        <input type="url" id="venue-facebook" name="venue-facebook" data-social="facebook" inputmode="url" placeholder="https://facebook.com/...">
                                     </div>
                                     <div class="form-group">
                                         <label for="venue-instagram"><i class="fa-brands fa-instagram"></i> Instagram</label>
-                                        <input type="url" id="venue-instagram" name="venue-instagram" inputmode="url" placeholder="https://instagram.com/...">
+                                        <input type="url" id="venue-instagram" name="venue-instagram" data-social="instagram" inputmode="url" placeholder="https://instagram.com/...">
                                     </div>
                                 </div>
                             </fieldset>
