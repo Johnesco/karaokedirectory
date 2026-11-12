@@ -387,6 +387,10 @@
         "featured": {
           "$ref": "#/$defs/featured"
         },
+        "ticketed": {
+          "type": "boolean",
+          "description": "True when getting into this show needs a ticket (#390). A fact about the show, not the venue, so it is not a tag: the card derives a Ticketed badge from it, the way special-event is derived from a one-time entry. No price is stored; the event link leads to the ticket page. Absent means not known to be ticketed."
+        },
         "changed": {
           "type": "string",
           "format": "date",

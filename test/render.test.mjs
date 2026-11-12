@@ -13,7 +13,7 @@
 import { describe, it, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { resolveHostFor, getVenueHosts, renderHostSection, renderScheduleTable, getScheduleContext } from '../js/utils/render.js';
+import { resolveHostFor, getVenueHosts, renderHostSection, renderScheduleTable, getScheduleContext, renderEventLink } from '../js/utils/render.js';
 import { initFreshLens } from '../js/utils/freshness.js';
 import { hydrateVenues } from '../js/utils/hosts.js';
 
@@ -275,5 +275,35 @@ describe('show lifespan on date-less surfaces (ADR-016)', () => {
     // A card after it mentions the new show, not the ended one.
     assert.match(getScheduleContext(venue, running, after).moreText, /Sat/);
     assert.doesNotMatch(getScheduleContext(venue, running, after).moreText, /Tue/);
+  });
+});
+
+describe('renderEventLink — a ticketed show reads as tickets (#390)', () => {
+  const url = 'https://example.com/show';
+
+  it('is an "Event page" link for an ordinary show, and nothing without a link', () => {
+    const html = renderEventLink({ eventUrl: url });
+    assert.match(html, /title="Event page"/);
+    assert.match(html, /fa-arrow-up-right-from-square/);
+    assert.equal(renderEventLink({}), '');
+  });
+
+  it('is a "Tickets" link with the ticket icon when the show is ticketed', () => {
+    const html = renderEventLink({ eventUrl: url, ticketed: true });
+    assert.ok(html.includes(`href="${url}"`));
+    assert.match(html, /title="Tickets"/);
+    assert.match(html, /fa-ticket/);
+    assert.doesNotMatch(html, /fa-arrow-up-right-from-square/);
+  });
+
+  it('still marks a ticketed show that has no link', () => {
+    const html = renderEventLink({ ticketed: true });
+    assert.doesNotMatch(html, /<a /);
+    assert.match(html, /title="Ticketed"/);
+  });
+
+  it('reaches the detail schedule table', () => {
+    const html = renderScheduleTable({ schedule: [{ frequency: 'every', day: 'Friday', startTime: '21:00', endTime: '01:00', eventUrl: url, ticketed: true }] });
+    assert.match(html, /title="Tickets"/);
   });
 });

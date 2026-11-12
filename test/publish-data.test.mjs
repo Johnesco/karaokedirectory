@@ -204,3 +204,12 @@ describe('prBody', () => {
     assert.match(body, /merges\s+itself/);
   });
 });
+
+describe('summarizeDiff — the ticketed flag (#390)', () => {
+  it('lists a show whose flag was set or cleared as edited, naming the field', () => {
+    const plain = data(venue('a', { name: 'A' }));
+    const ticketed = data(venue('a', { name: 'A', schedule: [show({ ticketed: true })] }));
+    assert.deepEqual(summarizeDiff(plain, ticketed).edited, ['A, Every Friday 9 PM — ticketed']);
+    assert.deepEqual(summarizeDiff(ticketed, plain).edited, ['A, Every Friday 9 PM — ticketed']);
+  });
+});

@@ -94,10 +94,21 @@ export class VenueCard extends Component {
             ? `<div class="venue-card__exclusion-banner"><i class="fa-solid fa-ban"></i> Closed${exclusion.reason ? `: ${escapeHtml(exclusion.reason)}` : ' tonight'}</div>`
             : '';
 
-        // Build tag list, injecting 'special-event' tag for one-time events
-        const tags = isSpecialEvent
-            ? ['special-event', ...(venue.tags || [])]
+        // Build tag list, injecting the tags derived from THIS show: the
+        // 'special-event' tag for one-time events, then 'ticketed' when the
+        // show needs a ticket (#390). Both are facts about the show, not the
+        // venue, so neither is stored in venue.tags.
+        const isTicketed = Boolean(schedule?.ticketed);
+        const derivedTags = [
+            ...(isSpecialEvent ? ['special-event'] : []),
+            ...(isTicketed ? ['ticketed'] : []),
+        ];
+        const tags = derivedTags.length
+            ? [...derivedTags, ...(venue.tags || [])]
             : venue.tags;
+        // A ticketed show's event link is where the tickets are.
+        const linkTitle = isTicketed ? 'Tickets' : 'Event page';
+        const linkIcon = isTicketed ? 'fa-ticket' : 'fa-arrow-up-right-from-square';
 
         // Schedule context: frequency label + "+N more" indicator (HTML-ready).
         // Passes the render date so the "Also" list can exclude same-day entries
@@ -130,12 +141,12 @@ export class VenueCard extends Component {
                     </button>
                 </h3>
                 ${renderTags(tags, { dedicated: venue.dedicated })}
-                ${eventName ? `<div class="venue-card__event-name"><i class="fa-solid fa-star"></i> ${schedule?.eventUrl ? `<a href="${escapeHtml(sanitizeUrl(schedule.eventUrl) || '')}" target="_blank" rel="noopener noreferrer" class="venue-card__event-link">${escapeHtml(eventName)} <i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : escapeHtml(eventName)}</div>` : ''}
+                ${eventName ? `<div class="venue-card__event-name"><i class="fa-solid fa-star"></i> ${schedule?.eventUrl ? `<a href="${escapeHtml(sanitizeUrl(schedule.eventUrl) || '')}" target="_blank" rel="noopener noreferrer" class="venue-card__event-link" title="${linkTitle}">${escapeHtml(eventName)} <i class="fa-solid ${linkIcon}"></i></a>` : escapeHtml(eventName)}</div>` : ''}
                 ${announced ? '<div class="venue-card__announced" title="Confirmed for this night"><i class="fa-solid fa-bullhorn"></i> Announced</div>' : ''}
                 ${showSchedule && timeDisplay ? `
                     <div class="venue-card__time">
                         <i class="fa-regular fa-clock"></i> ${frequencyHtml}${timeDisplay}
-                        ${!eventName && schedule?.eventUrl ? `<a href="${escapeHtml(sanitizeUrl(schedule.eventUrl) || '')}" target="_blank" rel="noopener noreferrer" class="venue-card__event-link" title="Event page"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : ''}
+                        ${!eventName && schedule?.eventUrl ? `<a href="${escapeHtml(sanitizeUrl(schedule.eventUrl) || '')}" target="_blank" rel="noopener noreferrer" class="venue-card__event-link" title="${linkTitle}"><i class="fa-solid ${linkIcon}"></i></a>` : ''}
                     </div>
                 ` : ''}
                 ${showSchedule ? moreNightsHtml : ''}
