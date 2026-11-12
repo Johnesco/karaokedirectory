@@ -130,17 +130,32 @@
     "dan-desetto": {
       "name": "Dan DeSetto"
     },
+    "deb-o-rah": {
+      "name": "DEB-O-RAH"
+    },
     "dj-cysum-and-mo": {
       "name": "DJ Cysum & Mo"
+    },
+    "dj-garfunkle-fits": {
+      "name": "DJ Garfunkle Fits"
     },
     "dj-pnasty": {
       "name": "DJ P'Nasty"
     },
+    "dj-rob": {
+      "name": "DJ Rob"
+    },
     "erin-hierholzer": {
       "name": "Erin Hierholzer"
     },
+    "gi-james": {
+      "name": "GI James"
+    },
     "ill-will": {
       "name": "Ill Will"
+    },
+    "isaac-moreno": {
+      "name": "Isaac Moreno"
     },
     "jason-lynum": {
       "name": "Jason Lynum"
@@ -175,6 +190,9 @@
     "murrah": {
       "name": "Murrah"
     },
+    "selma-bawdy": {
+      "name": "Selma Bawdy"
+    },
     "shelly-dowdy": {
       "name": "Shelly Dowdy"
     },
@@ -184,21 +202,6 @@
     "xpider-cantu": {
       "name": "Xpider Cantu",
       "website": "https://www.xpidermagic.com/karaoke"
-    },
-    "isaac-moreno": {
-      "name": "Isaac Moreno"
-    },
-    "deb-o-rah": {
-      "name": "DEB-O-RAH"
-    },
-    "gi-james": {
-      "name": "GI James"
-    },
-    "selma-bawdy": {
-      "name": "Selma Bawdy"
-    },
-    "dj-rob": {
-      "name": "DJ Rob"
     }
   },
   "companies": {
@@ -887,6 +890,46 @@
         "lat": 30.6524055,
         "lng": -97.6759384
       }
+    },
+    {
+      "id": "coldtowne-theater",
+      "name": "ColdTowne Theater",
+      "created": "2026-11-12",
+      "dedicated": false,
+      "address": {
+        "street": "1700 E 2nd St",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78702"
+      },
+      "schedule": [
+        {
+          "frequency": "once",
+          "date": "2026-11-28",
+          "startTime": "22:00",
+          "endTime": "23:45",
+          "eventName": "ON AIR! with 101.2 FKRD: Immersive Karaoke Experience",
+          "eventUrl": "https://coldtownetheater.com/show/on-air-with-101-2-fkrd-2026-11-28/",
+          "host": {
+            "kjId": "dj-garfunkle-fits"
+          },
+          "created": "2026-11-12",
+          "lastVerified": "2026-11-28",
+          "ticketed": true
+        }
+      ],
+      "coordinates": {
+        "lat": 30.258914,
+        "lng": -97.72578
+      },
+      "socials": {
+        "website": "https://coldtownetheater.com/",
+        "facebook": "https://www.facebook.com/ColdTowne",
+        "instagram": "https://www.instagram.com/coldtownetheater/",
+        "twitter": "https://twitter.com/coldtowne",
+        "youtube": "https://www.youtube.com/channel/UCiTkppNTNY0g2oQha-acSIw"
+      },
+      "phone": "512-814-8696"
     },
     {
       "id": "the-common-interest",
