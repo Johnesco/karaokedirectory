@@ -32,6 +32,9 @@ test.describe('Ticketed badge', () => {
     await page.route('**/js/data.json', async (route) => {
       const response = await route.fetch();
       const data = await response.json();
+      // Clear whatever the directory really lists as ticketed (#393): the
+      // "no other venue" assertion below must not depend on live data.
+      for (const venue of data.listings) for (const entry of venue.schedule) delete entry.ticketed;
       picked = pickCandidate(data);
       if (picked) {
         const entry = data.listings.find(v => v.id === picked.venueId).schedule[picked.idx];
