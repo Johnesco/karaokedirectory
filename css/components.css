@@ -484,6 +484,8 @@
 .tag[data-tag="craft-cocktails"] { background: #e6175d; color: #fff; }
 .tag[data-tag="neighborhood"] { background: #9e9e9e; color: #1f2937; }
 .tag[data-tag="special-event"] { background: #e6175d; color: #ffffff; }
+/* Derived from a show's `ticketed` flag (#390); its label lives in tags.js. */
+.tag[data-tag="ticketed"] { background: #0f766e; color: #ffffff; }
 
 /* Hover/focus land on every tag, anchor or not, so wiring a destination later
    (a future `?tag=` link — ADR-011) needs no new component. Nothing is linked

@@ -10,6 +10,16 @@ import { html } from './string.js';
 let tagConfig = {};
 
 /**
+ * Labels for tags that are derived from a show and never stored, so they have
+ * no entry in the data file's tagDefinitions. `ticketed` (#390) is derived
+ * from a schedule entry's `ticketed` flag by VenueCard. A definition in the
+ * data, if one is ever added, wins.
+ */
+const DERIVED_TAG_LABELS = {
+    ticketed: { label: 'Ticketed' },
+};
+
+/**
  * Initialize tag configuration from data.
  *
  * This used to also inject a stylesheet built from the definitions' colour
@@ -42,7 +52,7 @@ export function initTagConfig(definitions) {
  * @returns {string} HTML string, or '' when the tag has no definition
  */
 export function renderTagBadge(tagId, { href } = {}) {
-    const config = tagConfig[tagId];
+    const config = tagConfig[tagId] || DERIVED_TAG_LABELS[tagId];
     if (!config) return '';
 
     return href
@@ -53,9 +63,10 @@ export function renderTagBadge(tagId, { href } = {}) {
 /**
  * Render tags as HTML badges.
  *
- * Two tags are **derived** rather than stored, and are prepended by whoever
- * knows the condition: `dedicated` here, and `special-event` by VenueCard when
- * the entry it is rendering is a one-time show. Neither prepend can know
+ * Three tags are **derived** rather than stored, and are prepended by whoever
+ * knows the condition: `dedicated` here, and by VenueCard `special-event` when
+ * the entry it is rendering is a one-time show and `ticketed` when that entry
+ * is flagged `ticketed` (#390). No prepend can know
  * whether the venue also lists that tag in its own `tags`, so the list is
  * deduplicated here — the one funnel every surface renders through.
  *
@@ -91,5 +102,5 @@ export function renderTags(tags, options = {}) {
  * @returns {Object|null} Tag configuration or null if not found
  */
 export function getTagConfig(tagId) {
-    return tagConfig[tagId] || null;
+    return tagConfig[tagId] || DERIVED_TAG_LABELS[tagId] || null;
 }

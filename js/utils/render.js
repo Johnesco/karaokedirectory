@@ -104,9 +104,7 @@ export function renderScheduleTable(venue) {
         const formatted = formatScheduleEntry(entry, { showEvery: true });
         const dayLabel = scheduleEntryLabel(entry);
 
-        const eventLink = entry.eventUrl
-            ? ` <a href="${escapeHtml(sanitizeUrl(entry.eventUrl) || '')}" target="_blank" rel="noopener noreferrer" class="schedule-event-link" title="Event page"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>`
-            : '';
+        const eventLink = renderEventLink(entry);
 
         const hostCell = showHostColumn
             ? `<td data-label="Host">${escapeHtml(formatHostDisplay(resolveHostFor(venue, entry)))}</td>`
@@ -148,6 +146,29 @@ export function renderScheduleTable(venue) {
 }
 
 /**
+ * The link (or marker) that follows a show in a schedule list.
+ *
+ * A ticketed show (#390) reads as tickets: its event link takes the ticket
+ * icon and the title "Tickets", and a ticketed show with no link still gets
+ * the icon, so the fact is visible wherever the show is listed. Any other
+ * show keeps the plain "Event page" link, or nothing.
+ *
+ * @param {Object} entry - Schedule entry
+ * @returns {string} HTML string with a leading space, or ''
+ */
+export function renderEventLink(entry) {
+    const ticketed = Boolean(entry?.ticketed);
+    if (entry?.eventUrl) {
+        const title = ticketed ? 'Tickets' : 'Event page';
+        const icon = ticketed ? 'fa-ticket' : 'fa-arrow-up-right-from-square';
+        return ` <a href="${escapeHtml(sanitizeUrl(entry.eventUrl) || '')}" target="_blank" rel="noopener noreferrer" class="schedule-event-link" title="${title}"><i class="fa-solid ${icon}"></i></a>`;
+    }
+    return ticketed
+        ? ' <span class="schedule-event-link schedule-event-link--ticketed" title="Ticketed"><i class="fa-solid fa-ticket" aria-hidden="true"></i><span class="sr-only">Ticketed</span></span>'
+        : '';
+}
+
+/**
  * Render a compact schedule list (div per entry, no table) for summary cards.
  * Used by MapView's marker-popup card where a table would be too heavy.
  * @param {Object[]} schedule - Array of schedule entries
@@ -158,9 +179,7 @@ export function renderScheduleCompact(schedule) {
     if (live.length === 0) return '';
     return live.map(entry => {
         const { fullText } = formatScheduleEntry(entry, { showEvery: false });
-        const eventLink = entry.eventUrl
-            ? ` <a href="${escapeHtml(sanitizeUrl(entry.eventUrl) || '')}" target="_blank" rel="noopener noreferrer" class="schedule-event-link" title="Event page"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>`
-            : '';
+        const eventLink = renderEventLink(entry);
         return `<div>${fullText}${eventLink}</div>`;
     }).join('');
 }

@@ -106,3 +106,22 @@ describe('getTagConfig', () => {
         assert.equal(getTagConfig('nope'), null);
     });
 });
+
+describe('ticketed — a derived tag with no definition in the data (#390)', () => {
+    it('renders with its built-in label although tagDefinitions has no entry', () => {
+        assert.equal(DEFS.ticketed, undefined);
+        const out = renderTagBadge('ticketed');
+        assert.match(out, /data-tag="ticketed"/);
+        assert.match(out, />Ticketed</);
+        assert.equal(getTagConfig('ticketed').label, 'Ticketed');
+    });
+
+    it('keeps the order VenueCard hands over: special-event, ticketed, then the venue tags', () => {
+        const out = renderTags(['special-event', 'ticketed', 'lgbtq']);
+        assert.deepEqual(renderedTags(out), ['special-event', 'ticketed', 'lgbtq']);
+    });
+
+    it('still renders nothing for an id that is neither defined nor derived', () => {
+        assert.equal(renderTagBadge('no-such-tag'), '');
+    });
+});

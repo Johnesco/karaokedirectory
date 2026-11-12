@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.72
+**Version:** 1.0.74
 **Last updated:** October 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -461,6 +461,7 @@ Used in: Weekly Calendar day cards, Map floating card summary.
 Displays:
 - **Venue name** — clickable button
 - **Special event indicator** — star icon + event name (for `frequency: "once"` events). If `eventUrl` is set, event name is a link. Adds `.venue-card--special-event` class and injects `special-event` tag.
+- **Ticketed indicator** (#390) — a show whose entry has `ticketed: true` gets a derived **Ticketed** badge in the tag row, after Special Event and before the venue's own tags. Its event link, when it has one, carries the ticket icon and the title "Tickets" in place of "Event page". Recurring and one-time shows alike; a show without the flag is unchanged.
 - **Announced marker** (ADR-015, #275) — bullhorn icon + "Announced", styled like the event-name line (`.venue-card__announced`), on the card for the night the show's `lastVerified` names. Since that field *is* the confirmed night, the test is a date equality (`isAnnouncedOn()` in `js/utils/date.js`) with no evidence level to consult and no special case for one-time shows. The one per-occurrence signal besides the star, and public for every visitor by decision — "this one is confirmed for tonight" is what a calendar is for. Per occurrence, not per entry: the same show's other nights stay plain until something confirms them (§11 "Show Verification").
 - **Frequency + time** — clock icon + frequency label + time range. Format: "Every Friday · 9:00 PM - 1:00 AM" or "First Saturday · 9:00 PM - 1:00 AM". Frequency label is wrapped in `.venue-card__frequency` span with muted color. Skipped for `frequency: "once"` events (they already have event name line). If `eventUrl` is set (and not already shown as special event link), shows arrow link icon.
 - **Additional schedule indicator** — Shows which other days/dates a venue has karaoke, replacing the old "+N more" count. Format depends on schedule composition:
@@ -722,6 +723,7 @@ The shape `{ tagDefinitions, listings }` is the contract — both the local file
       lastVerified      string        OPTIONAL  "YYYY-MM-DD" — the show date the latest evidence confirms; may be in the future (see "Show Verification")
       created           string        OPTIONAL  "YYYY-MM-DD" — the day this show was added (see "Created and Featured")
       featured          true|object   OPTIONAL  A featured placement — true, or { start?, end? }, at least one (see "Created and Featured")
+      ticketed          boolean       OPTIONAL  True when getting in needs a ticket (#390). Drives the derived Ticketed badge; no price is stored
       changed           string        OPTIONAL  "YYYY-MM-DD" — when the show's details last changed (a Split or a correction); see "Created, Changed and Featured"
 
     One-time entry (no activePeriod — its date is its whole life):
@@ -1008,12 +1010,15 @@ Tags render as color-coded inline badges using `renderTags(tags, options)` from 
 
 #### Derived tags
 
-Two tags are **derived at render time** rather than stored, each prepended by whichever module knows the condition:
+Three tags are **derived at render time** rather than stored, each prepended by whichever module knows the condition:
 
 | Tag | Prepended by | When |
 |---|---|---|
 | `dedicated` | `renderTags()` | `venue.dedicated === true` |
 | `special-event` | `VenueCard` (compact card) | the entry being rendered is `frequency: "once"` |
+| `ticketed` | `VenueCard` (compact card) | the entry being rendered has `ticketed: true` (#390) |
+
+**`ticketed` has no entry in `tagDefinitions`.** It is a fact about a show, never a tag a venue can carry, so its label ("Ticketed") lives in `DERIVED_TAG_LABELS` in `js/utils/tags.js` and its colour is an authored rule like any other (ADR-014). A venue listing `ticketed` in its own `tags` fails validation as an unknown tag. No price is stored: prices and fees drift, and the event link leads to the ticket page. The detail schedule table and the map card's schedule list mark the same shows through `renderEventLink()` — a "Tickets" link, or a bare ticket icon when the show has no link — and generated entity pages add `isAccessibleForFree: false` to the event's JSON-LD. An unflagged show makes no claim either way.
 
 **`renderTags()` deduplicates the final list**, first occurrence winning, so a derived tag keeps its leading position. Neither prepend can see whether the venue *also* lists that id in its own `tags`, and one did: `austin-deaf-club` stored `special-event` while its only show is a `once` entry, so its card rendered `Special Event · LGBTQ+ · Special Event` (#208). The equivalent `dedicated` collision was latent — no venue sets the flag and lists the tag, but nothing prevented it.
 
@@ -1822,6 +1827,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-10 | 1.0.70 | #368: the 1400px breakpoint is gone, and with it the desktop detail pane (`VenueDetailPane`, the two-pane `.app-layout` grid, `.detail-pane*` styles). Wide screens fall back to the 769px+/1024px layout and open the venue modal at every width; the modal's `innerWidth < 1400` guard is removed. The footer is a plain body-level sibling again. §7, §8 (kept as a removal note), §19, §21 and the share-button table updated. | Claude Code |
 | 2026-11 | 1.0.71 | #373: an ended show is labelled (ADR-020, amending ADR-016 §4 and Display Philosophy #7). A recurring show past its `activePeriod.end`, with no entry starting the day after, carries a diagonal "Ended" banner on every calendar card, past nights included, and is listed on the nights it would have run for 14 days after its last night. New `ended` day-card section, last and unheaded; not counted in the footer. New `e2e/ended-show.spec.js`. | Claude Code |
 | 2026-11 | 1.0.72 | #378: Ended is decided per card, from its own night (ADR-020 amended). The nights after a last night are bannered whatever today is, so an ending entered ahead of time reads correctly at once; the show's own nights read normally until the last night arrives (today ≥ `end`, previously the day after), then every card is bannered. New `isEndedOn()`; used by the card, the footer count and `sectionOf()`. #376-style footer-count and section-order fixes in `e2e/day-card-sections.spec.js`, which today's real data (Wildflower's grace night) had begun to fail. Updated Section 11. | Claude Code |
+| 2026-11 | 1.0.74 | #390: a schedule entry accepts `ticketed` (boolean), for the directory's first show that needs a ticket. The calendar card derives a **Ticketed** badge from it (after Special Event, before the venue's tags); the label is built in (`DERIVED_TAG_LABELS`), so nothing is added to `tagDefinitions`. A ticketed show's event link reads "Tickets" with the ticket icon on the card, the detail schedule table and the map card (new `renderEventLink()`), and its JSON-LD event says `isAccessibleForFree: false`. No price is stored. Updated Sections 6, 11 and 12. | Claude Code |
 
 ---
 
