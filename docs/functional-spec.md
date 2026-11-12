@@ -3,8 +3,8 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.72
-**Last updated:** October 2026
+**Version:** 1.0.73
+**Last updated:** November 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
 
@@ -1165,7 +1165,7 @@ The form is structured as a short required-fields zone, then a single `<details>
 | Field | Notes |
 |-------|-------|
 | Venue Name | |
-| Street | `autocomplete="street-address"` |
+| Street | `autocomplete="street-address"`. Tidied on submit (#388) — see "Checks that flag rather than block" |
 | City | Default "Austin", `autocomplete="address-level2"`, backed by a `<datalist>` of the `cities` registry (#212). Not a `<select>` — see "City is a closed vocabulary" below |
 | ZIP | `pattern="\d{5}(-\d{4})?"`, `inputmode="numeric"` |
 | Schedule (≥ 1 entry) | First entry needs a day (recurring) or date (one-time); start/end times default to 21:00 / 01:00. The frequency dropdown carries the schema's full `frequency` enum — `fifth` was missing until #212, so a fifth-of-the-month show could not be submitted at all |
@@ -1177,14 +1177,18 @@ The form is structured as a short required-fields zone, then a single `<details>
 | State | Default "TX", `maxlength="2"` |
 | Submitter type radio | Default "Just a fan / patron"; selecting "I'm the KJ / Host" reveals required indicators on Name + Contact and auto-opens the details panel |
 | Add another night | Schedule entries are dynamic; each beyond the first has a remove button |
+| Show Name / Event Name | On every schedule entry (#388); it was hidden unless the frequency was "One-Time Event". Labelled "Event Name" on a one-time event, "Show Name" otherwise. Only a one-time event's name is written to the JSON — see "Checks that flag rather than block" |
+| Next Date | Date input shown on a schedule entry whose frequency is first / second / third / fourth / fifth / last. Email-only (#388) |
+| Event URL | On a recurring entry, hint text asks for a link that stays current. The hint is hidden on a one-time event, whose link is supposed to be that night's page |
+| Is karaoke the whole night? | Radio under the schedule: Not sure (default) / Yes, karaoke all night / No, it's part of a bigger show. Email-only (#388) |
 
 **Optional, collapsed under "Add more details":**
 
 | Section | Fields |
 |---------|--------|
 | Tags | Tag checkboxes (chip-style) generated at load by fetching `tagDefinitions` from `js/data.json` — adding a tag there auto-surfaces here, no parallel hardcoded list. System tags (`dedicated`, `special-event`) and age tags are excluded from the grid; age restriction is its own radio (not sure / 21+ / 18+ / all-ages / family-friendly) whose value joins the `tags: []` array at submit time, matching the schema's "age is a tag" shape. |
-| Who runs it | KJ name, company, website — either or both, mirroring the host model (§11). Both text inputs carry a `<datalist>` of names from the `kjs` / `companies` registries in `js/data.json`, so typing suggests hosts already in the directory. See "Host matching on submit" below. |
-| Venue Social Links | Website, Facebook, Instagram (3 fields — other platforms intentionally cut to reduce friction; the curator tool can add the rest) |
+| Who runs it | KJ name, company, website — either or both, mirroring the host model (§11). Both text inputs carry a `<datalist>` of names from the `kjs` / `companies` registries in `js/data.json`, so typing suggests hosts already in the directory. See "Host matching on submit" below. When the submitter type is "I'm the KJ / Host", a radio **"Are you the KJ named above?"** (Yes, that's me / No, someone else hosts) appears under the names; it has no default and is email-only (#388). |
+| Venue Social Links | Website, Facebook, Instagram (3 fields — other platforms intentionally cut to reduce friction; the curator tool can add the rest). Facebook and Instagram are checked against their network (#388) — see "Checks that flag rather than block" |
 | Notes | Free-text textarea |
 | Your Contact Info | Submitter name (required if KJ); contact methods checkboxes (email, phone text, phone call, other), each reveals its input on check |
 
@@ -1234,7 +1238,43 @@ Hidden honeypot field `website_url` (positioned offscreen via `.hp-field` CSS) w
 
 ### Email body format
 
-`formatEmailBody()` produces a structured plaintext email containing the full venue object as JSON between two `----...----` delimiter lines, plus submitter metadata and a TODO checklist (verify info, geocode, add to data.json). The JSON block is intended to be copy-paste-ready for the curator's editor workflow.
+`formatEmailBody()` produces a structured plaintext email. In order:
+
+| Section | Present | Contents |
+|---------|---------|----------|
+| `SUBMITTED BY:` | always | Name, type, and for a KJ / Host the answer to "Are you the KJ named above?" (Yes / No / Not answered, with the KJ name typed) |
+| `CONTACT PREFERENCES:` | when given | One line per contact method |
+| `HOST:` | when a host was typed | See "Host matching on submit" |
+| `CITY:` | when the city is not in the registry | See "City is a closed vocabulary" |
+| `SOCIAL LINKS:` | when a social link was left out of the JSON | The field and the value typed |
+| `SHOW DETAILS (not in the JSON):` | always | Whether karaoke is the whole night or part of a bigger show, then per recurring show: its name, its next date and whether that date fits the pattern, and a dated event link |
+| `VENUE JSON (...)` | always | The venue object between two `----...----` delimiter lines |
+| `ADDITIONAL NOTES:` | when given | The free-text notes |
+| `TODO:` | always | Verify the information; enter it in the curator (Input → Email); publish from the curator; for a KJ, contact them |
+
+The JSON heading reads **`VENUE JSON (copy/paste ready):`** only when nothing has to be fixed first. When the host is not in the registries, the city is unknown, or a social link was left out, it reads **`VENUE JSON (NOT ready as-is: see HOST, CITY, SOCIAL LINKS above):`**, naming only the sections that apply (#388). A host that matched the registries does not count: that JSON is usable as it stands.
+
+The TODO used to say "Add coordinates (lat/lng)" and "Add to data.json (validate with: node scripts/validate-data.js)". Only the curator changes `js/data.json` (ADR-018), so it now points there and says not to edit the file by hand (#388).
+
+### Checks that flag rather than block (#388)
+
+A real submission (a monthly variety show with a karaoke segment, sent in by its KJ) arrived with an event page in the Instagram field, an event link that was a 404 two weeks later, its title only in the free-text notes, and a "fourth Saturday" nobody could confirm. None of that is a reason to turn a visitor away. Each is handled the way an unknown city or host already was: **the submission goes through and the email says what to look at.** Nothing in this section blocks a submission.
+
+**Social links must belong to their network.** Each social field's host is checked: Facebook takes `facebook.com`, `fb.com`, `fb.me`; Instagram takes `instagram.com`, `instagr.am` (subdomains such as `www.` and `m.` count; the same table covers Twitter / X, TikTok, YouTube and Bluesky for when those fields return). Website takes anything.
+
+- A link that fits is written to `socials`, with `https://` added when the scheme was left off.
+- A value that does not fit — another site, an event page, a bare `@handle` — is **left out of the venue JSON**, where it would have been published as that network's link, and listed under `SOCIAL LINKS:` in the email.
+- The field shows an amber hint on change ("That doesn't look like an Instagram link. You can still submit; we'll pass it along as a note."), which clears when the value is fixed.
+
+**A recurring show's name is email-only.** The Show Name field is offered on every entry, but `eventName` is written to the JSON only for a one-time event. The schema permits `eventName` on any entry; the site, though, displays it only on one-time events (venue card, schedule table, KJ dossier), no recurring entry in the data carries one, and a recurring named production is modelled as its host registry entry (ADR-013). So the name is reported under `SHOW DETAILS` and the curator decides where it belongs.
+
+**A dated event link is flagged.** On a recurring entry, an Event URL containing a calendar date (`2026-11-28`, `2026/11/28`, `11-28-2026`, `20261128`) gets an amber hint on the field and an "Event link looks dated" line in the email. The link stays in the JSON: the curator decides whether to keep it. One-time events are exempt.
+
+**Next date.** A first / second / third / fourth / fifth / last show is asked for the next date it runs. The email reports it and says whether it fits the claimed pattern — `Next date: 2026-11-28 (fits "Fourth Saturday")`, or that it is NOT one — or that no date was given. It is evidence for the curator's confirmation, not a schema field, so it never enters the JSON.
+
+**Who is submitting, and what kind of night.** "Are you the KJ named above?" and "Is karaoke the whole night?" are email-only for the same reason: they inform whose word the submission is and whether it belongs in the directory, and neither is a fact about the venue.
+
+**Street tidy.** On submit the street has runs of spaces collapsed, a lower-case suffix capitalised (`st` → `St`, likewise ave, blvd, rd, dr, ln, ct, pkwy, hwy, cir, pl, trl, ter and their full words) where it ends the street or sits just before a unit (`#`, Suite, Ste, Unit, Apt, Bldg) or a comma, and a one-letter direction straight after the house number raised (`1700 e 2nd st` → `1700 E 2nd St`). A word typed with any capital is left alone, and street names are never touched.
 
 ### Host matching on submit (#124 Phase 3)
 
@@ -1259,7 +1299,7 @@ The `venue` object inside the Apps Script payload validates against [`schema/ven
 
 The form therefore backs the City input with a `<datalist>` of the registry's names, loaded from `data.json` beside `tagDefinitions` / `kjs` / `companies`. There is no parallel hardcoded list — adding a city to the registry surfaces it here, exactly as adding a tag surfaces a checkbox.
 
-**An unknown city is not blocked.** A venue in a suburb the registry does not list yet is a real submission, and rejecting it loses the venue to save the curator one lookup. The value passes through and the email gains a `CITY:` section naming the problem — the same reconciliation route an unrecognised host takes (see "Host matching on submit"). A city already in the registry produces no note.
+**An unknown city is not blocked.** A venue in a suburb the registry does not list yet is a real submission, and rejecting it loses the venue to save the curator one lookup. The value passes through and the email gains a `CITY:` section naming the problem (correct the spelling, or add the city to the registry first) — the same reconciliation route an unrecognised host takes (see "Host matching on submit"). A city already in the registry produces no note.
 
 This mattered concretely: before #212 the form could emit `"city": "Hutto/Round Rock"` — one of the exact strings #170 had to fold in, and precisely what free text produces (19 distinct strings for 17 real cities).
 
@@ -1822,6 +1862,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-10 | 1.0.70 | #368: the 1400px breakpoint is gone, and with it the desktop detail pane (`VenueDetailPane`, the two-pane `.app-layout` grid, `.detail-pane*` styles). Wide screens fall back to the 769px+/1024px layout and open the venue modal at every width; the modal's `innerWidth < 1400` guard is removed. The footer is a plain body-level sibling again. §7, §8 (kept as a removal note), §19, §21 and the share-button table updated. | Claude Code |
 | 2026-11 | 1.0.71 | #373: an ended show is labelled (ADR-020, amending ADR-016 §4 and Display Philosophy #7). A recurring show past its `activePeriod.end`, with no entry starting the day after, carries a diagonal "Ended" banner on every calendar card, past nights included, and is listed on the nights it would have run for 14 days after its last night. New `ended` day-card section, last and unheaded; not counted in the footer. New `e2e/ended-show.spec.js`. | Claude Code |
 | 2026-11 | 1.0.72 | #378: Ended is decided per card, from its own night (ADR-020 amended). The nights after a last night are bannered whatever today is, so an ending entered ahead of time reads correctly at once; the show's own nights read normally until the last night arrives (today ≥ `end`, previously the day after), then every card is bannered. New `isEndedOn()`; used by the card, the footer count and `sectionOf()`. #376-style footer-count and section-order fixes in `e2e/day-card-sections.spec.js`, which today's real data (Wildflower's grace night) had begun to fail. Updated Section 11. | Claude Code |
+| 2026-11 | 1.0.73 | #388: the submit form flags what a real submission got wrong, without blocking. Section 15 gains "Checks that flag rather than block": social links are checked against their network and a mismatch is left out of the JSON and reported under `SOCIAL LINKS:`; the Show Name field is offered on recurring entries (email-only; `eventName` is still written only for one-time events); a dated event link on a recurring show is flagged; non-weekly shows are asked for their next date, KJs whether they are the host named, and everyone whether karaoke is the whole night (all email-only); the street is tidied on submit. "Email body format" rewritten: the TODO points at the curator instead of hand-editing `data.json` (ADR-018), and the JSON heading no longer claims "copy/paste ready" when a host, city or social note has to be dealt with first. | Claude Code |
 
 ---
 
