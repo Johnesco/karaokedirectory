@@ -423,6 +423,8 @@ function eventNodes(shows, data) {
             image: OG_IMAGE,
             url: entry.eventUrl || `${ORIGIN}/venue/${venue.id}/`,
         };
+        // Stated only when known (#390): an unflagged show is not claimed free.
+        if (entry.ticketed) node.isAccessibleForFree = false;
 
         if (entry.frequency === 'once') {
             node.startDate = isoDateTime(entry.date, entry.startTime);

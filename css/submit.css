@@ -160,9 +160,26 @@
     line-height: 1.4;
 }
 
+/* A non-blocking hint under a field (#388): the value looks wrong, the
+   submission still goes through and the email carries a note. Amber, not the
+   error red, because nothing is being refused. */
+.form-group small.field-flag {
+    color: var(--color-warning);
+}
+
+/* The event link carries a hint and sometimes a flag; in a 160px grid track
+   both wrapped to seven lines. It takes the full row instead. */
+.schedule-entry .schedule-event-url-group {
+    grid-column: 1 / -1;
+}
+
+.karaoke-scope-row {
+    margin-top: var(--spacing-md);
+}
+
 /* ---- Schedule entry ----
- * Container-relative auto-fit. With 5-6 visible fields (Frequency, Day/Date,
- * [EventName], StartTime, EndTime, EventUrl), a 160px floor settles into
+ * Container-relative auto-fit. With 6-7 visible fields (Frequency, Day/Date,
+ * [NextDate], Show/Event name, StartTime, EndTime, EventUrl), a 160px floor settles into
  * 1 col on mobile and ~3 cols at the 700px form max — avoiding the orphaned
  * cell from the old fixed 4-col layout. min-width: 0 on children stops
  * intrinsic-min-content from breaking out of grid tracks.

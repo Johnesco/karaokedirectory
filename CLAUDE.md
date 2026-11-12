@@ -259,8 +259,10 @@ When adding or modifying venues in `js/data.json`, follow this structure:
         start: "2026-10-15",      // Same shape as activePeriod. Not allowed on "once" entries (already pinned). Validator warns once spent
         end: "2026-10-31"
       },
-      changed: "2026-11-06"       // Optional: when this show's details last changed (#329) — a Split sets the night it takes effect,
+      changed: "2026-11-06",      // Optional: when this show's details last changed (#329) — a Split sets the night it takes effect,
                                   // a correction the day it was corrected. Not on "once" entries. Listed under Updated for 30 days (#335)
+      ticketed: true              // Optional: getting in needs a ticket (#390). Any entry, recurring or "once". The card derives a
+                                  // "Ticketed" badge from it and the event link reads "Tickets". No price is stored
     },
     {
       frequency: "once",      // One-time special event
@@ -387,6 +389,8 @@ Available tags:
 | `special-event` | Special Event | One-time special karaoke events (auto-added on cards for `frequency: "once"` entries) |
 
 Tags are rendered as color-coded badges in VenueCard, VenueModal and MapView using the `renderTags()` function from `js/utils/tags.js`.
+
+**`ticketed` is a derived badge too, but not a tag in the data** (#390). `VenueCard` prepends it when the show it is rendering has `ticketed: true`; its label lives in `DERIVED_TAG_LABELS` in `js/utils/tags.js`, not in `tagDefinitions`, because it is a fact about a show and never something a venue is tagged with. Its colour is an authored CSS rule like the rest.
 
 **`dedicated` and `special-event` are derived, not stored.** `renderTags()` prepends the first when `venue.dedicated` is true; `VenueCard` prepends the second when the entry it is rendering is `frequency: "once"`. `renderTags()` deduplicates the result, so listing either in a venue's `tags` no longer renders the badge twice (#208) — but it is still redundant, and `validate-data.js` warns about it. Since ADR-014, `validate-data.js` also warns if a tag definition still carries `color`/`textColor` — those fields are ignored; the palette lives in CSS.
 
