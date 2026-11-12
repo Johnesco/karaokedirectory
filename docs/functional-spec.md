@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.74
+**Version:** 1.0.75
 **Last updated:** November 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -143,15 +143,17 @@ When viewing the current week, the page scrolls to today's day card after render
 
 ### Extended Sections
 
-Below the current 7-day week, three additional collapsible sections display venues on future dates. These sections are always visible — both when browsing and when searching.
+Below the 7-day week on screen, three additional collapsible sections display venues on later dates. These sections are always visible — both when browsing and when searching.
+
+**Each section follows the one before it, all anchored on the viewed week** (the week on screen, which is not necessarily the one containing the current date). Only the 60-day cap counts from the current date: it is about how far ahead the data can be trusted (Display Philosophy #3). Before #380 the third section was computed from the current date alone, so navigating forward repeated a month ("Later in December", then "December") or put one out of order ("Later in January", then "December").
 
 #### Sections
 
 | Section | Date Range | Deduplication |
 |---------|------------|---------------|
-| **Next Week** | Full 7 days following the current week | None — shows all venues |
-| **Later in [Month]** | Days after next week through end of current month | First occurrence only (skip if seen above) |
-| **[Next Month]** | Following calendar month (capped at 60 days from today) | First occurrence only (skip if seen above) |
+| **Next Week** | Full 7 days following the viewed week | None — shows all venues |
+| **Later in [Month]** | Days after next week through the end of that month | First occurrence only (skip if seen above) |
+| **[Next Month]** | The calendar month after the "Later in" month, capped at 60 days from the current date; omitted when it would start beyond the cap | First occurrence only (skip if seen above) |
 
 #### Behavior
 
@@ -161,7 +163,7 @@ Below the current 7-day week, three additional collapsible sections display venu
 - **Default collapse state is viewport-dependent:** on small screens (≤768px) sections start **collapsed** (they otherwise add ~20,000px to an already-tall single-column page); on desktop they start **expanded**. A stored choice always wins over the default, so toggling a section once makes that choice stick on every screen. The toggle stores the section's *actual* resulting state (DOM is the source of truth), since the displayed state may originate from the viewport default rather than storage.
 - Empty sections (no venues in date range) are not rendered
 - Day cards within sections use the same format as the current week
-- Maximum lookahead is 60 days from today
+- The third section's lookahead is capped at 60 days from the current date (`getNextMonthRange()`)
 
 #### Deduplication Logic
 
@@ -1869,6 +1871,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-11 | 1.0.72 | #378: Ended is decided per card, from its own night (ADR-020 amended). The nights after a last night are bannered whatever today is, so an ending entered ahead of time reads correctly at once; the show's own nights read normally until the last night arrives (today ≥ `end`, previously the day after), then every card is bannered. New `isEndedOn()`; used by the card, the footer count and `sectionOf()`. #376-style footer-count and section-order fixes in `e2e/day-card-sections.spec.js`, which today's real data (Wildflower's grace night) had begun to fail. Updated Section 11. | Claude Code |
 | 2026-11 | 1.0.73 | #388: the submit form flags what a real submission got wrong, without blocking. Section 15 gains "Checks that flag rather than block": social links are checked against their network and a mismatch is left out of the JSON and reported under `SOCIAL LINKS:`; the Show Name field is offered on recurring entries (email-only; `eventName` is still written only for one-time events); a dated event link on a recurring show is flagged; non-weekly shows are asked for their next date, KJs whether they are the host named, and everyone whether karaoke is the whole night (all email-only); the street is tidied on submit. "Email body format" rewritten: the TODO points at the curator instead of hand-editing `data.json` (ADR-018), and the JSON heading no longer claims "copy/paste ready" when a host, city or social note has to be dealt with first. | Claude Code |
 | 2026-11 | 1.0.74 | #390: a schedule entry accepts `ticketed` (boolean), for the directory's first show that needs a ticket. The calendar card derives a **Ticketed** badge from it (after Special Event, before the venue's tags); the label is built in (`DERIVED_TAG_LABELS`), so nothing is added to `tagDefinitions`. A ticketed show's event link reads "Tickets" with the ticket icon on the card, the detail schedule table and the map card (new `renderEventLink()`), and its JSON-LD event says `isAccessibleForFree: false`. No price is stored. Updated Sections 6, 11 and 12. | Claude Code |
+| 2026-11 | 1.0.75 | #380 (part 1): the extended sections follow the viewed week. The third section is now the month after "Later in [Month]", where it used to be the month after the current date, which repeated a month or put one out of order once the user navigated forward (and from late in a month, even on the current week). Its 60-day cap still counts from the current date. `getNextMonthRange(laterInMonthStart, { currentDate, maxDays })`; `WeeklyView` names the week on screen `viewedWeekStart`. New unit tests and `e2e/extended-sections.spec.js`. Updated Section 2. | Claude Code |
 
 ---
 

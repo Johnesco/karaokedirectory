@@ -33,6 +33,10 @@ import {
   formatTime24,
   formatTimeRange,
   getWeekRange,
+  getWeekStart,
+  getNextWeekRange,
+  getThisMonthRange,
+  getNextMonthRange,
   startOfToday,
   formatDateMonthDay,
   daysSince,
@@ -655,4 +659,58 @@ describe('ended shows — hasEnded / isEndedNight / isEndedOn (#373, #378)', () 
         const open = { frequency: 'every', day: 'Tuesday' };
         assert.equal(isEndedOn(open, [open], new Date(2026, 10, 10), TODAY), false);
     });
+});
+
+describe('extended section ranges — anchored on the viewed week (#380)', () => {
+  // The three ranges as WeeklyView chains them: Next Week from the viewed week,
+  // "Later in" after it, the third month after that. Only the cap uses the
+  // current date.
+  const iso = (d) => toLocalISO(d);
+  function sections(viewed, currentDate) {
+    const nextWeek = getNextWeekRange(getWeekStart(viewed));
+    const laterIn = getThisMonthRange(nextWeek.end);
+    const third = getNextMonthRange(laterIn ? laterIn.start : nextWeek.end, { currentDate });
+    return {
+      nextWeek: [iso(nextWeek.start), iso(nextWeek.end)],
+      laterIn: laterIn && [iso(laterIn.start), iso(laterIn.end)],
+      third: third && [iso(third.start), iso(third.end)],
+    };
+  }
+  const NOV_5 = new Date(2026, 10, 5);
+
+  it('the current week reads Next Week, rest of the month, next month', () => {
+    assert.deepEqual(sections(NOV_5, NOV_5), {
+      nextWeek: ['2026-11-08', '2026-11-14'],
+      laterIn: ['2026-11-15', '2026-11-30'],
+      third: ['2026-12-01', '2026-12-31'],
+    });
+  });
+
+  it('never repeats the "Later in" month (it used to: December twice)', () => {
+    const s = sections(new Date(2026, 10, 22), NOV_5);
+    assert.deepEqual(s.laterIn, ['2026-12-06', '2026-12-31']);
+    // January, capped at 60 days from the current date (Nov 5 + 60 = Jan 4)
+    assert.deepEqual(s.third, ['2027-01-01', '2027-01-04']);
+  });
+
+  it('the same holds in the current week late in a month', () => {
+    const nov25 = new Date(2026, 10, 25);
+    const s = sections(nov25, nov25);
+    assert.equal(s.laterIn[0].slice(0, 7), '2026-12');
+    assert.equal(s.third[0], '2027-01-01');
+  });
+
+  it('never puts a month out of order (it used to: December after January)', () => {
+    const s = sections(new Date(2026, 11, 27), NOV_5);
+    assert.deepEqual(s.laterIn, ['2027-01-10', '2027-01-31']);
+    // February starts beyond the 60-day cap from the current date
+    assert.equal(s.third, null);
+  });
+
+  it('the cap counts from the current date, not the viewed week', () => {
+    const viewed = new Date(2026, 10, 22);
+    assert.equal(sections(viewed, new Date(2026, 9, 1)).third, null);   // Oct 1 + 60 = Nov 30
+    assert.deepEqual(sections(viewed, new Date(2026, 11, 1)).third, ['2027-01-01', '2027-01-30']); // Dec 1 + 60
+    assert.deepEqual(sections(viewed, new Date(2026, 11, 5)).third, ['2027-01-01', '2027-01-31']); // whole month
+  });
 });
