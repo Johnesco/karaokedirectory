@@ -775,22 +775,36 @@ export function getThisMonthRange(afterDate) {
 }
 
 /**
- * Get date range for next calendar month (capped at maxDays from today)
- * @param {Date} today - Reference date (today)
- * @param {number} maxDays - Maximum days to look ahead (default 60)
- * @returns {{ start: Date, end: Date } | null} Start and end dates, or null if beyond maxDays
+ * The extended sections' third range: the calendar month after the one
+ * "Later in [Month]" covers, capped at maxDays from the current date.
+ *
+ * Two dates, on purpose (#380). Which month follows from the VIEWED week, via
+ * the "Later in" section before it, so the three sections always run in order.
+ * It used to follow the current date instead, so navigating forward repeated a
+ * month ("Later in December", then "December") or put one out of order
+ * ("Later in January", then "December"). The cap stays on the current date: it
+ * is about how far ahead the data can be trusted (Display Philosophy #3), not
+ * about which week is on screen.
+ *
+ * @param {Date} laterInMonthStart - First day of the "Later in [Month]" range
+ * @param {Object} [options]
+ * @param {Date} [options.currentDate] - The viewing day (defaults to today)
+ * @param {number} [options.maxDays=60] - Lookahead cap from the current date
+ * @returns {{ start: Date, end: Date } | null} The range, or null if it starts beyond the cap
  */
-export function getNextMonthRange(today, maxDays = 60) {
-    // Start of next month
-    const start = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+export function getNextMonthRange(laterInMonthStart, { currentDate = startOfToday(), maxDays = 60 } = {}) {
+    const after = laterInMonthStart;
+
+    // Start of the month after
+    const start = new Date(after.getFullYear(), after.getMonth() + 1, 1);
     start.setHours(0, 0, 0, 0);
 
-    // End of next month
-    const end = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+    // End of that month
+    const end = new Date(after.getFullYear(), after.getMonth() + 2, 0);
     end.setHours(23, 59, 59, 999);
 
-    // Calculate max date based on maxDays
-    const maxDate = new Date(today);
+    // The cap, counted from the current date
+    const maxDate = new Date(currentDate);
     maxDate.setDate(maxDate.getDate() + maxDays);
     maxDate.setHours(23, 59, 59, 999);
 

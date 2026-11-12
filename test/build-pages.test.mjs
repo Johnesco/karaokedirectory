@@ -529,3 +529,17 @@ describe('sitemap', () => {
     for (const e of entities) assert.ok(xml.includes(urlFor(e)), `${e.id} missing from sitemap`);
   });
 });
+
+describe('eventNodes — a ticketed show is not free (#390)', () => {
+  const venue = { id: 'v', name: 'V', address: { street: '1 Main St', city: 'Austin', state: 'TX', zip: '78701' } };
+  const mk = (entry) => eventNodes([{ venue, entry, kjId: null, companyId: null }], {});
+
+  it('says isAccessibleForFree: false when the entry is ticketed', () => {
+    assert.equal(mk({ frequency: 'once', date: '2099-07-04', startTime: '20:00', ticketed: true })[0].isAccessibleForFree, false);
+    assert.equal(mk({ frequency: 'every', day: 'Friday', startTime: '20:00', ticketed: true })[0].isAccessibleForFree, false);
+  });
+
+  it('makes no claim either way for a show that is not flagged', () => {
+    assert.equal('isAccessibleForFree' in mk({ frequency: 'every', day: 'Friday', startTime: '20:00' })[0], false);
+  });
+});
