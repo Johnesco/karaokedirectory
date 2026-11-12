@@ -93,7 +93,7 @@ karaokedirectory/
 │       ├── spike.yml      # Research/investigation template
 │       └── doc.yml        # Documentation-only changes template
 │   └── workflows/
-│       └── ci.yml         # CI: validators + unit tests, and the Playwright e2e job
+│       └── ci.yml         # CI: validators + unit tests, and the Playwright e2e job (smoke only on a data publish, #395; full suite nightly)
 ├── CLAUDE.md              # THIS FILE - Claude project memory
 ├── README.md              # Public documentation
 ├── index.html             # Main SPA (heavily commented)
@@ -177,7 +177,7 @@ karaokedirectory/
 ├── schema/
 │   └── venue.schema.json  # Authoritative venue schema (ADR-005)
 │
-├── e2e/                   # Playwright specs (18 files) — run by `npm test`, gated in CI
+├── e2e/                   # Playwright specs (20 files) — run by `npm test`, gated in CI. `data-smoke.spec.js` is the subset a data publish runs
 ├── test/                  # node --test unit specs (12 files: 11 listed by name, plus sections.test.mjs) — run by `npm run test:unit`
 │   ├── date.test.mjs      # Schedule matching, exclusions, lifespans, date ranges
 │   ├── venues.test.mjs    # venuePasses, search predicates, host hydration
@@ -564,6 +564,7 @@ npm run dev          # serve on http://localhost:8000
 npm run validate:all # venue data (Ajv + supplementary checks) and CSS load order
 npm run test:unit    # node --test — pure modules only, ~150ms
 npm test             # Playwright end-to-end, ~1.5 min
+npm run test:smoke   # the four @data-smoke tests a data publish runs in CI, ~30s
 
 npm run data:publish:dry  # what a publish would send live, without sending it
 npm run data:publish      # gates, then open the data PR with auto-merge on (no ticket by design, #338) — or add to the open one (#334)
@@ -577,7 +578,9 @@ npm run data:publish      # gates, then open the data PR with auto-merge on (no 
 |---|---|---|
 | `validate:all` | `js/data.json` against `schema/venue.schema.json`, plus cross-row checks and data-quality warnings; CSS load order on all 4 pages | Non-zero exit fails CI. Warnings are informational and do not fail |
 | `test:unit` | `js/utils/date.js`, `js/utils/hosts.js`, and the pure predicates in `js/services/venues.js` | **Pure modules only.** View classes belong to e2e — do not unit test them |
-| `npm test` | Behaviour across all 4 pages, 18 spec files | Starts its own server on **:3456**, so it will not collide with `npm run dev` |
+| `npm test` | Behaviour across all 4 pages, 20 spec files | Starts its own server on **:3456**, so it will not collide with `npm run dev` |
+
+**A data publish does not run the full suite** (#395). When a PR's only changed file is `js/data.json`, the `End-to-end tests` job runs the generated-page build and `e2e/data-smoke.spec.js` (the calendar renders, A to Z holds every active venue, a venue opens, the submit page builds its tags, no page errors) and skips the rest. The job still reports, because branch protection requires it by name. Every other PR and every push to main run everything, and the full suite also runs **nightly** (and on demand) against the live data, because several specs read real data and today's date and can fail with no code change. A spec that must see a particular show **patches it into the fetched data and clears the real ones first**; #393 blocked a valid publish by not doing that.
 
 Notes that will bite you otherwise:
 

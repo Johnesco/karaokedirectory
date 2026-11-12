@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.76
+**Version:** 1.0.77
 **Last updated:** November 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -1873,6 +1873,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-11 | 1.0.74 | #390: a schedule entry accepts `ticketed` (boolean), for the directory's first show that needs a ticket. The calendar card derives a **Ticketed** badge from it (after Special Event, before the venue's tags); the label is built in (`DERIVED_TAG_LABELS`), so nothing is added to `tagDefinitions`. A ticketed show's event link reads "Tickets" with the ticket icon on the card, the detail schedule table and the map card (new `renderEventLink()`), and its JSON-LD event says `isAccessibleForFree: false`. No price is stored. Updated Sections 6, 11 and 12. | Claude Code |
 | 2026-11 | 1.0.75 | #380 (part 1): the extended sections follow the viewed week. The third section is now the month after "Later in [Month]", where it used to be the month after the current date, which repeated a month or put one out of order once the user navigated forward (and from late in a month, even on the current week). Its 60-day cap still counts from the current date. `getNextMonthRange(laterInMonthStart, { currentDate, maxDays })`; `WeeklyView` names the week on screen `viewedWeekStart`. New unit tests and `e2e/extended-sections.spec.js`. Updated Section 2. | Claude Code |
 | 2026-11 | 1.0.76 | Curator, from a review of its issue history (no site change; the curator lives outside the repo). #382: Today's **Due** follows the 30-day Verified clock instead of the week — a confirmed show is due at day 25+, never-verified shows are a separate folded backlog, and both are grouped by host with **Confirm all N**. #385: **Check ↗** on a row or host group opens the best link on file in the companion window, or a Facebook search when there is none. #383: *Correct it* applied with nothing altered only confirms (it used to mark the show Updated); *Last night* becomes **Ended**, "ended as of", defaulting to yesterday. #384: every panel action stamps at once on every tab, Input included; Input's Submit files and logs. #386: a night off can be removed, **End all shows…** on a venue, To prune is its own card, stale "click Save" wording gone. (1.0.73 is #380's, on its own branch.) |
+| 2026-11 | 1.0.77 | #395, #393: CI no longer runs the full Playwright suite on a data publish. A PR whose only changed file is `js/data.json` runs the validators, the unit tests, the generated-page build and a four-test smoke subset (`e2e/data-smoke.spec.js`, tagged `@data-smoke`, `npm run test:smoke`): the calendar renders, the A to Z view holds every active venue, a venue detail opens, the submit page builds its tag list, and no page errors. Every other PR and every push to main run the full suite as before, and it now also runs nightly against the live data and on demand. The Ticketed spec no longer depends on live data (#393), which had blocked a valid publish. No application behaviour changed. | Claude Code |
 
 ---
 
