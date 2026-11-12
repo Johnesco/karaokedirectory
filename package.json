@@ -8,6 +8,7 @@
     "build": "node scripts/build-pages.js",
     "build:clean": "node scripts/build-pages.js --clean",
     "test": "npx playwright test",
+    "test:smoke": "npx playwright test --grep @data-smoke",
     "test:headed": "npx playwright test --headed",
     "test:ui": "npx playwright test --ui",
     "test:unit": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test",

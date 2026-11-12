@@ -4,6 +4,13 @@ on:
   pull_request:
   push:
     branches: [main]
+  # The full suite against whatever data is live, every night (#395). Several
+  # specs read real data and today's date, so they can start failing with no
+  # code change. This finds that within a day without blocking a publish.
+  # 10:17 UTC is the small hours in Austin. A failed run emails the owner.
+  schedule:
+    - cron: '17 10 * * *'
+  workflow_dispatch:
 
 jobs:
   validate:
@@ -78,12 +85,47 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # A data publish is not a code change (#395). When the PR's only changed
+      # file is js/data.json, this job runs the smoke subset: enough to prove
+      # the site renders the new data, not the whole behaviour suite, which
+      # tests code that did not change and blocked a valid publish in #392.
+      # The job itself always runs and reports, because branch protection
+      # requires "End-to-end tests" by name: a job skipped by a path filter
+      # would leave the PR waiting forever. Pushes to main, the nightly run
+      # and every other PR get the full suite.
+      - name: Is this a data-only change?
+        id: scope
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          data_only=false
+          if [ "$EVENT" = "pull_request" ]; then
+            git fetch --no-tags --depth=1 origin "$BASE_SHA"
+            changed=$(git diff --name-only "$BASE_SHA" HEAD)
+            echo "Changed files:"; echo "$changed"
+            if [ "$changed" = "js/data.json" ]; then data_only=true; fi
+          fi
+          echo "data_only=$data_only" >> "$GITHUB_OUTPUT"
+          echo "data_only=$data_only"
+
       # Chromium only — playwright.config.js defines a single chromium project,
       # and the suite starts its own `serve` via the config's webServer block.
       - name: Install Playwright browser
         run: npx playwright install --with-deps chromium
 
+      # The generated entity pages are built from the data too (ADR-012), and
+      # Netlify runs this on deploy: a publish that breaks it should fail here.
+      - name: Build generated pages (data-only change)
+        if: steps.scope.outputs.data_only == 'true'
+        run: npm run build
+
+      - name: Run the data smoke test (data-only change)
+        if: steps.scope.outputs.data_only == 'true'
+        run: npm run test:smoke
+
       - name: Run end-to-end tests
+        if: steps.scope.outputs.data_only != 'true'
         run: npm test
 
       - name: Upload report on failure
