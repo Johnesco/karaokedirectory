@@ -114,6 +114,144 @@ function populateSuggestions() {
             </label>`).join('');
 })();
 
+/* ------------------------------------------------- submission checks (#388) --
+ *
+ * A real submission put an event page in the Instagram field, a single night's
+ * link on a monthly show, and "1700 E 2nd st" in the street. None of these is a
+ * reason to turn the visitor away, so each one is flagged for the curator in
+ * the email (and, where the visitor can fix it, hinted on the field) the same
+ * way an unknown city or host is. Nothing here blocks a submission.
+ */
+
+// Hosts each social field accepts; subdomains (www., m.) count. The website
+// field takes anything, so it is not listed.
+const SOCIAL_HOSTS = {
+    facebook: ['facebook.com', 'fb.com', 'fb.me'],
+    instagram: ['instagram.com', 'instagr.am'],
+    twitter: ['twitter.com', 'x.com'],
+    tiktok: ['tiktok.com'],
+    youtube: ['youtube.com', 'youtu.be'],
+    bluesky: ['bsky.app'],
+};
+
+const SOCIAL_LABELS = {
+    facebook: 'a Facebook', instagram: 'an Instagram', twitter: 'a Twitter / X',
+    tiktok: 'a TikTok', youtube: 'a YouTube', bluesky: 'a Bluesky',
+};
+
+/**
+ * Check a social field's value against its network.
+ * Returns { ok: true, url } with the scheme filled in when it was left off, or
+ * { ok: false } when the value is not a link to that network ("@handle", an
+ * event page, another site).
+ */
+function checkSocialUrl(network, value) {
+    const hosts = SOCIAL_HOSTS[network];
+    if (!hosts) return { ok: true, url: value };
+    const candidate = /^[a-z][a-z0-9+.-]*:\/\//i.test(value) ? value : `https://${value}`;
+    let parsed;
+    try {
+        parsed = new URL(candidate);
+    } catch {
+        return { ok: false };
+    }
+    if (!/^https?:$/.test(parsed.protocol)) return { ok: false };
+    const host = parsed.hostname.toLowerCase();
+    const matches = hosts.some(h => host === h || host.endsWith(`.${h}`));
+    return matches ? { ok: true, url: candidate } : { ok: false };
+}
+
+/**
+ * Does this URL carry a calendar date? A dated link is one night's page, and on
+ * a recurring show it goes stale after that night (the real case was a 404 two
+ * weeks on). Matches 2026-11-28, 2026/11/28, 11-28-2026 and 20261128.
+ */
+function urlLooksDated(url) {
+    return /(?:^|\D)20\d{2}[-/._](?:0?[1-9]|1[0-2])[-/._](?:0?[1-9]|[12]\d|3[01])(?:\D|$)/.test(url)
+        || /(?:^|\D)(?:0?[1-9]|1[0-2])[-/._](?:0?[1-9]|[12]\d|3[01])[-/._]20\d{2}(?:\D|$)/.test(url)
+        || /(?:^|\D)20\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])(?:\D|$)/.test(url);
+}
+
+// Street suffixes worth fixing the case of. Abbreviations map to their usual
+// form; full words only get their first letter raised.
+const STREET_SUFFIXES = {
+    st: 'St', ave: 'Ave', blvd: 'Blvd', rd: 'Rd', dr: 'Dr', ln: 'Ln', ct: 'Ct',
+    pkwy: 'Pkwy', hwy: 'Hwy', cir: 'Cir', pl: 'Pl', trl: 'Trl', ter: 'Ter',
+    street: 'Street', avenue: 'Avenue', boulevard: 'Boulevard', road: 'Road',
+    drive: 'Drive', lane: 'Lane', court: 'Court', parkway: 'Parkway',
+    highway: 'Highway', circle: 'Circle', place: 'Place', trail: 'Trail',
+};
+
+/**
+ * Tidy a typed street, conservatively: collapse runs of spaces, capitalise a
+ * lower-case suffix ("1700 E 2nd st" -> "1700 E 2nd St") where it ends the
+ * street or sits just before a unit ("#4", "Suite 200"), and raise a one-letter
+ * direction straight after the house number ("1700 e 2nd"). Anything already
+ * carrying a capital is left as typed, and street names are never touched.
+ */
+function tidyStreet(street) {
+    let s = street.replace(/\s+/g, ' ').trim();
+    s = s.replace(
+        /\b([a-z]+)(\.?)(?=$|,|\s+(?:#|suite\b|ste\b|unit\b|apt\b|bldg\b))/gi,
+        (match, word, dot) => (word === word.toLowerCase() && STREET_SUFFIXES[word])
+            ? STREET_SUFFIXES[word] + dot
+            : match
+    );
+    s = s.replace(/^(\d+\s+)([nsew])(?=\s)/, (match, number, dir) => number + dir.toUpperCase());
+    return s;
+}
+
+const NTH_FREQUENCIES = ['first', 'second', 'third', 'fourth', 'fifth', 'last'];
+const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+/**
+ * Does a YYYY-MM-DD date fall on the claimed "<nth> <weekday>"? The form asks a
+ * non-weekly show for its next date precisely because "fourth Saturday" could
+ * not be confirmed; this says at once when the two disagree.
+ */
+function dateMatchesPattern(dateStr, frequency, day) {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const date = new Date(y, m - 1, d);
+    if (DAY_NAMES[date.getDay()] !== day) return false;
+    if (frequency === 'last') return new Date(y, m - 1, d + 7).getMonth() !== date.getMonth();
+    return Math.ceil(d / 7) === NTH_FREQUENCIES.indexOf(frequency) + 1;
+}
+
+/** Show or clear a non-blocking hint under a field. */
+function setFieldFlag(input, message) {
+    const group = input.closest('.form-group') || input.parentElement;
+    let flag = group.querySelector('.field-flag');
+    if (!message) {
+        if (flag) flag.remove();
+        return;
+    }
+    if (!flag) {
+        flag = document.createElement('small');
+        flag.className = 'field-flag';
+        flag.setAttribute('role', 'status');
+        group.appendChild(flag);
+    }
+    flag.textContent = message;
+}
+
+function flagSocialField(input) {
+    const network = input.dataset.social;
+    const value = input.value.trim();
+    const bad = value && !checkSocialUrl(network, value).ok;
+    setFieldFlag(input, bad
+        ? `That doesn't look like ${SOCIAL_LABELS[network]} link. You can still submit; we'll pass it along as a note.`
+        : '');
+}
+
+function flagEventUrlField(input) {
+    const entry = input.closest('.schedule-entry');
+    const isOnce = entry?.querySelector('[name^="frequency-"]')?.value === 'once';
+    const dated = !isOnce && urlLooksDated(input.value.trim());
+    setFieldFlag(input, dated
+        ? 'This looks like the page for a single date. If there is a link that stays current, use that one.'
+        : '');
+}
+
 // Rate limiting configuration
 const RATE_LIMIT_CONFIG = {
     maxSubmissions: 3,      // Max submissions allowed
@@ -154,6 +292,13 @@ function toggleSubmitterType() {
         if (submitterField) {
             setTimeout(() => submitterField.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
         }
+    }
+
+    // "Are you the KJ named above?" only makes sense for a KJ / Host (#388).
+    const hostSelfRow = document.getElementById('host-self-row');
+    if (hostSelfRow) {
+        hostSelfRow.style.display = isKJ ? '' : 'none';
+        if (!isKJ) hostSelfRow.querySelectorAll('input').forEach(r => { r.checked = false; });
     }
 
     // Clear errors when switching
@@ -325,9 +470,14 @@ function addScheduleEntry() {
             <label>Date</label>
             <input type="date" name="date-${scheduleCount}">
         </div>
-        <div class="form-group schedule-event-name-group" style="display: none;">
-            <label>Event Name</label>
-            <input type="text" name="eventName-${scheduleCount}" placeholder="e.g., Birthday Bash">
+        <div class="form-group schedule-next-date-group" style="display: none;">
+            <label>Next Date</label>
+            <input type="date" name="nextDate-${scheduleCount}">
+            <small>The next night it runs, so we can confirm the pattern.</small>
+        </div>
+        <div class="form-group schedule-event-name-group">
+            <label><span class="schedule-event-name-label">Show Name</span></label>
+            <input type="text" name="eventName-${scheduleCount}" placeholder="Optional">
         </div>
         <div class="form-group">
             <label>Start Time</label>
@@ -340,6 +490,7 @@ function addScheduleEntry() {
         <div class="form-group schedule-event-url-group">
             <label>Event URL</label>
             <input type="url" name="eventUrl-${scheduleCount}" inputmode="url" placeholder="https://...">
+            <small class="schedule-event-url-hint">A link that stays current (the show's page or the venue's calendar), not one night's event page.</small>
         </div>
         <button type="button" class="remove-schedule-btn">
             <i class="fa-solid fa-trash"></i> Remove
@@ -357,11 +508,29 @@ function toggleScheduleFields(select) {
 
     const dayGroup = entry.querySelector('.schedule-day-group');
     const dateGroup = entry.querySelector('.schedule-date-group');
-    const eventNameGroup = entry.querySelector('.schedule-event-name-group');
+    const nextDateGroup = entry.querySelector('.schedule-next-date-group');
+    const eventNameLabel = entry.querySelector('.schedule-event-name-label');
+    const eventUrlHint = entry.querySelector('.schedule-event-url-hint');
+    const isNth = NTH_FREQUENCIES.includes(select.value);
 
     if (dayGroup) dayGroup.style.display = isOnce ? 'none' : '';
     if (dateGroup) dateGroup.style.display = isOnce ? '' : 'none';
-    if (eventNameGroup) eventNameGroup.style.display = isOnce ? '' : 'none';
+
+    // The name field is always offered (#388): a recurring show can have a
+    // title too, and the real submission's only reached us in the notes.
+    if (eventNameLabel) eventNameLabel.textContent = isOnce ? 'Event Name' : 'Show Name';
+
+    // "First Saturday" and the like get a next-date question; weekly shows and
+    // one-time events (which already carry their date) don't need one.
+    if (nextDateGroup) {
+        nextDateGroup.style.display = isNth ? '' : 'none';
+        if (!isNth) nextDateGroup.querySelector('input').value = '';
+    }
+
+    // A one-time event's link is *supposed* to be that night's page.
+    if (eventUrlHint) eventUrlHint.style.display = isOnce ? 'none' : '';
+    const eventUrlInput = entry.querySelector('[name^="eventUrl-"]');
+    if (eventUrlInput) flagEventUrlField(eventUrlInput);
 
     const daySelect = entry.querySelector('[name^="day-"]');
     const dateInput = entry.querySelector('[name^="date-"]');
@@ -388,6 +557,9 @@ function collectFormData() {
     // Collect schedule entries
     const scheduleEntries = document.querySelectorAll('.schedule-entry');
     const schedule = [];
+    // Things the curator should know about each show that are evidence, not
+    // venue data — so they go in the email and stay out of the JSON (#388).
+    const showNotes = [];
 
     scheduleEntries.forEach((entry) => {
         const index = entry.dataset.index;
@@ -420,6 +592,36 @@ function collectFormData() {
             };
             if (eventUrl) scheduleEntry.eventUrl = eventUrl;
             schedule.push(scheduleEntry);
+
+            const label = `${frequency.charAt(0).toUpperCase()}${frequency.slice(1)} ${day}`;
+            const lines = [];
+
+            // The schema would take eventName here, but the site only shows it
+            // on one-time events, and a recurring named production is modelled
+            // as its host registry entry (ADR-013). So the name is reported,
+            // not written into the JSON, and the curator decides where it goes.
+            if (eventName) {
+                lines.push(`Show name: ${eventName}`
+                    + `\n  (Not in the JSON: the site does not display eventName on a recurring show.)`);
+            }
+
+            const nextDate = formData.get(`nextDate-${index}`);
+            if (NTH_FREQUENCIES.includes(frequency)) {
+                if (!nextDate) {
+                    lines.push('Next date: not given. Confirm the pattern before adding.');
+                } else if (dateMatchesPattern(nextDate, frequency, day)) {
+                    lines.push(`Next date: ${nextDate} (fits "${label}")`);
+                } else {
+                    lines.push(`Next date: ${nextDate}. That is NOT a "${label}"; ask which is right.`);
+                }
+            }
+
+            if (eventUrl && urlLooksDated(eventUrl)) {
+                lines.push(`Event link looks dated: ${eventUrl}`
+                    + `\n  It is in the JSON, but it probably points at one night and will go stale. Find a standing link or drop it.`);
+            }
+
+            if (lines.length) showNotes.push(`${label}:\n- ${lines.join('\n- ')}`);
         }
     });
 
@@ -443,7 +645,7 @@ function collectFormData() {
         id: slugify(venueName),
         name: venueName,
         address: {
-            street: formData.get('street').trim(),
+            street: tidyStreet(formData.get('street')),
             city: formData.get('city').trim() || 'Austin',
             state: (formData.get('state')?.trim() || 'TX'),
             zip: formData.get('zip').trim(),
@@ -526,21 +728,38 @@ function collectFormData() {
     const venueYoutube = formData.get('venue-youtube')?.trim();
     const venueBluesky = formData.get('venue-bluesky')?.trim();
 
-    if (venueWebsite || venueFacebook || venueInstagram || venueTwitter || venueTiktok || venueYoutube || venueBluesky) {
-        venue.socials = {};
-        if (venueWebsite) venue.socials.website = venueWebsite;
-        if (venueFacebook) venue.socials.facebook = venueFacebook;
-        if (venueInstagram) venue.socials.instagram = venueInstagram;
-        if (venueTwitter) venue.socials.twitter = venueTwitter;
-        if (venueTiktok) venue.socials.tiktok = venueTiktok;
-        if (venueYoutube) venue.socials.youtube = venueYoutube;
-        if (venueBluesky) venue.socials.bluesky = venueBluesky;
+    // Each social link must belong to its network (#388). One that doesn't is
+    // kept out of the JSON, where it would be published as that network's
+    // link, and carried in the email instead so the curator can place it.
+    const socials = {};
+    const rejectedSocials = [];
+    if (venueWebsite) socials.website = venueWebsite;
+    for (const [network, value] of [
+        ['facebook', venueFacebook], ['instagram', venueInstagram],
+        ['twitter', venueTwitter], ['tiktok', venueTiktok],
+        ['youtube', venueYoutube], ['bluesky', venueBluesky],
+    ]) {
+        if (!value) continue;
+        const check = checkSocialUrl(network, value);
+        if (check.ok) socials[network] = check.url;
+        else rejectedSocials.push(`${network} field: ${value}`);
     }
+    if (Object.keys(socials).length > 0) venue.socials = socials;
+
+    const socialNote = rejectedSocials.length === 0 ? '' :
+        'Not a link to the network its field names, so left OUT of the JSON:'
+        + `\n${rejectedSocials.join('\n')}`
+        + '\nIt may be an event page or a handle. Find the real profile, or put the link where it belongs.';
 
     // Collect metadata
     const notes = formData.get('notes')?.trim();
     const submitterName = formData.get('submitter-name')?.trim();
     const submitterType = formData.get('submitter-type');
+
+    // Email-only answers (#388): whose word this is, and whether karaoke is
+    // the night or a segment of it. Neither is venue data.
+    const hostSelf = submitterType === 'kj' ? (formData.get('host-self') || '') : '';
+    const karaokeScope = formData.get('karaoke-scope') || '';
 
     // Collect contact info (for both fans and KJs)
     const contactMethods = [];
@@ -568,8 +787,8 @@ function collectFormData() {
     // report would lose the venue to save the curator one lookup.
     const cityNote = matchRegistryId(knownCities, venue.address.city)
         ? ''
-        : `"${venue.address.city}" is not in the cities registry. Add it to `
-          + `data.json's "cities" map, or correct the spelling — validate-data.js `
+        : `"${venue.address.city}" is not in the cities registry. Correct the `
+          + `spelling, or add the city to the registry first — the validator `
           + `fails the venue otherwise.`;
 
     return {
@@ -579,7 +798,15 @@ function collectFormData() {
         submitterType,
         contactMethods,
         hostNote,
-        cityNote
+        // True when the host is free text the registries don't know — the one
+        // host outcome that stops the JSON being usable as it stands.
+        hostUnresolved: Boolean((hostName || affiliation) && !(kjResolved && companyResolved)),
+        hostName,
+        cityNote,
+        socialNote,
+        showNotes,
+        hostSelf,
+        karaokeScope
     };
 }
 
@@ -597,6 +824,13 @@ function formatEmailBody(data) {
         body += `Name: ${data.submitterName}\n`;
     }
     body += `Type: ${isKJ ? 'KJ / Host' : 'Fan / Patron'}\n`;
+    if (isKJ) {
+        const named = data.hostName ? `"${data.hostName}"` : 'no KJ name given';
+        const answer = data.hostSelf === 'yes' ? `Yes (${named})`
+            : data.hostSelf === 'no' ? `No (${named})`
+            : `Not answered (${named})`;
+        body += `Submitter is the KJ named below: ${answer}\n`;
+    }
 
     // Contact info (for both fans and KJs)
     if (data.contactMethods && data.contactMethods.length > 0) {
@@ -624,7 +858,30 @@ function formatEmailBody(data) {
         body += 'CITY:\n' + data.cityNote + '\n\n';
     }
 
-    body += 'VENUE JSON (copy/paste ready):\n';
+    if (data.socialNote) {
+        body += 'SOCIAL LINKS:\n' + data.socialNote + '\n\n';
+    }
+
+    // Evidence about the shows that has no place in the venue JSON (#388).
+    const scopeLine = data.karaokeScope === 'whole' ? 'Karaoke is the whole night.'
+        : data.karaokeScope === 'part' ? 'Karaoke is PART OF A BIGGER SHOW. Check it belongs in the directory.'
+        : 'Whole night or part of a bigger show: not answered.';
+    body += 'SHOW DETAILS (not in the JSON):\n' + scopeLine + '\n';
+    if (data.showNotes && data.showNotes.length > 0) {
+        body += data.showNotes.join('\n') + '\n';
+    }
+    body += '\n';
+
+    // "Copy/paste ready" was printed over JSON holding an unknown city or a
+    // free-text host. Say which sections have to be dealt with first.
+    const fixFirst = [
+        data.hostUnresolved ? 'HOST' : null,
+        data.cityNote ? 'CITY' : null,
+        data.socialNote ? 'SOCIAL LINKS' : null,
+    ].filter(Boolean);
+    body += fixFirst.length > 0
+        ? `VENUE JSON (NOT ready as-is: see ${fixFirst.join(', ')} above):\n`
+        : 'VENUE JSON (copy/paste ready):\n';
     body += '-'.repeat(40) + '\n';
     body += JSON.stringify(data.venue, null, 2);
     body += '\n' + '-'.repeat(40) + '\n\n';
@@ -636,8 +893,8 @@ function formatEmailBody(data) {
 
     body += 'TODO:\n';
     body += '- [ ] Verify venue information\n';
-    body += '- [ ] Add coordinates (lat/lng)\n';
-    body += '- [ ] Add to data.json (validate with: node scripts/validate-data.js)\n';
+    body += '- [ ] Enter it in the curator: Input → Email (never edit js/data.json by hand)\n';
+    body += '- [ ] Publish from the curator\n';
     if (isKJ) {
         body += '- [ ] Contact KJ to confirm details\n';
     }
@@ -831,6 +1088,10 @@ document.addEventListener('change', (e) => {
         toggleSubmitterType();
     } else if (t.matches('[data-contact-toggle]')) {
         toggleContactInput(t.dataset.contactToggle);
+    } else if (t.matches('input[data-social]')) {
+        flagSocialField(t);
+    } else if (t.matches('input[name^="eventUrl-"]')) {
+        flagEventUrlField(t);
     }
 });
 
