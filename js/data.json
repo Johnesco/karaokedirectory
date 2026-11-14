@@ -908,7 +908,7 @@
           "date": "2026-11-28",
           "startTime": "22:00",
           "endTime": "23:45",
-          "eventName": "ON AIR! with 101.2 FKRD: Immersive Karaoke Experience",
+          "eventName": "ON AIR! with 101.2 FKRD: Immersive Karaoke Comedy Experience",
           "eventUrl": "https://coldtownetheater.com/show/on-air-with-101-2-fkrd-2026-11-28/",
           "host": {
             "kjId": "dj-garfunkle-fits"
@@ -3711,6 +3711,48 @@
         "kjId": "dj-rob",
         "companyId": "vibehouse-entertainment"
       }
+    },
+    {
+      "id": "bobs-blue-collar-tavern",
+      "name": "Bob's Blue Collar Tavern",
+      "created": "2026-11-13",
+      "dedicated": false,
+      "tags": [
+        "sports-bar",
+        "billiards"
+      ],
+      "address": {
+        "street": "18810 US-290",
+        "city": "Elgin",
+        "state": "TX",
+        "zip": "78621"
+      },
+      "schedule": [
+        {
+          "frequency": "every",
+          "day": "Tuesday",
+          "startTime": "20:00",
+          "endTime": "00:00",
+          "created": "2026-11-13",
+          "lastVerified": "2026-11-17"
+        },
+        {
+          "frequency": "every",
+          "day": "Saturday",
+          "startTime": "21:00",
+          "endTime": "00:00",
+          "created": "2026-11-13",
+          "lastVerified": "2026-11-14"
+        }
+      ],
+      "coordinates": {
+        "lat": 30.35304,
+        "lng": -97.41262
+      },
+      "socials": {
+        "facebook": "https://www.facebook.com/BobsBlueCollarTavern/"
+      },
+      "phone": "512-285-9633"
     }
   ]
 }
