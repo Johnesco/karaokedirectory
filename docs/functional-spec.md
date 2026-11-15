@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.78
+**Version:** 1.0.79
 **Last updated:** November 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -131,9 +131,9 @@ Recurring entries are read **as of the card's own date** (§11 "Show Lifespan"):
 
 ### Auto-Scroll
 
-When viewing the current week, the page scrolls to today's day card after render using `scrollIntoView({ behavior: 'instant', block: 'start' })`.
+When viewing the current week, the page scrolls to today's day card using `scrollIntoView({ behavior: 'instant', block: 'start' })`, but only when the week on screen changes: the first render, or week navigation (including **Today**). A re-render of the same week (toggling Dedicated, each search keystroke) leaves the scroll position where the reader put it, so someone reading Friday is not thrown back to today (#400). The jump-to-today button does its own scroll and is unaffected.
 
-> **Implementation note:** WeeklyView creates day cards via `renderDayCard(date, venueIds?)` — a template helper that instantiates a temporary DayCard, calls `template()`, and returns an HTML string (no persistent component instance). The optional second argument narrows the card to a given set of venue ids; the primary week omits it. Extended sections use `renderExtendedSection()` with a shared `seenVenues` Set passed across all three sections for deduplication, and hand the resulting ids to each card so the rendered venues match the section's own count (#206). Auto-scroll to today runs in `afterRender()`. See [Architecture: Component Hierarchy](architecture.md#2-component-hierarchy) for the template helper pattern.
+> **Implementation note:** WeeklyView creates day cards via `renderDayCard(date, venueIds?)` — a template helper that instantiates a temporary DayCard, calls `template()`, and returns an HTML string (no persistent component instance). The optional second argument narrows the card to a given set of venue ids; the primary week omits it. Extended sections use `renderExtendedSection()` with a shared `seenVenues` Set passed across all three sections for deduplication, and hand the resulting ids to each card so the rendered venues match the section's own count (#206). Auto-scroll to today runs in `afterRender()`, gated on `this._scrolledWeek` (the viewed week's Sunday as a date string) so it fires once per week shown. See [Architecture: Component Hierarchy](architecture.md#2-component-hierarchy) for the template helper pattern.
 
 ### Filtering
 
@@ -1875,6 +1875,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-11 | 1.0.76 | Curator, from a review of its issue history (no site change; the curator lives outside the repo). #382: Today's **Due** follows the 30-day Verified clock instead of the week — a confirmed show is due at day 25+, never-verified shows are a separate folded backlog, and both are grouped by host with **Confirm all N**. #385: **Check ↗** on a row or host group opens the best link on file in the companion window, or a Facebook search when there is none. #383: *Correct it* applied with nothing altered only confirms (it used to mark the show Updated); *Last night* becomes **Ended**, "ended as of", defaulting to yesterday. #384: every panel action stamps at once on every tab, Input included; Input's Submit files and logs. #386: a night off can be removed, **End all shows…** on a venue, To prune is its own card, stale "click Save" wording gone. (1.0.73 is #380's, on its own branch.) |
 | 2026-11 | 1.0.77 | #395, #393: CI no longer runs the full Playwright suite on a data publish. A PR whose only changed file is `js/data.json` runs the validators, the unit tests, the generated-page build and a four-test smoke subset (`e2e/data-smoke.spec.js`, tagged `@data-smoke`, `npm run test:smoke`): the calendar renders, the A to Z view holds every active venue, a venue detail opens, the submit page builds its tag list, and no page errors. Every other PR and every push to main run the full suite as before, and it now also runs nightly against the live data and on demand. The Ticketed spec no longer depends on live data (#393), which had blocked a valid publish. No application behaviour changed. | Claude Code |
 | 2026-11 | 1.0.78 | #399: when `js/data.json` fails to load, the page no longer renders an empty week. `loadData()` returns `false` and `init()` stops before the navigation and view; `#main-content` shows "Couldn't load the schedule" (or that the browser is offline) with a **Retry** button that reloads. The raw error text is console-only. New `e2e/data-load-error.spec.js`. Updated Section 11. | Claude Code |
+| 2026-11 | 1.0.79 | #400: the calendar no longer jumps back to today on every filter change or search keystroke. `WeeklyView` remembers the week it last scrolled for (`_scrolledWeek`) and scrolls to today only when the viewed week changes: first render or week navigation. New `e2e/weekly-scroll.spec.js`. Updated Section 2 "Auto-Scroll". | Claude Code |
 
 ---
 

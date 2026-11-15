@@ -290,7 +290,7 @@ sequenceDiagram
 
     WeeklyView->>WeeklyView: Render extended sections
     WeeklyView->>WeeklyView: container.innerHTML = html
-    WeeklyView->>WeeklyView: afterRender() — scroll to today
+    WeeklyView->>WeeklyView: afterRender() — scroll to today (only when the week changed, #400)
 ```
 
 ---
