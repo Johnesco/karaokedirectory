@@ -10,3 +10,4 @@
   - [Surface data unification](spikes/surface-data-unification.md)
   - [Day-card sections](spikes/day-card-sections.md)
   - [Curator update flow](spikes/curator-update-flow.md)
+  - [UX quick wins audit](spikes/ux-quick-wins-2026-11-15.md)
