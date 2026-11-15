@@ -327,11 +327,6 @@ button {
     color: var(--color-error);
 }
 
-.error-message pre {
-    background: var(--color-gray-800);
-    padding: var(--spacing-md);
-    border-radius: var(--border-radius-sm);
-    overflow-x: auto;
-    font-size: var(--font-size-sm);
+.error-message__retry {
     margin-top: var(--spacing-md);
 }
