@@ -136,8 +136,16 @@ export class WeeklyView extends Component {
             attachExtendedSectionListeners(this.container);
         }
 
-        // Auto-scroll to today if viewing current week
-        this.scrollToToday();
+        // Auto-scroll to today, but only when the week on screen changes: the
+        // first render, or week navigation. A filter toggle or a search
+        // keystroke re-renders the same week and must leave the reader where
+        // they were, not throw them back to today (#400). The jump-to-today
+        // FAB keeps its own scroll.
+        const viewedWeek = getWeekStart(getState('weekStart')).toDateString();
+        if (viewedWeek !== this._scrolledWeek) {
+            this._scrolledWeek = viewedWeek;
+            this.scrollToToday();
+        }
     }
 
     scrollToToday() {
