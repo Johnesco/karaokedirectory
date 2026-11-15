@@ -66,8 +66,10 @@ async function init() {
     // takes the answer.
     initFreshLens(readLocation().fresh);
 
-    // Load venue data
-    await loadData();
+    // Load venue data. On failure loadData() has already put an error in
+    // #main-content; stop here, because rendering the calendar over no data
+    // shows seven empty days, which reads as "no karaoke this week" (#399).
+    if (!(await loadData())) return;
 
     // Initialize navigation
     navigation = new Navigation('#navigation');
@@ -178,6 +180,9 @@ async function init() {
  * Needs the page served over http(s): fetch is blocked on file:// origins, so
  * opening index.html straight from disk won't work. Run a local server
  * (`npm run dev`).
+ *
+ * @returns {Promise<boolean>} true when the data loaded; false when it did
+ *   not, in which case the error is already on screen and init() must stop.
  */
 async function loadData() {
     try {
@@ -203,21 +208,41 @@ async function loadData() {
                 indicator.innerHTML = `<i class="fa-solid fa-bug"></i> Debug Mode | ${dataSource}`;
             }
         }
+        return true;
     } catch (error) {
+        // The detail stays in the console. On screen, the visitor needs to
+        // know the schedule is missing (not empty) and what to do about it —
+        // an HTTP status or a parser message tells them neither (#399).
         console.error('Failed to load venue data:', error);
-
-        // Show error to user
-        const container = document.querySelector('#main-content');
-        if (container) {
-            container.innerHTML = `
-                <div class="error-message">
-                    <h2>Error Loading Data</h2>
-                    <p>Failed to load venue data. Please refresh the page.</p>
-                    <pre>${error.message}</pre>
-                </div>
-            `;
-        }
+        renderLoadError();
+        return false;
     }
+}
+
+/**
+ * Replace the loading spinner with a "couldn't load" message and a Retry
+ * button. Worded for the likeliest cause at a karaoke bar — a bad signal —
+ * and for the browser's own verdict when it says it is offline.
+ */
+function renderLoadError() {
+    const container = document.querySelector('#main-content');
+    if (!container) return;
+
+    const hint = navigator.onLine === false
+        ? 'You appear to be offline. Reconnect, then try again.'
+        : 'Check your connection, then try again.';
+
+    container.innerHTML = `
+        <div class="error-message" role="alert">
+            <h2>Couldn't load the schedule</h2>
+            <p>${hint}</p>
+            <button type="button" class="btn btn--primary error-message__retry" data-action="retry-load">
+                <i class="fa-solid fa-rotate-right" aria-hidden="true"></i> Retry
+            </button>
+        </div>
+    `;
+    container.querySelector('[data-action="retry-load"]')
+        ?.addEventListener('click', () => location.reload());
 }
 
 /**
