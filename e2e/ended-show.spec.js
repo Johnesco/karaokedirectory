@@ -1,5 +1,6 @@
 // @ts-check
 const { test, expect } = require('@playwright/test');
+const { pinToNoon } = require('./helpers/clock');
 
 /**
  * Ended shows (#373, #378): a recurring show whose last night has arrived
@@ -69,6 +70,9 @@ async function serveWithEndedVenues(page) {
 const card = (scope, id) => `.weekly-view > .weekly-view__grid ${scope} .venue-card[data-venue-id="${id}"]`;
 
 test.describe('Ended shows (#373, #378)', () => {
+  // Today in Node and Today on the page must agree, even after midnight (#401).
+  test.beforeEach(({ page }) => pinToNoon(page));
+
 
   test.beforeEach(async ({ page }) => {
     await serveWithEndedVenues(page);

@@ -25,13 +25,51 @@ export function getDayDisplayName(date) {
 }
 
 /**
- * Check if date is today
- * @param {Date} date - Date to check
- * @returns {boolean} True if today
+ * The hour the calendar's "Today" moves to the next date (#401, owner's
+ * decision: 1 AM). Karaoke runs past midnight, so at 12:45 AM the reader is
+ * still out on Friday night: Friday stays Today and its cards stay open.
  */
-export function isToday(date) {
-    const today = new Date();
-    return date.toDateString() === today.toDateString();
+export const NIGHT_ROLLOVER_HOUR = 1;
+
+/**
+ * The date the calendar calls Today: the night still under way, which until
+ * NIGHT_ROLLOVER_HOUR is yesterday's date. Local midnight of that date.
+ *
+ * Only for what the calendar *presents* as today: the Today card and badge,
+ * which days are past, the current week, the scroll target and the FAB.
+ * Schedule matching, Ended and the 30-day clocks stay on calendar dates.
+ *
+ * @param {Date} [now] - The moment to read (defaults to now)
+ * @returns {Date} 00:00:00.000 local on the night's date
+ */
+export function displayToday(now = new Date()) {
+    const d = new Date(now);
+    d.setHours(d.getHours() - NIGHT_ROLLOVER_HOUR);
+    d.setHours(0, 0, 0, 0);
+    return d;
+}
+
+/**
+ * Whether a date is the calendar's Today: the night under way (displayToday).
+ * @param {Date} date - Date to check
+ * @param {Date} [now] - The moment to read (defaults to now)
+ * @returns {boolean}
+ */
+export function isToday(date, now = new Date()) {
+    return date.toDateString() === displayToday(now).toDateString();
+}
+
+/**
+ * Whether a date is a past night on the calendar: before displayToday, so
+ * between midnight and NIGHT_ROLLOVER_HOUR yesterday is not past yet.
+ * @param {Date} date - Date to check
+ * @param {Date} [now] - The moment to read (defaults to now)
+ * @returns {boolean}
+ */
+export function isPastDay(date, now = new Date()) {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    return d < displayToday(now);
 }
 
 /**
@@ -145,12 +183,16 @@ export function getWeekRange(date = new Date()) {
  * week start with `setDate(getDate() - getDay())` and compared `getTime()`.
  * They agreed, but only by coincidence of both being correct.
  *
+ * "Today" here is displayToday (#401): early on a Sunday morning the night
+ * under way is Saturday's, so the current week is still the one that ends.
+ *
  * @param {Date} weekStart - Any date within the week being examined
+ * @param {Date} [now] - The moment to read (defaults to now)
  * @returns {boolean}
  */
-export function isCurrentWeek(weekStart) {
+export function isCurrentWeek(weekStart, now = new Date()) {
     if (!weekStart) return false;
-    return getWeekStart(new Date()).getTime() === getWeekStart(weekStart).getTime();
+    return getWeekStart(displayToday(now)).getTime() === getWeekStart(weekStart).getTime();
 }
 
 /**

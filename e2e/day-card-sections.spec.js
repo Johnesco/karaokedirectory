@@ -1,5 +1,6 @@
 // @ts-check
 const { test, expect } = require('@playwright/test');
+const { pinToNoon } = require('./helpers/clock');
 
 /**
  * Day-card sections (ADR-017, #324, #335): every day card groups its shows as
@@ -84,6 +85,9 @@ async function load(page) {
 }
 
 test.describe('Day-card sections (ADR-017, #324)', () => {
+  // Today in Node and Today on the page must agree, even after midnight (#401).
+  test.beforeEach(({ page }) => pinToNoon(page));
+
 
   test('today\'s card renders the sections in order, each show in the right one', async ({ page }) => {
     const picked = await load(page);
