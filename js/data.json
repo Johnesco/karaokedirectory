@@ -3753,6 +3753,43 @@
         "facebook": "https://www.facebook.com/BobsBlueCollarTavern/"
       },
       "phone": "512-285-9633"
+    },
+    {
+      "id": "bedrock-breakfast-and-bar",
+      "name": "Bedrock Breakfast & Bar",
+      "created": "2026-11-16",
+      "dedicated": false,
+      "address": {
+        "street": "114 East Main Street",
+        "city": "Round Rock",
+        "state": "TX",
+        "zip": "78664"
+      },
+      "schedule": [
+        {
+          "frequency": "every",
+          "day": "Wednesday",
+          "startTime": "20:00",
+          "endTime": "00:00",
+          "host": {
+            "companyId": "diamond-karaoke-austin"
+          },
+          "activePeriod": {
+            "start": "2026-11-18"
+          },
+          "created": "2026-11-16",
+          "lastVerified": "2026-11-18"
+        }
+      ],
+      "coordinates": {
+        "lat": 30.509088,
+        "lng": -97.67822
+      },
+      "socials": {
+        "website": "https://www.bedrockbreakfast.com/",
+        "facebook": "https://www.facebook.com/profile.php?id=61595356312094#",
+        "instagram": "https://www.instagram.com/bedrockbreakfast"
+      }
     }
   ]
 }
