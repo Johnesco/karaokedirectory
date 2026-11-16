@@ -460,6 +460,8 @@ Every day card groups its shows: **Specials** (one-time events, no heading) → 
 | `.day-card--empty` | Collapsed, dimmed — no matching venues |
 | `.day-card--expanded` | Modifier for expanded past days |
 
+**"Today" is the night under way until 1 AM** (#401, owner's decision). `displayToday()` in `js/utils/date.js` drives the Today card, which days are past, the current week, the scroll target and the jump-to-today FAB. Schedule matching, Ended and the 30-day clocks stay on calendar dates. Specs that compute "today" in Node against real data pin the page clock to noon (`e2e/helpers/clock.js`) so the two agree after midnight.
+
 ## CSS Conventions
 
 ### CSS Loading Order (IMPORTANT)

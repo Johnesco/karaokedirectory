@@ -14,22 +14,11 @@
 
 import { Component } from './Component.js';
 import { renderVenueCard } from './VenueCard.js';
-import { formatDateShort, isToday, getDayDisplayName, getDayName, getScheduleExclusion, isEndedOn } from '../utils/date.js';
+import { formatDateShort, isToday, isPastDay as isPast, getDayDisplayName, getDayName, getScheduleExclusion, isEndedOn } from '../utils/date.js';
 import { getVenueEventsForDate } from '../services/venues.js';
 import { renderDisclosureButton } from '../utils/disclosure.js';
 import { getState } from '../core/state.js';
 import { groupShows } from '../utils/sections.js';
-
-/**
- * Check if a date is in the past (before today)
- */
-function isPast(date) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const checkDate = new Date(date);
-    checkDate.setHours(0, 0, 0, 0);
-    return checkDate < today;
-}
 
 export class DayCard extends Component {
     /**

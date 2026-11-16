@@ -8,6 +8,7 @@
  * any real show being ticketed.
  */
 const { test, expect } = require('@playwright/test');
+const { pinToNoon } = require('./helpers/clock');
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -26,6 +27,9 @@ function pickCandidate(data) {
 }
 
 test.describe('Ticketed badge', () => {
+  // Today in Node and Today on the page must agree, even after midnight (#401).
+  test.beforeEach(({ page }) => pinToNoon(page));
+
   test('a ticketed show carries the badge and a Tickets link; an unflagged one does not', async ({ page }) => {
     let picked = null;
 

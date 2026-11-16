@@ -1,5 +1,6 @@
 // @ts-check
 const { test, expect } = require('@playwright/test');
+const { pinToNoon } = require('./helpers/clock');
 
 /**
  * The Announced marker (ADR-015, #275): a calendar card for the night a show
@@ -48,6 +49,9 @@ function pickCandidate(data, iso) {
 }
 
 test.describe('Announced marker (ADR-015, #275)', () => {
+  // Today in Node and Today on the page must agree, even after midnight (#401).
+  test.beforeEach(({ page }) => pinToNoon(page));
+
 
   test('the real data renders exactly the markers it implies (none today, most days)', async ({ page }) => {
     const data = await (await page.request.get('/js/data.json')).json();

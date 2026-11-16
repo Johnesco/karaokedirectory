@@ -1,5 +1,6 @@
 // @ts-check
 const { test, expect } = require('@playwright/test');
+const { pinToNoon } = require('./helpers/clock');
 
 /**
  * A show's lifespan (ADR-016, #288): a schedule entry may carry its own
@@ -66,6 +67,9 @@ async function serveWithLifespanVenue(page) {
 const card = (scope) => `.weekly-view > .weekly-view__grid ${scope} .venue-card[data-venue-id="${VENUE_ID}"]`;
 
 test.describe('Show lifespan (ADR-016)', () => {
+  // Today in Node and Today on the page must agree, even after midnight (#401).
+  test.beforeEach(({ page }) => pinToNoon(page));
+
 
   test.beforeEach(async ({ page }) => {
     await serveWithLifespanVenue(page);
