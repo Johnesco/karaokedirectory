@@ -156,6 +156,7 @@ karaokedirectory/
 │       ├── date.js        # Date formatting, schedule matching
 │       ├── debug.js       # Debug mode utilities
 │       ├── hosts.js       # Host ref hydration (kjs/companies registries, ADR-007)
+│       ├── print.js       # ?print= plain-text printout of one night (#463)
 │       ├── render.js      # Shared rendering (schedule table, host section, active period)
 │       ├── string.js      # Text manipulation, escaping
 │       ├── tags.js        # Venue tag rendering and configuration
@@ -177,8 +178,8 @@ karaokedirectory/
 ├── schema/
 │   └── venue.schema.json  # Authoritative venue schema (ADR-005)
 │
-├── e2e/                   # Playwright specs (22 files) — run by `npm test`, gated in CI. `data-smoke.spec.js` is the subset a data publish runs
-├── test/                  # node --test unit specs (12 files: 11 listed by name, plus sections.test.mjs) — run by `npm run test:unit`
+├── e2e/                   # Playwright specs (23 files) — run by `npm test`, gated in CI. `data-smoke.spec.js` is the subset a data publish runs
+├── test/                  # node --test unit specs (13 files: 11 listed by name, plus sections and print) — run by `npm run test:unit`
 │   ├── date.test.mjs      # Schedule matching, exclusions, lifespans, date ranges
 │   ├── venues.test.mjs    # venuePasses, search predicates, host hydration
 │   ├── render.test.mjs    # Host resolution, schedule table, "Also" line
@@ -433,6 +434,7 @@ Tags are rendered as color-coded badges in VenueCard, VenueModal and MapView usi
 - `?kj=<id>` — KJ dossier (`KJDossierView`). Carries a **registry id**, matched exactly, so `?kj=armando` no longer also matches "KJ Armando and Paola". A non-id value still substring-matches names, so links shared before #124 Phase 5 keep working
 - `?debug=1` — debug mode (also `localStorage.debug=1`)
 - `?fresh=1` — freshness lens (#259): reveals each show's confirmed night on calendar cards, the detail schedule table and the KJ dossier, worded from that night (ADR-015) — "Announced for Oct 1" ahead of it, "Verified today" on it, "Verified Aug 28 · 9d" after. URL-only by decision — no `localStorage` twin. Read by `readLocation()`, initialised via `initFreshLens()` in `js/utils/freshness.js`
+- `?print=<today|yesterday|tomorrow|MMDDYYYY>` — one night's shows as plain text for a social media post, with a Copy button, in place of the app (#463). Specials first, then alphabetical; nights off and Ended cards left out. The router passes the raw value; `parsePrintDate()` and `formatPrintout()` in `js/utils/print.js` own the meaning and the text. An unreadable value shows the accepted forms
 - `#view=<v>&venue=<id>` — deep link to a selected venue. The hash records the **actual** view; a venue-less hash is cleared rather than left as `#view=weekly`
 - Legacy bare hashes (`#weekly`) are still honoured
 
@@ -580,7 +582,7 @@ npm run data:publish      # gates, then open the data PR with auto-merge on (no 
 |---|---|---|
 | `validate:all` | `js/data.json` against `schema/venue.schema.json`, plus cross-row checks and data-quality warnings; CSS load order on all 4 pages | Non-zero exit fails CI. Warnings are informational and do not fail |
 | `test:unit` | `js/utils/date.js`, `js/utils/hosts.js`, and the pure predicates in `js/services/venues.js` | **Pure modules only.** View classes belong to e2e — do not unit test them |
-| `npm test` | Behaviour across all 4 pages, 22 spec files | Starts its own server on **:3456**, so it will not collide with `npm run dev` |
+| `npm test` | Behaviour across all 4 pages, 23 spec files | Starts its own server on **:3456**, so it will not collide with `npm run dev` |
 
 **A data publish does not run the full suite** (#395). When a PR's only changed file is `js/data.json`, the `End-to-end tests` job runs the generated-page build and `e2e/data-smoke.spec.js` (the calendar renders, A to Z holds every active venue, a venue opens, the submit page builds its tags, no page errors) and skips the rest. The job still reports, because branch protection requires it by name. Every other PR and every push to main run everything, and the full suite also runs **nightly** (and on demand) against the live data, because several specs read real data and today's date and can fail with no code change. A spec that must see a particular show **patches it into the fetched data and clears the real ones first**; #393 blocked a valid publish by not doing that.
 

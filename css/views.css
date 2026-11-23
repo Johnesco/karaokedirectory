@@ -1470,3 +1470,39 @@ body.view--map .map-view__container {
 .kj-index__no-host-link i {
     margin-right: var(--spacing-2xs);
 }
+
+/* ==========================================================================
+   Print view (?print=<day>, #463) — one night as plain text to copy
+   ========================================================================== */
+
+/* The page is for copying, not browsing: the nav bar has nothing to do. */
+body.view--print .navigation-container {
+    display: none;
+}
+
+.print-view {
+    max-width: 48rem;
+    margin: 0 auto;
+}
+
+.print-view__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.print-view__text {
+    margin: 0;
+    padding: var(--spacing-md);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+    /* Keep the post's own line breaks, but wrap long lines on a phone. */
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}

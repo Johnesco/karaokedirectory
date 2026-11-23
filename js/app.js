@@ -5,7 +5,8 @@
 
 import { setState, subscribe, getState, goToCurrentWeek } from './core/state.js';
 import { on, emit, Events } from './core/events.js';
-import { initVenues, getVenueById } from './services/venues.js';
+import { initVenues, getVenueById, getVenueEventsForDate } from './services/venues.js';
+import { parsePrintDate, printableShows, formatPrintout, PRINT_FORMAT_HINT } from './utils/print.js';
 import { Navigation } from './components/Navigation.js';
 import { VenueModal } from './components/VenueModal.js';
 import { WeeklyView } from './views/WeeklyView.js';
@@ -70,6 +71,14 @@ async function init() {
     // #main-content; stop here, because rendering the calendar over no data
     // shows seven empty days, which reads as "no karaoke this week" (#399).
     if (!(await loadData())) return;
+
+    // ?print=<day> (#463): one night as plain text, in place of the app. No
+    // navigation, views or FABs: the page is something to copy, not browse.
+    const { print } = readLocation();
+    if (print !== null) {
+        renderPrintout(print);
+        return;
+    }
 
     // Initialize navigation
     navigation = new Navigation('#navigation');
@@ -243,6 +252,67 @@ function renderLoadError() {
     `;
     container.querySelector('[data-action="retry-load"]')
         ?.addEventListener('click', () => location.reload());
+}
+
+/**
+ * The `?print=` page (#463): one night's shows as plain text, with a Copy
+ * button, ready to paste into a social media post. What the text says is
+ * utils/print.js; this only puts it on the page. textContent throughout, so
+ * nothing in the data is ever parsed as markup.
+ *
+ * @param {string} value - The raw `?print=` value
+ */
+function renderPrintout(value) {
+    const container = document.querySelector('#main-content');
+    if (!container) return;
+    document.body.classList.add('view--print');
+
+    const section = document.createElement('section');
+    section.className = 'print-view';
+    container.replaceChildren(section);
+
+    const date = parsePrintDate(value);
+    if (!date) {
+        section.innerHTML = `
+            <div class="error-message" role="alert">
+                <h2>Can't read that date</h2>
+                <p class="print-view__hint"></p>
+            </div>
+        `;
+        section.querySelector('.print-view__hint').textContent = PRINT_FORMAT_HINT;
+        return;
+    }
+
+    const text = formatPrintout(printableShows(getVenueEventsForDate(date), date), date);
+
+    section.innerHTML = `
+        <div class="print-view__actions">
+            <button type="button" class="btn btn--primary" data-action="copy-print">
+                <i class="fa-solid fa-copy" aria-hidden="true"></i> <span>Copy text</span>
+            </button>
+            <a class="btn btn--secondary" href="./">Back to the calendar</a>
+        </div>
+        <pre class="print-view__text"></pre>
+    `;
+    section.querySelector('.print-view__text').textContent = text;
+
+    const button = section.querySelector('[data-action="copy-print"]');
+    const label = button.querySelector('span');
+    button.addEventListener('click', async () => {
+        try {
+            await navigator.clipboard.writeText(text);
+            label.textContent = 'Copied';
+        } catch {
+            // Clipboard refused (insecure origin, permissions): select the
+            // text so a manual copy is one keystroke away.
+            const range = document.createRange();
+            range.selectNodeContents(section.querySelector('.print-view__text'));
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            label.textContent = 'Selected: copy it now';
+        }
+    });
 }
 
 /**

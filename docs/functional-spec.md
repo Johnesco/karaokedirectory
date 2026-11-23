@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.80
+**Version:** 1.0.81
 **Last updated:** November 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -70,7 +70,7 @@ The default view. Displays a 7-day schedule grid showing which venues have karao
 
 Karaoke runs past midnight, so the calendar's **Today is the night under way**, not the calendar date: it moves to the next date at **1 AM** (`NIGHT_ROLLOVER_HOUR`, owner's decision). At 12:45 AM Saturday, Friday is still Today, keeps its badge and stays expanded, and Saturday is still ahead. Early on a Sunday the night under way is Saturday's, so the calendar opens on the week that ends that night.
 
-- **What follows it** (`displayToday()` in `js/utils/date.js`): the Today card and badge, which days are past, the current week (initial `weekStart`, the **Today** nav button, `isCurrentWeek()`), the auto-scroll target, and the jump-to-today button.
+- **What follows it** (`displayToday()` in `js/utils/date.js`): the Today card and badge, which days are past, the current week (initial `weekStart`, the **Today** nav button, `isCurrentWeek()`), the auto-scroll target, the jump-to-today button, and the date `?print=today` / `yesterday` / `tomorrow` count from ("Plain-Text Printout", #463).
 - **What does not:** schedule matching, Ended (§11 "Show Lifespan"), the 30-day New / Updated / Verified clocks, the freshness lens and the map's Today filter all keep reading **calendar dates**. A card's shows are always that date's shows; only which card is called Today changes.
 
 ### Day Card Header
@@ -210,6 +210,37 @@ This prevents the same weekly-recurring venue from appearing multiple times acro
   renders every venue scheduled that day, which is what the primary week wants
 - Pinned by e2e: a section's badge equals its unique rendered venues, and a
   deduplicating section repeats nothing shown above it
+
+### Plain-Text Printout (`?print=`, #463)
+
+`index.html?print=<day>` replaces the app with one night's shows as plain text, ready to paste into a social media post, with a **Copy text** button and a link back to the calendar. No navigation bar, views or floating buttons are rendered.
+
+| `<day>` | Means |
+|---|---|
+| `today`, `yesterday`, `tomorrow` (any case) | Counted from the calendar's Today, `displayToday()`: until 1 AM, "today" is the night under way, so at 12:30 AM Saturday `?print=today` prints Friday, matching the Today card ("Tonight Lasts Until 1 AM") |
+| 8 digits, `MMDDYYYY` | That date, e.g. `?print=11272026`. It must be a real date: `02302026` is refused, not rolled into March |
+| Anything else, or empty | "Can't read that date", with the accepted forms. No listing |
+
+The text, built by `formatPrintout()` in `js/utils/print.js`:
+
+```
+Karaoke in Austin — Sunday, November 22, 2026
+
+★ Event Name at Venue — 8:00 PM - 11:00 PM, Austin (ticketed)
+
+• Venue — 9:00 PM - 1:00 AM, Round Rock · KJ Name (Company)
+…
+
+16 shows. Times change, so check with the venue before you go.
+Full schedule: https://karaokedirectory.com
+```
+
+- **The same shows the calendar lists that night,** from `getVenueEventsForDate()`, so the post and the site cannot disagree: one-time specials first, then the rest alphabetical (Display Philosophy #1). The day-card sections (New, Updated, Featured, Verified) are on-site groupings and are not carried over.
+- **Only shows that run.** A night off (an exclusion) and a card bannered "Ended" that night are left out (`printableShows()`); the calendar shows them with a banner, but a post has no banner.
+- Each line carries the time range, the city, the show's effective host (`resolveHostFor()`) when there is one, and "(ticketed)" when the show is.
+- A night with nothing on prints "No karaoke listed for this night." and the link.
+- **Copy text** uses the Clipboard API. Where the browser refuses it, the text is selected instead and the button reads "Selected: copy it now".
+- The router passes `?print=` through raw (`readLocation().print`, `null` when absent); `parsePrintDate()` decides what it means. Everything on the page is set with `textContent`.
 
 ---
 
@@ -1884,6 +1915,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-11 | 1.0.78 | #399: when `js/data.json` fails to load, the page no longer renders an empty week. `loadData()` returns `false` and `init()` stops before the navigation and view; `#main-content` shows "Couldn't load the schedule" (or that the browser is offline) with a **Retry** button that reloads. The raw error text is console-only. New `e2e/data-load-error.spec.js`. Updated Section 11. | Claude Code |
 | 2026-11 | 1.0.79 | #400: the calendar no longer jumps back to today on every filter change or search keystroke. `WeeklyView` remembers the week it last scrolled for (`_scrolledWeek`) and scrolls to today only when the viewed week changes: first render or week navigation. New `e2e/weekly-scroll.spec.js`. Updated Section 2 "Auto-Scroll". | Claude Code |
 | 2026-11 | 1.0.80 | #401: the calendar's Today is the night under way until **1 AM** (owner's decision; the ticket proposed 4 AM). New `displayToday()`, `isPastDay()` and `NIGHT_ROLLOVER_HOUR` in `js/utils/date.js`; `isToday()` and `isCurrentWeek()` read it, and so do the initial `weekStart`, `goToCurrentWeek()`, `WeeklyView.scrollToToday()` and the jump-to-today button. Matching, Ended and the 30-day clocks stay on calendar dates. DayCard's private `isPast()` is gone. New unit tests and `e2e/night-rollover.spec.js`; five real-data specs pin the page clock to noon (`e2e/helpers/clock.js`) so their Today agrees with Node's after midnight. New Section 2 "Tonight Lasts Until 1 AM". | Claude Code |
+| 2026-11 | 1.0.81 | #463: `?print=<day>` prints one night's shows as plain text for a social media post, with a Copy button. `<day>` is `today`, `yesterday`, `tomorrow` or `MMDDYYYY`; the three words count from `displayToday()`, so until 1 AM "today" is the night under way, as on the calendar. Anything else says what is accepted. Specials first, then alphabetical; nights off and Ended cards left out. New `js/utils/print.js` (`parsePrintDate`, `printableShows`, `formatShowLine`, `formatPrintout`), `readLocation()` gains `print`, `app.js` gains `renderPrintout()`. New `test/print.test.mjs`, `e2e/print-view.spec.js`. New Section 2 "Plain-Text Printout". | Claude Code |
 
 ---
 
