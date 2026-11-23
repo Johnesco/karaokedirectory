@@ -101,8 +101,13 @@ function parseHash(rawHash) {
  * `fresh` is the freshness lens (#259): URL-only by decision, so unlike
  * `debug` it has no localStorage twin.
  *
+ * `print` is the raw `?print=` value (#463), or null when absent. It is read
+ * here but not interpreted: parsePrintDate() in utils/print.js owns what it
+ * means, because "today" depends on the clock and the router does not.
+ *
  * @returns {{view: string|null, venueId: string|null, hostFilter: string,
- *            debug: boolean, fresh: boolean, isLegacyHashView: boolean}}
+ *            debug: boolean, fresh: boolean, print: string|null,
+ *            isLegacyHashView: boolean}}
  */
 export function readLocation() {
     const query = new URLSearchParams(window.location.search);
@@ -123,6 +128,7 @@ export function readLocation() {
         hostFilter: query.get('kj') || '',
         debug: query.get('debug') === '1',
         fresh: query.get('fresh') === '1',
+        print: query.get('print'),
         isLegacyHashView: !!legacyView,
     };
 }

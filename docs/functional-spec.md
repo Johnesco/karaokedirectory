@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.79
+**Version:** 1.0.81
 **Last updated:** November 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -203,6 +203,37 @@ This prevents the same weekly-recurring venue from appearing multiple times acro
   renders every venue scheduled that day, which is what the primary week wants
 - Pinned by e2e: a section's badge equals its unique rendered venues, and a
   deduplicating section repeats nothing shown above it
+
+### Plain-Text Printout (`?print=`, #463)
+
+`index.html?print=<day>` replaces the app with one night's shows as plain text, ready to paste into a social media post, with a **Copy text** button and a link back to the calendar. No navigation bar, views or floating buttons are rendered.
+
+| `<day>` | Means |
+|---|---|
+| `today`, `yesterday`, `tomorrow` (any case) | Counted from today's calendar date |
+| 8 digits, `MMDDYYYY` | That date, e.g. `?print=11272026`. It must be a real date: `02302026` is refused, not rolled into March |
+| Anything else, or empty | "Can't read that date", with the accepted forms. No listing |
+
+The text, built by `formatPrintout()` in `js/utils/print.js`:
+
+```
+Karaoke in Austin — Sunday, November 22, 2026
+
+★ Event Name at Venue — 8:00 PM - 11:00 PM, Austin (ticketed)
+
+• Venue — 9:00 PM - 1:00 AM, Round Rock · KJ Name (Company)
+…
+
+16 shows. Times change, so check with the venue before you go.
+Full schedule: https://karaokedirectory.com
+```
+
+- **The same shows the calendar lists that night,** from `getVenueEventsForDate()`, so the post and the site cannot disagree: one-time specials first, then the rest alphabetical (Display Philosophy #1). The day-card sections (New, Updated, Featured, Verified) are on-site groupings and are not carried over.
+- **Only shows that run.** A night off (an exclusion) and a card bannered "Ended" that night are left out (`printableShows()`); the calendar shows them with a banner, but a post has no banner.
+- Each line carries the time range, the city, the show's effective host (`resolveHostFor()`) when there is one, and "(ticketed)" when the show is.
+- A night with nothing on prints "No karaoke listed for this night." and the link.
+- **Copy text** uses the Clipboard API. Where the browser refuses it, the text is selected instead and the button reads "Selected: copy it now".
+- The router passes `?print=` through raw (`readLocation().print`, `null` when absent); `parsePrintDate()` decides what it means. Everything on the page is set with `textContent`.
 
 ---
 
@@ -1876,6 +1907,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-11 | 1.0.77 | #395, #393: CI no longer runs the full Playwright suite on a data publish. A PR whose only changed file is `js/data.json` runs the validators, the unit tests, the generated-page build and a four-test smoke subset (`e2e/data-smoke.spec.js`, tagged `@data-smoke`, `npm run test:smoke`): the calendar renders, the A to Z view holds every active venue, a venue detail opens, the submit page builds its tag list, and no page errors. Every other PR and every push to main run the full suite as before, and it now also runs nightly against the live data and on demand. The Ticketed spec no longer depends on live data (#393), which had blocked a valid publish. No application behaviour changed. | Claude Code |
 | 2026-11 | 1.0.78 | #399: when `js/data.json` fails to load, the page no longer renders an empty week. `loadData()` returns `false` and `init()` stops before the navigation and view; `#main-content` shows "Couldn't load the schedule" (or that the browser is offline) with a **Retry** button that reloads. The raw error text is console-only. New `e2e/data-load-error.spec.js`. Updated Section 11. | Claude Code |
 | 2026-11 | 1.0.79 | #400: the calendar no longer jumps back to today on every filter change or search keystroke. `WeeklyView` remembers the week it last scrolled for (`_scrolledWeek`) and scrolls to today only when the viewed week changes: first render or week navigation. New `e2e/weekly-scroll.spec.js`. Updated Section 2 "Auto-Scroll". | Claude Code |
+| 2026-11 | 1.0.81 | #463: `?print=<day>` prints one night's shows as plain text for a social media post, with a Copy button. `<day>` is `today`, `yesterday`, `tomorrow` or `MMDDYYYY`; anything else says what is accepted. Specials first, then alphabetical; nights off and Ended cards left out. New `js/utils/print.js` (`parsePrintDate`, `printableShows`, `formatShowLine`, `formatPrintout`), `readLocation()` gains `print`, `app.js` gains `renderPrintout()`. New `test/print.test.mjs`, `e2e/print-view.spec.js`. New Section 2 "Plain-Text Printout". (1.0.80 is #401's, in flight.) | Claude Code |
 
 ---
 

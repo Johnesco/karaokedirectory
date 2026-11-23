@@ -79,8 +79,15 @@ describe('readLocation — query', () => {
     it('defaults cleanly on a bare URL', () => {
         at(ORIGIN + '/');
         assert.deepEqual(readLocation(), {
-            view: null, venueId: null, hostFilter: '', debug: false, fresh: false, isLegacyHashView: false,
+            view: null, venueId: null, hostFilter: '', debug: false, fresh: false, print: null, isLegacyHashView: false,
         });
+    });
+
+    it('passes ?print= through raw — parsing it is utils/print.js\'s job (#463)', () => {
+        at(ORIGIN + '/?print=Tomorrow');
+        assert.equal(readLocation().print, 'Tomorrow');
+        at(ORIGIN + '/?print=');
+        assert.equal(readLocation().print, '');
     });
 });
 
