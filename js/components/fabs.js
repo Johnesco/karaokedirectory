@@ -12,7 +12,7 @@
  */
 
 import { getState, setState, subscribe } from '../core/state.js';
-import { isCurrentWeek } from '../utils/date.js';
+import { isCurrentWeek, displayToday } from '../utils/date.js';
 
 const SCROLL_SHOW_AT = 300;
 
@@ -55,7 +55,7 @@ export function initFabs() {
     });
 
     jumpToToday.addEventListener('click', () => {
-        setState({ view: 'weekly', weekStart: new Date() });
+        setState({ view: 'weekly', weekStart: displayToday() });
 
         // Let the view re-render before scrolling to the card it creates.
         requestAnimationFrame(() => {

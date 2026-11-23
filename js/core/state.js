@@ -24,11 +24,15 @@
  * arriving cold. Removed in #157.
  */
 
+import { displayToday } from '../utils/date.js';
+
 const subscribers = new Map();
 
 const state = {
     view: 'weekly',
-    weekStart: new Date(),
+    // The night under way, not the calendar date: at 12:30 AM on a Sunday
+    // the week on screen is still the one holding Saturday night (#401).
+    weekStart: displayToday(),
     showDedicated: true,
     mapDateFilter: 'all',
     searchQuery: '',
@@ -107,7 +111,7 @@ export function navigateWeek(weeks) {
  * Go to current week
  */
 export function goToCurrentWeek() {
-    setState({ weekStart: new Date() });
+    setState({ weekStart: displayToday() });
 }
 
 export { state };

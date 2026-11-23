@@ -10,7 +10,7 @@ import { renderDayCard } from '../components/DayCard.js';
 import { renderExtendedSection, attachExtendedSectionListeners } from '../components/ExtendedSection.js';
 import { attachVenueSelectionListener } from '../components/venue-selection.js';
 import { getState, subscribe } from '../core/state.js';
-import { getWeekDates, getWeekStart, getNextWeekRange, getThisMonthRange, getNextMonthRange, getMonthName } from '../utils/date.js';
+import { getWeekDates, getWeekStart, getNextWeekRange, getThisMonthRange, getNextMonthRange, getMonthName, displayToday } from '../utils/date.js';
 import { getVenuesForDate } from '../services/venues.js';
 import { bindDisclosure } from '../utils/disclosure.js';
 
@@ -150,7 +150,7 @@ export class WeeklyView extends Component {
 
     scrollToToday() {
         const weekStart = getState('weekStart');
-        const today = new Date();
+        const today = displayToday();
         const weekStartDate = getWeekStart(weekStart);
         const currentWeekStart = getWeekStart(today);
 

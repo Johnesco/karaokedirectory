@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.79
+**Version:** 1.0.80
 **Last updated:** November 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -65,6 +65,13 @@ The default view. Displays a 7-day schedule grid showing which venues have karao
 | Empty day | `.day-card--empty` | Dimmed, collapsed to header only, shows "No karaoke scheduled" |
 | Past + expanded | `.day-card--past.day-card--expanded` | Past day that user clicked to expand |
 | Today + empty | `.day-card--today.day-card--empty` | Purple border, collapsed (search filtered all venues) |
+
+### Tonight Lasts Until 1 AM (#401)
+
+Karaoke runs past midnight, so the calendar's **Today is the night under way**, not the calendar date: it moves to the next date at **1 AM** (`NIGHT_ROLLOVER_HOUR`, owner's decision). At 12:45 AM Saturday, Friday is still Today, keeps its badge and stays expanded, and Saturday is still ahead. Early on a Sunday the night under way is Saturday's, so the calendar opens on the week that ends that night.
+
+- **What follows it** (`displayToday()` in `js/utils/date.js`): the Today card and badge, which days are past, the current week (initial `weekStart`, the **Today** nav button, `isCurrentWeek()`), the auto-scroll target, and the jump-to-today button.
+- **What does not:** schedule matching, Ended (§11 "Show Lifespan"), the 30-day New / Updated / Verified clocks, the freshness lens and the map's Today filter all keep reading **calendar dates**. A card's shows are always that date's shows; only which card is called Today changes.
 
 ### Day Card Header
 
@@ -1541,7 +1548,7 @@ second notification renders every listening view a second time.
 | Key | Type | Default | Purpose |
 |-----|------|---------|---------|
 | `view` | string | `'weekly'` | Base view: `weekly`, `alphabetical`, or `map`. What is actually on screen also depends on `hostFilter` — `router.resolveView()` combines the two |
-| `weekStart` | Date | Today | Start date for weekly view |
+| `weekStart` | Date | Today (the night under way, `displayToday()`, §2) | Start date for weekly view |
 | `showDedicated` | boolean | `true` | Whether dedicated venues are shown |
 | `mapDateFilter` | string | `'all'` | Which date span the map plots: `all`, `week`, or `today` ([Section 4](#4-map-view)). Map-only, and kept out of the URL because the spans are relative to "now" |
 | `searchQuery` | string | `''` | Current search text |
@@ -1566,7 +1573,7 @@ Which view subscribes to which key:
 - `setState(updates)` — update state and notify subscribers
 - `subscribe(key, callback)` — subscribe to changes for a specific key; returns unsubscribe function
 - `navigateWeek(weeks)` — move weekStart by N weeks
-- `goToCurrentWeek()` — reset weekStart to today
+- `goToCurrentWeek()` — reset weekStart to today (the night under way, until 1 AM, §2)
 
 > **Removed in #157.** The keys `venues`, `filteredVenues`, and `filters` were
 > documented here as the app's data model, but no code ever read or wrote them —
@@ -1876,6 +1883,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-11 | 1.0.77 | #395, #393: CI no longer runs the full Playwright suite on a data publish. A PR whose only changed file is `js/data.json` runs the validators, the unit tests, the generated-page build and a four-test smoke subset (`e2e/data-smoke.spec.js`, tagged `@data-smoke`, `npm run test:smoke`): the calendar renders, the A to Z view holds every active venue, a venue detail opens, the submit page builds its tag list, and no page errors. Every other PR and every push to main run the full suite as before, and it now also runs nightly against the live data and on demand. The Ticketed spec no longer depends on live data (#393), which had blocked a valid publish. No application behaviour changed. | Claude Code |
 | 2026-11 | 1.0.78 | #399: when `js/data.json` fails to load, the page no longer renders an empty week. `loadData()` returns `false` and `init()` stops before the navigation and view; `#main-content` shows "Couldn't load the schedule" (or that the browser is offline) with a **Retry** button that reloads. The raw error text is console-only. New `e2e/data-load-error.spec.js`. Updated Section 11. | Claude Code |
 | 2026-11 | 1.0.79 | #400: the calendar no longer jumps back to today on every filter change or search keystroke. `WeeklyView` remembers the week it last scrolled for (`_scrolledWeek`) and scrolls to today only when the viewed week changes: first render or week navigation. New `e2e/weekly-scroll.spec.js`. Updated Section 2 "Auto-Scroll". | Claude Code |
+| 2026-11 | 1.0.80 | #401: the calendar's Today is the night under way until **1 AM** (owner's decision; the ticket proposed 4 AM). New `displayToday()`, `isPastDay()` and `NIGHT_ROLLOVER_HOUR` in `js/utils/date.js`; `isToday()` and `isCurrentWeek()` read it, and so do the initial `weekStart`, `goToCurrentWeek()`, `WeeklyView.scrollToToday()` and the jump-to-today button. Matching, Ended and the 30-day clocks stay on calendar dates. DayCard's private `isPast()` is gone. New unit tests and `e2e/night-rollover.spec.js`; five real-data specs pin the page clock to noon (`e2e/helpers/clock.js`) so their Today agrees with Node's after midnight. New Section 2 "Tonight Lasts Until 1 AM". | Claude Code |
 
 ---
 

@@ -38,6 +38,11 @@ import {
   getThisMonthRange,
   getNextMonthRange,
   startOfToday,
+  displayToday,
+  isToday,
+  isPastDay,
+  isCurrentWeek,
+  NIGHT_ROLLOVER_HOUR,
   formatDateMonthDay,
   daysSince,
   freshnessOf,
@@ -107,6 +112,59 @@ describe('getWeekRange / startOfToday — the map date filter spans (#215)', () 
     assert.equal(d.getSeconds(), 0);
     assert.equal(d.getMilliseconds(), 0);
     assert.equal(d.toDateString(), new Date().toDateString());
+  });
+});
+
+describe('displayToday — the night under way stays Today until 1 AM (#401)', () => {
+  // Jan 2026: Fri 9, Sat 10, Sun 11. Sat 10 closes the week of Sun 4.
+  const at = (d, h, m = 0) => new Date(2026, 0, d, h, m);
+
+  it('the rollover hour is 1 AM, by the owner\'s decision', () => {
+    assert.equal(NIGHT_ROLLOVER_HOUR, 1);
+  });
+
+  it('at 12:45 AM Saturday, Friday is still Today and not past', () => {
+    const now = at(10, 0, 45);
+    assert.equal(displayToday(now).toDateString(), JAN(9).toDateString());
+    assert.equal(isToday(JAN(9), now), true);
+    assert.equal(isToday(JAN(10), now), false);
+    assert.equal(isPastDay(JAN(9), now), false);
+    assert.equal(isPastDay(JAN(8), now), true);
+  });
+
+  it('at 1:00 AM it rolls over: Saturday is Today and Friday is past', () => {
+    const now = at(10, 1, 0);
+    assert.equal(displayToday(now).toDateString(), JAN(10).toDateString());
+    assert.equal(isToday(JAN(10), now), true);
+    assert.equal(isPastDay(JAN(9), now), true);
+  });
+
+  it('an evening reads as its own date', () => {
+    const now = at(9, 23, 59);
+    assert.equal(isToday(JAN(9), now), true);
+    assert.equal(isPastDay(JAN(9), now), false);
+  });
+
+  it('returns local midnight of the night\'s date', () => {
+    const d = displayToday(at(10, 0, 30));
+    assert.equal(d.getHours(), 0);
+    assert.equal(d.getMinutes(), 0);
+  });
+
+  it('early Sunday belongs to the week that ends Saturday', () => {
+    const now = at(11, 0, 30);
+    assert.equal(isToday(JAN(10), now), true);
+    assert.equal(isCurrentWeek(JAN(4), now), true, 'the week holding Saturday night');
+    assert.equal(isCurrentWeek(JAN(11), now), false);
+    // From 1 AM the new week is current.
+    assert.equal(isCurrentWeek(JAN(11), at(11, 1, 0)), true);
+  });
+
+  it('schedule matching is untouched: it still reads calendar dates', () => {
+    // A Saturday show matches Saturday's date, whatever the time of night.
+    const sat = { frequency: 'every', day: 'Saturday', startTime: '21:00', endTime: '02:00' };
+    assert.equal(scheduleMatchesDate(sat, JAN(10)), true);
+    assert.equal(scheduleMatchesDate(sat, JAN(9)), false);
   });
 });
 
