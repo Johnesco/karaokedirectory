@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.81
+**Version:** 1.0.82
 **Last updated:** November 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -102,6 +102,7 @@ Every day card groups its shows into sections, in this order. A show sits in **e
 | **Featured** | "Featured" | its `featured` is `true`, or a placement window covering **the card's own date**. Test placements only for now (ADR-017) |
 | **Verified** | "Verified" | its `lastVerified` (§11 "Show Verification") is within a rolling 30 days of today. A confirmation for a night still ahead counts |
 | The rest | none | everything else |
+| Closed | none | it has a **night off** on the card's date (an `exclusions[]` entry, §11), whatever else it qualifies for (owner's decision, #465). Only that night moves, and any night off counts, whatever its reason. The card keeps its amber **"Closed: …"** banner and is not counted in the footer. Ended wins over Closed |
 | Ended | none | the show has ended (§11 "Show Lifespan", ADR-020). Always last. Each card carries a diagonal **"Ended"** banner across the whole card, over dimmed content, and is not counted in the footer |
 
 - **Both 30-day windows count from today, not from the card's date**, so every card shows the same split. That includes the extended sections (Next Week, Later in Month, Next Month), which render through the same component.
@@ -1916,6 +1917,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-11 | 1.0.79 | #400: the calendar no longer jumps back to today on every filter change or search keystroke. `WeeklyView` remembers the week it last scrolled for (`_scrolledWeek`) and scrolls to today only when the viewed week changes: first render or week navigation. New `e2e/weekly-scroll.spec.js`. Updated Section 2 "Auto-Scroll". | Claude Code |
 | 2026-11 | 1.0.80 | #401: the calendar's Today is the night under way until **1 AM** (owner's decision; the ticket proposed 4 AM). New `displayToday()`, `isPastDay()` and `NIGHT_ROLLOVER_HOUR` in `js/utils/date.js`; `isToday()` and `isCurrentWeek()` read it, and so do the initial `weekStart`, `goToCurrentWeek()`, `WeeklyView.scrollToToday()` and the jump-to-today button. Matching, Ended and the 30-day clocks stay on calendar dates. DayCard's private `isPast()` is gone. New unit tests and `e2e/night-rollover.spec.js`; five real-data specs pin the page clock to noon (`e2e/helpers/clock.js`) so their Today agrees with Node's after midnight. New Section 2 "Tonight Lasts Until 1 AM". | Claude Code |
 | 2026-11 | 1.0.81 | #463: `?print=<day>` prints one night's shows as plain text for a social media post, with a Copy button. `<day>` is `today`, `yesterday`, `tomorrow` or `MMDDYYYY`; the three words count from `displayToday()`, so until 1 AM "today" is the night under way, as on the calendar. Anything else says what is accepted. Specials first, then alphabetical; nights off and Ended cards left out. New `js/utils/print.js` (`parsePrintDate`, `printableShows`, `formatShowLine`, `formatPrintout`), `readLocation()` gains `print`, `app.js` gains `renderPrintout()`. New `test/print.test.mjs`, `e2e/print-view.spec.js`. New Section 2 "Plain-Text Printout". | Claude Code |
+| 2026-11 | 1.0.82 | #465: a show on its night off sorts to the bottom of that day, after the rest and before Ended, in a new unheaded **closed** section, instead of keeping New, Updated, Featured or Verified (owner's decision). Only that night moves; Ended wins over closed. `sectionOf()` returns `closed` via `getScheduleExclusion()`; `sectionReason()` gives "Closed: <reason> (night off)". New unit tests in `test/sections.test.mjs`. Updated Section 2 "Sections", ADR-017 amendment. | Claude Code |
 
 ---
 

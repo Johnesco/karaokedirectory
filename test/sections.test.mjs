@@ -179,3 +179,38 @@ describe('ended shows sort last (#373)', () => {
         assert.equal(sectionOf(v, ending, { date: new Date(2026, 10, 19), asOf: NOV5 }), 'ended');
     });
 });
+
+describe('a night off sorts to the bottom, before ended (#465)', () => {
+    const NOV18 = new Date(2026, 10, 18);
+    const NOV25 = new Date(2026, 10, 25);
+    const off = show({ day: 'Wednesday', lastVerified: '2026-11-18', exclusions: [{ date: '2026-11-25', reason: 'Holiday' }] });
+
+    it('on its night off a show is closed, whatever else it qualifies for', () => {
+        const fresh = show({ ...off, created: '2026-11-20', featured: true });
+        assert.equal(sectionOf(venue({ schedule: [fresh] }), fresh, { date: NOV25, asOf: NOV18 }), 'closed');
+        assert.equal(sectionOf(venue({ schedule: [off] }), off, { date: NOV25, asOf: NOV18 }), 'closed');
+    });
+    it('only that night: its other nights keep their section', () => {
+        assert.equal(sectionOf(venue({ schedule: [off] }), off, { date: NOV18, asOf: NOV18 }), 'verified');
+    });
+    it('the closed group sits after the rest and before ended, with no heading', () => {
+        const live = show({ day: 'Wednesday' });
+        const ended = show({ day: 'Wednesday', activePeriod: { end: '2026-11-18' } });
+        const groups = groupShows([
+            { venue: venue({ name: 'A', schedule: [ended] }), schedule: ended },
+            { venue: venue({ name: 'B', schedule: [off] }), schedule: off },
+            { venue: venue({ name: 'C', schedule: [live] }), schedule: live },
+        ], { date: NOV25, asOf: NOV18 });
+        assert.deepEqual(groups.map(g => g.key), ['rest', 'closed', 'ended']);
+        assert.equal(groups[1].label, null);
+    });
+    it('ended wins over a night off', () => {
+        const both = show({ day: 'Wednesday', activePeriod: { end: '2026-11-18' }, exclusions: [{ date: '2026-11-25' }] });
+        assert.equal(sectionOf(venue({ schedule: [both] }), both, { date: NOV25, asOf: NOV18 }), 'ended');
+    });
+    it('debug mode gives the reason, when there is one', () => {
+        assert.equal(sectionReason(venue({ schedule: [off] }), off, { date: NOV25, asOf: NOV18 }).text, 'Closed: Holiday (night off)');
+        const bare = show({ day: 'Wednesday', exclusions: [{ date: '2026-11-25' }] });
+        assert.equal(sectionReason(venue({ schedule: [bare] }), bare, { date: NOV25, asOf: NOV18 }).text, 'Closed: night off');
+    });
+});

@@ -59,6 +59,16 @@ ignores `activePeriod.start` on an entry carrying `changed`; otherwise every
 change would read as New. Ordering and the one-section-per-show rule are
 unchanged, and each section stays alphabetical.
 
+### Amendment (2026-11-23, #465): closed shows sink to the bottom
+
+A show on its **night off** (an `exclusions[]` date) is not happening that
+night, so on that card it leaves whatever section it qualified for and goes
+into an unheaded **closed** group after the rest and before Ended (ADR-020):
+… → the rest → **closed** → Ended. Owner's decision: the top of a day is what
+is actually happening. Only that night moves; any night off counts, whatever
+its reason; Ended still wins over closed. The card keeps its amber "Closed"
+banner.
+
 ## Consequences
 
 - **Good.** Signal (new, featured, recently confirmed) is visible without a click, and the regular schedule stays complete underneath. The grouping is a pure function over the rows `getVenueEventsForDate()` already emits. Filters, search, deduplication and the footer count are untouched.
