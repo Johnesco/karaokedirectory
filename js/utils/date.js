@@ -36,7 +36,8 @@ export const NIGHT_ROLLOVER_HOUR = 1;
  * NIGHT_ROLLOVER_HOUR is yesterday's date. Local midnight of that date.
  *
  * Only for what the calendar *presents* as today: the Today card and badge,
- * which days are past, the current week, the scroll target and the FAB.
+ * which days are past, the current week, the scroll target and the FAB, and
+ * the date `?print=today` names (#463).
  * Schedule matching, Ended and the 30-day clocks stay on calendar dates.
  *
  * @param {Date} [now] - The moment to read (defaults to now)

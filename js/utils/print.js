@@ -15,13 +15,14 @@
 
 import {
     formatTimeRange,
+    displayToday,
     getScheduleExclusion,
     isEndedOn,
     startOfToday,
 } from './date.js';
 import { resolveHostFor, formatHostDisplay } from './render.js';
 
-/** The words `?print=` accepts, as day offsets from today. */
+/** The words `?print=` accepts, as day offsets from the calendar's Today. */
 const RELATIVE_DAYS = { yesterday: -1, today: 0, tomorrow: 1 };
 
 /** Shown when `?print=` carries something it cannot read. */
@@ -34,15 +35,22 @@ export const SITE_URL = 'https://karaokedirectory.com';
 /**
  * Read a `?print=` value into a date.
  *
- * `today` / `yesterday` / `tomorrow` (any case) count from `today`. Eight
- * digits are MMDDYYYY and must be a real calendar date: `02302026` is refused
- * rather than rolled over into March, which is what `new Date()` would do.
+ * `today` / `yesterday` / `tomorrow` (any case) count from `today`, which
+ * defaults to the calendar's Today, displayToday() (#401): until 1 AM that is
+ * the night under way, so "today" at 12:30 AM Saturday prints Friday, the
+ * same night the Today card shows. Eight digits are MMDDYYYY and must be a
+ * real calendar date: `02302026` is refused rather than rolled over into
+ * March, which is what `new Date()` would do.
+ *
+ * Only the words follow the rollover. Which shows run on the chosen date, and
+ * whether one has Ended, stay on calendar dates, as everywhere else.
  *
  * @param {string|null|undefined} value - The raw query value
- * @param {Date} [today] - The date "today" means (local midnight)
+ * @param {Date} [today] - The date "today" means (local midnight); the
+ *   calendar's Today by default
  * @returns {Date|null} Local midnight on that date, or null when unreadable
  */
-export function parsePrintDate(value, today = startOfToday()) {
+export function parsePrintDate(value, today = displayToday()) {
     const v = String(value ?? '').trim().toLowerCase();
 
     if (v in RELATIVE_DAYS) {

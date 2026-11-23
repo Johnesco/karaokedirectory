@@ -60,6 +60,21 @@ test.describe('Print view', () => {
     }
   });
 
+  test('until 1 AM, today is the night under way, as on the calendar (#401)', async ({ page }) => {
+    // 12:30 AM Saturday, Nov 14 2026: Friday is still Today.
+    await page.clock.setFixedTime(new Date(2026, 10, 14, 0, 30));
+    await page.goto('/?print=today');
+    await expect(page.locator('.print-view__text')).toContainText('Karaoke in Austin — Friday, November 13, 2026', { timeout: 15000 });
+
+    await page.goto('/?print=tomorrow');
+    await expect(page.locator('.print-view__text')).toContainText('Karaoke in Austin — Saturday, November 14, 2026', { timeout: 15000 });
+
+    // From 1 AM the date moves on.
+    await page.clock.setFixedTime(new Date(2026, 10, 14, 1, 0));
+    await page.goto('/?print=today');
+    await expect(page.locator('.print-view__text')).toContainText('Karaoke in Austin — Saturday, November 14, 2026', { timeout: 15000 });
+  });
+
   test('an unreadable value says what is accepted', async ({ page }) => {
     for (const bad of ['02302026', 'friday', '']) {
       await page.goto(`/?print=${bad}`);
