@@ -9,6 +9,8 @@
  *   Featured    an owner-set flag on the show (test placements only for now)
  *   Verified    the show's `lastVerified` is within the last 30 days
  *   (the rest)  everything else; no heading
+ *   (closed)    a night off on this card's date (#465); no heading, after the
+ *               rest and before ended — the card carries its "Closed" banner
  *   (ended)     a show past its last night (#373); no heading, always last —
  *               each card carries its own "Ended" banner
  *
@@ -26,7 +28,7 @@
  * unit-tested without a DOM (test/sections.test.mjs).
  */
 
-import { hasEnded, isEndedOn, daysSince, parseLocalDate, startOfToday, VERIFIED_WINDOW_DAYS, formatDateMonthDay } from './date.js';
+import { hasEnded, isEndedOn, getScheduleExclusion, daysSince, parseLocalDate, startOfToday, VERIFIED_WINDOW_DAYS, formatDateMonthDay } from './date.js';
 
 /**
  * Both windows — New and Verified — are the one 30-day clock (#330). New uses
@@ -42,6 +44,7 @@ export const SECTIONS = [
     { key: 'featured', label: 'Featured' },
     { key: 'verified', label: 'Verified' },
     { key: 'rest', label: null },
+    { key: 'closed', label: null },
     { key: 'ended', label: null },
 ];
 
@@ -138,7 +141,7 @@ export function isFeaturedShow(venue, entry, date) {
  * @param {Object} options
  * @param {Date} options.date - The card's date (for Featured)
  * @param {Date} [options.asOf] - Today (for New and Verified)
- * @returns {'special'|'new'|'updated'|'featured'|'verified'|'rest'|'ended'}
+ * @returns {'special'|'new'|'updated'|'featured'|'verified'|'rest'|'closed'|'ended'}
  */
 export function sectionOf(venue, entry, { date, asOf = startOfToday() }) {
     // Ended first (#373): a show that no longer runs is not New, Verified or
@@ -146,6 +149,10 @@ export function sectionOf(venue, entry, { date, asOf = startOfToday() }) {
     // (#378), so a future last night reads normally until it arrives.
     const ended = date ? isEndedOn(entry, venue?.schedule, date, asOf) : hasEnded(entry, venue?.schedule, asOf);
     if (ended) return 'ended';
+    // Closed (#465): a night off on this card's date. Not happening tonight,
+    // so it sinks below everything that is, whatever else it qualifies for —
+    // only on that night. Ended still wins: a show that is over reads "Ended".
+    if (date && getScheduleExclusion(entry, date)) return 'closed';
     if (entry?.frequency === 'once') return 'special';
     if (isNewShow(venue, entry, asOf)) return 'new';
     if (isUpdatedShow(entry, asOf)) return 'updated';
@@ -174,6 +181,11 @@ export function sectionReason(venue, entry, { date, asOf = startOfToday() }) {
     if (key === 'special') return { key, text: 'Special: one-time event' };
 
     if (key === 'ended') return { key, text: `Ended: last night ${md(entry.activePeriod.end)}` };
+
+    if (key === 'closed') {
+        const { reason } = getScheduleExclusion(entry, date);
+        return { key, text: reason ? `Closed: ${reason} (night off)` : 'Closed: night off' };
+    }
 
     if (key === 'new') {
         const fromShow = withinWindow(newSince(entry), asOf);
