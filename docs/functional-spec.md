@@ -3,7 +3,7 @@
 > **Status:** Living document — must be updated with every code change.
 > **Authority:** This is the single source of truth for application behavior. Code must match this spec; any discrepancy must be flagged and resolved.
 
-**Version:** 1.0.82
+**Version:** 1.0.83
 **Last updated:** November 2026
 **Application:** Austin Karaoke Directory
 **Live site:** https://www.karaokedirectory.com
@@ -342,7 +342,7 @@ A card that appears over the map when a marker is selected. Has two states:
 - "Back to Summary" returns to compact view
 - Clicking the map background (not a marker or card) dismisses the card
 - **Past one-time events are hidden** — `frequency: "once"` entries dated before today are filtered out of both the summary and detail schedule. Recurring entries always show; the modal opened from the calendar view still display the full schedule unfiltered.
-- **Sizing:** full-width bottom sheet on mobile; on desktop (≥1024px) a fixed 350px-wide card anchored right (explicit width so it doesn't shrink to its content). The floating "Hide Dedicated" map control and the analytics consent-banner buttons are ≥44px tall (touch targets).
+- **Sizing:** full-width bottom sheet on mobile; on desktop (≥1024px) a fixed 350px-wide card anchored right (explicit width so it doesn't shrink to its content). The floating "Hide Dedicated" map control and the touch targets elsewhere are ≥44px tall.
 
 ### Exclusion Dates on the Map
 
@@ -1562,7 +1562,7 @@ Submission form limits to 3 submissions per hour per browser via `localStorage`.
 
 ### Privacy
 
-No analytics tag loads until the visitor consents. See **§23 Analytics and Consent**.
+Analytics are cookie-free page counts, with no personal data and no consent banner. See **§23 Analytics**.
 
 ---
 
@@ -1779,40 +1779,24 @@ Pages cross-link: a venue lists the KJs and companies who host there, and each o
 
 ---
 
-## 23 Analytics and Consent
+## 23 Analytics
 
-The site loads **Microsoft Clarity** (project `x1sfnv6zu4`) for anonymous traffic analytics — pageviews, clicks, scroll depth. Clarity sets non-essential cookies, so it is gated behind explicit consent.
+The site counts page views with **GoatCounter** (`https://karaokedirectory.goatcounter.com`), replacing Microsoft Clarity (#467, owner's decision: keep analytics simple). GoatCounter sets **no cookies** and collects **no personal data**, so there is **no consent banner**; Clarity's banner, its `.consent-banner` styles and the `--z-consent` token are gone. What it records: the page, the referrer, and screen size and browser. There are no heatmaps or session recordings.
 
-Implemented in `js/analytics.js`, loaded with `defer` on all four public pages (`index`, `about`, `submit`, `bingo`). It is a standalone IIFE, not an ES module, so it runs independently of `app.js`.
+Implemented in `js/analytics.js`, loaded with `defer` on all four public pages (`index`, `about`, `submit`, `bingo`) and on every generated entity page (`scripts/build-pages.js`). It is a standalone IIFE, not an ES module, so it runs independently of `app.js`. It appends GoatCounter's script (`https://gc.zgo.at/count.js`, `async`, with `data-goatcounter` naming the count endpoint) to `<head>`.
 
-### The guarantee
+### Production only
 
-**No analytics tag is requested before the visitor clicks Accept.** The Clarity script element is created inside `loadClarity()`, which is only reachable from stored consent or from the Accept handler. A visitor who declines, or who never answers, causes zero requests to `clarity.ms`.
+The script is added only when the host is `karaokedirectory.com` or `www.karaokedirectory.com`. Dev servers, the e2e server (:3456) and Netlify deploy previews make **no request to `gc.zgo.at`**, so they are not counted and the test suite does not depend on a third party.
 
-### Consent states
+### The old consent choice
 
-Stored in `localStorage` under **`kd_analytics_consent`**:
-
-| Value | Behavior |
-|---|---|
-| `"accepted"` | Clarity loads immediately on every subsequent page load. No banner. |
-| `"declined"` | Clarity never loads. No banner — the choice is not re-asked. |
-| *(absent)* | Banner renders; Clarity does not load until Accept is clicked. |
-
-Reads and writes are wrapped in `try/catch` so private-browsing modes that throw on `localStorage` degrade to "banner shown, nothing loaded" rather than breaking the page.
-
-### The banner
-
-Appended to `<body>` as `.consent-banner`, with `role="dialog"` and `aria-label="Analytics consent"`. Waits for `DOMContentLoaded` when the document is still loading.
-
-Copy: *"This site uses Microsoft Clarity for anonymous traffic analytics (pageviews, clicks, scrolling). No personal information is collected."* — followed by a **Learn more** link to `about.html#privacy`.
-
-Two buttons, **Decline** and **Accept**, handled by one delegated listener reading `data-consent`. Either choice persists the value and removes the banner; only Accept additionally calls `loadClarity()`.
+Clarity's banner stored a choice in `localStorage` under `kd_analytics_consent`. Nothing reads it now; `analytics.js` removes it (inside `try/catch`, for private modes that throw).
 
 ### Related
 
 - §20 *Security* — the privacy guarantee this section details
-- §17 *About Page* — the Privacy section the banner links to
+- §17 *About Page* — its Privacy section says the same in plain words
 
 ---
 
@@ -1918,6 +1902,7 @@ Two buttons, **Decline** and **Accept**, handled by one delegated listener readi
 | 2026-11 | 1.0.80 | #401: the calendar's Today is the night under way until **1 AM** (owner's decision; the ticket proposed 4 AM). New `displayToday()`, `isPastDay()` and `NIGHT_ROLLOVER_HOUR` in `js/utils/date.js`; `isToday()` and `isCurrentWeek()` read it, and so do the initial `weekStart`, `goToCurrentWeek()`, `WeeklyView.scrollToToday()` and the jump-to-today button. Matching, Ended and the 30-day clocks stay on calendar dates. DayCard's private `isPast()` is gone. New unit tests and `e2e/night-rollover.spec.js`; five real-data specs pin the page clock to noon (`e2e/helpers/clock.js`) so their Today agrees with Node's after midnight. New Section 2 "Tonight Lasts Until 1 AM". | Claude Code |
 | 2026-11 | 1.0.81 | #463: `?print=<day>` prints one night's shows as plain text for a social media post, with a Copy button. `<day>` is `today`, `yesterday`, `tomorrow` or `MMDDYYYY`; the three words count from `displayToday()`, so until 1 AM "today" is the night under way, as on the calendar. Anything else says what is accepted. Specials first, then alphabetical; nights off and Ended cards left out. New `js/utils/print.js` (`parsePrintDate`, `printableShows`, `formatShowLine`, `formatPrintout`), `readLocation()` gains `print`, `app.js` gains `renderPrintout()`. New `test/print.test.mjs`, `e2e/print-view.spec.js`. New Section 2 "Plain-Text Printout". | Claude Code |
 | 2026-11 | 1.0.82 | #465: a show on its night off sorts to the bottom of that day, after the rest and before Ended, in a new unheaded **closed** section, instead of keeping New, Updated, Featured or Verified (owner's decision). Only that night moves; Ended wins over closed. `sectionOf()` returns `closed` via `getScheduleExclusion()`; `sectionReason()` gives "Closed: <reason> (night off)". New unit tests in `test/sections.test.mjs`. Updated Section 2 "Sections", ADR-017 amendment. | Claude Code |
+| 2026-11 | 1.0.83 | #467: Microsoft Clarity replaced by **GoatCounter**, and the consent banner removed (owner's decision): GoatCounter sets no cookies and collects no personal data. `js/analytics.js` adds the GoatCounter script on the production host only; it also clears the old `kd_analytics_consent` key. `.consent-banner` CSS and `--z-consent` removed. about.html Privacy rewritten. Section 23 rewritten and renamed "Analytics"; §20 Privacy updated. | Claude Code |
 
 ---
 
