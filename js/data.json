@@ -202,6 +202,9 @@
     "xpider-cantu": {
       "name": "Xpider Cantu",
       "website": "https://www.xpidermagic.com/karaoke"
+    },
+    "kj-mike-on-the-mic": {
+      "name": "KJ Mike on the Mic"
     }
   },
   "companies": {
@@ -558,7 +561,9 @@
           "frequency": "every",
           "day": "Thursday",
           "startTime": "21:00",
-          "endTime": "01:30"
+          "endTime": "01:00",
+          "changed": "2026-11-23",
+          "lastVerified": "2026-11-19"
         }
       ],
       "host": {
@@ -1511,6 +1516,18 @@
           "day": "Saturday",
           "startTime": "19:00",
           "endTime": "22:00"
+        },
+        {
+          "frequency": "once",
+          "date": "2026-12-20",
+          "startTime": "18:00",
+          "endTime": "21:00",
+          "eventName": "All Ages Karaoke",
+          "host": {
+            "companyId": "starling-karaoke"
+          },
+          "created": "2026-11-23",
+          "lastVerified": "2026-12-20"
         }
       ],
       "host": {
@@ -2221,7 +2238,13 @@
             "start": "2026-10-01"
           },
           "lastVerified": "2026-10-15",
-          "created": "2026-09-26"
+          "created": "2026-09-26",
+          "exclusions": [
+            {
+              "date": "2026-11-26",
+              "reason": "Holiday"
+            }
+          ]
         }
       ],
       "socials": {
@@ -2318,7 +2341,14 @@
           "frequency": "every",
           "day": "Wednesday",
           "startTime": "19:00",
-          "endTime": "23:30"
+          "endTime": "23:30",
+          "lastVerified": "2026-11-18",
+          "exclusions": [
+            {
+              "date": "2026-11-25",
+              "reason": "Holiday"
+            }
+          ]
         }
       ],
       "host": {
@@ -2352,18 +2382,20 @@
         {
           "frequency": "every",
           "day": "Friday",
-          "startTime": "21:00",
+          "startTime": "20:00",
           "endTime": "00:00",
           "exclusions": [
             {
               "date": "2026-06-12",
               "reason": "Private event"
             }
-          ]
+          ],
+          "changed": "2026-11-23",
+          "lastVerified": "2026-11-20"
         }
       ],
       "host": {
-        "kjId": "kj-j3n",
+        "kjId": "kj-mike-on-the-mic",
         "companyId": "starling-karaoke"
       },
       "socials": {
@@ -3789,6 +3821,71 @@
         "website": "https://www.bedrockbreakfast.com/",
         "facebook": "https://www.facebook.com/profile.php?id=61595356312094#",
         "instagram": "https://www.instagram.com/bedrockbreakfast"
+      }
+    },
+    {
+      "id": "the-little-darlin",
+      "name": "The Little Darlin'",
+      "created": "2026-11-23",
+      "dedicated": false,
+      "address": {
+        "street": "6507 Circle S Rd",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78745"
+      },
+      "schedule": [
+        {
+          "frequency": "third",
+          "day": "Saturday",
+          "startTime": "21:00",
+          "endTime": "00:00",
+          "created": "2026-11-23",
+          "lastVerified": "2026-11-21"
+        }
+      ],
+      "host": {
+        "kjId": "average-joe",
+        "companyId": "starling-karaoke"
+      },
+      "coordinates": {
+        "lat": 30.194524,
+        "lng": -97.7768084
+      },
+      "socials": {
+        "website": "https://thelittledarlin.com/"
+      }
+    },
+    {
+      "id": "wahoos",
+      "name": "Wahoos",
+      "created": "2026-11-23",
+      "dedicated": false,
+      "address": {
+        "street": "1333 Shore District Dr",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78741"
+      },
+      "schedule": [
+        {
+          "frequency": "every",
+          "day": "Wednesday",
+          "startTime": "19:00",
+          "endTime": "22:00",
+          "host": {
+            "companyId": "starling-karaoke"
+          },
+          "activePeriod": {
+            "start": "2026-12-02"
+          },
+          "created": "2026-11-23",
+          "lastVerified": "2026-12-02"
+        }
+      ],
+      "coordinates": {
+        "lat": 30.2429601,
+        "lng": -97.7273263
       }
     }
   ]
