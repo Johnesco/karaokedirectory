@@ -1,67 +1,31 @@
 /**
- * Consent-gated Microsoft Clarity loader.
+ * GoatCounter page-view analytics (#467, spec §23).
  *
- * Why this lives in its own file:
- * Clarity sets non-essential cookies, so loading it before consent would
- * violate GDPR/ePrivacy. We render a banner on first visit and only
- * load the tag if the visitor clicks Accept. Choice persists in
- * localStorage so the banner only appears once.
+ * GoatCounter sets no cookies and collects no personal data, so there is no
+ * consent banner: the script loads on every page view. It replaced Microsoft
+ * Clarity, which recorded sessions, set cookies and needed the banner.
+ *
+ * Production only. Dev servers, the e2e server and Netlify deploy previews
+ * never request gc.zgo.at, so they are neither counted nor dependent on it.
+ *
+ * One file, loaded with `defer` by every page (the four public pages and the
+ * generated entity pages), so changing the counter is a one-file change.
  */
 (function () {
     'use strict';
 
-    var STORAGE_KEY = 'kd_analytics_consent';
-    var CLARITY_ID = 'x1sfnv6zu4';
+    var PRODUCTION_HOSTS = ['karaokedirectory.com', 'www.karaokedirectory.com'];
+    var COUNT_URL = 'https://karaokedirectory.goatcounter.com/count';
+    var SCRIPT_URL = 'https://gc.zgo.at/count.js';
 
-    function getConsent() {
-        try { return localStorage.getItem(STORAGE_KEY); } catch (e) { return null; }
-    }
+    // The consent choice Clarity's banner stored. Nothing reads it now.
+    try { localStorage.removeItem('kd_analytics_consent'); } catch (e) { /* private mode etc. */ }
 
-    function setConsent(value) {
-        try { localStorage.setItem(STORAGE_KEY, value); } catch (e) { /* private mode etc. */ }
-    }
+    if (PRODUCTION_HOSTS.indexOf(location.hostname) === -1) return;
 
-    function loadClarity() {
-        (function (c, l, a, r, i, t, y) {
-            c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments); };
-            t = l.createElement(r); t.async = 1; t.src = 'https://www.clarity.ms/tag/' + i;
-            y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
-        })(window, document, 'clarity', 'script', CLARITY_ID);
-    }
-
-    function renderBanner() {
-        var banner = document.createElement('div');
-        banner.className = 'consent-banner';
-        banner.setAttribute('role', 'dialog');
-        banner.setAttribute('aria-label', 'Analytics consent');
-        banner.innerHTML =
-            '<p class="consent-banner__text">' +
-                'This site uses Microsoft Clarity for anonymous traffic analytics ' +
-                '(pageviews, clicks, scrolling). No personal information is collected. ' +
-                '<a href="about.html#privacy">Learn more</a>.' +
-            '</p>' +
-            '<div class="consent-banner__actions">' +
-                '<button type="button" class="consent-banner__btn consent-banner__btn--decline" data-consent="declined">Decline</button>' +
-                '<button type="button" class="consent-banner__btn consent-banner__btn--accept" data-consent="accepted">Accept</button>' +
-            '</div>';
-        banner.addEventListener('click', function (e) {
-            var choice = e.target && e.target.getAttribute('data-consent');
-            if (!choice) return;
-            setConsent(choice);
-            banner.remove();
-            if (choice === 'accepted') loadClarity();
-        });
-        document.body.appendChild(banner);
-    }
-
-    var consent = getConsent();
-    if (consent === 'accepted') {
-        loadClarity();
-    } else if (consent !== 'declined') {
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', renderBanner);
-        } else {
-            renderBanner();
-        }
-    }
+    var script = document.createElement('script');
+    script.async = true;
+    script.src = SCRIPT_URL;
+    script.setAttribute('data-goatcounter', COUNT_URL);
+    document.head.appendChild(script);
 })();

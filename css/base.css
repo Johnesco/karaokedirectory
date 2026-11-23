@@ -143,7 +143,6 @@
     --z-modal: 1200;
     --z-tooltip: 1250;
     --z-toast: 1300;
-    --z-consent: 1400;       /* consent banner outranks everything it may cover */
 
     /* Icon / touch-target sizes */
     --size-icon-sm: 32px;

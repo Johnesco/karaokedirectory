@@ -9,7 +9,7 @@
 **Target Users:** Karaoke enthusiasts looking for venues, schedules, and event details
 **Live Site:** https://karaokedirectory.com (apex — `www.` 301s here; the apex is what every canonical and `og:url` points at)
 **Hosting:** Netlify, static, deployed from `main`. Config in `netlify.toml` ([ADR-010](docs/adr/010-static-on-netlify-only-constraint.md))
-**Analytics:** Microsoft Clarity (project ID `x1sfnv6zu4`), loaded by `js/analytics.js` **only after the visitor accepts** the consent banner — not an inline snippet. Choice persists in `localStorage` under `kd_analytics_consent`. See [functional spec §23](docs/functional-spec.md)
+**Analytics:** GoatCounter (`karaokedirectory.goatcounter.com`), loaded by `js/analytics.js` on the production host only — no cookies, no personal data, so **no consent banner** (#467 replaced Microsoft Clarity and its banner). See [functional spec §23](docs/functional-spec.md)
 
 ## Architecture
 
@@ -125,7 +125,7 @@ karaokedirectory/
 │   ├── bingo.js           # Bingo game logic
 │   ├── submit.js          # Venue submission form (was 803 inline lines, #168)
 │   ├── chrome.js          # Shared site header + footer across the public pages (#162)
-│   ├── analytics.js       # Consent-gated Microsoft Clarity loader (spec §23)
+│   ├── analytics.js       # GoatCounter page counts, production host only (spec §23)
 │   │
 │   ├── core/
 │   │   ├── router.js      # THE owner of URL <-> state; only replaceState caller
