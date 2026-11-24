@@ -2057,7 +2057,16 @@
           "frequency": "every",
           "day": "Sunday",
           "startTime": "19:00",
-          "endTime": "23:00"
+          "endTime": "23:00",
+          "lastVerified": "2026-11-29"
+        },
+        {
+          "frequency": "every",
+          "day": "Wednesday",
+          "startTime": "20:30",
+          "endTime": "23:30",
+          "created": "2026-11-24",
+          "lastVerified": "2026-11-25"
         }
       ],
       "host": {
