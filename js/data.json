@@ -205,6 +205,9 @@
     },
     "kj-mike-on-the-mic": {
       "name": "KJ Mike on the Mic"
+    },
+    "maurice-martinez": {
+      "name": "Maurice Martinez"
     }
   },
   "companies": {
@@ -3887,6 +3890,47 @@
         "lat": 30.2429601,
         "lng": -97.7273263
       }
+    },
+    {
+      "id": "lulus",
+      "name": "Lulu's",
+      "created": "2026-11-24",
+      "dedicated": false,
+      "address": {
+        "street": "10402 Menchaca Rd. Building C",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78748"
+      },
+      "schedule": [
+        {
+          "frequency": "every",
+          "day": "Wednesday",
+          "startTime": "19:00",
+          "endTime": "22:00",
+          "host": {
+            "kjId": "maurice-martinez"
+          },
+          "activePeriod": {
+            "start": "2026-11-25"
+          },
+          "eventUrl": "https://www.instagram.com/p/DgDZW6YxIWS/?bqrl=bXA0dDYxMm5tZHRk",
+          "created": "2026-11-24",
+          "lastVerified": "2026-11-25"
+        }
+      ],
+      "socials": {
+        "website": "https://www.lulusaustin.com/",
+        "facebook": "https://www.facebook.com/lulusaustin",
+        "instagram": "https://www.instagram.com/lulus.austin/"
+      },
+      "coordinates": {
+        "lat": 30.166833,
+        "lng": -97.827136
+      },
+      "tags": [
+        "restaurant"
+      ]
     }
   ]
 }
